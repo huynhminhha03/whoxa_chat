@@ -770,14 +770,18 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   height: MediaQuery.of(context).size.height * 0.33,
                   child: const Center(child: CircularProgressIndicator()))
               : storyGetxController
-                      .myStorySeenData.value.statusViewsList!.isEmpty
+                          .myStorySeenData.value.statusViewsList!.isEmpty ||
+                      storyGetxController
+                              .myStorySeenData.value.statusViewsList ==
+                          []
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height * 0.33,
-                      child: const Center(
-                        child: Text(
+                      child: Center(
+                        child: const Text(
                           "Your Story hasn't been viewed by any users yet.",
+                          textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 14, color: Colors.black),
-                        ),
+                        ).paddingSymmetric(horizontal: 40),
                       ),
                     )
                   : ClipRRect(
