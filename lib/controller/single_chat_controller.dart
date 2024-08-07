@@ -243,6 +243,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -289,6 +290,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     // final respo = MessageList.fromJson(useData);
     // userdetailschattModel.value!.messageList!.add(respo);
     Get.find<ChatListController>().forChatList();
@@ -341,6 +343,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -392,6 +395,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -443,7 +447,7 @@ class SingleChatContorller extends GetxController {
         userdetailschattModel.value!.messageList!.insert(0, newMessage);
       }
     }
-
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -493,6 +497,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -540,6 +545,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -608,6 +614,7 @@ class SingleChatContorller extends GetxController {
       //   }
       // }
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
 
@@ -657,6 +664,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -705,6 +713,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -755,6 +764,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -806,6 +816,7 @@ class SingleChatContorller extends GetxController {
       print("check.......");
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
+    userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
@@ -960,8 +971,8 @@ class SingleChatContorller extends GetxController {
           }
         }
         isStar(false);
-        Get.find<ChatListController>().forChatList();
         userdetailschattModel.refresh();
+        Get.find<ChatListController>().forChatList();
         showCustomToast(starModel.value!.message!);
       } else {
         isStar(false);
@@ -1020,6 +1031,7 @@ class SingleChatContorller extends GetxController {
     print("IS-TYPING:$istyping");
     socketIntilized.socket!.emit("isTyping",
         {"conversation_id": cID.toString(), "is_typing": istyping.toString()});
+    userdetailschattModel.refresh();
     print("isTyping Emitted");
   }
 

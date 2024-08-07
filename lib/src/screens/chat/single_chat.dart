@@ -578,45 +578,54 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         //   ),
                         // ),
                         // arrow down button
-                        Padding(
-                          padding: const EdgeInsets.only(top: 40),
-                          child: ValueListenableBuilder<double>(
-                            valueListenable: notifier,
-                            builder: (context, value, child) {
-                              return Transform.translate(
-                                  offset: const Offset(0, 0),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        bottom: 0, right: 0),
-                                    child: value < 1
-                                        ? Container()
-                                        : Align(
-                                            alignment: Alignment.bottomCenter,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  color: Colors.grey[200],
-                                                  borderRadius:
-                                                      const BorderRadius.all(
-                                                          Radius.circular(40))),
-                                              height: 40,
-                                              width: 40,
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  // _animateToIndex(20);
-                                                  listScrollController!.jumpTo(
-                                                      listScrollController!
-                                                          .position
-                                                          .minScrollExtent);
-                                                },
-                                                icon: const Icon(
-                                                    Icons.arrow_circle_down),
-                                              ),
-                                            ),
-                                          ),
-                                  ));
-                            },
-                          ),
-                        ),
+                        chatContorller.userdetailschattModel.value!.messageList!
+                                    .isEmpty ||
+                                chatContorller.userdetailschattModel.value!
+                                        .messageList!.first.message ==
+                                    null
+                            ? const SizedBox.shrink()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 40),
+                                child: ValueListenableBuilder<double>(
+                                  valueListenable: notifier,
+                                  builder: (context, value, child) {
+                                    return Transform.translate(
+                                        offset: const Offset(0, 0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 0, right: 0),
+                                          child: value < 1
+                                              ? Container()
+                                              : Align(
+                                                  alignment:
+                                                      Alignment.bottomCenter,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.grey[200],
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    40))),
+                                                    height: 40,
+                                                    width: 40,
+                                                    child: IconButton(
+                                                      onPressed: () {
+                                                        // _animateToIndex(20);
+                                                        listScrollController!.jumpTo(
+                                                            listScrollController!
+                                                                .position
+                                                                .minScrollExtent);
+                                                      },
+                                                      icon: const Icon(Icons
+                                                          .arrow_circle_down),
+                                                    ),
+                                                  ),
+                                                ),
+                                        ));
+                                  },
+                                ),
+                              ),
 
                         //========================= for reply design
                         //========================= for reply design
@@ -5226,6 +5235,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     chatContorller.isSendMsg.value = true;
                     chatContorller.deleteChatApi(
                         chatID, false, widget.mobileNum.toString());
+
                     setState(() {
                       isSelectedmessage = "0";
                       chatID = [];
@@ -5479,6 +5489,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 chatContorller.userdetailschattModel.value?.messageList
                     ?.clear();
               }
+              isKeyboard = false;
               //deleteMsgDialog();
             },
             child: const Text('Clear chat')),

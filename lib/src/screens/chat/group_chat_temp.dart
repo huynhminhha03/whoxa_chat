@@ -6062,6 +6062,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 chatContorller.userdetailschattModel.value?.messageList
                     ?.clear();
               }
+              isKeyboard = false;
             },
             child: const Text('Clear chat')),
         PopupMenuItem(

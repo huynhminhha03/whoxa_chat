@@ -780,14 +780,14 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
       )),
       builder: (BuildContext context) {
         return Obx(() {
-          return storyGetxController.isMyStorySeenLoading.value &&
+          return storyGetxController.isMyStorySeenLoading.value ||
                   storyGetxController.isAllUserStoryLoad.value
               ? SizedBox(
                   height: MediaQuery.of(context).size.height * 0.33,
                   child: const Center(
                       child: CircularProgressIndicator(color: chatownColor)))
-              : storyGetxController
-                      .myStorySeenData.value.statusViewsList!.isEmpty
+              : storyGetxController.myStorySeenData.value.statusViewsList ==
+                      null
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height * 0.33,
                       child: Center(
