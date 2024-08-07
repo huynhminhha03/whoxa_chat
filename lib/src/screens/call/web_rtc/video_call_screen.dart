@@ -621,11 +621,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     //   onPressed: () => _startCall(
                     //       'remote-peer-id'), // Replace with actual remote peer ID
                     // ),
-                    Image.asset(
-                      "assets/icons/camera_off.png",
-                      height: 60,
-                      width: 60,
-                    ),
+                    // Image.asset(
+                    //   "assets/icons/camera_off.png",
+                    //   height: 60,
+                    //   width: 60,
+                    // ),
                     Image.asset(
                       "assets/icons/mice_on.png",
                       height: 60,
