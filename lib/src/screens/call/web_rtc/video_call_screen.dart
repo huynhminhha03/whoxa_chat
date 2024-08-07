@@ -541,34 +541,34 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           children: [
             Column(
               children: [
-                // Expanded(
-                //   child: ClipRRect(
-                //     borderRadius: const BorderRadius.only(
-                //       bottomLeft: Radius.circular(10),
-                //       bottomRight: Radius.circular(10),
-                //     ),
-                //     child: RTCVideoView(
-                //       localRenderer,
-                //       mirror: true,
-                //       objectFit:
-                //           RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                //     ),
-                //   ),
-                // ),
-                // Expanded(
-                //   child: ClipRRect(
-                //     borderRadius: BorderRadius.only(
-                //       topLeft: Radius.circular(5),
-                //       topRight: Radius.circular(5),
-                //     ),
-                //     child: RTCVideoView(
-                //       remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                //       mirror: true,
-                //       objectFit:
-                //           RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                //     ),
-                //   ),
-                // ),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(10),
+                      bottomRight: Radius.circular(10),
+                    ),
+                    child: RTCVideoView(
+                      localRenderer,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(5),
+                      topRight: Radius.circular(5),
+                    ),
+                    child: RTCVideoView(
+                      remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  ),
+                ),
                 // Expanded(
                 //   child: GridView.builder(
                 //     gridDelegate:
