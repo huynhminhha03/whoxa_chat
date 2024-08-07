@@ -145,16 +145,19 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                               const TextStyle(fontSize: 16, color: blackcolor),
                           subtitleTextStyle:
                               const TextStyle(fontSize: 14, color: Colors.grey),
-                          trailing: GestureDetector(
-                              onTap: () {
-                                storyController.storyListData.value.myStatus!
-                                        .statuses!.isEmpty
-                                    ? const SizedBox.shrink()
-                                    : Get.to(() => const StoryScreen6PM(
-                                          isForMyStory: true,
-                                        ));
-                              },
-                              child: const Icon(CupertinoIcons.eye)),
+                          trailing: storyController.storyListData.value
+                                  .myStatus!.statuses!.isEmpty
+                              ? const SizedBox.shrink()
+                              : GestureDetector(
+                                  onTap: () {
+                                    storyController.storyListData.value
+                                            .myStatus!.statuses!.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : Get.to(() => const StoryScreen6PM(
+                                              isForMyStory: true,
+                                            ));
+                                  },
+                                  child: const Icon(CupertinoIcons.eye)),
                         ),
                         Container(
                           height: 15,
