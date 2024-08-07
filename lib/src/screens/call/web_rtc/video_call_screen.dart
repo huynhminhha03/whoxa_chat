@@ -541,20 +541,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           children: [
             Column(
               children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                    child: RTCVideoView(
-                      localRenderer,
-                      mirror: true,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
-                  ),
-                ),
+                // Expanded(
+                //   child: ClipRRect(
+                //     borderRadius: const BorderRadius.only(
+                //       bottomLeft: Radius.circular(10),
+                //       bottomRight: Radius.circular(10),
+                //     ),
+                //     child: RTCVideoView(
+                //       localRenderer,
+                //       mirror: true,
+                //       objectFit:
+                //           RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
