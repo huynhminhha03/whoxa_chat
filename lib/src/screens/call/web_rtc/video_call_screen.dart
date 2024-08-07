@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:meyaoo_new/main.dart';
+import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:peerdart/peerdart.dart';
 import 'package:uuid/uuid.dart';
@@ -212,6 +213,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     {
                       remoteRenderers[userId]!.dispose(),
                       remoteRenderers.remove(userId),
+                      if (remoteRenderers.isEmpty)
+                        {
+                          getx.Get.back(),
+                        }
                     },
                   setState(() {}),
                   print("disconnected peers[userId] ${peers[userId]}"),
@@ -342,6 +347,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   // }
 
   void _endCall() {
+    socketIntilized.socket!
+        .emit("leave-call", {"room_id": widget.roomID, "user_id": myPeer!.id});
     localRenderer.dispose();
     // remoteRenderer.dispose();
     remoteRenderers.forEach((key, renderer) {
@@ -353,23 +360,33 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     getx.Get.back();
   }
 
-  // void _toggleMicrophone() {
-  //   final audioTracks = localStream?.getAudioTracks();
-  //   if (audioTracks != null && audioTracks.isNotEmpty) {
-  //     setState(() {
-  //       audioTracks[0].enabled = !audioTracks[0].enabled;
-  //     });
-  //   }
-  // }
+  bool microphone = false;
+  void _toggleMicrophone() {
+    microphone = !microphone;
+    localRenderer.srcObject!.getAudioTracks()[0].enabled == true
+        ? localRenderer.srcObject!.getAudioTracks()[0].enabled = false
+        : localRenderer.srcObject!.getAudioTracks()[0].enabled = true;
+    setState(() {});
+  }
 
-  // void _toggleCamera() {
-  //   final videoTracks = localStream?.getVideoTracks();
-  //   if (videoTracks != null && videoTracks.isNotEmpty) {
-  //     setState(() {
-  //       videoTracks[0].enabled = !videoTracks[0].enabled;
-  //     });
-  //   }
-  // }
+  bool camera = false;
+  void _toggleCamera() {
+    camera = !camera;
+    localRenderer.srcObject!.getVideoTracks()[0].enabled == true
+        ? localRenderer.srcObject!.getVideoTracks()[0].enabled = false
+        : localRenderer.srcObject!.getVideoTracks()[0].enabled = true;
+    setState(() {});
+  }
+
+  bool specker = true;
+  void _toggleSpecker() async {
+    specker == true
+        ? await Helper.setSpeakerphoneOn(false)
+        : await Helper.setSpeakerphoneOn(true);
+    specker = !specker;
+
+    setState(() {});
+  }
 
   void _toggleScreenSize() {
     setState(() {
@@ -445,20 +462,28 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Image.asset(
-                          "assets/icons/camera_off.png",
-                          height: 60,
-                          width: 60,
+                        callOptionsContainer(
+                          image: camera == false
+                              ? "assets/icons/camera_on.png"
+                              : "assets/icons/camera_off.png",
+                          onTap: _toggleCamera,
                         ),
-                        Image.asset(
-                          "assets/icons/mice_on.png",
-                          height: 60,
-                          width: 60,
+                        callOptionsContainer(
+                          image: microphone == false
+                              ? "assets/icons/mice_off.png"
+                              : "assets/icons/mice_on.png",
+                          onTap: _toggleMicrophone,
                         ),
-                        Image.asset(
-                          "assets/icons/volume_on.png",
-                          height: 60,
-                          width: 60,
+                        callOptionsContainer(
+                          image:
+                              // localRenderer.srcObject!
+                              //             .getAudioTracks()[0]
+                              //             .enabled ==
+                              //         false
+                              specker == false
+                                  ? "assets/icons/volume_off.png"
+                                  : "assets/icons/volume_on.png",
+                          onTap: _toggleSpecker,
                         ),
                         GestureDetector(
                           onTap: _endCall,
