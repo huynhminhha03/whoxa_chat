@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "391729812590",
+    "project_id": "meyaoo-36820",
+    "storage_bucket": "meyaoo-36820.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:391729812590:android:25416bbd4c56a0d23cc27f",
+        "android_client_info": {
+          "package_name": "com.primocys.meyaoo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "391729812590-c1qif3msti77uf21sev4isde99i80naa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkQrEHySselU83c0xs5xZPc2taixT9T7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "391729812590-c1qif3msti77uf21sev4isde99i80naa.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
