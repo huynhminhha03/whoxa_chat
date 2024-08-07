@@ -145,9 +145,8 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                               const TextStyle(fontSize: 16, color: blackcolor),
                           subtitleTextStyle:
                               const TextStyle(fontSize: 14, color: Colors.grey),
-                          trailing: storyController
-                                      .storyListData.value.myStatus!.statuses ==
-                                  null
+                          trailing: storyController.storyListData.value
+                                  .myStatus!.statuses!.isEmpty
                               ? const SizedBox.shrink()
                               : GestureDetector(
                                   onTap: () {

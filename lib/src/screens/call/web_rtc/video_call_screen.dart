@@ -318,7 +318,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     }
 
     navigator.mediaDevices
-        .getUserMedia({"video": false, "audio": true}).then((mediaStream) {
+        .getUserMedia({"video": true, "audio": true}).then((mediaStream) {
       localRenderer.srcObject = mediaStream;
       print('my stream $mediaStream');
 
