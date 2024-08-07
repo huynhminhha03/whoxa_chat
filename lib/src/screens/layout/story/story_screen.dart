@@ -273,14 +273,29 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                     .statusId!
                     .toString());
               } else {
-                storyGetxController.viewStoryAPI(storyGetxController
-                    .storyListData
-                    .value
-                    .statusList![pageIndex]
-                    .userData!
-                    .statuses![0]
-                    .statusId!
-                    .toString());
+                if (storyGetxController
+                        .storyListData
+                        .value
+                        .statusList![pageIndex]
+                        .userData!
+                        .statuses![0]
+                        .statusViews![0]
+                        .statusCount! <
+                    storyIndex + 1) {
+                  storyGetxController.viewStoryAPI(
+                      storyGetxController
+                          .storyListData
+                          .value
+                          .statusList![pageIndex]
+                          .userData!
+                          .statuses![0]
+                          .statusId!
+                          .toString(),
+                      storyIndex + 1,
+                      pageIndex);
+
+                  // storyGetxController.storyListData.refresh();
+                }
                 // if (storyGetxController.storyListData.value.statusList![pageIndex]
                 //         .userData!.statuses![storyIndex].type ==
                 //     "video") {
@@ -765,15 +780,14 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
       )),
       builder: (BuildContext context) {
         return Obx(() {
-          return storyGetxController.isMyStorySeenLoading.value
+          return storyGetxController.isMyStorySeenLoading.value &&
+                  storyGetxController.isAllUserStoryLoad.value
               ? SizedBox(
                   height: MediaQuery.of(context).size.height * 0.33,
-                  child: const Center(child: CircularProgressIndicator()))
+                  child: const Center(
+                      child: CircularProgressIndicator(color: chatownColor)))
               : storyGetxController
-                          .myStorySeenData.value.statusViewsList!.isEmpty ||
-                      storyGetxController
-                              .myStorySeenData.value.statusViewsList ==
-                          []
+                      .myStorySeenData.value.statusViewsList!.isEmpty
                   ? SizedBox(
                       height: MediaQuery.of(context).size.height * 0.33,
                       child: Center(

@@ -434,10 +434,15 @@ class _MediaState extends State<Media> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => VideoViewFix(
-                          username: capitalizeFirstLetter(widget.peername!),
-                          url: data.url!,
-                          play: true,
-                          mute: false),
+                        username:
+                            "${capitalizeFirstLetter("")} ${capitalizeFirstLetter("")}",
+                        url: data.url!,
+                        play: true,
+                        mute: false,
+                        date: "",
+
+                        ///convertUTCTimeTo12HourFormat(data.createdAt!),
+                      ),
                     ));
               },
               child: Container(

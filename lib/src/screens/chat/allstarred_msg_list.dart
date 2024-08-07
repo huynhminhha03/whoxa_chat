@@ -1178,10 +1178,15 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => VideoViewFix(
-                                            username: '',
-                                            url: '',
+                                            username: "",
+                                            //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
+                                            url: data.chat!.url!,
                                             play: true,
-                                            mute: false),
+                                            mute: false,
+                                            date: ""
+                                            // convertUTCTimeTo12HourFormat(
+                                            //     data.createdAt!),
+                                            ),
                                       ));
                                 },
                                 child: CircleAvatar(
@@ -2998,9 +3003,14 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                                         MaterialPageRoute(
                                                                           builder: (context) => VideoViewFix(
                                                                               username: "",
+                                                                              //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
                                                                               url: data.chat!.url!,
                                                                               play: true,
-                                                                              mute: false),
+                                                                              mute: false,
+                                                                              date: ""
+                                                                              // convertUTCTimeTo12HourFormat(
+                                                                              //     data.createdAt!),
+                                                                              ),
                                                                         ));
                                                                   },
                                                                   child: CircleAvatar(
