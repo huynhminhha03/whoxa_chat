@@ -173,10 +173,7 @@ class _InviteFriendState extends State<InviteFriend> {
       Contact contact = allcontacts[i];
       if (isMatchinginvite(
               getMobile(contact.phones.map((e) => e.number).toString())) &&
-          (contact.displayName?.toLowerCase().contains(searchText) ??
-              false ||
-                  contact.phones
-                      .any((phone) => phone.number.contains(searchText)))) {
+          (contact.displayName.toLowerCase().contains(searchText))) {
         filteredContacts.add(contact);
       }
     }

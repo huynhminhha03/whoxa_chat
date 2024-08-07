@@ -1,4 +1,4 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, constant_identifier_names, duplicate_ignore, avoid_print
 
 import 'package:flutter/material.dart';
 import 'package:peerdart/peerdart.dart';
@@ -24,6 +24,7 @@ class AudioCallScreenState extends State<AudioCallScreen> {
 
   Peer? myPeer;
   String? peerid;
+  // ignore: constant_identifier_names
   static const CLOUD_HOST = "62.72.36.245";
   static const CLOUD_PORT = 4001;
 
@@ -59,6 +60,6 @@ class AudioCallScreenState extends State<AudioCallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold();
   }
 }

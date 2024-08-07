@@ -344,10 +344,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
       Contact contact = allcontacts[i];
       if (isMatchinginvite(
               getMobile(contact.phones.map((e) => e.number).toString())) &&
-          (contact.displayName?.toLowerCase().contains(searchText) ??
-              false ||
-                  contact.phones
-                      .any((phone) => phone.number.contains(searchText)))) {
+          (contact.displayName.toLowerCase().contains(searchText))) {
         filteredContacts.add(contact);
       }
     }
@@ -403,7 +400,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                                 )),
                     ),
                     title: Text(
-                      contact.displayName ?? "",
+                      contact.displayName,
                       maxLines: 1,
                       style: const TextStyle(
                         fontSize: 15.0,

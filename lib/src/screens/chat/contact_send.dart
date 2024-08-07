@@ -152,10 +152,7 @@ class _ContactSendState extends State<ContactSend> {
     List<Contact> filteredContacts = [];
     for (int i = 0; i < allcontacts.length; i++) {
       Contact contact = allcontacts[i];
-      if ((contact.displayName?.toLowerCase().contains(searchText) ??
-          false ||
-              contact.phones
-                  .any((phone) => phone.number.contains(searchText)))) {
+      if ((contact.displayName.toLowerCase().contains(searchText))) {
         filteredContacts.add(contact);
       }
     }
@@ -229,7 +226,7 @@ class _ContactSendState extends State<ContactSend> {
                       ],
                     ),
                     title: Text(
-                      contact.displayName ?? "",
+                      contact.displayName,
                       maxLines: 1,
                       style: const TextStyle(
                         fontSize: 15.0,

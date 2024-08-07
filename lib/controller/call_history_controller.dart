@@ -1,16 +1,9 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert';
-import 'dart:developer';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/calllistmodel.dart';
-import 'package:http/http.dart' as http;
 import 'package:meyaoo_new/Models/get_all_audiocall_list_model.dart';
 import 'package:meyaoo_new/Models/get_all_videocall_list_model.dart';
-import 'package:meyaoo_new/hive_service/hive_service.dart';
-import 'package:meyaoo_new/src/global/global.dart';
-import 'package:meyaoo_new/src/global/strings.dart';
 
 class CallHistoryController extends GetxController {
   // InternetController inController = Get.find<InternetController>();
@@ -22,7 +15,6 @@ class CallHistoryController extends GetxController {
       GetAllAudioCallListModel().obs;
 
   Future<void> callHistoryApi() async {
-    var box = await Hive.openBox(HiveService.callListBox);
 
     // try {
     //   // if (inController.isOnline.value) {
@@ -88,7 +80,6 @@ class CallHistoryController extends GetxController {
   }
 
   Future<void> callHistoryApiVideo() async {
-    var box = await Hive.openBox(HiveService.callListBox);
 
     // try {
     //   // if (inController.isOnline.value) {
@@ -156,7 +147,6 @@ class CallHistoryController extends GetxController {
   }
 
   Future<void> callHistoryApiAudio() async {
-    var box = await Hive.openBox(HiveService.callListBox);
 
     // try {
     //   // if (inController.isOnline.value) {

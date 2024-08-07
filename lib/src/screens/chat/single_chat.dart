@@ -43,6 +43,7 @@ import 'package:record_mp3/record_mp3.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:meyaoo_new/model/chatdetails/single_chat_list_model.dart';
 import 'package:light_compressor/light_compressor.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:video_thumbnail/video_thumbnail.dart';
 

@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/reply_msg_model.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
-import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:meyaoo_new/src/global/strings.dart';

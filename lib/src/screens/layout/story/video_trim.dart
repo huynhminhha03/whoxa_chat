@@ -169,8 +169,6 @@ class _VideoTrimmerState extends State<VideoTrimmer> {
       log("START TIME IN MILLI SECOND $startTimeInMilliseconds");
       log("DURATION TIME IN MILLI SECOND $durationInMilliseconds");
 
-      String command =
-          '-ss $start -i ${widget.files.path} -t ${end - start} -c copy $outputPath';
 
       // await flutterFFmpeg.execute(command);
 

@@ -2,12 +2,10 @@
 
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
-import 'package:video_player/video_player.dart';
 
 class FinalStoryConfirmationScreen extends StatefulWidget {
   const FinalStoryConfirmationScreen({super.key});
