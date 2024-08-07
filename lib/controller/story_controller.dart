@@ -317,25 +317,37 @@ class StroyGetxController extends GetxController {
     }
   }
 
-  viewStoryAPI(String storyID) async {
+  viewStoryAPI(String storyID, viewCount, pageIndex) async {
     try {
-      Map<String, dynamic> data = {'status_id': storyID};
+      Map<String, dynamic> data = {
+        'status_id': storyID,
+        'status_count': viewCount
+      };
 
       log("Requested Data of view_story $data");
 
       final result =
           await dio.post(apiHelper.viewStatusUrl, data: data, options: options);
 
-      dd.FormData formData = dd.FormData.fromMap({
-        "status_id": storyID,
-      });
+      dd.FormData formData = dd.FormData.fromMap(
+          {"status_id": storyID, "status_count": viewCount});
 
       print("Requested Data of add_story ${formData.fields}");
 
       print("Staus of view_story ${result.statusCode}");
 
       final respo = ViewStoryData.fromJson(result.data);
-
+      storyListData.value.statusList![pageIndex].userData!.statuses![0]
+          .statusViews![0].statusCount = storyListData
+              .value
+              .statusList![pageIndex]
+              .userData!
+              .statuses![0]
+              .statusViews![0]
+              .statusCount! +
+          1;
+      storyListData.refresh();
+      print("Requested Data of add_story$respo");
       // if (respo.responseCode == 1) {
       //   for (int i = 0; i < storyListData.value.post!.length; i++) {
       //     for (int j = 0;

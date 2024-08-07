@@ -145,19 +145,25 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                               const TextStyle(fontSize: 16, color: blackcolor),
                           subtitleTextStyle:
                               const TextStyle(fontSize: 14, color: Colors.grey),
-                          trailing: storyController.storyListData.value
-                                  .myStatus!.statuses!.isEmpty
-                              ? const SizedBox.shrink()
-                              : GestureDetector(
-                                  onTap: () {
-                                    storyController.storyListData.value
-                                            .myStatus!.statuses!.isEmpty
-                                        ? const SizedBox.shrink()
-                                        : Get.to(() => const StoryScreen6PM(
+                          trailing:
+                              (storyController.isAllUserStoryLoad.value) &&
+                                      (storyController
+                                          .isMyStorySeenLoading.value) &&
+                                      (storyController
+                                          .isProfileLoading.value) &&
+                                      storyController.storyListData.value
+                                          .myStatus!.statuses!.isEmpty &&
+                                      storyController.storyListData.value
+                                              .myStatus!.statuses ==
+                                          []
+                                  ? const SizedBox.shrink()
+                                  : InkWell(
+                                      onTap: () {
+                                        Get.to(() => const StoryScreen6PM(
                                               isForMyStory: true,
                                             ));
-                                  },
-                                  child: const Icon(CupertinoIcons.eye)),
+                                      },
+                                      child: const Icon(CupertinoIcons.eye)),
                         ),
                         Container(
                           height: 15,
@@ -189,79 +195,98 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                               onTap: () {
                                                 storyController.pageIndexValue
                                                     .value = index;
-                                                storyController
-                                                    .storyIndexValue.value = 0
-                                                        // storyController
-                                                        //         .storyListData
-                                                        //         .value
-                                                        //         .statusList![index]
-                                                        //         .userReadCount!
-                                                        ==
+                                                storyController.storyIndexValue
+                                                    .value = storyController
+                                                            .storyListData
+                                                            .value
+                                                            .statusList![index]
+                                                            .userData!
+                                                            .statuses![0]
+                                                            .statusViews![0]
+                                                            .statusCount! ==
                                                         0
                                                     ? 0
-                                                    : 0
-                                                            // storyController
-                                                            //             .storyListData
-                                                            //             .value
-                                                            //             .statusList![index]
-                                                            //             .userReadCount!
-                                                            ==
-                                                            0
-                                                        // storyController
-                                                        //     .storyListData
-                                                        //     .value
-                                                        //     .statusList![index]
-                                                        //     .totalStories!
+                                                    : storyController
+                                                                .storyListData
+                                                                .value
+                                                                .statusList![
+                                                                    index]
+                                                                .userData!
+                                                                .statuses![0]
+                                                                .statusViews![0]
+                                                                .statusCount! ==
+                                                            storyController
+                                                                .storyListData
+                                                                .value
+                                                                .statusList!
+                                                                .length
                                                         ? 0
-                                                        : 0
-                                                            // storyController
-                                                            //         .storyListData
-                                                            //         .value
-                                                            //         .statusList![index]
-                                                            //         .userReadCount!
-                                                            -
+                                                        : storyController
+                                                                .storyListData
+                                                                .value
+                                                                .statusList![
+                                                                    index]
+                                                                .userData!
+                                                                .statuses![0]
+                                                                .statusViews![0]
+                                                                .statusCount! -
                                                             1;
                                                 log("Page Index Value : ${storyController.pageIndexValue.value}");
                                                 log("Story Index Value : ${storyController.storyIndexValue.value}");
                                                 setState(() {});
                                                 Get.to(() => StoryScreen6PM(
-                                                    pageIndex: index,
-                                                    storyIndex: 0,
-                                                    i: index,
-                                                    username: storyController
-                                                        .storyListData
-                                                        .value
-                                                        .statusList![index]
-                                                        .fullName));
+                                                        pageIndex: index,
+                                                        storyIndex: 0,
+                                                        i: index,
+                                                        username:
+                                                            storyController
+                                                                .storyListData
+                                                                .value
+                                                                .statusList![
+                                                                    index]
+                                                                .fullName))!
+                                                    .then((_) {
+                                                  print("REFRESH");
+                                                  storyController.storyListData
+                                                      .refresh();
+                                                });
                                               },
-                                              leading: StatusView(
-                                                radius: 31,
-                                                spacing: 10,
-                                                strokeWidth: 2,
-                                                indexOfSeenStatus: 0,
-                                                // storyController
-                                                //     .storyListData
-                                                //     .value
-                                                //     .statusList![index]
-                                                //     .userReadCount!,
-                                                numberOfStatus: storyController
-                                                    .storyListData
-                                                    .value
-                                                    .statusList![index]
-                                                    .userData!
-                                                    .statuses![0]
-                                                    .statusMedia!
-                                                    .length,
-                                                padding: 0,
-                                                centerImageUrl: storyController
-                                                    .storyListData
-                                                    .value
-                                                    .statusList![index]
-                                                    .userData!
-                                                    .profileImage!,
-                                                seenColor: Colors.grey,
-                                                unSeenColor: chatownColor,
-                                              ),
+                                              leading: Obx(() {
+                                                return StatusView(
+                                                  radius: 31,
+                                                  spacing: 10,
+                                                  strokeWidth: 2,
+                                                  indexOfSeenStatus:
+                                                      storyController
+                                                          .storyListData
+                                                          .value
+                                                          .statusList![index]
+                                                          .userData!
+                                                          .statuses![0]
+                                                          .statusViews![0]
+                                                          .statusCount!,
+                                                  numberOfStatus:
+                                                      storyController
+                                                          .storyListData
+                                                          .value
+                                                          .statusList![index]
+                                                          .userData!
+                                                          .statuses![0]
+                                                          .statusMedia!
+                                                          .length,
+                                                  padding: 0,
+                                                  centerImageUrl:
+                                                      storyController
+                                                          .storyListData
+                                                          .value
+                                                          .statusList![index]
+                                                          .userData!
+                                                          .profileImage!,
+                                                  seenColor:
+                                                      Colors.grey.shade400,
+                                                  unSeenColor: chatownColor,
+                                                );
+                                              }),
                                               title: Text(
                                                   "${storyController.storyListData.value.statusList![index].fullName}"),
                                               subtitle: Text(formatCreateDate(

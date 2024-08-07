@@ -289,8 +289,14 @@ class Statuses {
   String? statusText;
   String? createdAt;
   List<StatusMedia>? statusMedia;
+  List<StatusViews>? statusViews;
 
-  Statuses({this.statusId, this.statusText, this.createdAt, this.statusMedia});
+  Statuses(
+      {this.statusId,
+      this.statusText,
+      this.createdAt,
+      this.statusMedia,
+      this.statusViews});
 
   Statuses.fromJson(Map<String, dynamic> json) {
     statusId = json['status_id'];
@@ -302,6 +308,12 @@ class Statuses {
         statusMedia!.add(StatusMedia.fromJson(v));
       });
     }
+    if (json['StatusViews'] != null) {
+      statusViews = <StatusViews>[];
+      json['StatusViews'].forEach((v) {
+        statusViews!.add(StatusViews.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -311,6 +323,9 @@ class Statuses {
     data['createdAt'] = createdAt;
     if (statusMedia != null) {
       data['StatusMedia'] = statusMedia!.map((v) => v.toJson()).toList();
+    }
+    if (statusViews != null) {
+      data['StatusViews'] = statusViews!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -331,6 +346,22 @@ class StatusMedia {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['url'] = url;
     data['status_media_id'] = statusMediaId;
+    return data;
+  }
+}
+
+class StatusViews {
+  int? statusCount;
+
+  StatusViews({this.statusCount});
+
+  StatusViews.fromJson(Map<String, dynamic> json) {
+    statusCount = json['status_count'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_count'] = statusCount;
     return data;
   }
 }
