@@ -14,7 +14,7 @@ class LocalNotificationService {
 
       NotificationDetails notificationDetails = NotificationDetails(
         iOS: DarwinNotificationDetails(),
-        android: message.data['title'] == 'Video call' ||
+        android: message.data['call_type'] == 'video_call' ||
                 message.data['title'] == 'Audio call' ||
                 message.data['title'] == 'Group Audio call' ||
                 message.data['title'] == 'Group Video call'

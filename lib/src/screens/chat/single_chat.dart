@@ -4956,13 +4956,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           return chatListController.blockModel.value!.isBlock == true
               ? const SizedBox.shrink()
               : InkWell(
-                  onTap: () {
+                  onTap: () async {
+                    await getRoomController.getRoomModelApi(
+                        conversationID: widget.conversationID,
+                        callType: "video_call");
+                    print(
+                        "ROOMID 1 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
                     Get.to(() => VideoCallScreen(
-                        roomID: 'cdecb4c5-f6ff-4076-9322-3f91ea143fd9',
-                        conversation_id: ''));
-                    // getRoomController.getRoomModelApi(
-                    //     conversationID: widget.conversationID,
-                    //     callType: "video_call");
+                          roomID: Get.find<RoomIdController>()
+                              .roomModel
+                              .value!
+                              .roomId,
+                          // conversation_id: '',
+                        ));
                   },
                   child: Image.asset(
                     "assets/images/video_1.png",

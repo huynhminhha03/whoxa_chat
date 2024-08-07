@@ -15,6 +15,7 @@ import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/call/audio/audiocalling.dart';
 import 'package:meyaoo_new/src/screens/call/audio/group_audio_call.dart';
 import 'package:meyaoo_new/src/screens/call/video/group_video_call_recived.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/welcome.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -80,16 +81,11 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
             onDidReceiveBackgroundNotificationResponse: (details) {
               if (details.actionId == 'accept') {
                 print("accept");
-                if (message.data['title'] == 'Video call') {
+                if (message.data['call_type'] == 'video_call') {
                   // Navigate to the desired screen based on the payload'
-                  // Get.to(VideoCallPage(
-                  //   fromChannelId: message.data['channel'],
-                  //   fromToken: message.data['token'],
-                  //   isCaller: false,
-                  //   callerImage: message.data['caller_profile_pic'],
-                  //   callerName: message.data['caller_name'],
-                  //   isReciverWait: false,
-                  // ));
+                  Get.to(VideoCallScreen(
+                    roomID: message.data['room_id'],
+                  ));
                 } else if (message.data['title'] == 'Audio call') {
                   Get.to(VoiceCall(
                     fromChannelId: message.data['channel'],
@@ -129,7 +125,10 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
               } else if (details.actionId == 'decline') {
                 print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
               } else {
-                if (message.data['title'] == 'Video call') {
+                if (message.data['call_type'] == 'video_call') {
+                  Get.to(VideoCallScreen(
+                    roomID: message.data['room_id'],
+                  ));
                   // Get.to(VideoCallPage(
                   //   callerImage: message.data['caller_profile_pic'],
                   //   callerName: message.data['caller_name'],
@@ -164,7 +163,7 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
                         callerId: message.data['my_id'],
                         reciverId: message.data['toUser'],
                       ));
-                } else if (message.data['title'] == 'Group Video call') {
+                } else if (message.data['title'] == 'Group video call') {
                   Get.to(() => GroupReceivedVideoCallScreen(
                         isCaller: false,
                         callerImage: message.data['receiver_profile_pic'],
@@ -212,7 +211,10 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
             onDidReceiveNotificationResponse: (details) {
               if (details.actionId == 'accept') {
                 print("accept");
-                if (message.data['title'] == 'Video call') {
+                if (message.data['call_type'] == 'video_call') {
+                  Get.to(VideoCallScreen(
+                    roomID: message.data['room_id'],
+                  ));
                   // Navigate to the desired screen based on the payload'
                   // Get.to(VideoCallPage(
                   //   fromChannelId: message.data['channel'],
@@ -253,7 +255,10 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
               } else if (details.actionId == 'decline') {
                 print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
               } else {
-                if (message.data['title'] == 'Video call') {
+                if (message.data['call_type'] == 'video_call') {
+                  Get.to(VideoCallScreen(
+                    roomID: message.data['room_id'],
+                  ));
                   // Get.to(VideoCallPage(
                   //   callerImage: message.data['caller_profile_pic'],
                   //   callerName: message.data['caller_name'],
@@ -350,7 +355,10 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
           if (message.data['title'] == 'Call Decline') {
             print('☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_app_closed');
             // Get.to(ChatList());
-          } else if (message.data['title'] == 'Video call') {
+          } else if (message.data['call_type'] == 'video_call') {
+            Get.to(VideoCallScreen(
+              roomID: message.data['room_id'],
+            ));
             // Get.to(VideoCallPage(
             //   callerImage: message.data['caller_profile_pic'],
             //   callerName: message.data['caller_name'],

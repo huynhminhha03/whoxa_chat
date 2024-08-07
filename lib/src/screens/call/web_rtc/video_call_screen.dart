@@ -1,160 +1,8 @@
-// ignore_for_file: non_constant_identifier_names, must_be_immutable, avoid_print, library_prefixes, depend_on_referenced_packages, constant_identifier_names, use_build_context_synchronously
-
-// import 'package:flutter/material.dart';
-// import 'package:meyaoo_new/main.dart';
-// import 'package:peerdart/peerdart.dart';
-// import 'package:flutter_webrtc/flutter_webrtc.dart';
-// import 'package:socket_io_client/socket_io_client.dart';
-
-// class CallExample extends StatefulWidget {
-//   String? roomID;
-//   String? conversation_id;
-//   CallExample({super.key, this.roomID, this.conversation_id});
-
-//   @override
-//   State<CallExample> createState() => _CallExampleState();
-// }
-
-// class _CallExampleState extends State<CallExample> {
-//   final TextEditingController _controller = TextEditingController();
-//   final Peer peer = Peer(
-//       options: PeerOptions(
-//           port: 4001,
-//           host: '62.72.36.245',
-//           path: '/',
-//           secure: false,
-//           debug: LogLevel.All));
-//   final _localRenderer = RTCVideoRenderer();
-//   final _remoteRenderer = RTCVideoRenderer();
-//   bool inCall = false;
-//   String? peerId;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _localRenderer.initialize();
-//     _remoteRenderer.initialize();
-
-//     peer.on('open', context, ((id, _) {
-//       setState(() {
-//         peerId = peer.id;
-//       });
-//       print("PEERID☺☺☺☺☺☺☺:$peerId");
-//       // Emit the peer ID to the socket
-//       socketIntilized.socket!.emit("join-room", {widget.roomID, id});
-//     }));
-
-//     peer.on("call", context, (event, context) async {
-//       final mediaStream = await navigator.mediaDevices
-//           .getUserMedia({"video": true, "audio": false});
-
-//       call.answer(mediaStream);
-
-//       call.on("close").listen((event) {
-//         setState(() {
-//           inCall = false;
-//         });
-//       });
-
-//       call.on<MediaStream>("stream").listen((event) {
-//         _localRenderer.srcObject = mediaStream;
-//         _remoteRenderer.srcObject = event;
-
-//         setState(() {
-//           inCall = true;
-//         });
-//       });
-//     });
-//   }
-
-//   @override
-//   void dispose() {
-//     peer.dispose();
-//     _controller.dispose();
-//     _localRenderer.dispose();
-//     _remoteRenderer.dispose();
-//     super.dispose();
-//   }
-
-//   void connect() async {
-//     final mediaStream = await navigator.mediaDevices
-//         .getUserMedia({"video": true, "audio": false});
-
-//     final conn = peer.call(_controller.text, mediaStream);
-
-//     conn.on("close").listen((event) {
-//       setState(() {
-//         inCall = false;
-//       });
-//     });
-
-//     conn.on<MediaStream>("stream").listen((event) {
-//       _remoteRenderer.srcObject = event;
-//       _localRenderer.srcObject = mediaStream;
-
-//       setState(() {
-//         inCall = true;
-//       });
-//     });
-
-//     // });
-//   }
-
-//   void send() {
-//     // conn.send('Hello!');
-//   }
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         appBar: AppBar(),
-//         body: Center(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             children: <Widget>[
-//               _renderState(),
-//               const Text(
-//                 'Connection ID:',
-//               ),
-//               SelectableText(peerId ?? ""),
-//               TextField(
-//                 controller: _controller,
-//               ),
-//               ElevatedButton(onPressed: connect, child: const Text("connect")),
-//               ElevatedButton(
-//                   onPressed: send, child: const Text("send message")),
-//               if (inCall)
-//                 Expanded(
-//                   child: RTCVideoView(
-//                     _localRenderer,
-//                   ),
-//                 ),
-//               if (inCall)
-//                 Expanded(
-//                   child: RTCVideoView(
-//                     _remoteRenderer,
-//                   ),
-//                 ),
-//             ],
-//           ),
-//         ));
-//   }
-
-//   Widget _renderState() {
-//     Color bgColor = inCall ? Colors.green : Colors.grey;
-//     Color txtColor = Colors.white;
-//     String txt = inCall ? "Connected" : "Standby";
-//     return Container(
-//       decoration: BoxDecoration(color: bgColor),
-//       child: Text(
-//         txt,
-//         style:
-//             Theme.of(context).textTheme.titleLarge?.copyWith(color: txtColor),
-//       ),
-//     );
-//   }
-// }
+// ignore_for_file: must_be_immutable, depend_on_referenced_packages, constant_identifier_names, avoid_print, non_constant_identifier_names
 
 // // ignore_for_file: avoid_print, use_build_context_synchronously
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
@@ -200,6 +48,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   Future<void> _initializeRenderers() async {
     await localRenderer.initialize();
+    print("ROOMID ${widget.roomID}");
     await _initPeer();
   }
 
@@ -275,13 +124,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         peerid = event.toString();
       });
       print("PEERID☺☺☺☺☺☺☺:$event");
-      // Emit the myPeer ID to the socket
-      socketIntilized.socket!.emit("test");
-      // Emit the myPeer ID to the socket
-      socketIntilized.socket!.emit("join-call", {
-        "room_id": "ff3aae8b-bea3-4f92-a008-24d6816f1eb2",
-        "user_id": event
-      });
+      socketIntilized.socket!
+          .emit("join-call", {"room_id": widget.roomID, "user_id": event});
     });
 
     connectNewUser(userId, MediaStream mediaStream) async {
@@ -302,7 +146,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         }
         remoteRenderers[userId]!.srcObject = stream;
         print("remoteStream $stream");
-        // localRenderer.srcObject = mediaStream;
+        print("remoteRenderers length ${remoteRenderers.length}");
       });
 
       call.on("close").listen((onData) {
@@ -310,6 +154,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         if (remoteRenderers[userId] != null) {
           remoteRenderers[userId]!.dispose();
           remoteRenderers.remove(userId);
+          print("remoteRenderers length ${remoteRenderers.length}");
         }
       });
 
@@ -344,6 +189,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           setState(() {
             remoteRenderers[call.peer]!.srcObject = remoteStream;
           });
+          print("remoteRenderers length ${remoteRenderers.length}");
         });
       });
       socketIntilized.socket!.on(
@@ -369,6 +215,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                     },
                   setState(() {}),
                   print("disconnected peers[userId] ${peers[userId]}"),
+                  print("remoteRenderers length ${remoteRenderers.length}"),
                 }
             });
   }
@@ -538,129 +385,95 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         backgroundColor: appColorBlack,
         body: Stack(
           children: [
-            Column(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                    ),
-                    child: RTCVideoView(
-                      localRenderer,
-                      mirror: true,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            forTwo(),
+            // forThree(),
+            // forFour(),
+            // forFive(),
+            Positioned(
+              top: 40,
+              left: 20,
+              right: 20,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Icon(
+                    Icons.arrow_back,
+                  ),
+                  const Text(
+                    "End-to-end encrypted",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      fontFamily: "Poppins",
                     ),
                   ),
-                ),
-                remoteRenderers.isEmpty
-                    ? const SizedBox()
-                    : Expanded(
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(5),
-                            topRight: Radius.circular(5),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(100)),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: appColorBlack.withOpacity(0.07),
                           ),
-                          child: RTCVideoView(
-                            remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                            mirror: true,
-                            objectFit: RTCVideoViewObjectFit
-                                .RTCVideoViewObjectFitCover,
-                          ),
+                          color: appColorBlack.withOpacity(0.10),
                         ),
+                        child: Image.asset(
+                          "assets/icons/profile-add.png",
+                          height: 16,
+                          width: 16,
+                        ).paddingAll(9),
                       ),
-                // Expanded(
-                //   child: GridView.builder(
-                //     gridDelegate:
-                //         const SliverGridDelegateWithFixedCrossAxisCount(
-                //       crossAxisCount: 2,
-                //     ),
-                //     itemCount: remoteRenderers.length,
-                //     itemBuilder: (context, index) {
-                //       print("remoteRenderers length ${remoteRenderers.length}");
-
-                //       String key = remoteRenderers.keys.elementAt(index);
-                //       return SizedBox(
-                //           height: 300,
-                //           child: RTCVideoView(remoteRenderers[key]!,
-                //               mirror: true));
-                //     },
-                //   ),
-                // ),
-              ],
+                    ),
+                  )
+                ],
+              ),
             ),
-
-            // Positioned.fill(
-            //   child: isScreenBig
-            //       ? RTCVideoView(remoteRenderer)
-            //       : RTCVideoView(localRenderer, mirror: true),
-            // ),
-            // Positioned(
-            //   bottom: 20,
-            //   right: 20,
-            //   width: 100,
-            //   height: 150,
-            //   child: isScreenBig
-            //       ? RTCVideoView(localRenderer, mirror: true)
-            //       : RTCVideoView(remoteRenderer),
-            // ),
             Positioned(
               bottom: 20,
               left: 20,
               right: 20,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: appColorWhite.withOpacity(0.36),
-                  borderRadius: BorderRadius.circular(38),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // IconButton(
-                    //   icon: const Icon(Icons.call),
-                    //   onPressed: () => _startCall(
-                    //       'remote-peer-id'), // Replace with actual remote peer ID
-                    // ),
-                    Image.asset(
-                      "assets/icons/camera_off.png",
-                      height: 60,
-                      width: 60,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(38),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: appColorWhite.withOpacity(0.36),
                     ),
-                    Image.asset(
-                      "assets/icons/mice_on.png",
-                      height: 60,
-                      width: 60,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          "assets/icons/camera_off.png",
+                          height: 60,
+                          width: 60,
+                        ),
+                        Image.asset(
+                          "assets/icons/mice_on.png",
+                          height: 60,
+                          width: 60,
+                        ),
+                        Image.asset(
+                          "assets/icons/volume_on.png",
+                          height: 60,
+                          width: 60,
+                        ),
+                        GestureDetector(
+                          onTap: _endCall,
+                          child: Image.asset(
+                            "assets/icons/call_end.png",
+                            height: 60,
+                            width: 60,
+                          ),
+                        ),
+                      ],
+                    ).paddingSymmetric(
+                      horizontal: 22,
+                      vertical: 12,
                     ),
-                    Image.asset(
-                      "assets/icons/volume_on.png",
-                      height: 60,
-                      width: 60,
-                    ),
-                    GestureDetector(
-                      onTap: _endCall,
-                      child: Image.asset(
-                        "assets/icons/call_end.png",
-                        height: 60,
-                        width: 60,
-                      ),
-                    ),
-                    // IconButton(
-                    //   icon: const Icon(Icons.call_end),
-                    //   onPressed: _endCall,
-                    // ),
-                    // IconButton(
-                    //   icon: const Icon(Icons.mic),
-                    //   onPressed: () {},
-                    // ),
-                    // IconButton(
-                    //   icon: const Icon(Icons.videocam),
-                    //   onPressed: () {},
-                    // ),
-                  ],
-                ).paddingSymmetric(
-                  horizontal: 22,
-                  vertical: 12,
+                  ),
                 ),
               ),
             ),
@@ -669,6 +482,320 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       ),
     );
   }
+
+  Widget forFive() {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      child: RTCVideoView(
+                        localRenderer,
+                        mirror: true,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(10),
+                        bottomRight: Radius.circular(10),
+                      ),
+                      child: RTCVideoView(
+                        localRenderer,
+                        mirror: true,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 2,
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                      ),
+                      child: RTCVideoView(
+                        localRenderer,
+                        mirror: true,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(10),
+                        topRight: Radius.circular(10),
+                      ),
+                      child: RTCVideoView(
+                        localRenderer,
+                        mirror: true,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        Positioned(
+          bottom: 110,
+          // left: 20,
+          right: 20,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(10),
+            ),
+            child: SizedBox(
+              height: 110,
+              width: 85,
+              child: RTCVideoView(
+                localRenderer,
+                mirror: true,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget forFour() {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 2,
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(
+          height: 2,
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 2,
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget forThree() {
+    return Column(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            child: RTCVideoView(
+              localRenderer,
+              mirror: true,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 2,
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 2,
+              ),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget forTwo() {
+    return Column(
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+            child: RTCVideoView(
+              localRenderer,
+              mirror: true,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+            ),
+          ),
+        ),
+        // remoteRenderers.isEmpty
+        //     ? const SizedBox()
+        //     : const SizedBox(
+        //         height: 2,
+        //       ),
+        remoteRenderers.isEmpty
+            ? const SizedBox()
+            : Expanded(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                  ),
+                  child: RTCVideoView(
+                    remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              ),
+        // Expanded(
+        //   child: GridView.builder(
+        //     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        //       crossAxisCount: 2,
+        //     ),
+        //     itemCount: remoteRenderers.length,
+        //     itemBuilder: (context, index) {
+        //       print("remoteRenderers length ${remoteRenderers.length}");
+
+        //       String key = remoteRenderers.keys.elementAt(index);
+        //       return SizedBox(
+        //           height: 300,
+        //           child: RTCVideoView(remoteRenderers[key]!, mirror: true));
+        //     },
+        //   ),
+        // ),
+      ],
+    );
+  }
+
+  // IconButton(
+  //   icon: const Icon(Icons.call_end),
+  //   onPressed: _endCall,
+  // ),
+  // IconButton(
+  //   icon: const Icon(Icons.mic),
+  //   onPressed: () {},
+  // ),
+  // IconButton(
+  //   icon: const Icon(Icons.videocam),
+  //   onPressed: () {},
+  // ),
 
   @override
   void dispose() {
