@@ -626,11 +626,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       height: 60,
                       width: 60,
                     ),
-                    Image.asset(
-                      "assets/icons/mice_on.png",
-                      height: 60,
-                      width: 60,
-                    ),
+                    // Image.asset(
+                    //   "assets/icons/mice_on.png",
+                    //   height: 60,
+                    //   width: 60,
+                    // ),
                     Image.asset(
                       "assets/icons/volume_on.png",
                       height: 60,
