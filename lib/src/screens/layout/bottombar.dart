@@ -10,11 +10,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
+import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/chat/chats.dart';
@@ -100,6 +102,49 @@ class _TabbarScreenState extends State<TabbarScreen>
     return true;
   }
 
+  bool isLoading = false;
+  final ApiHelper apiHelper = ApiHelper();
+  UserProfileModel userProfileModel = UserProfileModel();
+  editApiCall() async {
+    await _getToken();
+    closeKeyboard();
+
+    setState(() {
+      isLoading = true;
+    });
+
+    var uri = Uri.parse(apiHelper.userCreateProfile);
+    var request = http.MultipartRequest("POST", uri);
+    Map<String, String> headers = {
+      "Accept": "application/json",
+      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}'
+    };
+    request.headers.addAll(headers);
+    request.fields['device_token'] = _fcmtoken;
+
+    print(request.fields);
+
+    var response = await request.send();
+
+    String responseData = await response.stream.transform(utf8.decoder).join();
+    var userData = json.decode(responseData);
+    userProfileModel = UserProfileModel.fromJson(userData);
+
+    print(responseData);
+
+    if (userProfileModel.success == true) {
+      await Hive.box(userdata)
+          .put(userBio, userProfileModel.resData!.bio.toString());
+      setState(() {
+        isLoading = false;
+      });
+    } else {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   Future<void> _fetchTimeZone() async {
     try {
       Position position = await _getCurrentLocation();
@@ -178,7 +223,8 @@ class _TabbarScreenState extends State<TabbarScreen>
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    _getToken();
+
+    editApiCall();
     _fetchTimeZone();
     permissionAcessPhone();
     super.initState();

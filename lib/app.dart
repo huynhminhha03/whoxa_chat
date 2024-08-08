@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, empty_catches, unused_local_variable, use_build_context_synchronously
+// ignore_for_file: avoid_print, empty_catches, unused_local_variable, use_build_context_synchronously, depend_on_referenced_packages, unused_import
 
 import 'dart:developer';
 
@@ -19,6 +19,7 @@ import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/welcome.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 
 import 'src/screens/layout/bottombar.dart';
 
@@ -52,11 +53,129 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     );
 
     FirebaseMessaging.onMessage.listen(
-      (message) {
+      (message) async {
         print("FirebaseMessaging.onMessage.listen");
         LocalNotificationService.notificationsPlugin.cancelAll();
+        print("NOTIFICATION:::: ${message.data}");
 
-        print("FirebaseMessaging.onMessage.listen");
+        // if (message.data['call_type'] == 'video_call') {
+        //   print('testing incoming video call');
+        //   CallKitParams callKitParams = CallKitParams(
+        //     id: const Uuid().v4(),
+        //     nameCaller: 'Hien Nguyen',
+        //     appName: 'Meyaoo',
+        //     avatar: 'https://i.pravatar.cc/100',
+        //     handle: '0123456789',
+        //     type: 0,
+        //     textAccept: 'Conform',
+        //     textDecline: 'Reject',
+        //     // missedCallNotification: const NotificationParams(
+        //     //   showNotification: true,
+        //     //   isShowCallback: true,
+        //     //   subtitle: 'Missed call',
+        //     //   callbackText: 'Call back',
+        //     // ),
+        //     duration: 30000,
+        //     // extra: <String, dynamic>{'userId': '1a2b3c4d'},
+        //     // headers: <String, dynamic>{
+        //     //   'apiKey': 'Abc@123!',
+        //     //   'platform': 'flutter'
+        //     // },
+        //     android: const AndroidParams(
+        //       isCustomNotification: true,
+        //       isShowLogo: true,
+        //       ringtonePath: 'system_ringtone_default',
+        //       backgroundColor: '#0955fa',
+        //       backgroundUrl: 'https://i.pravatar.cc/500',
+        //       actionColor: '#4CAF50',
+        //       textColor: '#ffffff',
+        //       incomingCallNotificationChannelName: "Incoming Call",
+        //       missedCallNotificationChannelName: "Missed Call",
+        //       isShowFullLockedScreen: true,
+        //       isShowCallID: false,
+        //     ),
+        //     ios: const IOSParams(
+        //       // iconName: 'CallKitLogo',
+        //       handleType: 'generic',
+        //       supportsVideo: true,
+        //       maximumCallGroups: 2,
+        //       maximumCallsPerCallGroup: 1,
+        //       audioSessionMode: 'default',
+        //       audioSessionActive: true,
+        //       audioSessionPreferredSampleRate: 44100.0,
+        //       audioSessionPreferredIOBufferDuration: 0.005,
+        //       supportsDTMF: true,
+        //       supportsHolding: true,
+        //       supportsGrouping: false,
+        //       supportsUngrouping: false,
+        //       ringtonePath: 'system_ringtone_default',
+        //     ),
+        //   );
+        //   await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
+        //   FlutterCallkitIncoming.onEvent.listen((event) {
+        //     switch (event!.event) {
+        //       case Event.actionCallIncoming:
+        //         print("NOTIFICATION EVENT actionCallIncoming");
+        //         break;
+        //       case Event.actionCallStart:
+        //         print("NOTIFICATION EVENT actionCallStart");
+        //         break;
+        //       case Event.actionCallAccept:
+        //         print("NOTIFICATION EVENT actionCallAccept");
+        //         Get.to(
+        //           VideoCallScreen(
+        //             roomID: message.data['room_id'],
+        //           ),
+        //           transition: Transition.rightToLeft,
+        //         );
+        //         break;
+        //       case Event.actionCallDecline:
+        //         print("NOTIFICATION EVENT actionCallDecline");
+        //         FlutterCallkitIncoming.endAllCalls();
+        //         break;
+        //       case Event.actionCallEnded:
+        //         print("NOTIFICATION EVENT actionCallEnded");
+        //         FlutterCallkitIncoming.endAllCalls();
+        //         break;
+        //       case Event.actionCallTimeout:
+        //         print("NOTIFICATION EVENT actionCallTimeout");
+        //         FlutterCallkitIncoming.endAllCalls();
+        //         break;
+        //       case Event.actionCallCallback:
+        //         print("NOTIFICATION EVENT actionCallCallback");
+
+        //         break;
+        //       case Event.actionCallToggleHold:
+        //         print("NOTIFICATION EVENT actionCallToggleHold");
+
+        //         break;
+        //       case Event.actionCallToggleMute:
+        //         print("NOTIFICATION EVENT actionCallToggleMute");
+
+        //         break;
+        //       case Event.actionCallToggleDmtf:
+        //         print("NOTIFICATION EVENT actionCallToggleDmtf");
+
+        //         break;
+        //       case Event.actionCallToggleGroup:
+        //         print("NOTIFICATION EVENT actionCallToggleGroup");
+
+        //         break;
+        //       case Event.actionCallToggleAudioSession:
+        //         print("NOTIFICATION EVENT actionCallToggleAudioSession");
+
+        //         break;
+        //       case Event.actionDidUpdateDevicePushTokenVoip:
+        //         print("NOTIFICATION EVENT actionDidUpdateDevicePushTokenVoip");
+
+        //         break;
+        //       case Event.actionCallCustom:
+        //         print("NOTIFICATION EVENT actionCallCustom");
+
+        //         break;
+        //     }
+        //   });
+        // } else {
         if (message.notification != null) {
           print(message.notification!.title);
 
@@ -338,103 +457,157 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
           );
           LocalNotificationService.createanddisplaynotification(message);
         }
+        // }
       },
     );
 
-    FirebaseMessaging.onMessageOpenedApp.listen(
-      (message) {
-        print("FirebaseMessaging.onMessageOpenedApp.listen");
-        if (message.notification != null) {
-          print('title-----> ${message.notification!.title}');
-          // print(message.notification!);
+    // FirebaseMessaging.onMessageOpenedApp.listen(
+    //   (message) async {
+    //     print("FirebaseMessaging.onMessageOpenedApp.listen");
+    //     if (message.data['call_type'] == 'video_call') {
+    //       CallKitParams callKitParams = CallKitParams(
+    //         id: const Uuid().v4(),
+    //         nameCaller: 'Hien Nguyen',
+    //         appName: 'Callkit',
+    //         avatar: 'https://i.pravatar.cc/100',
+    //         handle: '0123456789',
+    //         type: 0,
+    //         textAccept: 'Accept',
+    //         textDecline: 'Decline',
+    //         missedCallNotification: const NotificationParams(
+    //           showNotification: true,
+    //           isShowCallback: true,
+    //           subtitle: 'Missed call',
+    //           callbackText: 'Call back',
+    //         ),
+    //         duration: 30000,
+    //         extra: <String, dynamic>{'userId': '1a2b3c4d'},
+    //         headers: <String, dynamic>{
+    //           'apiKey': 'Abc@123!',
+    //           'platform': 'flutter'
+    //         },
+    //         android: const AndroidParams(
+    //             isCustomNotification: true,
+    //             isShowLogo: false,
+    //             ringtonePath: 'system_ringtone_default',
+    //             backgroundColor: '#0955fa',
+    //             backgroundUrl: 'https://i.pravatar.cc/500',
+    //             actionColor: '#4CAF50',
+    //             textColor: '#ffffff',
+    //             incomingCallNotificationChannelName: "Incoming Call",
+    //             missedCallNotificationChannelName: "Missed Call",
+    //             isShowCallID: false),
+    //         ios: const IOSParams(
+    //           // iconName: 'CallKitLogo',
+    //           handleType: 'generic',
+    //           supportsVideo: true,
+    //           maximumCallGroups: 2,
+    //           maximumCallsPerCallGroup: 1,
+    //           audioSessionMode: 'default',
+    //           audioSessionActive: true,
+    //           audioSessionPreferredSampleRate: 44100.0,
+    //           audioSessionPreferredIOBufferDuration: 0.005,
+    //           supportsDTMF: true,
+    //           supportsHolding: true,
+    //           supportsGrouping: false,
+    //           supportsUngrouping: false,
+    //           ringtonePath: 'system_ringtone_default',
+    //         ),
+    //       );
+    //       await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
+    //     } else {
+    //       if (message.notification != null) {
+    //         print('title-----> ${message.notification!.title}');
+    //         // print(message.notification!);
 
-          print(message.data['message']);
+    //         print(message.data['message']);
 
-          print('data--->> ${message.data}');
+    //         print('data--->> ${message.data}');
 
-          if (message.data['title'] == 'Call Decline') {
-            print('☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_app_closed');
-            // Get.to(ChatList());
-          } else if (message.data['call_type'] == 'video_call') {
-            Get.to(VideoCallScreen(
-              roomID: message.data['room_id'],
-            ));
-            // Get.to(VideoCallPage(
-            //   callerImage: message.data['caller_profile_pic'],
-            //   callerName: message.data['caller_name'],
-            //   reciverImage: message.data['receiver_profile_pic'],
-            //   reciverName: message.data['receiver_name'],
-            //   isCaller: false,
-            //   isReciverWait: true,
-            //   waitChannelId: message.data['channel'],
-            //   waitToken: message.data['token'],
-            //   callerId: message.data['my_id'],
-            //   reciverId: message.data['toUser'],
-            // ));
-          } else if (message.data['title'] == 'Audio call') {
-            Get.to(VoiceCall(
-              isCaller: false,
-              callerImage: message.data['caller_profile_pic'],
-              callerName: message.data['caller_name'],
-              isReciverWait: true,
-              waitChannelId: message.data['channel'],
-              waitToken: message.data['token'],
-              callerId: message.data['my_id'],
-              reciverId: message.data['toUser'],
-            ));
-          } else if (message.data['title'] == 'Group Audio call') {
-            Get.to(() => GroupVoiceCall(
-                  isCaller: false,
-                  callerImage: message.data['receiver_profile_pic'],
-                  callerName: message.data['receiver_name'],
-                  isReciverWait: true,
-                  waitChannelId: message.data['channel'],
-                  waitToken: message.data['token'],
-                  callerId: message.data['my_id'],
-                  reciverId: message.data['toUser'],
-                ));
-          } else if (message.data['title'] == 'Group Video call') {
-            Get.to(() => GroupReceivedVideoCallScreen(
-                  isCaller: false,
-                  callerImage: message.data['receiver_profile_pic'],
-                  callerName: message.data['receiver_name'],
-                  isReciverWait: true,
-                  waitChannelId: message.data['channel'],
-                  waitToken: message.data['token'],
-                  callerId: message.data['my_id'],
-                  reciverId: message.data['toUser'],
-                ));
-          } else if (message.data['title_done'] == 'Message') {
-            print("ID::::::");
-            // single chat message notification through navigate specific single_chat
-            // Get.to(() => SingelChatDetailsScreenTemp(
-            //       index: 0,
-            //       seconduserID: message.data['second_user_id'],
-            //       secondUsername: capitalizeFirstLetter(getContact1(
-            //           getMobile(message.data['mobile']),
-            //           message.data['second_username'])),
-            //       groupID: "",
-            //       groupName: "",
-            //       myID: message.data['my_id'],
-            //       isBlocked: "0",
-            //       seconduserpic: message.data['profile_image'],
-            //       phoneNumber: message.data['mobile'],
-            //       userStatus: "",
-            //       lastSeen: "",
-            //     ));
-          } else if (message.data['title_done'] == 'group_message') {
-            print("GROUP::::");
-            // group chat message notification through navigate specific group_chat
-            // Get.to(() => GroupchatScreenTemp(
-            //       groupID: message.data['group_id'],
-            //       groupName: message.data['group_name'],
-            //       myID: Hive.box(userdata).get(userId),
-            //       seconduserpic: message.data['group_profile_image'],
-            //     ));
-          }
-        }
-      },
-    );
+    //         if (message.data['title'] == 'Call Decline') {
+    //           print('☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_app_closed');
+    //           // Get.to(ChatList());
+    //         } else if (message.data['call_type'] == 'video_call') {
+    //           Get.to(VideoCallScreen(
+    //             roomID: message.data['room_id'],
+    //           ));
+    //           // Get.to(VideoCallPage(
+    //           //   callerImage: message.data['caller_profile_pic'],
+    //           //   callerName: message.data['caller_name'],
+    //           //   reciverImage: message.data['receiver_profile_pic'],
+    //           //   reciverName: message.data['receiver_name'],
+    //           //   isCaller: false,
+    //           //   isReciverWait: true,
+    //           //   waitChannelId: message.data['channel'],
+    //           //   waitToken: message.data['token'],
+    //           //   callerId: message.data['my_id'],
+    //           //   reciverId: message.data['toUser'],
+    //           // ));
+    //         } else if (message.data['title'] == 'Audio call') {
+    //           Get.to(VoiceCall(
+    //             isCaller: false,
+    //             callerImage: message.data['caller_profile_pic'],
+    //             callerName: message.data['caller_name'],
+    //             isReciverWait: true,
+    //             waitChannelId: message.data['channel'],
+    //             waitToken: message.data['token'],
+    //             callerId: message.data['my_id'],
+    //             reciverId: message.data['toUser'],
+    //           ));
+    //         } else if (message.data['title'] == 'Group Audio call') {
+    //           Get.to(() => GroupVoiceCall(
+    //                 isCaller: false,
+    //                 callerImage: message.data['receiver_profile_pic'],
+    //                 callerName: message.data['receiver_name'],
+    //                 isReciverWait: true,
+    //                 waitChannelId: message.data['channel'],
+    //                 waitToken: message.data['token'],
+    //                 callerId: message.data['my_id'],
+    //                 reciverId: message.data['toUser'],
+    //               ));
+    //         } else if (message.data['title'] == 'Group Video call') {
+    //           Get.to(() => GroupReceivedVideoCallScreen(
+    //                 isCaller: false,
+    //                 callerImage: message.data['receiver_profile_pic'],
+    //                 callerName: message.data['receiver_name'],
+    //                 isReciverWait: true,
+    //                 waitChannelId: message.data['channel'],
+    //                 waitToken: message.data['token'],
+    //                 callerId: message.data['my_id'],
+    //                 reciverId: message.data['toUser'],
+    //               ));
+    //         } else if (message.data['title_done'] == 'Message') {
+    //           print("ID::::::");
+    //           // single chat message notification through navigate specific single_chat
+    //           // Get.to(() => SingelChatDetailsScreenTemp(
+    //           //       index: 0,
+    //           //       seconduserID: message.data['second_user_id'],
+    //           //       secondUsername: capitalizeFirstLetter(getContact1(
+    //           //           getMobile(message.data['mobile']),
+    //           //           message.data['second_username'])),
+    //           //       groupID: "",
+    //           //       groupName: "",
+    //           //       myID: message.data['my_id'],
+    //           //       isBlocked: "0",
+    //           //       seconduserpic: message.data['profile_image'],
+    //           //       phoneNumber: message.data['mobile'],
+    //           //       userStatus: "",
+    //           //       lastSeen: "",
+    //           //     ));
+    //         } else if (message.data['title_done'] == 'group_message') {
+    //           print("GROUP::::");
+    //           // group chat message notification through navigate specific group_chat
+    //           // Get.to(() => GroupchatScreenTemp(
+    //           //       groupID: message.data['group_id'],
+    //           //       groupName: message.data['group_name'],
+    //           //       myID: Hive.box(userdata).get(userId),
+    //           //       seconduserpic: message.data['group_profile_image'],
+    //           //     ));
+    //         }
+    //       }
+    //     }
+    //   },
+    // );
 
     deleteStroy.getDelete();
     // callController.callHistoryApi();

@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 //flutter version 3.19.6
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -11,29 +10,34 @@ import 'package:meyaoo_new/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/socket_initiallize.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-Future<void> _firebasebackgroundmessagehendler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  print("BackgroundDATA:${message.data.toString()}");
-  print("BackgroundTITLE:${message.notification!.title}");
+// Future<void> _firebasebackgroundmessagehendler(RemoteMessage message) async {
+//   await Firebase.initializeApp();
+//   print("BackgroundDATA:${message.data.toString()}");
+//   print("BackgroundTITLE:${message.notification!.title}");
+//   LocalNotificationService.createanddisplaynotification(message);
 
-  if (message.data['title'] == 'Call Decline') {
-    Get.to(() => TabbarScreen());
-  }
-  //
-}
+//   if (message.data['title'] == 'Call Decline') {
+//     Get.to(() => TabbarScreen());
+//   }
+//  if (message.data['call_type'] == 'video_call') {
+//             Get.to(VideoCallScreen(
+//               roomID: message.data['room_id'],
+//             ));
+//  }
+//   //
+// }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
+  // FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
   LocalNotificationService.initialize();
   Directory directory = await getApplicationDocumentsDirectory();
   await Permission.location.request();
