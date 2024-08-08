@@ -504,7 +504,7 @@ class SingleChatContorller extends GetxController {
 
   //========================= send contact message ==============================
   sendMessageContact(conversationID, msgtype, contactName, contactNumber,
-      String mobileNum) async {
+      String mobileNum, image) async {
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -520,6 +520,7 @@ class SingleChatContorller extends GetxController {
     request.fields['conversation_id'] = conversationID;
     request.fields['shared_contact_name'] = contactName;
     request.fields['shared_contact_number'] = contactNumber;
+    request.fields['shared_contact_profile_image'] = image;
     request.fields['phone_number'] = mobileNum;
 
     // send

@@ -309,11 +309,14 @@ class _TabbarScreenState extends State<TabbarScreen>
               ),
               child: BottomNavigationBar(
                 selectedIconTheme: const IconThemeData(color: chatownColor),
-                selectedItemColor: chatownColor,
-                selectedFontSize: 12,
-                unselectedFontSize: 12,
+                selectedItemColor: Colors.black,
+                selectedFontSize: 10,
+                unselectedFontSize: 10,
+                unselectedLabelStyle: const TextStyle(color: Colors.white),
                 selectedLabelStyle: const TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.w600),
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10),
                 backgroundColor: Colors.white,
                 type: BottomNavigationBarType.fixed,
                 currentIndex: widget.currentTab!,
@@ -324,52 +327,47 @@ class _TabbarScreenState extends State<TabbarScreen>
                   widget.currentTab == 0
                       ? const BottomNavigationBarItem(
                           icon: Image(
-                              image:
-                                  AssetImage('assets/images/message-text.png'),
-                              width: 24,
-                              color: chatownColor),
-                          label: "Chats")
+                              image: AssetImage('assets/icons/chat1.png'),
+                              width: 24),
+                          label: "Chat")
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/message-text.png'),
                             width: 24,
                             color: chatColor,
                           ),
-                          label: "Chats"),
+                          label: ""),
                   widget.currentTab == 1
                       ? const BottomNavigationBarItem(
                           //status2
                           icon: Image(
-                              image: AssetImage('assets/images/status2.png'),
-                              width: 24,
-                              color: chatownColor),
+                              image: AssetImage('assets/icons/status1.png'),
+                              width: 24),
                           label: "Status")
                       : const BottomNavigationBarItem(
                           icon: Image(
                               image: AssetImage('assets/images/status2.png'),
                               width: 24,
                               color: chatColor),
-                          label: "Status"),
+                          label: ""),
                   widget.currentTab == 2
                       ? const BottomNavigationBarItem(
                           icon: Image(
-                              image: AssetImage('assets/images/call_1.png'),
-                              width: 24,
-                              color: chatownColor),
-                          label: "Calls")
+                              image: AssetImage('assets/icons/call1.png'),
+                              width: 24),
+                          label: "Call")
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/call_1.png'),
                             width: 24,
                             color: chatColor,
                           ),
-                          label: "Calls"),
+                          label: ""),
                   widget.currentTab == 3
                       ? const BottomNavigationBarItem(
                           icon: Image(
-                              image: AssetImage('assets/images/contacts.png'),
-                              width: 25,
-                              color: chatownColor),
+                              image: AssetImage('assets/icons/contact1.png'),
+                              width: 25),
                           label: "Contact")
                       : const BottomNavigationBarItem(
                           icon: Image(
@@ -377,22 +375,20 @@ class _TabbarScreenState extends State<TabbarScreen>
                             width: 25,
                             color: Colors.black,
                           ),
-                          label: "Contact"),
+                          label: ""),
                   widget.currentTab == 4
                       ? const BottomNavigationBarItem(
                           icon: Image(
-                              image:
-                                  AssetImage('assets/images/profile (1).png'),
-                              width: 24,
-                              color: chatownColor),
+                              image: AssetImage('assets/icons/setting1.png'),
+                              width: 24),
                           label: "Profile")
                       : const BottomNavigationBarItem(
                           icon: Image(
-                            image: AssetImage('assets/images/profile (1).png'),
+                            image: AssetImage('assets/images/setting.png'),
                             width: 24,
                             color: Colors.black,
                           ),
-                          label: "Profile",
+                          label: "",
                         ),
                 ],
               ),

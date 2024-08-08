@@ -19,7 +19,7 @@ class AudioController extends GetxController {
   var completedPercentage = 0.0.obs;
   var currentDuration = 0.obs;
   var totalDuration = 0.obs;
-
+  //var waveform = <double>[].obs;
   bool get isRecordPlaying => _isRecordPlaying.value;
   bool get isRecordingValue => isRecording.value;
   late final AudioPlayerService _audioPlayerService;
@@ -42,7 +42,8 @@ class AudioController extends GetxController {
       await _audioPlayerService.getAudioPlayer.seek(Duration.zero);
       _isRecordPlaying.value = false;
     });
-
+    // Mock waveform data - in a real scenario, this would be generated
+    //waveform.value = List.generate(50, (index) => (index % 10) / 10.0);
     super.onInit();
   }
 
@@ -167,3 +168,213 @@ class AudioDuration {
     }
   }
 }
+
+// import 'dart:async';
+
+// import 'package:audioplayers/audioplayers.dart';
+// import 'package:get/get.dart';
+// import 'package:sizer/sizer.dart';
+
+// class AudioController extends GetxController {
+//   final _isRecordPlaying = false.obs,
+//       isRecording = false.obs,
+//       isSending = false.obs,
+//       isUploading = false.obs;
+//   final _currentId = 999999.obs;
+//   final start = DateTime.now().obs;
+//   final end = DateTime.now().obs;
+//   String _total = "";
+//   String get total => _total;
+//   var completedPercentage = 0.0.obs;
+//   var currentDuration = 0.obs;
+//   var totalDuration = 0.obs;
+//   var waveform = <double>[].obs; // Store waveform data
+
+//   bool get isRecordPlaying => _isRecordPlaying.value;
+//   bool get isRecordingValue => isRecording.value;
+//   late final AudioPlayerService _audioPlayerService;
+//   int get currentId => _currentId.value;
+
+//   @override
+//   void onInit() {
+//     _audioPlayerService = AudioPlayerAdapter();
+
+//     // Listen to audio duration changes
+//     _audioPlayerService.getAudioPlayer.onDurationChanged.listen((duration) {
+//       totalDuration.value = duration.inMicroseconds;
+//     });
+
+//     // Listen to audio position changes and update waveform
+//     _audioPlayerService.getAudioPlayer.onPositionChanged.listen((duration) {
+//       currentDuration.value = duration.inMicroseconds;
+//       completedPercentage.value =
+//           currentDuration.value.toDouble() / totalDuration.value.toDouble();
+
+//       // Update waveform data based on current duration
+//       //_updateWaveform();
+//     });
+
+//     _audioPlayerService.getAudioPlayer.onPlayerComplete.listen((event) async {
+//       await _audioPlayerService.getAudioPlayer.seek(Duration.zero);
+//       _isRecordPlaying.value = false;
+//     });
+
+//     super.onInit();
+//   }
+
+//   @override
+//   void onClose() {
+//     _audioPlayerService.dispose();
+//     super.onClose();
+//   }
+
+//   Future<void> changeProg() async {
+//     if (isRecordPlaying) {
+//       _audioPlayerService.getAudioPlayer.onDurationChanged.listen((duration) {
+//         totalDuration.value = duration.inMicroseconds;
+//       });
+
+//       _audioPlayerService.getAudioPlayer.onPositionChanged.listen((duration) {
+//         currentDuration.value = duration.inMicroseconds;
+//         completedPercentage.value =
+//             currentDuration.value.toDouble() / totalDuration.value.toDouble();
+
+//         _updateWaveform(); // Update waveform during playback
+//       });
+//     }
+//   }
+
+//   void onPressedPlayButton(int id, var content) async {
+//     _currentId.value = id;
+//     if (isRecordPlaying) {
+//       await _pauseRecord();
+//     } else {
+//       _isRecordPlaying.value = true;
+//       try {
+//         _generateWaveform(content); // Generate waveform when playing
+//         await _audioPlayerService.play(content);
+//       } catch (e) {
+//         _isRecordPlaying.value = false;
+//         print('Error playing audio: $e');
+//       }
+//     }
+//   }
+
+//   void _generateWaveform(String content) {
+//     // This is a mock implementation. Replace with actual audio analysis to generate waveform data.
+//     waveform.value = [
+//       0.3,
+//       0.6,
+//       0.9,
+//       0.4,
+//       0.2,
+//       0.8,
+//       0.5,
+//       0.7,
+//       0.1,
+//       0.4,
+//       0.9,
+//       0.6,
+//       0.3,
+//       0.5,
+//       0.2
+//     ];
+//   }
+
+//   void _updateWaveform() {
+//     // Update the waveform data during playback.
+//     // This can be more complex depending on how you want to visualize the current playback position.
+//     // For simplicity, you might just shift the waveform or animate it.
+
+//     // Example: Shift waveform to create a moving effect
+//     if (waveform.isNotEmpty) {
+//       waveform.value = waveform.sublist(1)..add(waveform.first);
+//     }
+//   }
+
+//   calcDuration() {
+//     var a = end.value.difference(start.value).inSeconds;
+//     format(Duration d) => d.toString().split('.').first.padLeft(8, "0");
+//     _total = format(Duration(seconds: a));
+//   }
+
+//   Future<void> _pauseRecord() async {
+//     _isRecordPlaying.value = false;
+//     await _audioPlayerService.pause();
+//   }
+// }
+
+// abstract class AudioPlayerService {
+//   void dispose();
+//   Future<void> play(String url);
+//   Future<void> resume();
+//   Future<void> pause();
+//   Future<void> release();
+
+//   AudioPlayer get getAudioPlayer;
+// }
+
+// class AudioPlayerAdapter implements AudioPlayerService {
+//   late AudioPlayer _audioPlayer;
+
+//   @override
+//   AudioPlayer get getAudioPlayer => _audioPlayer;
+
+//   AudioPlayerAdapter() {
+//     _audioPlayer = AudioPlayer();
+//   }
+
+//   @override
+//   void dispose() async {
+//     await _audioPlayer.dispose();
+//   }
+
+//   @override
+//   Future<void> pause() async {
+//     await _audioPlayer.pause();
+//   }
+
+//   @override
+//   Future<void> play(String url) async {
+//     try {
+//       await _audioPlayer
+//           .play(UrlSource(url))
+//           .timeout(const Duration(seconds: 30), onTimeout: () {
+//         throw TimeoutException("Audio playback timed out");
+//       });
+//     } catch (e) {
+//       print('Error during audio play: $e');
+//       rethrow;
+//     }
+//   }
+
+//   @override
+//   Future<void> release() async {
+//     await _audioPlayer.release();
+//   }
+
+//   @override
+//   Future<void> resume() async {
+//     await _audioPlayer.resume();
+//   }
+// }
+
+// class AudioDuration {
+//   static double calculate(Duration soundDuration) {
+//     if (soundDuration.inSeconds > 60) {
+//       return 70.w;
+//     } else if (soundDuration.inSeconds > 50) {
+//       return 65.w;
+//     } else if (soundDuration.inSeconds > 40) {
+//       return 60.w;
+//     } else if (soundDuration.inSeconds > 30) {
+//       return 55.w;
+//     } else if (soundDuration.inSeconds > 20) {
+//       return 50.w;
+//     } else if (soundDuration.inSeconds > 10) {
+//       return 45.w;
+//     } else {
+//       return 40.w;
+//     }
+//   }
+// }

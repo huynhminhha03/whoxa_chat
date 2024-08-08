@@ -138,11 +138,9 @@ class _ContactSendState extends State<ContactSend> {
 
   int isMatchinginvite(String userNumber) {
     for (int i = 0; i < getAllDeviceContact.getList.length; i++) {
-      List<String> numbers = userNumber.split(',');
-      for (String listNumber in numbers) {
-        if (listNumber == getAllDeviceContact.getList[i].phoneNumber) {
-          return i; // Return the index of the matching contact
-        }
+      //List<String> numbers = userNumber.split(',');
+      if (userNumber == getAllDeviceContact.getList[i].phoneNumber) {
+        return i; // Return the index of the matching contact
       }
     }
     return -1; // Return -1 if no match is found
@@ -187,7 +185,8 @@ class _ContactSendState extends State<ContactSend> {
                           contact.displayName,
                           getMobile(
                               contact.phones.map((e) => e.number).toString()),
-                          widget.mobileNum);
+                          widget.mobileNum,
+                          "");
                     },
                     leading: Stack(
                       children: <Widget>[
