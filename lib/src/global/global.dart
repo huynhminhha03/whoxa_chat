@@ -91,6 +91,7 @@ const Color appgrey = Color(0xffD9D9D9);
 const Color appgrey2 = Color.fromARGB(255, 150, 150, 150);
 const Color chatcolor2 = Color(0xFF393738);
 Color chatLogoColor = const Color.fromRGBO(252, 198, 4, 1);
+Color chatYColor = const Color.fromRGBO(252, 198, 4, 0.43);
 List<String> likedPost = [];
 List<String> likedComment = [];
 var likedProduct = [];

@@ -76,7 +76,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   String isUserTyping(String cID) {
     for (var i = 0; i < onlieController.typingList.length; i++) {
       if (cID == onlieController.typingList[i].conversationId.toString()) {
-        return "Typing...";
+        return "Typing....";
       }
     }
     return '';
@@ -315,7 +315,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
                                   style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 10,
                                       fontWeight: FontWeight.w400,
                                       color: Colors.grey),
                                 ),
@@ -327,7 +327,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                       isUserTyping(
                                           data.conversationId.toString()),
                                       style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
+                                          fontSize: 12, color: chatownColor),
                                     );
                                   })
                                 : data.lastMessageType == "text"
@@ -1058,6 +1058,39 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   Widget chatWidget(BuildContext context) {
     return Column(
       children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              "Chats",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: "Poppins"),
+            ),
+            Container(
+              height: 32,
+              width: 105,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10), color: chatYColor),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/images/new-add.png", height: 15),
+                  const SizedBox(width: 5),
+                  const Text(
+                    "New Group",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: "Poppins"),
+                  )
+                ],
+              ),
+            )
+          ],
+        ).paddingSymmetric(horizontal: 15),
+        const SizedBox(height: 15),
         SizedBox(
           height: 45,
           width: MediaQuery.of(context).size.width * 0.94,
@@ -1070,9 +1103,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
               decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: Colors.grey.shade200)),
+                    borderSide: BorderSide(color: Colors.grey.shade100)),
                 focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.grey.shade200),
+                    borderSide: BorderSide(color: Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(15)),
                 contentPadding: EdgeInsets.zero,
                 hintText: 'Search',
@@ -1086,7 +1119,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                       color: Colors.grey),
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade200,
+                fillColor: Colors.grey.shade100,
               )),
         ),
         const SizedBox(height: 10),
@@ -1106,15 +1139,21 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             closeKeyboard();
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
+                Image.asset("assets/images/archive2.png", height: 15),
+                const SizedBox(width: 10),
                 Row(
                   children: [
                     const Text(
                       'Archived',
-                      style: TextStyle(color: chatownColor, fontSize: 17),
+                      style: TextStyle(
+                          color: appgrey2,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: "Poppins"),
                     ),
                     const SizedBox(width: 5),
                     Obx(() {
@@ -1130,8 +1169,8 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                           : chatListController.userArchiveListModel.value!
                                   .archiveList!.isNotEmpty
                               ? Container(
-                                  height: 20,
-                                  width: 20,
+                                  height: 15,
+                                  width: 15,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(20),
                                       color: chatownColor),
@@ -1140,20 +1179,21 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                         chatListController.userArchiveListModel
                                             .value!.archiveList!.length
                                             .toString(),
-                                        style: const TextStyle(fontSize: 10)),
+                                        style: const TextStyle(
+                                            fontSize: 7,
+                                            fontWeight: FontWeight.w600)),
                                   ),
                                 )
                               : const SizedBox.shrink();
                     }),
                   ],
                 ),
-                Image.asset("assets/images/archive1.png",
-                    height: 23, color: chatownColor)
               ],
             ),
           ),
         ),
-        const SizedBox(height: 5),
+        Divider(color: Colors.grey.shade300).paddingSymmetric(horizontal: 10),
+        //const SizedBox(height: 5),
       ],
     );
   }
