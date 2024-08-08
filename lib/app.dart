@@ -1,9 +1,15 @@
-// ignore_for_file: avoid_print, empty_catches, unused_local_variable, use_build_context_synchronously, depend_on_referenced_packages, unused_import
+// ignore_for_file: avoid_print, empty_catches, unused_local_variable, use_build_context_synchronously, depend_on_referenced_packages, unused_import, unused_field
 
 import 'dart:developer';
 
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/android_params.dart';
+import 'package:flutter_callkit_incoming/entities/call_event.dart';
+import 'package:flutter_callkit_incoming/entities/call_kit_params.dart';
+import 'package:flutter_callkit_incoming/entities/ios_params.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -33,11 +39,44 @@ class AppScreen extends StatefulWidget {
 class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
   //CallHistoryController callController = Get.put(CallHistoryController());
   GetDeleteStroy deleteStroy = Get.put(GetDeleteStroy());
+  String? _currentUuid;
+  late final Uuid _uuid;
+
+  asknotificationpermmision() async {
+    await FlutterCallkitIncoming.requestNotificationPermission({
+      "rationaleMessagePermission":
+          "Notification permission is required, to show notification.",
+      "postNotificationMessageRequired":
+          "Notification permission is required, Please allow notification permission from setting."
+    });
+  }
+
+  dynamicLinkIsPending() async {
+    print("deepLinking ");
+    final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+
+    print("initialLink 1 $initialLink");
+    if (initialLink != null) {
+      final Uri deepLink = initialLink.link;
+      print("deepLink 1 $deepLink");
+    }
+
+    FirebaseDynamicLinks.instance.onLink.listen(
+      (pendingDynamicLinkData) {
+        final Uri deepLink = pendingDynamicLinkData.link;
+        log("deepLink 2 $deepLink");
+        // if (deepLink.path == "/primocys") {
+        //   Get.to(BottomAppBarWithoutCenterButton(index: 2));
+        // }
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // asknotificationpermmision();
     requestPermissions();
     _checkPermissions();
     FirebaseMessaging.instance.getInitialMessage().then(
@@ -52,129 +91,84 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
       },
     );
 
+    // FlutterCallkitIncoming.onEvent.listen((event) {
+    //   switch (event!.event) {
+    //     case Event.actionCallIncoming:
+    //       print("NOTIFICATION EVENT actionCallIncoming");
+    //       break;
+    //     case Event.actionCallStart:
+    //       print("NOTIFICATION EVENT actionCallStart");
+    //       break;
+    //     case Event.actionCallAccept:
+    //       print("NOTIFICATION EVENT actionCallAccept");
+    //       print("NOTIFICATION EVENT BODY ${event.body}");
+    //       Get.to(
+    //         VideoCallScreen(
+    //           roomID: event.body['extra']['roomId'],
+    //         ),
+    //       );
+    //       break;
+    //     case Event.actionCallDecline:
+    //       print("NOTIFICATION EVENT actionCallDecline");
+    //       FlutterCallkitIncoming.endAllCalls();
+    //       break;
+    //     case Event.actionCallEnded:
+    //       print("NOTIFICATION EVENT actionCallEnded");
+    //       FlutterCallkitIncoming.endAllCalls();
+    //       break;
+    //     case Event.actionCallTimeout:
+    //       print("NOTIFICATION EVENT actionCallTimeout");
+    //       FlutterCallkitIncoming.endAllCalls();
+    //       break;
+    //     case Event.actionCallCallback:
+    //       print("NOTIFICATION EVENT actionCallCallback");
+
+    //       break;
+    //     case Event.actionCallToggleHold:
+    //       print("NOTIFICATION EVENT actionCallToggleHold");
+
+    //       break;
+    //     case Event.actionCallToggleMute:
+    //       print("NOTIFICATION EVENT actionCallToggleMute");
+
+    //       break;
+    //     case Event.actionCallToggleDmtf:
+    //       print("NOTIFICATION EVENT actionCallToggleDmtf");
+
+    //       break;
+    //     case Event.actionCallToggleGroup:
+    //       print("NOTIFICATION EVENT actionCallToggleGroup");
+
+    //       break;
+    //     case Event.actionCallToggleAudioSession:
+    //       print("NOTIFICATION EVENT actionCallToggleAudioSession");
+
+    //       break;
+    //     case Event.actionDidUpdateDevicePushTokenVoip:
+    //       print("NOTIFICATION EVENT actionDidUpdateDevicePushTokenVoip");
+
+    //       break;
+    //     case Event.actionCallCustom:
+    //       print("NOTIFICATION EVENT actionCallCustom");
+
+    //       break;
+    //   }
+    // });
+
+    // _uuid = const Uuid();
     FirebaseMessaging.onMessage.listen(
       (message) async {
         print("FirebaseMessaging.onMessage.listen");
         LocalNotificationService.notificationsPlugin.cancelAll();
+        // FlutterCallkitIncoming.endAllCalls();
         print("NOTIFICATION:::: ${message.data}");
 
         // if (message.data['call_type'] == 'video_call') {
-        //   print('testing incoming video call');
-        //   CallKitParams callKitParams = CallKitParams(
-        //     id: const Uuid().v4(),
-        //     nameCaller: 'Hien Nguyen',
-        //     appName: 'Meyaoo',
-        //     avatar: 'https://i.pravatar.cc/100',
-        //     handle: '0123456789',
-        //     type: 0,
-        //     textAccept: 'Conform',
-        //     textDecline: 'Reject',
-        //     // missedCallNotification: const NotificationParams(
-        //     //   showNotification: true,
-        //     //   isShowCallback: true,
-        //     //   subtitle: 'Missed call',
-        //     //   callbackText: 'Call back',
-        //     // ),
-        //     duration: 30000,
-        //     // extra: <String, dynamic>{'userId': '1a2b3c4d'},
-        //     // headers: <String, dynamic>{
-        //     //   'apiKey': 'Abc@123!',
-        //     //   'platform': 'flutter'
-        //     // },
-        //     android: const AndroidParams(
-        //       isCustomNotification: true,
-        //       isShowLogo: true,
-        //       ringtonePath: 'system_ringtone_default',
-        //       backgroundColor: '#0955fa',
-        //       backgroundUrl: 'https://i.pravatar.cc/500',
-        //       actionColor: '#4CAF50',
-        //       textColor: '#ffffff',
-        //       incomingCallNotificationChannelName: "Incoming Call",
-        //       missedCallNotificationChannelName: "Missed Call",
-        //       isShowFullLockedScreen: true,
-        //       isShowCallID: false,
-        //     ),
-        //     ios: const IOSParams(
-        //       // iconName: 'CallKitLogo',
-        //       handleType: 'generic',
-        //       supportsVideo: true,
-        //       maximumCallGroups: 2,
-        //       maximumCallsPerCallGroup: 1,
-        //       audioSessionMode: 'default',
-        //       audioSessionActive: true,
-        //       audioSessionPreferredSampleRate: 44100.0,
-        //       audioSessionPreferredIOBufferDuration: 0.005,
-        //       supportsDTMF: true,
-        //       supportsHolding: true,
-        //       supportsGrouping: false,
-        //       supportsUngrouping: false,
-        //       ringtonePath: 'system_ringtone_default',
-        //     ),
-        //   );
-        //   await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
-        //   FlutterCallkitIncoming.onEvent.listen((event) {
-        //     switch (event!.event) {
-        //       case Event.actionCallIncoming:
-        //         print("NOTIFICATION EVENT actionCallIncoming");
-        //         break;
-        //       case Event.actionCallStart:
-        //         print("NOTIFICATION EVENT actionCallStart");
-        //         break;
-        //       case Event.actionCallAccept:
-        //         print("NOTIFICATION EVENT actionCallAccept");
-        //         Get.to(
-        //           VideoCallScreen(
-        //             roomID: message.data['room_id'],
-        //           ),
-        //           transition: Transition.rightToLeft,
-        //         );
-        //         break;
-        //       case Event.actionCallDecline:
-        //         print("NOTIFICATION EVENT actionCallDecline");
-        //         FlutterCallkitIncoming.endAllCalls();
-        //         break;
-        //       case Event.actionCallEnded:
-        //         print("NOTIFICATION EVENT actionCallEnded");
-        //         FlutterCallkitIncoming.endAllCalls();
-        //         break;
-        //       case Event.actionCallTimeout:
-        //         print("NOTIFICATION EVENT actionCallTimeout");
-        //         FlutterCallkitIncoming.endAllCalls();
-        //         break;
-        //       case Event.actionCallCallback:
-        //         print("NOTIFICATION EVENT actionCallCallback");
-
-        //         break;
-        //       case Event.actionCallToggleHold:
-        //         print("NOTIFICATION EVENT actionCallToggleHold");
-
-        //         break;
-        //       case Event.actionCallToggleMute:
-        //         print("NOTIFICATION EVENT actionCallToggleMute");
-
-        //         break;
-        //       case Event.actionCallToggleDmtf:
-        //         print("NOTIFICATION EVENT actionCallToggleDmtf");
-
-        //         break;
-        //       case Event.actionCallToggleGroup:
-        //         print("NOTIFICATION EVENT actionCallToggleGroup");
-
-        //         break;
-        //       case Event.actionCallToggleAudioSession:
-        //         print("NOTIFICATION EVENT actionCallToggleAudioSession");
-
-        //         break;
-        //       case Event.actionDidUpdateDevicePushTokenVoip:
-        //         print("NOTIFICATION EVENT actionDidUpdateDevicePushTokenVoip");
-
-        //         break;
-        //       case Event.actionCallCustom:
-        //         print("NOTIFICATION EVENT actionCallCustom");
-
-        //         break;
-        //     }
-        //   });
+        //   // _currentUuid = _uuid.v4();
+        //   // // showInCommingCall(_currentUuid!, message);
+        //   Get.to(VideoCallScreen(
+        //     roomID: message.data['room_id'],
+        //   ));
         // } else {
         if (message.notification != null) {
           print(message.notification!.title);
@@ -614,6 +608,59 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     // callController.callHistoryApiVideo();
     // callController.callHistoryApiAudio();
     log("AuthToken: ${Hive.box(userdata).get(authToken)}");
+  }
+
+  Future<void> showInCommingCall(String uuid, RemoteMessage message) async {
+    print('testing incoming video call');
+    CallKitParams callKitParams = CallKitParams(
+      id: uuid,
+      nameCaller: message.data["senderName"],
+      appName: 'Meyaoo',
+      avatar: message.data["sender_profile_image"],
+      handle: message.data["sender_phone_number"],
+      type: 0,
+      textAccept: 'Accept',
+      textDecline: 'Reject',
+
+      // missedCallNotification: const NotificationParams(
+      //   showNotification: true,
+      //   isShowCallback: true,
+      //   subtitle: 'Missed call',
+      //   callbackText: 'Call back',
+      // ),
+      duration: 30000,
+      extra: <String, dynamic>{
+        'roomId': message.data['room_id'],
+      },
+      // headers: <String, dynamic>{
+      //   'apiKey': 'Abc@123!',
+      //   'platform': 'flutter'
+      // },
+      android: AndroidParams(
+        isCustomNotification: true,
+        isShowLogo: true,
+        ringtonePath: 'system_ringtone_default',
+        backgroundColor: '#0955fa',
+        actionColor: '#4CAF50',
+        backgroundUrl: message.data["receiver_profile_image"],
+      ),
+      ios: const IOSParams(
+        handleType: '',
+        supportsVideo: true,
+        maximumCallGroups: 2,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'default',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        supportsDTMF: true,
+        supportsHolding: true,
+        supportsGrouping: false,
+        supportsUngrouping: false,
+        ringtonePath: 'system_ringtone_default',
+      ),
+    );
+    await FlutterCallkitIncoming.showCallkitIncoming(callKitParams);
   }
 
   Future<void> _checkPermissions() async {
