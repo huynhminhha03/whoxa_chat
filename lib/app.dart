@@ -49,7 +49,7 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
   }
 
   dynamicLinkIsPending() async {
-    print("deepLinking ");
+    print("deepLinking");
     final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
 
     print("initialLink 1 $initialLink");
@@ -60,11 +60,13 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
 
     FirebaseDynamicLinks.instance.onLink.listen(
       (pendingDynamicLinkData) {
+        print("FirebaseDynamicLinks cheking");
         final Uri deepLink = pendingDynamicLinkData.link;
         log("deepLink 2 $deepLink");
-        // if (deepLink.path == "/primocys") {
-        //   Get.to(BottomAppBarWithoutCenterButton(index: 2));
-        // }
+        if (deepLink.path == "/incoming_video_call") {
+          print("NAVIGAT TO VIDEO CALL SCREEN");
+          Get.to(VideoCallScreen());
+        }
       },
     );
   }
@@ -161,191 +163,192 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
         // FlutterCallkitIncoming.endAllCalls();
         print("NOTIFICATION:::: ${message.data}");
 
-        // if (message.data['call_type'] == 'video_call') {
-        //   // _currentUuid = _uuid.v4();
-        //   // // showInCommingCall(_currentUuid!, message);
-        //   Get.to(VideoCallScreen(
-        //     roomID: message.data['room_id'],
-        //   ));
-        // } else {
-        if (message.notification != null) {
-          print(message.notification!.title);
+        if (message.data['call_type'] == 'video_call') {
+          launchURL("https://meyaoo.page.link/incoming_video_call");
+          // // _currentUuid = _uuid.v4();
+          // // // showInCommingCall(_currentUuid!, message);
+          // Get.to(VideoCallScreen(
+          //   roomID: message.data['room_id'],
+          // ));
+        } else {
+          if (message.notification != null) {
+            print(message.notification!.title);
 
-          print(message.data['message']);
+            print(message.data['message']);
 
-          print("message.data ${message.data}");
-          if (message.data['title'] == 'Call Decline') {
-            Get.to(TabbarScreen());
+            print("message.data ${message.data}");
+            if (message.data['title'] == 'Call Decline') {
+              Get.to(TabbarScreen());
+            }
+
+            ///SIMPLE NOTIFICATION
+            InitializationSettings initializationSettings =
+                const InitializationSettings(
+              android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+            );
+
+            LocalNotificationService.notificationsPlugin.initialize(
+              initializationSettings,
+              //-----------------------------------------------------------------------------
+              //--------------------------- WHEN APP BACKGROUND -----------------------------
+              //-----------------------------------------------------------------------------
+              onDidReceiveBackgroundNotificationResponse: (details) {
+                if (details.actionId == 'accept') {
+                  print("accept");
+                  if (message.data['call_type'] == 'video_call') {
+                    // Navigate to the desired screen based on the payload'
+                    Get.to(VideoCallScreen(
+                      roomID: message.data['room_id'],
+                    ));
+                  } else if (message.data['title'] == 'Audio call') {
+                    // navigate to screen
+                  } else if (message.data['title'] == 'Group Audio call') {
+                    // navigate to screen
+                  } else if (message.data['title'] == 'Group Video call') {
+                    //navigate to screen
+                  }
+                } else if (details.actionId == 'decline') {
+                  print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
+                } else {
+                  if (message.data['call_type'] == 'video_call') {
+                    Get.to(VideoCallScreen(
+                      roomID: message.data['room_id'],
+                    ));
+                    // Get.to(VideoCallPage(
+                    //   callerImage: message.data['caller_profile_pic'],
+                    //   callerName: message.data['caller_name'],
+                    //   reciverImage: message.data['receiver_profile_pic'],
+                    //   reciverName: message.data['receiver_name'],
+                    //   isCaller: false,
+                    //   isReciverWait: true,
+                    //   waitChannelId: message.data['channel'],
+                    //   waitToken: message.data['token'],
+                    //   callerId: message.data['my_id'],
+                    //   reciverId: message.data['toUser'],
+                    // ));
+                  } else if (message.data['title'] == 'Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group video call') {
+                    //navigate to screen
+                  } else if (message.data['title_done'] == 'Message') {
+                    print("ID::::::");
+                    // single chat message notification through navigate specific single_chat
+                    // Get.to(() => SingelChatDetailsScreenTemp(
+                    //       index: 0,
+                    //       seconduserID: message.data['second_user_id'],
+                    //       secondUsername: capitalizeFirstLetter(getContact1(
+                    //           getMobile(message.data['mobile']),
+                    //           message.data['second_username'])),
+                    //       groupID: "",
+                    //       groupName: "",
+                    //       myID: message.data['my_id'],
+                    //       isBlocked: "0",
+                    //       seconduserpic: message.data['profile_image'],
+                    //       phoneNumber: message.data['mobile'],
+                    //       userStatus: "",
+                    //       lastSeen: "",
+                    //     ));
+                  } else if (message.data['title_done'] == 'group_message') {
+                    print("GROUP::::");
+                    // group chat message notification through navigate specific group_chat
+                    // Get.to(() => GroupchatScreenTemp(
+                    //       groupID: message.data['group_id'],
+                    //       groupName: message.data['group_name'],
+                    //       myID: Hive.box(userdata).get(userId),
+                    //       seconduserpic: message.data['group_profile_image'],
+                    //     ));
+                  }
+                }
+                // }
+              },
+              //-----------------------------------------------------------------------------------------------------------
+              //------------------------------------------------- WEHN APP IS ALREADY OPEN THEN RECEIVED NOTIFI------------
+              //-----------------------------------------------------------------------------------------------------------
+              onDidReceiveNotificationResponse: (details) {
+                if (details.actionId == 'accept') {
+                  print("accept");
+                  if (message.data['call_type'] == 'video_call') {
+                    Get.to(VideoCallScreen(
+                      roomID: message.data['room_id'],
+                    ));
+                    // Navigate to the desired screen based on the payload'
+                    // Get.to(VideoCallPage(
+                    //   fromChannelId: message.data['channel'],
+                    //   fromToken: message.data['token'],
+                    //   isCaller: false,
+                    //   callerImage: message.data['caller_profile_pic'],
+                    //   callerName: message.data['caller_name'],
+                    //   isReciverWait: false,
+                    // ));
+                  } else if (message.data['title'] == 'Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group Video call') {
+                    //navigate to screen
+                  }
+                } else if (details.actionId == 'decline') {
+                  print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
+                } else {
+                  if (message.data['call_type'] == 'video_call') {
+                    Get.to(VideoCallScreen(
+                      roomID: message.data['room_id'],
+                    ));
+                    // Get.to(VideoCallPage(
+                    //   callerImage: message.data['caller_profile_pic'],
+                    //   callerName: message.data['caller_name'],
+                    //   reciverImage: message.data['receiver_profile_pic'],
+                    //   reciverName: message.data['receiver_name'],
+                    //   isCaller: false,
+                    //   isReciverWait: true,
+                    //   waitChannelId: message.data['channel'],
+                    //   waitToken: message.data['token'],
+                    //   callerId: message.data['my_id'],
+                    //   reciverId: message.data['toUser'],
+                    // ));
+                  } else if (message.data['title'] == 'Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group Audio call') {
+                    //navigate to screen
+                  } else if (message.data['title'] == 'Group Video call') {
+                    //navigate to screen
+                  } else if (message.data['title_done'] == 'Message') {
+                    print("ID::::::");
+                    // single chat message notification through navigate specific single_chat
+                    // Get.to(() => SingelChatDetailsScreenTemp(
+                    //       index: 0,
+                    //       seconduserID: message.data['second_user_id'],
+                    //       secondUsername: capitalizeFirstLetter(getContact1(
+                    //           getMobile(message.data['mobile']),
+                    //           message.data['second_username'])),
+                    //       groupID: "",
+                    //       groupName: "",
+                    //       myID: message.data['my_id'],
+                    //       isBlocked: "0",
+                    //       seconduserpic: message.data['profile_image'],
+                    //       phoneNumber: message.data['mobile'],
+                    //       userStatus: "",
+                    //       lastSeen: "",
+                    //     ));
+                  } else if (message.data['title_done'] == 'group_message') {
+                    print("GROUP::::");
+                    // group chat message notification through navigate specific group_chat
+                    // Get.to(() => GroupchatScreenTemp(
+                    //       groupID: message.data['group_id'],
+                    //       groupName: message.data['group_name'],
+                    //       myID: Hive.box(userdata).get(userId),
+                    //       seconduserpic: message.data['group_profile_image'],
+                    //     ));
+                  }
+                }
+                // }
+              },
+            );
+            LocalNotificationService.createanddisplaynotification(message);
           }
-
-          ///SIMPLE NOTIFICATION
-          InitializationSettings initializationSettings =
-              const InitializationSettings(
-            android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-          );
-
-          LocalNotificationService.notificationsPlugin.initialize(
-            initializationSettings,
-            //-----------------------------------------------------------------------------
-            //--------------------------- WHEN APP BACKGROUND -----------------------------
-            //-----------------------------------------------------------------------------
-            onDidReceiveBackgroundNotificationResponse: (details) {
-              if (details.actionId == 'accept') {
-                print("accept");
-                if (message.data['call_type'] == 'video_call') {
-                  // Navigate to the desired screen based on the payload'
-                  Get.to(VideoCallScreen(
-                    roomID: message.data['room_id'],
-                  ));
-                } else if (message.data['title'] == 'Audio call') {
-                  // navigate to screen
-                } else if (message.data['title'] == 'Group Audio call') {
-                  // navigate to screen
-                } else if (message.data['title'] == 'Group Video call') {
-                  //navigate to screen
-                }
-              } else if (details.actionId == 'decline') {
-                print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
-              } else {
-                if (message.data['call_type'] == 'video_call') {
-                  Get.to(VideoCallScreen(
-                    roomID: message.data['room_id'],
-                  ));
-                  // Get.to(VideoCallPage(
-                  //   callerImage: message.data['caller_profile_pic'],
-                  //   callerName: message.data['caller_name'],
-                  //   reciverImage: message.data['receiver_profile_pic'],
-                  //   reciverName: message.data['receiver_name'],
-                  //   isCaller: false,
-                  //   isReciverWait: true,
-                  //   waitChannelId: message.data['channel'],
-                  //   waitToken: message.data['token'],
-                  //   callerId: message.data['my_id'],
-                  //   reciverId: message.data['toUser'],
-                  // ));
-                } else if (message.data['title'] == 'Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group video call') {
-                  //navigate to screen
-                } else if (message.data['title_done'] == 'Message') {
-                  print("ID::::::");
-                  // single chat message notification through navigate specific single_chat
-                  // Get.to(() => SingelChatDetailsScreenTemp(
-                  //       index: 0,
-                  //       seconduserID: message.data['second_user_id'],
-                  //       secondUsername: capitalizeFirstLetter(getContact1(
-                  //           getMobile(message.data['mobile']),
-                  //           message.data['second_username'])),
-                  //       groupID: "",
-                  //       groupName: "",
-                  //       myID: message.data['my_id'],
-                  //       isBlocked: "0",
-                  //       seconduserpic: message.data['profile_image'],
-                  //       phoneNumber: message.data['mobile'],
-                  //       userStatus: "",
-                  //       lastSeen: "",
-                  //     ));
-                } else if (message.data['title_done'] == 'group_message') {
-                  print("GROUP::::");
-                  // group chat message notification through navigate specific group_chat
-                  // Get.to(() => GroupchatScreenTemp(
-                  //       groupID: message.data['group_id'],
-                  //       groupName: message.data['group_name'],
-                  //       myID: Hive.box(userdata).get(userId),
-                  //       seconduserpic: message.data['group_profile_image'],
-                  //     ));
-                }
-              }
-              // }
-            },
-            //-----------------------------------------------------------------------------------------------------------
-            //------------------------------------------------- WEHN APP IS ALREADY OPEN THEN RECEIVED NOTIFI------------
-            //-----------------------------------------------------------------------------------------------------------
-            onDidReceiveNotificationResponse: (details) {
-              if (details.actionId == 'accept') {
-                print("accept");
-                if (message.data['call_type'] == 'video_call') {
-                  Get.to(VideoCallScreen(
-                    roomID: message.data['room_id'],
-                  ));
-                  // Navigate to the desired screen based on the payload'
-                  // Get.to(VideoCallPage(
-                  //   fromChannelId: message.data['channel'],
-                  //   fromToken: message.data['token'],
-                  //   isCaller: false,
-                  //   callerImage: message.data['caller_profile_pic'],
-                  //   callerName: message.data['caller_name'],
-                  //   isReciverWait: false,
-                  // ));
-                } else if (message.data['title'] == 'Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group Video call') {
-                  //navigate to screen
-                }
-              } else if (details.actionId == 'decline') {
-                print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
-              } else {
-                if (message.data['call_type'] == 'video_call') {
-                  Get.to(VideoCallScreen(
-                    roomID: message.data['room_id'],
-                  ));
-                  // Get.to(VideoCallPage(
-                  //   callerImage: message.data['caller_profile_pic'],
-                  //   callerName: message.data['caller_name'],
-                  //   reciverImage: message.data['receiver_profile_pic'],
-                  //   reciverName: message.data['receiver_name'],
-                  //   isCaller: false,
-                  //   isReciverWait: true,
-                  //   waitChannelId: message.data['channel'],
-                  //   waitToken: message.data['token'],
-                  //   callerId: message.data['my_id'],
-                  //   reciverId: message.data['toUser'],
-                  // ));
-                } else if (message.data['title'] == 'Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group Audio call') {
-                  //navigate to screen
-                } else if (message.data['title'] == 'Group Video call') {
-                  //navigate to screen
-                } else if (message.data['title_done'] == 'Message') {
-                  print("ID::::::");
-                  // single chat message notification through navigate specific single_chat
-                  // Get.to(() => SingelChatDetailsScreenTemp(
-                  //       index: 0,
-                  //       seconduserID: message.data['second_user_id'],
-                  //       secondUsername: capitalizeFirstLetter(getContact1(
-                  //           getMobile(message.data['mobile']),
-                  //           message.data['second_username'])),
-                  //       groupID: "",
-                  //       groupName: "",
-                  //       myID: message.data['my_id'],
-                  //       isBlocked: "0",
-                  //       seconduserpic: message.data['profile_image'],
-                  //       phoneNumber: message.data['mobile'],
-                  //       userStatus: "",
-                  //       lastSeen: "",
-                  //     ));
-                } else if (message.data['title_done'] == 'group_message') {
-                  print("GROUP::::");
-                  // group chat message notification through navigate specific group_chat
-                  // Get.to(() => GroupchatScreenTemp(
-                  //       groupID: message.data['group_id'],
-                  //       groupName: message.data['group_name'],
-                  //       myID: Hive.box(userdata).get(userId),
-                  //       seconduserpic: message.data['group_profile_image'],
-                  //     ));
-                }
-              }
-              // }
-            },
-          );
-          LocalNotificationService.createanddisplaynotification(message);
         }
-        // }
       },
     );
 
