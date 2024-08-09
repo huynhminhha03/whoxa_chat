@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
@@ -96,6 +97,10 @@ Color yellow1Color = const Color.fromRGBO(255, 237, 171, 1);
 Color yellow2Color = const Color.fromRGBO(252, 198, 4, 1);
 Color grey1Color = const Color.fromRGBO(221, 221, 221, 1);
 Color blurColor = const Color.fromRGBO(0, 0, 0, 0.56);
+Color darkGreyColor = const Color.fromRGBO(58, 51, 51, 1);
+Color linkColor = const Color.fromRGBO(2, 126, 181, 1);
+Color blackColor = const Color.fromRGBO(158, 158, 158, 1);
+Color black1Color = const Color.fromRGBO(27, 27, 27, 1);
 List<String> likedPost = [];
 List<String> likedComment = [];
 var likedProduct = [];
@@ -1861,4 +1866,38 @@ class CustomButtom extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget messageSelector({
+  required Function() onTap,
+  required List chatID,
+  required int messageid,
+}) {
+  return InkWell(
+      onTap: onTap,
+      child: chatID.isEmpty
+          ? const SizedBox()
+          : Transform.scale(
+              scale: 1.1,
+              child: Container(
+                  width: 20.0,
+                  height: 20.0,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(
+                          color: chatID.contains(messageid.toString())
+                              ? Colors.transparent
+                              : black1Color),
+                      color: chatID.contains(messageid.toString()) ? bg1 : bg1,
+                      gradient: chatID.contains(messageid.toString())
+                          ? LinearGradient(
+                              colors: [blackColor, black1Color],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomCenter)
+                          : null),
+                  child: chatID.contains(messageid.toString())
+                      ? Image.asset("assets/images/right.png").paddingAll(4)
+                      : const SizedBox(
+                          height: 10,
+                        ))));
 }

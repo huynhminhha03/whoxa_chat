@@ -822,6 +822,107 @@ class SingleChatContorller extends GetxController {
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
 
+  sendMessageVoiceRply(conversationID, msgtype, File filePath, duration, chatID,
+      String mobileNum) async {
+    isSendMsg(true);
+    var uri = Uri.parse(apiHelper.sendChatMsg);
+
+    var request = http.MultipartRequest("POST", uri);
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+      "Accept": "application/json",
+    };
+
+    //add headers
+    request.headers.addAll(headers);
+    //adding params
+    request.fields['message_type'] = msgtype;
+    request.fields['conversation_id'] = conversationID;
+    request.fields['audio_time'] = duration;
+    request.fields['reply_id'] = chatID;
+    request.fields['phone_number'] = mobileNum;
+    request.files
+        .add(await http.MultipartFile.fromPath('files', filePath.path));
+
+    // send
+    var response = await request.send();
+
+    String responseData = await response.stream.transform(utf8.decoder).join();
+    var useData = json.decode(responseData);
+
+    sendMsgModel.value = SendMsgModel.fromJson(useData);
+    isSendMsg(false);
+    print("object: ${request.fields}");
+    print(responseData);
+
+    // final respo = MessageList.fromJson(useData);
+    // userdetailschattModel.value!.messageList!.add(respo);
+    if (duration != null) {
+      final newMessage = MessageList.fromJson(useData);
+
+      if (userdetailschattModel.value?.messageList == null) {
+        userdetailschattModel.value =
+            SingleChatListModel(messageList: [newMessage]);
+      } else {
+        print("check.......");
+        userdetailschattModel.value!.messageList!.insert(0, newMessage);
+      }
+    }
+    userdetailschattModel.refresh();
+    Get.find<ChatListController>().forChatList();
+    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+  }
+
+  sendMessageContactReply(conversationID, msgtype, contactName, contactNumber,
+      String mobileNum, image, chatID) async {
+    var uri = Uri.parse(apiHelper.sendChatMsg);
+
+    var request = http.MultipartRequest("POST", uri);
+
+    Map<String, String> headers = {
+      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+      "Accept": "application/json",
+    };
+    //add headers
+    request.headers.addAll(headers);
+    //adding params
+    request.fields['message_type'] = msgtype;
+    request.fields['conversation_id'] = conversationID;
+    request.fields['shared_contact_name'] = contactName;
+    request.fields['shared_contact_number'] = contactNumber;
+    request.fields['shared_contact_profile_image'] = image;
+    request.fields['reply_id'] = chatID;
+    request.fields['phone_number'] = mobileNum;
+
+    // send
+    var response = await request.send();
+
+    String responseData = await response.stream.transform(utf8.decoder).join();
+    var useData = json.decode(responseData);
+
+    sendMsgModel.value = SendMsgModel.fromJson(useData);
+    Get.back();
+    print("object: ${request.fields}");
+    print("object: ${request.files}");
+    print("RESPONSE: $responseData");
+
+    // final respo = MessageList.fromJson(useData);
+    // userdetailschattModel.value!.messageList!.add(respo);
+    final newMessage = MessageList.fromJson(useData);
+
+    if (userdetailschattModel.value?.messageList == null) {
+      userdetailschattModel.value =
+          SingleChatListModel(messageList: [newMessage]);
+    } else {
+      print("check.......");
+      userdetailschattModel.value!.messageList!.insert(0, newMessage);
+    }
+    userdetailschattModel.refresh();
+    Get.find<ChatListController>().forChatList();
+    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+  }
+
   deleteChatApi(chatID, bool deleteFrom, String mobileNum) async {
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.deleteChatMsg);

@@ -14,8 +14,14 @@ import '../../../controller/get_contact_controller.dart';
 class ContactSend extends StatefulWidget {
   String conversationID;
   String mobileNum;
+  bool SelectedreplyText;
+  String replyID;
   ContactSend(
-      {super.key, required this.conversationID, required this.mobileNum});
+      {super.key,
+      required this.conversationID,
+      required this.mobileNum,
+      required this.SelectedreplyText,
+      required this.replyID});
 
   @override
   State<ContactSend> createState() => _ContactSendState();
@@ -180,17 +186,32 @@ class _ContactSendState extends State<ContactSend> {
                 Expanded(
                   child: ListTile(
                     onTap: () {
-                      chatContorller.sendMessageContact(
-                          widget.conversationID,
-                          "contact",
-                          contact.displayName,
-                          getMobile(
-                              contact.phones.map((e) => e.number).toString()),
-                          widget.mobileNum,
-                          matchingIndex != -1
-                              ? getAllDeviceContact
-                                  .getList[matchingIndex].profileImage!
-                              : "");
+                      if (widget.SelectedreplyText == true) {
+                        chatContorller.sendMessageContactReply(
+                            widget.conversationID,
+                            "contact",
+                            contact.displayName,
+                            getMobile(
+                                contact.phones.map((e) => e.number).toString()),
+                            widget.mobileNum,
+                            matchingIndex != -1
+                                ? getAllDeviceContact
+                                    .getList[matchingIndex].profileImage!
+                                : "",
+                            widget.replyID);
+                      } else {
+                        chatContorller.sendMessageContact(
+                            widget.conversationID,
+                            "contact",
+                            contact.displayName,
+                            getMobile(
+                                contact.phones.map((e) => e.number).toString()),
+                            widget.mobileNum,
+                            matchingIndex != -1
+                                ? getAllDeviceContact
+                                    .getList[matchingIndex].profileImage!
+                                : "");
+                      }
                     },
                     leading: Stack(
                       children: <Widget>[

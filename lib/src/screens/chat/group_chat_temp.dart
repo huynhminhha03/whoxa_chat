@@ -3476,6 +3476,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               () => ContactSend(
                                     conversationID: widget.conversationID!,
                                     mobileNum: widget.mobileNum.toString(),
+                                    SelectedreplyText: SelectedreplyText,
+                                    replyID: reply_chatID,
                                   ),
                               transition: Transition.leftToRight);
                         },
