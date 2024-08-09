@@ -18,9 +18,6 @@ import 'package:meyaoo_new/controller/get_delete_story.dart';
 import 'package:meyaoo_new/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/call/audio/audiocalling.dart';
-import 'package:meyaoo_new/src/screens/call/audio/group_audio_call.dart';
-import 'package:meyaoo_new/src/screens/call/video/group_video_call_recived.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/welcome.dart';
@@ -200,40 +197,11 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
                     roomID: message.data['room_id'],
                   ));
                 } else if (message.data['title'] == 'Audio call') {
-                  Get.to(VoiceCall(
-                    fromChannelId: message.data['channel'],
-                    fromToken: message.data['token'],
-                    isCaller: false,
-                    callerImage: message.data['caller_profile_pic'],
-                    callerName: message.data['caller_name'],
-                    isReciverWait: false,
-                  ));
+                  // navigate to screen
                 } else if (message.data['title'] == 'Group Audio call') {
-                  Get.to(() => GroupVoiceCall(
-                        fromChannelId: message.data['channel'],
-                        fromToken: message.data['token'],
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: false,
-                      ));
+                  // navigate to screen
                 } else if (message.data['title'] == 'Group Video call') {
-                  Get.to(() => GroupReceivedVideoCallScreen(
-                        fromChannelId: message.data['channel'],
-                        fromToken: message.data['token'],
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: false,
-                      ));
-                  // Get.to(() => GroupVideoCallScreen(
-                  //       fromChannelId: message.data['channel'],
-                  //       fromToken: message.data['token'],
-                  //       isCaller: false,
-                  //       callerImage: message.data['caller_profile_pic'],
-                  //       callerName: message.data['receiver_name'],
-                  //       isReciverWait: false,
-                  //     ));
+                  //navigate to screen
                 }
               } else if (details.actionId == 'decline') {
                 print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
@@ -255,38 +223,11 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
                   //   reciverId: message.data['toUser'],
                   // ));
                 } else if (message.data['title'] == 'Audio call') {
-                  Get.to(VoiceCall(
-                    isCaller: false,
-                    callerImage: message.data['caller_profile_pic'],
-                    callerName: message.data['caller_name'],
-                    isReciverWait: true,
-                    waitChannelId: message.data['channel'],
-                    waitToken: message.data['token'],
-                    callerId: message.data['my_id'],
-                    reciverId: message.data['toUser'],
-                  ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group Audio call') {
-                  Get.to(() => GroupVoiceCall(
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: true,
-                        waitChannelId: message.data['channel'],
-                        waitToken: message.data['token'],
-                        callerId: message.data['my_id'],
-                        reciverId: message.data['toUser'],
-                      ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group video call') {
-                  Get.to(() => GroupReceivedVideoCallScreen(
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: true,
-                        waitChannelId: message.data['channel'],
-                        waitToken: message.data['token'],
-                        callerId: message.data['my_id'],
-                        reciverId: message.data['toUser'],
-                      ));
+                  //navigate to screen
                 } else if (message.data['title_done'] == 'Message') {
                   print("ID::::::");
                   // single chat message notification through navigate specific single_chat
@@ -338,32 +279,11 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
                   //   isReciverWait: false,
                   // ));
                 } else if (message.data['title'] == 'Audio call') {
-                  Get.to(VoiceCall(
-                    fromChannelId: message.data['channel'],
-                    fromToken: message.data['token'],
-                    isCaller: false,
-                    callerImage: message.data['caller_profile_pic'],
-                    callerName: message.data['caller_name'],
-                    isReciverWait: false,
-                  ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group Audio call') {
-                  Get.to(() => GroupVoiceCall(
-                        fromChannelId: message.data['channel'],
-                        fromToken: message.data['token'],
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: false,
-                      ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group Video call') {
-                  Get.to(() => GroupReceivedVideoCallScreen(
-                        fromChannelId: message.data['channel'],
-                        fromToken: message.data['token'],
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: false,
-                      ));
+                  //navigate to screen
                 }
               } else if (details.actionId == 'decline') {
                 print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
@@ -385,38 +305,11 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
                   //   reciverId: message.data['toUser'],
                   // ));
                 } else if (message.data['title'] == 'Audio call') {
-                  Get.to(VoiceCall(
-                    isCaller: false,
-                    callerImage: message.data['caller_profile_pic'],
-                    callerName: message.data['caller_name'],
-                    isReciverWait: true,
-                    waitChannelId: message.data['channel'],
-                    waitToken: message.data['token'],
-                    callerId: message.data['my_id'],
-                    reciverId: message.data['toUser'],
-                  ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group Audio call') {
-                  Get.to(() => GroupVoiceCall(
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: true,
-                        waitChannelId: message.data['channel'],
-                        waitToken: message.data['token'],
-                        callerId: message.data['my_id'],
-                        reciverId: message.data['toUser'],
-                      ));
+                  //navigate to screen
                 } else if (message.data['title'] == 'Group Video call') {
-                  Get.to(() => GroupReceivedVideoCallScreen(
-                        isCaller: false,
-                        callerImage: message.data['receiver_profile_pic'],
-                        callerName: message.data['receiver_name'],
-                        isReciverWait: true,
-                        waitChannelId: message.data['channel'],
-                        waitToken: message.data['token'],
-                        callerId: message.data['my_id'],
-                        reciverId: message.data['toUser'],
-                      ));
+                  //navigate to screen
                 } else if (message.data['title_done'] == 'Message') {
                   print("ID::::::");
                   // single chat message notification through navigate specific single_chat

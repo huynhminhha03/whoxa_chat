@@ -17,8 +17,6 @@ import 'package:meyaoo_new/model/group_audio_call_model.dart';
 import 'package:meyaoo_new/model/groupvideocall_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/call/audio/group_audio_call.dart';
-import 'package:meyaoo_new/src/screens/call/video/group_video_call.dart';
 import 'package:meyaoo_new/src/screens/chat/Media.dart';
 import 'package:meyaoo_new/src/screens/chat/allstarred_msg_list.dart';
 import 'package:meyaoo_new/src/screens/chat/group_memberlist.dart';
@@ -115,21 +113,6 @@ class _GroupProfileState extends State<GroupProfile> {
       setState(() {
         isLoading = false;
       });
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GroupVoiceCall(
-              fromChannelId: "",
-              fromToken: grpAudioCallModel.token,
-              isCaller: true,
-              callerImage: grpAudioCallModel.callerProfilePic,
-              callerName: grpAudioCallModel.callerName,
-              reciverImage: grpAudioCallModel.receiverProfilePic,
-              reciverName: grpAudioCallModel.receiverName,
-              callerId: grpAudioCallModel.callerId,
-              reciverId: grpAudioCallModel.receiverId,
-            ),
-          ));
     }
     if (mounted) {
       setState(() {
@@ -169,21 +152,6 @@ class _GroupProfileState extends State<GroupProfile> {
       setState(() {
         isLoading = false;
       });
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GroupVideoCallScreen(
-              fromChannelId: "",
-              fromToken: videoCallModel.token,
-              isCaller: true,
-              callerImage: videoCallModel.callerProfilePic,
-              callerName: videoCallModel.callerName,
-              reciverImage: videoCallModel.receiverProfilePic,
-              reciverName: videoCallModel.receiverName,
-              callerId: videoCallModel.callerId,
-              reciverId: videoCallModel.receiverId,
-            ),
-          ));
     }
     if (mounted) {
       setState(() {

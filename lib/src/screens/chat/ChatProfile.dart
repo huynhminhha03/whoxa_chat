@@ -22,7 +22,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../global/strings.dart';
-import '../call/audio/audiocalling.dart';
 
 class ChatProfile extends StatefulWidget {
   String? fullName;
@@ -83,22 +82,6 @@ class _ChatProfileState extends State<ChatProfile> {
         print("caller token::${audioCallModel.token}");
         print("caller channel::${audioCallModel.callerId}");
       });
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => VoiceCall(
-              fromChannelId: widget.peeid!,
-              fromToken: audioCallModel.token,
-              isCaller: true,
-              callerImage: audioCallModel.callerProfilePic,
-              callerName: audioCallModel.callerName,
-              reciverImage: audioCallModel.receiverProfilePic,
-              reciverName: widget.fullName,
-              callerId: audioCallModel.callerId,
-              reciverId: audioCallModel.receiverId,
-              callID: audioCallModel.callId,
-            ),
-          ));
     }
   }
 

@@ -67,7 +67,6 @@ dependencies:
   geocoding: ^2.0.5
   google_maps_webservice: ^0.0.19
   #flutter_google_places: ^0.3.0
-  agora_rtc_engine: ^6.0.0
   place_picker: ^0.10.0
   record_mp3: ^3.0.0
   firebase_messaging: ^14.2.1
