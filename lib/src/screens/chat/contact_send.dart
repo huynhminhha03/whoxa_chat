@@ -169,8 +169,9 @@ class _ContactSendState extends State<ContactSend> {
         Uint8List? image = contact.photo;
 
         // Check for matching invite
-        int matchingIndex =
-            isMatchinginvite(contact.phones.map((e) => e.number).join(','));
+        int matchingIndex = isMatchinginvite(
+            getMobile(contact.phones.map((e) => e.number).toString()));
+        // ignore: avoid_print
 
         return Column(
           children: <Widget>[
@@ -186,7 +187,10 @@ class _ContactSendState extends State<ContactSend> {
                           getMobile(
                               contact.phones.map((e) => e.number).toString()),
                           widget.mobileNum,
-                          "");
+                          matchingIndex != -1
+                              ? getAllDeviceContact
+                                  .getList[matchingIndex].profileImage!
+                              : "");
                     },
                     leading: Stack(
                       children: <Widget>[

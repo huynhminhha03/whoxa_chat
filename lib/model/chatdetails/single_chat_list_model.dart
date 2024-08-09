@@ -46,33 +46,37 @@ class MessageList {
   bool? isStarMessage;
   bool? myMessage;
   SenderData? senderData;
+  String? whoSeenTheMessage;
+  String? sharedContactProfileImage;
   // ResData? resData;
 
-  MessageList({
-    this.url,
-    this.thumbnail,
-    this.messageId,
-    this.message,
-    this.messageType,
-    this.messageRead,
-    this.videoTime,
-    this.audioTime,
-    this.latitude,
-    this.longitude,
-    this.sharedContactName,
-    this.sharedContactNumber,
-    this.forwardId,
-    this.replyId,
-    this.statusId,
-    this.createdAt,
-    this.updatedAt,
-    this.senderId,
-    this.conversationId,
-    this.isStarMessage,
-    this.myMessage,
-    this.senderData,
-    // this.resData
-  });
+  MessageList(
+      {this.url,
+      this.thumbnail,
+      this.messageId,
+      this.message,
+      this.messageType,
+      this.messageRead,
+      this.videoTime,
+      this.audioTime,
+      this.latitude,
+      this.longitude,
+      this.sharedContactName,
+      this.sharedContactNumber,
+      this.forwardId,
+      this.replyId,
+      this.statusId,
+      this.createdAt,
+      this.updatedAt,
+      this.senderId,
+      this.conversationId,
+      this.isStarMessage,
+      this.myMessage,
+      this.senderData,
+      this.whoSeenTheMessage,
+      this.sharedContactProfileImage
+      // this.resData
+      });
 
   MessageList.fromJson(Map<String, dynamic> json) {
     url = json['url'];
@@ -99,6 +103,8 @@ class MessageList {
     senderData = json['senderData'] != null
         ? SenderData.fromJson(json['senderData'])
         : null;
+    whoSeenTheMessage = json['who_seen_the_message'];
+    sharedContactProfileImage = json['shared_contact_profile_image'];
     // resData =
     //     json['resData'] != null ? ResData.fromJson(json['resData']) : null;
   }
@@ -129,6 +135,8 @@ class MessageList {
     if (senderData != null) {
       data['senderData'] = senderData!.toJson();
     }
+    data['who_seen_the_message'] = whoSeenTheMessage;
+    data['shared_contact_profile_image'] = sharedContactProfileImage;
     // if (resData != null) {
     //   data['resData'] = resData!.toJson();
     // }

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -316,428 +317,454 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               Column(
                   children: [
                     Flexible(
-                        child: Stack(
-                      children: [
-                        NotificationListener<ScrollNotification>(
-                            onNotification: (n) {
-                              if (n.metrics.pixels <= HEIGHT) {
-                                notifier.value = n.metrics.pixels;
+                        child: Container(
+                      decoration: const BoxDecoration(
+                          image: DecorationImage(
+                              opacity: 0.03,
+                              image:
+                                  AssetImage("assets/images/chat_back_img.png"),
+                              fit: BoxFit.cover)),
+                      child: Stack(
+                        children: [
+                          NotificationListener<ScrollNotification>(
+                              onNotification: (n) {
+                                if (n.metrics.pixels <= HEIGHT) {
+                                  notifier.value = n.metrics.pixels;
 
-                                // Calculate the index of the first visible message
-                                int firstVisibleIndex = (n.metrics.pixels /
-                                        (HEIGHT /
-                                            chatContorller.userdetailschattModel
-                                                .value!.messageList!.length))
-                                    .floor();
-                                if (firstVisibleIndex <
-                                    chatContorller.userdetailschattModel.value!
-                                        .messageList!.length) {
-                                  String formattedDate = chatContorller
-                                              .userdetailschattModel
-                                              .value!
-                                              .messageList![firstVisibleIndex]
-                                              .messageType ==
-                                          'date'
-                                      ? formatDate(convertToLocalDate(
-                                          chatContorller
-                                              .userdetailschattModel
-                                              .value!
-                                              .messageList![firstVisibleIndex]
-                                              .message))
-                                      : "";
-                                  dateNotifier.value = formattedDate;
-                                }
-                              }
-                              return false;
-                            },
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: chatContorller.userdetailschattModel.value!
-                                          .messageList!.isEmpty ||
-                                      chatContorller
-                                              .userdetailschattModel
-                                              .value!
-                                              .messageList!
-                                              .first
-                                              .message ==
-                                          null
-                                  ? Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15),
-                                        child: Column(
-                                          children: [
-                                            SizedBox(
-                                                height: isKeyboard
-                                                    ? MediaQuery.sizeOf(context)
-                                                            .height *
-                                                        0.3
-                                                    : MediaQuery.sizeOf(context)
-                                                            .height *
-                                                        0.4),
-                                            InkWell(
-                                              onTap: () {
-                                                //sendApiBydefult();
-                                                widget.isBlock == true
-                                                    ? showCustomToast(
-                                                        "User bloked")
-                                                    : widget.mobileNum ==
-                                                                null &&
-                                                            widget.mobileNum ==
-                                                                ""
-                                                        ? chatContorller
-                                                            .sendMessageText(
-                                                                "Hi",
-                                                                widget
-                                                                    .conversationID!,
-                                                                "text",
-                                                                widget.mobileNum
-                                                                    .toString())
-                                                        : chatContorller
-                                                            .sendMessageText(
-                                                                "Hi",
-                                                                widget
-                                                                    .conversationID!,
-                                                                "text",
-                                                                "");
-                                              },
-                                              child: Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    1.5,
-                                                decoration: BoxDecoration(
-                                                    color: const Color.fromARGB(
-                                                        255, 238, 234, 234),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      15.0),
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      RichText(
-                                                          text: const TextSpan(
-                                                              children: [
-                                                            TextSpan(
-                                                                text:
-                                                                    "To Start Message Say  ",
-                                                                style: TextStyle(
-                                                                    color:
-                                                                        chatColor,
-                                                                    fontSize:
-                                                                        13,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w200)),
-                                                            TextSpan(
-                                                                text: "Hi!",
-                                                                style: TextStyle(
-                                                                    color:
-                                                                        chatColor,
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w500))
-                                                          ]))
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  //____________ ALL MESSAGES _____________________
-
-                                  : Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: _searchResult.isNotEmpty ||
-                                              _searchController.text
-                                                  .toLowerCase()
-                                                  .isNotEmpty
-                                          ? ListView.builder(
-                                              shrinkWrap: true,
-                                              reverse: true,
-                                              controller: listScrollController,
-                                              // physics:
-                                              //     const BouncingScrollPhysics(),
-                                              itemCount: _searchResult.length,
-                                              itemBuilder: (context, index) {
-                                                return buildItem(index,
-                                                    _searchResult[index]);
-                                              })
-                                          : ListView.builder(
-                                              shrinkWrap: true,
-                                              reverse: true,
-                                              scrollDirection: Axis.vertical,
-                                              controller: listScrollController,
-                                              // physics:
-                                              //     const BouncingScrollPhysics(),
-                                              itemCount: chatContorller
+                                  // Calculate the index of the first visible message
+                                  int firstVisibleIndex = (n.metrics.pixels /
+                                          (HEIGHT /
+                                              chatContorller
                                                   .userdetailschattModel
                                                   .value!
                                                   .messageList!
-                                                  .length,
-                                              itemBuilder: (context, index) {
-                                                print(
-                                                    "LISTTTTTT:${chatContorller.userdetailschattModel.value!.messageList!.length}");
-                                                for (int i = 0;
-                                                    i <
-                                                        chatContorller
-                                                            .userdetailschattModel
-                                                            .value!
-                                                            .messageList!
-                                                            .length;
-                                                    i++) {
-                                                  if (isScroll == true) {
-                                                    gotoindex = i;
-                                                    _scrollToIndex(gotoindex);
-                                                    isScroll = false;
-                                                  }
-                                                }
-                                                return AutoScrollTag(
-                                                    key: ValueKey(index),
-                                                    controller:
-                                                        listScrollController!,
-                                                    index: index,
-                                                    child: buildItem(
-                                                        index,
-                                                        chatContorller
-                                                            .userdetailschattModel
-                                                            .value!
-                                                            .messageList![index]));
-                                              },
-                                            ),
-                                    ),
-                            )),
-                        // sticky date
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 100),
-                        //   child: ValueListenableBuilder<double>(
-                        //     valueListenable: notifier,
-                        //     builder: (context, value, child) {
-                        //       return Transform.translate(
-                        //         offset: Offset(0, value - HEIGHT),
-                        //         child: Row(
-                        //           mainAxisAlignment: MainAxisAlignment.center,
-                        //           children: [
-                        //             Container(
-                        //               decoration: BoxDecoration(
-                        //                   color: Colors.grey[300],
-                        //                   borderRadius: const BorderRadius.all(
-                        //                       Radius.circular(20))),
-                        //               height: 35,
-                        //               // width: 120,
-                        //               child: Padding(
-                        //                 padding: const EdgeInsets.only(
-                        //                     left: 10, right: 10),
-                        //                 child: Row(
-                        //                   mainAxisAlignment:
-                        //                       MainAxisAlignment.center,
-                        //                   crossAxisAlignment:
-                        //                       CrossAxisAlignment.center,
-                        //                   children: [
-                        //                     Padding(
-                        //                       padding:
-                        //                           const EdgeInsets.only(top: 0),
-                        //                       child: ValueListenableBuilder<
-                        //                           String>(
-                        //                         valueListenable: dateNotifier,
-                        //                         builder:
-                        //                             (context, date, child) {
-                        //                           print("DATETIME: $date");
-                        //                           return Text(
-                        //                             date,
-                        //                             style: const TextStyle(
-                        //                               color: Colors.black,
-                        //                               fontSize: 12,
-                        //                               fontWeight:
-                        //                                   FontWeight.bold,
-                        //                             ),
-                        //                           );
-                        //                         },
-                        //                       ),
-                        //                     )
-                        //                   ],
-                        //                 ),
-                        //               ),
-                        //             )
-                        //           ],
-                        //         ),
-                        //       );
-                        //     },
-                        //   ),
-                        // ),
-                        // arrow down button
-                        chatContorller.userdetailschattModel.value!.messageList!
-                                    .isEmpty ||
-                                chatContorller.userdetailschattModel.value!
-                                        .messageList!.first.message ==
-                                    null
-                            ? const SizedBox.shrink()
-                            : Padding(
-                                padding: const EdgeInsets.only(top: 40),
-                                child: ValueListenableBuilder<double>(
-                                  valueListenable: notifier,
-                                  builder: (context, value, child) {
-                                    return Transform.translate(
-                                        offset: const Offset(0, 0),
+                                                  .length))
+                                      .floor();
+                                  if (firstVisibleIndex <
+                                      chatContorller.userdetailschattModel
+                                          .value!.messageList!.length) {
+                                    String formattedDate = chatContorller
+                                                .userdetailschattModel
+                                                .value!
+                                                .messageList![firstVisibleIndex]
+                                                .messageType ==
+                                            'date'
+                                        ? formatDate(convertToLocalDate(
+                                            chatContorller
+                                                .userdetailschattModel
+                                                .value!
+                                                .messageList![firstVisibleIndex]
+                                                .message))
+                                        : "";
+                                    dateNotifier.value = formattedDate;
+                                  }
+                                }
+                                return false;
+                              },
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: chatContorller.userdetailschattModel
+                                            .value!.messageList!.isEmpty ||
+                                        chatContorller
+                                                .userdetailschattModel
+                                                .value!
+                                                .messageList!
+                                                .first
+                                                .message ==
+                                            null
+                                    ? Center(
                                         child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 0, right: 0),
-                                          child: value < 1
-                                              ? Container()
-                                              : Align(
-                                                  alignment:
-                                                      Alignment.bottomCenter,
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.grey[200],
-                                                        borderRadius:
-                                                            const BorderRadius
-                                                                .all(
-                                                                Radius.circular(
-                                                                    40))),
-                                                    height: 40,
-                                                    width: 40,
-                                                    child: IconButton(
-                                                      onPressed: () {
-                                                        // _animateToIndex(20);
-                                                        listScrollController!.jumpTo(
-                                                            listScrollController!
-                                                                .position
-                                                                .minScrollExtent);
-                                                      },
-                                                      icon: const Icon(Icons
-                                                          .arrow_circle_down),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 15),
+                                          child: Column(
+                                            children: [
+                                              SizedBox(
+                                                  height: isKeyboard
+                                                      ? MediaQuery.sizeOf(
+                                                                  context)
+                                                              .height *
+                                                          0.3
+                                                      : MediaQuery.sizeOf(
+                                                                  context)
+                                                              .height *
+                                                          0.4),
+                                              InkWell(
+                                                onTap: () {
+                                                  //sendApiBydefult();
+                                                  widget.isBlock == true
+                                                      ? showCustomToast(
+                                                          "User bloked")
+                                                      : widget.mobileNum ==
+                                                                  null &&
+                                                              widget.mobileNum ==
+                                                                  ""
+                                                          ? chatContorller
+                                                              .sendMessageText(
+                                                                  "Hi",
+                                                                  widget
+                                                                      .conversationID!,
+                                                                  "text",
+                                                                  widget
+                                                                      .mobileNum
+                                                                      .toString())
+                                                          : chatContorller
+                                                              .sendMessageText(
+                                                                  "Hi",
+                                                                  widget
+                                                                      .conversationID!,
+                                                                  "text",
+                                                                  "");
+                                                },
+                                                child: Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width /
+                                                      1.5,
+                                                  decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              238,
+                                                              234,
+                                                              234),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10)),
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            15.0),
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        RichText(
+                                                            text:
+                                                                const TextSpan(
+                                                                    children: [
+                                                              TextSpan(
+                                                                  text:
+                                                                      "To Start Message Say  ",
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          chatColor,
+                                                                      fontSize:
+                                                                          13,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w200)),
+                                                              TextSpan(
+                                                                  text: "Hi!",
+                                                                  style: TextStyle(
+                                                                      color:
+                                                                          chatColor,
+                                                                      fontSize:
+                                                                          16,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500))
+                                                            ]))
+                                                      ],
                                                     ),
                                                   ),
                                                 ),
-                                        ));
-                                  },
-                                ),
-                              ),
-
-                        //========================= for reply design
-                        //========================= for reply design
-                        SelectedreplyText
-                            ? Positioned(
-                                bottom: 0,
-                                child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.99,
-                                  // height: 73,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(00.0),
-                                          topLeft: Radius.circular(00.0))),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Divider(
-                                        height: 1,
-                                        thickness: 1,
-                                        color: Colors.grey[200],
-                                      ),
-                                      Container(
-                                        color: bg1,
-                                        child: Row(
-                                          children: [
-                                            Container(
-                                              height: 60,
-                                              width: 8,
-                                              decoration: const BoxDecoration(
-                                                  color: chatownColor,
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10.0),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  10.0))),
-                                            ),
-                                            const SizedBox(
-                                              width: 10,
-                                            ),
-                                            Container(
-                                              height: 51,
-                                              width: MediaQuery.sizeOf(context)
-                                                      .width *
-                                                  0.85,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
                                               ),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(USERTEXT),
-                                                  const SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(
-                                                    capitalizeFirstLetter(
-                                                        replyText),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w400,
-                                                      color: chatColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  SelectedreplyText = false;
-                                                  print(SelectedreplyText);
-                                                });
-                                              },
-                                              child: Container(
-                                                height: 30,
-                                                width: 30,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: Border.all(
-                                                      color: appColorBlack),
-                                                  // color: Colors.blue,
-                                                ),
-                                                child: const Icon(Icons.close,
-                                                    color: appColorBlack),
-                                              ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
+                                      )
+                                    //____________ ALL MESSAGES _____________________
+
+                                    : Padding(
+                                        padding: const EdgeInsets.only(top: 5),
+                                        child: _searchResult.isNotEmpty ||
+                                                _searchController.text
+                                                    .toLowerCase()
+                                                    .isNotEmpty
+                                            ? ListView.builder(
+                                                shrinkWrap: true,
+                                                reverse: true,
+                                                controller:
+                                                    listScrollController,
+                                                // physics:
+                                                //     const BouncingScrollPhysics(),
+                                                itemCount: _searchResult.length,
+                                                itemBuilder: (context, index) {
+                                                  return buildItem(index,
+                                                      _searchResult[index]);
+                                                })
+                                            : ListView.builder(
+                                                shrinkWrap: true,
+                                                reverse: true,
+                                                scrollDirection: Axis.vertical,
+                                                controller:
+                                                    listScrollController,
+                                                // physics:
+                                                //     const BouncingScrollPhysics(),
+                                                itemCount: chatContorller
+                                                    .userdetailschattModel
+                                                    .value!
+                                                    .messageList!
+                                                    .length,
+                                                itemBuilder: (context, index) {
+                                                  print(
+                                                      "LISTTTTTT:${chatContorller.userdetailschattModel.value!.messageList!.length}");
+                                                  for (int i = 0;
+                                                      i <
+                                                          chatContorller
+                                                              .userdetailschattModel
+                                                              .value!
+                                                              .messageList!
+                                                              .length;
+                                                      i++) {
+                                                    if (isScroll == true) {
+                                                      gotoindex = i;
+                                                      _scrollToIndex(gotoindex);
+                                                      isScroll = false;
+                                                    }
+                                                  }
+                                                  return AutoScrollTag(
+                                                      key: ValueKey(index),
+                                                      controller:
+                                                          listScrollController!,
+                                                      index: index,
+                                                      child: buildItem(
+                                                          index,
+                                                          chatContorller
+                                                                  .userdetailschattModel
+                                                                  .value!
+                                                                  .messageList![
+                                                              index]));
+                                                },
+                                              ),
                                       ),
-                                    ],
+                              )),
+                          // sticky date
+                          // Padding(
+                          //   padding: const EdgeInsets.only(top: 100),
+                          //   child: ValueListenableBuilder<double>(
+                          //     valueListenable: notifier,
+                          //     builder: (context, value, child) {
+                          //       return Transform.translate(
+                          //         offset: Offset(0, value - HEIGHT),
+                          //         child: Row(
+                          //           mainAxisAlignment: MainAxisAlignment.center,
+                          //           children: [
+                          //             Container(
+                          //               decoration: BoxDecoration(
+                          //                   color: Colors.grey[300],
+                          //                   borderRadius: const BorderRadius.all(
+                          //                       Radius.circular(20))),
+                          //               height: 35,
+                          //               // width: 120,
+                          //               child: Padding(
+                          //                 padding: const EdgeInsets.only(
+                          //                     left: 10, right: 10),
+                          //                 child: Row(
+                          //                   mainAxisAlignment:
+                          //                       MainAxisAlignment.center,
+                          //                   crossAxisAlignment:
+                          //                       CrossAxisAlignment.center,
+                          //                   children: [
+                          //                     Padding(
+                          //                       padding:
+                          //                           const EdgeInsets.only(top: 0),
+                          //                       child: ValueListenableBuilder<
+                          //                           String>(
+                          //                         valueListenable: dateNotifier,
+                          //                         builder:
+                          //                             (context, date, child) {
+                          //                           print("DATETIME: $date");
+                          //                           return Text(
+                          //                             date,
+                          //                             style: const TextStyle(
+                          //                               color: Colors.black,
+                          //                               fontSize: 12,
+                          //                               fontWeight:
+                          //                                   FontWeight.bold,
+                          //                             ),
+                          //                           );
+                          //                         },
+                          //                       ),
+                          //                     )
+                          //                   ],
+                          //                 ),
+                          //               ),
+                          //             )
+                          //           ],
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                          // ),
+                          // arrow down button
+                          chatContorller.userdetailschattModel.value!
+                                      .messageList!.isEmpty ||
+                                  chatContorller.userdetailschattModel.value!
+                                          .messageList!.first.message ==
+                                      null
+                              ? const SizedBox.shrink()
+                              : Padding(
+                                  padding: const EdgeInsets.only(top: 40),
+                                  child: ValueListenableBuilder<double>(
+                                    valueListenable: notifier,
+                                    builder: (context, value, child) {
+                                      return Transform.translate(
+                                          offset: const Offset(0, 0),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 0, right: 0),
+                                            child: value < 1
+                                                ? Container()
+                                                : Align(
+                                                    alignment:
+                                                        Alignment.bottomCenter,
+                                                    child: Container(
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              Colors.grey[200],
+                                                          borderRadius:
+                                                              const BorderRadius
+                                                                  .all(Radius
+                                                                      .circular(
+                                                                          40))),
+                                                      height: 40,
+                                                      width: 40,
+                                                      child: IconButton(
+                                                        onPressed: () {
+                                                          // _animateToIndex(20);
+                                                          listScrollController!.jumpTo(
+                                                              listScrollController!
+                                                                  .position
+                                                                  .minScrollExtent);
+                                                        },
+                                                        icon: const Icon(Icons
+                                                            .arrow_circle_down),
+                                                      ),
+                                                    ),
+                                                  ),
+                                          ));
+                                    },
                                   ),
                                 ),
-                              )
-                            : const SizedBox(),
-                      ],
+
+                          //========================= for reply design
+                          //========================= for reply design
+                          SelectedreplyText
+                              ? Positioned(
+                                  bottom: 0,
+                                  child: Container(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.99,
+                                    // height: 73,
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(00.0),
+                                            topLeft: Radius.circular(00.0))),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Divider(
+                                          height: 1,
+                                          thickness: 1,
+                                          color: Colors.grey[200],
+                                        ),
+                                        Container(
+                                          color: bg1,
+                                          child: Row(
+                                            children: [
+                                              Container(
+                                                height: 60,
+                                                width: 8,
+                                                decoration: const BoxDecoration(
+                                                    color: chatownColor,
+                                                    borderRadius: BorderRadius
+                                                        .only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10.0),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10.0))),
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Container(
+                                                height: 51,
+                                                width:
+                                                    MediaQuery.sizeOf(context)
+                                                            .width *
+                                                        0.85,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(USERTEXT),
+                                                    const SizedBox(
+                                                      height: 5,
+                                                    ),
+                                                    Text(
+                                                      capitalizeFirstLetter(
+                                                          replyText),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: chatColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    SelectedreplyText = false;
+                                                    print(SelectedreplyText);
+                                                  });
+                                                },
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 30,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(
+                                                        color: appColorBlack),
+                                                    // color: Colors.blue,
+                                                  ),
+                                                  child: const Icon(Icons.close,
+                                                      color: appColorBlack),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(),
+                        ],
+                      ),
                     )),
                     chatContorller.isSendMsg.value
                         ? SizedBox(
@@ -776,7 +803,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     //     )
                                     //   :
                                     isSelectedmessage == "0"
-                                        ? floatbutton()
+                                        ? floatbuttonNew()
                                         // when isSelectedmessage == "1" then forward option show
                                         : floatbutton1())
                                 : const SizedBox.shrink())
@@ -2496,9 +2523,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
-                                          const CircleAvatar(
-                                            radius: 18,
-                                            backgroundColor: Colors.grey,
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(35)),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(35),
+                                              child: CustomCachedNetworkImage(
+                                                  imageUrl: data
+                                                      .sharedContactProfileImage!,
+                                                  placeholderColor:
+                                                      chatownColor,
+                                                  errorWidgeticon: const Icon(
+                                                    Icons.groups,
+                                                    size: 30,
+                                                  )),
+                                            ),
                                           ),
                                           const SizedBox(width: 5),
                                           Column(
@@ -3235,6 +3278,200 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               ],
             ),
           );
+  }
+
+  Widget floatbuttonNew() {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: InkWell(
+                onTap: () {
+                  // if (widget.isBlocked == "1") {
+                  //   openBlockSheet(context);
+                  // } else {
+                  //   setState(() {
+                  //     click = !click;
+                  //   });
+                  // }
+                  setState(() {
+                    click = !click;
+                    closekeyboard();
+                  });
+                },
+                child: CircleAvatar(
+                    backgroundColor: chatownColor,
+                    radius: 20,
+                    child: Center(
+                        child: Icon(click ? Icons.remove : Icons.add,
+                            color: chatColor))),
+              ),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
+                    color: Colors.white),
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: TextFormField(
+                    onTap: () {
+                      isKeyboard = true;
+                    },
+                    maxLines: 4,
+                    minLines: 1, // Minimum lines to show initially
+                    cursorColor: Colors.black,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: TextStyle(
+                        color: isURL(messagecontroller.text.trim())
+                            ? const Color.fromARGB(255, 6, 6, 252)
+                            : Colors.black),
+                    controller: messagecontroller,
+                    decoration: InputDecoration(
+                        alignLabelWithHint: true,
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+                        border: InputBorder.none,
+                        hintText: "Type Message",
+                        hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400),
+                        suffixIcon: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Image.asset("assets/images/pin.png", height: 20),
+                            SizedBox(width: 5),
+                            Image.asset("assets/images/camera1.png", height: 20)
+                          ],
+                        ),
+                        isDense: true),
+                    onChanged: (value) {
+                      setState(() {
+                        if (value.trim().isEmpty) {
+                          // If only whitespace characters are entered
+                          isSendbutton = false;
+                          isHttpSendbutton = false;
+                        } else if (isURL(value)) {
+                          // If it's a URL
+                          isSendbutton = true;
+                          isHttpSendbutton = true;
+                        } else {
+                          // If it's not a URL
+                          isSendbutton = true; // Adjusted condition
+                          isHttpSendbutton = false;
+                        }
+                        if (value.isNotEmpty &&
+                            isSendbutton &&
+                            typingstart == '0') {
+                          print("START-TYPING-1");
+                          typingstart = "1";
+                          chatContorller.isTypingApi(
+                              widget.conversationID!, "1");
+                          controller.isTyping();
+                        }
+                        typingTimer?.cancel();
+                        startTypingTimer();
+                        if (value.isNotEmpty &&
+                            isSendbutton &&
+                            typingstart == '0') {
+                          print("START-TYPING-1");
+                          typingstart = '1';
+                          chatContorller.isTypingApi(
+                              widget.conversationID!, "1");
+                          controller.isTyping();
+                        }
+                      });
+                    },
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              width: 5,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: InkWell(
+                  onTap: () {
+                    //--------- reply text api call -----------------//
+                    if (messagecontroller.text.isNotEmpty && isSendbutton) {
+                      if (SelectedreplyText == true) {
+                        try {
+                          chatContorller.isSendMsg.value = true;
+                          chatContorller.sendMessageReplyText(
+                              messagecontroller.text.trim(),
+                              widget.conversationID.toString(),
+                              'text',
+                              reply_chatID,
+                              widget.mobileNum.toString());
+                          chatContorller.isSendMsg.value = false;
+                          SelectedreplyText = false;
+                          chatContorller.isTypingApi(
+                              widget.conversationID!, "0");
+                          controller.isTyping();
+                          typingstart = "0";
+                        } catch (e) {
+                          chatContorller.isSendMsg.value = false;
+                          print(e);
+                          showCustomToast("Something Error2");
+                        }
+                        messagecontroller.clear();
+                      } else {
+                        //================ text api call =============//
+                        try {
+                          chatContorller.isSendMsg.value = true;
+                          print(messagecontroller.text.trim());
+                          print(widget.conversationID);
+                          print('text');
+                          print(widget.mobileNum);
+                          chatContorller.sendMessageText(
+                              messagecontroller.text.trim(),
+                              widget.conversationID.toString(),
+                              'text',
+                              widget.mobileNum.toString());
+                          chatContorller.isTypingApi(
+                              widget.conversationID!, "0");
+                          controller.isTyping();
+                          typingstart = "0";
+                          chatContorller.isSendMsg.value = false;
+                        } catch (e) {
+                          chatContorller.isSendMsg.value = false;
+                          print(e);
+                          showCustomToast("Something Error1");
+                        }
+                        messagecontroller.clear();
+                      }
+                    } else {
+                      checkPermission();
+                      bottoSheet();
+                      closekeyboard();
+                    }
+                  },
+                  child: CircleAvatar(
+                      backgroundColor: chatownColor,
+                      radius: 20,
+                      child: messagecontroller.text.isNotEmpty && isSendbutton
+                          ? const Icon(
+                              Icons.send,
+                              color: chatColor,
+                            )
+                          : Image.asset("assets/images/microphone-2.png",
+                              height: 20, color: chatColor))),
+            )
+          ],
+        ),
+        Platform.isIOS
+            ? const SizedBox(height: 30)
+            : const SizedBox(height: 10),
+      ],
+    );
   }
 
 //============================================================= AUDIO PLAYER VOICE MESSAGE ===============================================================
