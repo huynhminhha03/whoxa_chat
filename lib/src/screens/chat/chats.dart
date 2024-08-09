@@ -1,6 +1,7 @@
 // ignore_for_file: curly_braces_in_flow_control_structures, avoid_print, prefer_if_null_operators, prefer_is_empty, unused_field, avoid_function_literals_in_foreach_calls, unused_local_variable
 
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -1201,80 +1202,84 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   Future dialogBox(bool isblock, String cID, bool isGroup, String uname,
       String gpname, ChatList data) {
     return showDialog(
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.0),
-            ),
-            content: SizedBox(
-              height: isGroup == false ? 87 : 50,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 40,
-                    child: ListTile(
-                      leading: const Text(
-                        'Archive',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+          return Stack(
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(
+                  color: const Color.fromRGBO(30, 30, 30, 0.37),
+                ),
+              ),
+              AlertDialog(
+                insetPadding: const EdgeInsets.all(8),
+                alignment: Alignment.bottomCenter,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                content: SizedBox(
+                  height: isGroup == false ? 87 : 50,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40,
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.archive_outlined,
+                            size: 19,
+                            color: Colors.black,
+                          ),
+                          title: const Text(
+                            'Archive chat',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            isGroup == false
+                                ? chatListController.addArchveApi(cID, uname)
+                                : chatListController.addArchveApi(cID, gpname);
+                            chatListController
+                                .userChatListModel.value!.chatList!
+                                .remove(data);
+                          },
                         ),
                       ),
-                      trailing: const Icon(
-                        Icons.archive_outlined,
-                        size: 19,
-                        color: Colors.black,
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        isGroup == false
-                            ? chatListController.addArchveApi(cID, uname)
-                            : chatListController.addArchveApi(cID, gpname);
-                        chatListController.userChatListModel.value!.chatList!
-                            .remove(data);
-                      },
-                    ),
-                  ),
-                  isGroup == false
-                      ? const SizedBox(height: 5)
-                      : const SizedBox.shrink(),
-                  isGroup == false
-                      ? Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey[200],
-                        )
-                      : const SizedBox.shrink(),
-                  isGroup == false
-                      ? SizedBox(
-                          height: 40,
-                          child: ListTile(
-                            leading: Text(
-                              isblock == false ? 'Block' : "Unblock",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
+                      isGroup == false
+                          ? const SizedBox(height: 5)
+                          : const SizedBox.shrink(),
+                      isGroup == false
+                          ? SizedBox(
+                              height: 40,
+                              child: ListTile(
+                                title: Text(
+                                  isblock == false ? 'Block' : "Unblock",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                leading: Image.asset("assets/images/block.png",
+                                    height: 18),
+                                onTap: () {
+                                  setState(() {});
+                                  Navigator.pop(context);
+                                  chatListController.blockUserApi(cID);
+                                },
                               ),
-                            ),
-                            trailing: const Icon(
-                              Icons.block,
-                              size: 19,
-                              color: Colors.black,
-                            ),
-                            onTap: () {
-                              setState(() {});
-                              Navigator.pop(context);
-                              chatListController.blockUserApi(cID);
-                            },
-                          ),
-                        )
-                      : const SizedBox.shrink()
-                ],
+                            )
+                          : const SizedBox.shrink()
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         });
   }
