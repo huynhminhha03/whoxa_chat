@@ -76,6 +76,7 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     // asknotificationpermmision();
     requestPermissions();
     _checkPermissions();
+    dynamicLinkIsPending();
     FirebaseMessaging.instance.getInitialMessage().then(
       (message) {
         print("FirebaseMessaging.instance.getInitialMessage");
