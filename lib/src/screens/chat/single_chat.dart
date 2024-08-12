@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names, unused_field
+// ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names, unused_field, prefer_is_empty
 
 import 'dart:async';
 import 'dart:io';
@@ -171,6 +171,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   List? chatMsgList;
 
   List chatID = [];
+  List<MessageList> chatMessageList = [];
   final TextEditingController _searchController = TextEditingController();
   TextEditingController messagecontroller = TextEditingController();
   AudioPlayer audioPlayer = AudioPlayer();
@@ -302,7 +303,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     bool isKeyboard = isKeyboardOpen();
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: isSelectedmessage == "0"
+        appBar: isSelectedmessage == "0" ||
+                chatID.isEmpty ||
+                chatMessageList.isEmpty
             ? (isSearchSelect == "0"
                 ? _appbar(context)
                 : _appbarSearch(context))
@@ -877,16 +880,24 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   Widget getTextMessageWidget(index, MessageList data) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
           print("ONTAPMSGID:$chatID");
@@ -897,56 +908,60 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.length == 0
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(data.messageId.toString())
-                                              ? Colors.transparent
-                                              : bg1,
-                                          gradient: chatID.contains(data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID.contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png")
-                                              .paddingAll(4)
-                                          : null),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(
                     height: 10,
                   ),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
                             ? 40
                             : 12
@@ -1036,16 +1051,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1053,58 +1077,58 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -1218,16 +1242,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1235,53 +1268,53 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
@@ -1297,7 +1330,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     : Alignment.centerRight,
                 child: Padding(
                   padding: EdgeInsets.only(
-                      left: chatID.isNotEmpty
+                      left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                           ? data.myMessage == false
                               ? 40
                               : 12
@@ -1414,16 +1447,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1431,58 +1473,58 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -1631,16 +1673,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1648,53 +1699,53 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 5,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
@@ -1717,11 +1768,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         height: 70,
                         width: 250,
                         padding: EdgeInsets.only(
-                            left: chatID.isNotEmpty
-                                ? data.myMessage == false
-                                    ? 35
-                                    : 10
-                                : 3,
+                            left:
+                                chatID.isNotEmpty || chatMessageList.isNotEmpty
+                                    ? data.myMessage == false
+                                        ? 35
+                                        : 10
+                                    : 3,
                             right: 3,
                             top: 0,
                             bottom: 0),
@@ -1825,16 +1877,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   Widget getVoiceMessageWidget(index, MessageList data) {
     return InkWell(
       onLongPress: () {
-        msgDailogShow(data, data.senderData!);
+        if (chatID.isEmpty || chatMessageList.isEmpty) {
+          msgDailogShow(data, data.senderData!);
+        }
       },
       onTap: () {
-        if (chatID.isNotEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
                 : chatID.add(data.messageId.toString());
+            //forward list
+            chatMessageList.contains(data)
+                ? chatMessageList.remove(data)
+                : chatMessageList.add(data);
+
+            print("MESSAGE_LISTTT:${chatMessageList.length}");
           });
         }
+        print("ONTAPMSGID:$chatID");
       },
       child: Stack(
         children: [
@@ -1842,58 +1903,55 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               ? Positioned(
                   left: 10,
                   bottom: 35,
-                  child: GestureDetector(
+                  child: InkWell(
                       onTap: () {
                         // Handle checkbox state change if needed
                         setState(() {
                           chatID.contains(data.messageId.toString())
                               ? chatID.remove(data.messageId.toString())
                               : chatID.add(data.messageId.toString());
+                          chatMessageList.contains(data)
+                              ? chatMessageList.remove(data)
+                              : chatMessageList.add(data);
                         });
                         print("ONTAPMSGID:$chatID");
                       },
-                      child: chatID.isEmpty
+                      child: chatID.length == 0 || chatMessageList.length == 0
                           ? const SizedBox()
                           : Transform.scale(
                               scale: 1.1,
-                              child: GestureDetector(
-                                child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(
-                                            color: chatID.contains(
-                                                    data.messageId.toString())
-                                                ? Colors.transparent
-                                                : black1Color),
-                                        color: chatID.contains(
-                                                data.messageId.toString())
-                                            ? bg1
-                                            : bg1,
-                                        gradient:
-                                            chatID.contains(data.messageId.toString())
-                                                ? LinearGradient(
-                                                    colors: [
-                                                        blackColor,
-                                                        black1Color
-                                                      ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomCenter)
-                                                : null),
-                                    child: chatID
-                                            .contains(data.messageId.toString())
-                                        ? Image.asset("assets/images/right.png")
-                                            .paddingAll(4)
-                                        : const SizedBox(
-                                            height: 10,
-                                          )),
-                              ))),
+                              child: chatID.contains(
+                                          data.messageId.toString()) ||
+                                      chatMessageList.contains(data)
+                                  ? Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          color: bg1,
+                                          gradient: LinearGradient(
+                                              colors: [blackColor, black1Color],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomCenter)),
+                                      child:
+                                          Image.asset("assets/images/right.png")
+                                              .paddingAll(3))
+                                  : Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          border:
+                                              Border.all(color: black1Color),
+                                          color: bg1),
+                                    ))),
                 )
               : const SizedBox(height: 10),
           Container(
             padding: EdgeInsets.only(
-                left: chatID.isNotEmpty
+                left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                     ? data.myMessage == false
                         ? 40
                         : 0
@@ -1919,16 +1977,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1936,58 +2003,58 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(
-                                              color: chatID.contains(
-                                                      data.messageId.toString())
-                                                  ? Colors.transparent
-                                                  : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? LinearGradient(
-                                                  colors: [
-                                                      blackColor,
-                                                      black1Color
-                                                    ],
-                                                  begin: Alignment.topLeft,
-                                                  end: Alignment.bottomCenter)
-                                              : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -2036,25 +2103,21 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     topRight: Radius.circular(15),
                                     topLeft: Radius.circular(15),
                                     bottomLeft: Radius.circular(15)),
-                            color: data.myMessage == false ? grey1Color : null,
-                            gradient: data.myMessage == false
-                                ? null
-                                : LinearGradient(
-                                    colors: [yellow1Color, yellow2Color],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter)),
+                            color: data.myMessage == false
+                                ? grey1Color
+                                : yellow1Color),
                         child: Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ClipRRect(
                             borderRadius: data.myMessage == false
                                 ? const BorderRadius.only(
-                                    topLeft: Radius.circular(15),
-                                    topRight: Radius.circular(15),
-                                    bottomRight: Radius.circular(15))
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10))
                                 : const BorderRadius.only(
-                                    topRight: Radius.circular(15),
-                                    topLeft: Radius.circular(15),
-                                    bottomLeft: Radius.circular(15)),
+                                    topRight: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
                             child: CachedNetworkImage(
                               imageUrl: data.url!,
                               imageBuilder: (context, imageProvider) => Stack(
@@ -2101,17 +2164,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
-          print(data.message!);
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -2119,56 +2190,58 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(
-                                            color: chatID.contains(
-                                                    data.messageId.toString())
-                                                ? Colors.transparent
-                                                : black1Color),
-                                        color: chatID.contains(
-                                                data.messageId.toString())
-                                            ? bg1
-                                            : bg1,
-                                        gradient:
-                                            chatID.contains(data.messageId.toString())
-                                                ? LinearGradient(
-                                                    colors: [
-                                                        blackColor,
-                                                        black1Color
-                                                      ],
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomCenter)
-                                                : null),
-                                    child: chatID
-                                            .contains(data.messageId.toString())
-                                        ? Image.asset("assets/images/right.png")
-                                            .paddingAll(4)
-                                        : const SizedBox(
-                                            height: 10,
-                                          )))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
                             ? 40
                             : 12
@@ -2392,16 +2465,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(data, data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -2409,50 +2491,60 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 ? Positioned(
                     left: 5,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(
                     height: 10,
                   ),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
                             ? 35
                             : 10
@@ -2611,16 +2703,22 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   Widget getReplyMessage(index, MessageList data) {
     return InkWell(
       onLongPress: () {
-        setState(() {
+        if (chatID.isEmpty || chatMessageList.isEmpty) {
           msgDailogShow(data, data.senderData!);
-        });
+        }
       },
       onTap: () {
-        if (chatID.isNotEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
                 : chatID.add(data.messageId.toString());
+            //forward list
+            chatMessageList.contains(data)
+                ? chatMessageList.remove(data)
+                : chatMessageList.add(data);
+
+            print("MESSAGE_LISTTT:${chatMessageList.length}");
           });
         }
         print("ONTAPMSGID:$chatID");
@@ -2632,6 +2730,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           data.senderData!),
     );
   }
+
 //================================================================= KEYBOARD =================================================================================
 
   bool click = false;
@@ -2672,8 +2771,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                         .replaceAll(']', '')
                                         .replaceAll('[', ''),
                                     isMsgType: true,
+                                    forwardMsgList: chatMessageList,
                                   ),
                                 ));
+                            chatMessageList = [];
                           },
                           child: Image.asset("assets/images/forward.png",
                               height: 20, color: chatColor),
@@ -2710,6 +2811,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               setState(() {
                                 isSelectedmessage = "0";
                                 chatID = [];
+                                chatMessageList = [];
                               });
                             },
                             child: const Text(
@@ -2845,22 +2947,27 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       if (SelectedreplyText == true) {
                         try {
                           chatContorller.isSendMsg.value = true;
-                          chatContorller.sendMessageReplyText(
+                          print(messagecontroller.text.trim());
+                          print(widget.conversationID);
+                          print('text');
+                          print(widget.mobileNum);
+                          chatContorller.sendMessageText(
                               messagecontroller.text.trim(),
                               widget.conversationID.toString(),
                               'text',
-                              reply_chatID,
-                              widget.mobileNum.toString());
-                          chatContorller.isSendMsg.value = false;
+                              widget.mobileNum.toString(),
+                              '',
+                              reply_chatID);
                           SelectedreplyText = false;
                           chatContorller.isTypingApi(
                               widget.conversationID!, "0");
                           controller.isTyping();
                           typingstart = "0";
+                          chatContorller.isSendMsg.value = false;
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
-                          showCustomToast("Something Error2");
+                          showCustomToast("Something Error1");
                         }
                         messagecontroller.clear();
                       } else {
@@ -2875,7 +2982,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               messagecontroller.text.trim(),
                               widget.conversationID.toString(),
                               'text',
-                              widget.mobileNum.toString());
+                              widget.mobileNum.toString(),
+                              '',
+                              '');
                           chatContorller.isTypingApi(
                               widget.conversationID!, "0");
                           controller.isTyping();
@@ -3153,20 +3262,26 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       audioController.isSending.value = true;
       print("DURATION:::${audioController.total}");
       if (SelectedreplyText == true) {
-        chatContorller.sendMessageVoiceRply(
-            widget.conversationID,
+        chatContorller.sendMessageVoice(
+            widget.conversationID!,
             "audio",
             File(recordFilePath),
+            '',
             audioController.total,
-            reply_chatID,
-            widget.mobileNum.toString());
+            widget.mobileNum.toString(),
+            '',
+            reply_chatID);
+        SelectedreplyText = false;
       } else {
         chatContorller.sendMessageVoice(
-            widget.conversationID,
+            widget.conversationID!,
             "audio",
             File(recordFilePath),
+            '',
             audioController.total,
-            widget.mobileNum.toString());
+            widget.mobileNum.toString(),
+            '',
+            '');
       }
     }
   }
@@ -3575,12 +3690,14 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           quality: 50,
         ).then((value) {
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageRpltIMGDoc(widget.conversationID, 'image',
-                value!.path, reply_chatID, widget.mobileNum.toString());
+            // chatContorller.sendMessageRpltIMGDoc(widget.conversationID, 'image',
+            //     value!.path, reply_chatID, widget.mobileNum.toString());
+            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
+                value!.path, widget.mobileNum.toString(), '', reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString());
+                value!.path, widget.mobileNum.toString(), '', '');
           }
         });
       } else {}
@@ -3613,16 +3730,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           print("RPLY:$SelectedreplyText");
           print(reply_chatID);
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageRpltIMGDoc(
-                widget.conversationID.toString(),
-                'image',
-                value!.path,
-                reply_chatID,
-                widget.mobileNum.toString());
+            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
+                value!.path, widget.mobileNum.toString(), '', reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString());
+                value!.path, widget.mobileNum.toString(), '', '');
           }
         });
       }
@@ -3648,12 +3761,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         // print('file type =============== > file $image');
 
         if (SelectedreplyText == true) {
-          chatContorller.sendMessageRpltIMGDoc(widget.conversationID,
-              'document', doc!.path, reply_chatID, widget.mobileNum.toString());
+          chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
+              doc!.path, widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
         } else {
           chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
-              doc!.path, widget.mobileNum.toString());
+              doc!.path, widget.mobileNum.toString(), '', '');
         }
 
         // print('Api Complete');
@@ -3775,12 +3888,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           compressedVideos = [compressedVideoPath, value];
 
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageVideoRply(widget.conversationID, "video",
-                compressedVideos, reply_chatID, widget.mobileNum.toString());
+            // chatContorller.sendMessageVideoRply(widget.conversationID, "video",
+            //     compressedVideos, reply_chatID, widget.mobileNum.toString());
+            chatContorller.sendMessageVideo(
+                widget.conversationID,
+                "video",
+                compressedVideos,
+                widget.mobileNum.toString(),
+                '',
+                reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageVideo(widget.conversationID, "video",
-                compressedVideos, widget.mobileNum.toString());
+                compressedVideos, widget.mobileNum.toString(), '', '');
           }
         }
       } else {
@@ -3832,12 +3952,14 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       if (response.statusCode == 200) {
         Uint8List bytes = response.bodyBytes;
         if (SelectedreplyText == true) {
-          chatContorller.sendMessageGIFRply(widget.conversationID, 'gif', bytes,
-              reply_chatID, widget.mobileNum.toString());
+          // chatContorller.sendMessageGIFRply(widget.conversationID, 'gif', bytes,
+          //     reply_chatID, widget.mobileNum.toString());
+          chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
+              widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
         } else {
-          chatContorller.sendMessageGIF(
-              widget.conversationID, 'gif', bytes, widget.mobileNum.toString());
+          chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
+              widget.mobileNum.toString(), '', '');
         }
 
         print(bytes.toString());
@@ -3870,12 +3992,20 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       _placeLong = result.latLng!.longitude.toString();
     });
     if (SelectedreplyText == true) {
-      chatContorller.sendMessageLocationRply(widget.conversationID!, "location",
-          _placeLat!, _placeLong!, reply_chatID, widget.mobileNum.toString());
+      // chatContorller.sendMessageLocationRply(widget.conversationID!, "location",
+      //     _placeLat!, _placeLong!, reply_chatID, widget.mobileNum.toString());
+      chatContorller.sendMessageLocation(
+          widget.conversationID!,
+          "location",
+          _placeLat!,
+          _placeLong!,
+          widget.mobileNum.toString(),
+          '',
+          reply_chatID);
       SelectedreplyText = false;
     } else {
       chatContorller.sendMessageLocation(widget.conversationID!, "location",
-          _placeLat!, _placeLong!, widget.mobileNum.toString());
+          _placeLat!, _placeLong!, widget.mobileNum.toString(), '', '');
     }
 
     // Handle the result in your way
@@ -3893,81 +4023,162 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25.0),
-          ),
-          title: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: bg1,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                data.messageType == "location"
-                    ? capitalizeFirstLetter("📌 Location")
-                    : data.messageType == "video"
-                        ? capitalizeFirstLetter("🎥 Video")
-                        : data.messageType == "image"
-                            ? capitalizeFirstLetter("📷 Photo")
-                            : data.messageType == "document"
-                                ? capitalizeFirstLetter("📄 Documenet")
-                                : data.messageType == "audio"
-                                    ? capitalizeFirstLetter("🔊 Voice message")
-                                    : data.messageType == "link"
-                                        ? capitalizeFirstLetter(data.message!)
-                                        : data.messageType == "gif"
-                                            ? "GIF"
-                                            : data.messageType == "contact"
-                                                ? "Contact"
-                                                : capitalizeFirstLetter(
-                                                    data.message!),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: chatColor,
-                ),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color: const Color.fromRGBO(30, 30, 30, 0.37),
               ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              //================ COPY ===============================
-              data.messageType != "location" &&
-                      data.messageType != "image" &&
-                      data.messageType != "video" &&
-                      data.messageType != "document" &&
-                      data.messageType != "audio" &&
-                      data.messageType != "gif" &&
-                      data.messageType != "contact"
-                  ? SizedBox(
+            AlertDialog(
+              insetPadding: const EdgeInsets.all(15),
+              alignment: Alignment.bottomCenter,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              title: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: bg1,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    data.messageType == "location"
+                        ? capitalizeFirstLetter("📌 Location")
+                        : data.messageType == "video"
+                            ? capitalizeFirstLetter("🎥 Video")
+                            : data.messageType == "image"
+                                ? capitalizeFirstLetter("📷 Photo")
+                                : data.messageType == "document"
+                                    ? capitalizeFirstLetter("📄 Documenet")
+                                    : data.messageType == "audio"
+                                        ? capitalizeFirstLetter(
+                                            "🔊 Voice message")
+                                        : data.messageType == "link"
+                                            ? capitalizeFirstLetter(
+                                                data.message!)
+                                            : data.messageType == "gif"
+                                                ? "GIF"
+                                                : data.messageType == "contact"
+                                                    ? "Contact"
+                                                    : capitalizeFirstLetter(
+                                                        data.message!),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: chatColor,
+                    ),
+                  ),
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  //================ COPY ===============================
+                  data.messageType != "location" &&
+                          data.messageType != "image" &&
+                          data.messageType != "video" &&
+                          data.messageType != "document" &&
+                          data.messageType != "audio" &&
+                          data.messageType != "gif" &&
+                          data.messageType != "contact"
+                      ? SizedBox(
+                          height: 45,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                // chatID.add(msgID);
+                                // isSelectedmessage = "1";
+                              });
+                              Navigator.pop(context);
+                              Clipboard.setData(
+                                  ClipboardData(text: data.message!));
+                              showCustomToast("Message copied");
+                              // Add your copy functionality here
+                            },
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 10),
+                                Image.asset("assets/images/copy.png",
+                                    height: 18, color: chatColor),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Copy',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
+                      : const SizedBox.shrink(),
+                  // Add SizedBox between Copy and Forward
+                  data.messageType != "location" &&
+                          data.messageType != "image" &&
+                          data.messageType != "video" &&
+                          data.messageType != "docdocument" &&
+                          data.messageType != "audio" &&
+                          data.messageType != "gif" &&
+                          data.messageType != "contact"
+                      ? Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Colors.grey[200],
+                        )
+                      : const SizedBox.shrink(),
+                  //================================== REPLY ================================
+                  SizedBox(
                       height: 45,
                       child: InkWell(
                         onTap: () {
-                          setState(() {
-                            // chatID.add(msgID);
-                            // isSelectedmessage = "1";
-                          });
                           Navigator.pop(context);
-                          Clipboard.setData(ClipboardData(text: data.message!));
-                          showCustomToast("Message copied");
-                          // Add your copy functionality here
+                          setState(() {
+                            SelectedreplyText = !SelectedreplyText;
+                            USERTEXT = data.myMessage == false
+                                ? "${users.firstName} ${users.lastName!}"
+                                : "You";
+                            replyText = (data.messageType == "text"
+                                ? data.message
+                                : data.messageType == "location"
+                                    ? "📌 Location"
+                                    : data.messageType == "image"
+                                        ? "📷 Photo"
+                                        : data.messageType == "video"
+                                            ? "🎥 Video"
+                                            : data.messageType == "docdocument"
+                                                ? "📄 Documenet"
+                                                : data.messageType == "audio"
+                                                    ? "🔊 Voice message"
+                                                    : data.messageType == "gif"
+                                                        ? "GIF"
+                                                        : data.messageType ==
+                                                                "contact"
+                                                            ? "Contact"
+                                                            : data.message)!;
+                            reply_chatID = data.messageId.toString();
+                            // rplyTime = time;
+                            print("TEXT:$replyText");
+                            print("RPLYTIME:$rplyTime");
+                            print("RPLY$SelectedreplyText");
+                            print("SELECT_MSG_ID:$reply_chatID");
+                          });
                         },
                         child: Row(
                           children: [
                             const SizedBox(width: 10),
-                            Image.asset("assets/images/copy.png",
+                            Image.asset("assets/images/reply.png",
                                 height: 18, color: chatColor),
                             const SizedBox(width: 10),
                             const Text(
-                              'Copy',
+                              'Reply',
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
@@ -3975,187 +4186,128 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                             )
                           ],
                         ),
-                      ))
-                  : const SizedBox.shrink(),
-              // Add SizedBox between Copy and Forward
-              data.messageType != "location" &&
-                      data.messageType != "image" &&
-                      data.messageType != "video" &&
-                      data.messageType != "docdocument" &&
-                      data.messageType != "audio" &&
-                      data.messageType != "gif" &&
-                      data.messageType != "contact"
-                  ? Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey[200],
-                    )
-                  : const SizedBox.shrink(),
-              //================================== REPLY ================================
-              SizedBox(
-                  height: 45,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        SelectedreplyText = !SelectedreplyText;
-                        USERTEXT = data.myMessage == false
-                            ? "${users.firstName} ${users.lastName!}"
-                            : "You";
-                        replyText = (data.messageType == "text"
-                            ? data.message
-                            : data.messageType == "location"
-                                ? "📌 Location"
-                                : data.messageType == "image"
-                                    ? "📷 Photo"
-                                    : data.messageType == "video"
-                                        ? "🎥 Video"
-                                        : data.messageType == "docdocument"
-                                            ? "📄 Documenet"
-                                            : data.messageType == "audio"
-                                                ? "🔊 Voice message"
-                                                : data.messageType == "gif"
-                                                    ? "GIF"
-                                                    : data.messageType ==
-                                                            "contact"
-                                                        ? "Contact"
-                                                        : data.message)!;
-                        reply_chatID = data.messageId.toString();
-                        // rplyTime = time;
-                        print("TEXT:$replyText");
-                        print("RPLYTIME:$rplyTime");
-                        print("RPLY$SelectedreplyText");
-                        print("SELECT_MSG_ID:$reply_chatID");
-                      });
-                    },
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 10),
-                        Image.asset("assets/images/reply.png",
-                            height: 18, color: chatColor),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Reply',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        )
-                      ],
+                      )),
+
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
+                  ),
+                  // Add your forward functionality here
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          chatID.add(data.messageId.toString());
+                          chatMessageList.add(data);
+                          isSelectedmessage = "1";
+                          print("MSGID:${data.messageId}");
+                          print("MESSAGE_LIST:${chatMessageList.length}");
+                        });
+                        // Add your forward functionality here
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/forward1.png",
+                              height: 18, color: chatColor),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Forward',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
 
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              // Add your forward functionality here
-              SizedBox(
-                height: 45,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      chatID.add(data.messageId);
-                      isSelectedmessage = "1";
-                      print("MSGID:${data.messageId}");
-                    });
-                    // Add your forward functionality here
-                  },
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      Image.asset("assets/images/forward1.png",
-                          height: 18, color: chatColor),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Forward',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    ],
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
                   ),
-                ),
-              ),
-
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              // ========================== delete =============================
-              SizedBox(
-                height: 45,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      chatID.add(data.messageId);
-                      isSelectedmessage = "1";
-                      print("MSGID:${data.messageId}");
-                    });
-                  },
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      Image.asset("assets/images/trash.png",
-                          height: 18, color: chatColor),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'Delete',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    ],
+                  // ========================== delete =============================
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          chatID.add(data.messageId.toString());
+                          chatMessageList.add(data);
+                          isSelectedmessage = "1";
+                          print("MSGID:${data.messageId}");
+                          print("MESSAGE_LIST:$chatMessageList");
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/trash.png",
+                              height: 18, color: chatColor),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              SizedBox(
-                height: 45,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (data.isStarMessage != false) {
-                      print("******");
-                      chatContorller.removeStarApi(data.messageId);
-                    } else {
-                      chatContorller.addStarApi(data.messageId);
-                      print("+++++++");
-                    }
-                    // starchat(msgID);
-                  },
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      data.isStarMessage != false
-                          ? Image.asset("assets/images/starfill.png",
-                              color: chatColor, height: 18) //starUnfill
-                          : Image.asset("assets/images/starUnfill.png",
-                              color: chatColor, height: 18),
-                      const SizedBox(width: 10),
-                      Text(
-                        data.isStarMessage != false ? 'Unstarted' : 'Started',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      )
-                    ],
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
                   ),
-                ),
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (data.isStarMessage != false) {
+                          print("******");
+                          chatContorller
+                              .removeStarApi(data.messageId.toString());
+                        } else {
+                          chatContorller.addStarApi(data.messageId.toString());
+                          print("+++++++");
+                        }
+                        // starchat(msgID);
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          data.isStarMessage != false
+                              ? Image.asset("assets/images/star-slash.png",
+                                  color: chatColor, height: 18) //starUnfill
+                              : Image.asset("assets/images/starUnfill.png",
+                                  color: chatColor, height: 18),
+                          const SizedBox(width: 10),
+                          Text(
+                            data.isStarMessage != false
+                                ? 'Unstar Message'
+                                : 'Star Message',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -4260,40 +4412,48 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           chatID.contains(data.messageId.toString())
                               ? chatID.remove(data.messageId.toString())
                               : chatID.add(data.messageId.toString());
+                          chatMessageList.contains(data)
+                              ? chatMessageList.remove(data)
+                              : chatMessageList.add(data);
                         });
                         print("ONTAPMSGID:$chatID");
                       },
-                      child: chatID.isEmpty
+                      child: chatID.length == 0 || chatMessageList.length == 0
                           ? const SizedBox()
                           : Transform.scale(
                               scale: 1.1,
-                              child: GestureDetector(
-                                child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(color: bg1),
-                                        color: chatID.contains(
-                                                data.messageId.toString())
-                                            ? bg1
-                                            : bg1),
-                                    child: chatID
-                                            .contains(data.messageId.toString())
-                                        ? const Icon(
-                                            Icons.check,
-                                            size: 15.0,
-                                            color: Colors.black,
-                                          )
-                                        : const SizedBox(
-                                            height: 10,
-                                          )),
-                              ))),
+                              child: chatID.contains(
+                                          data.messageId.toString()) ||
+                                      chatMessageList.contains(data)
+                                  ? Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          color: bg1,
+                                          gradient: LinearGradient(
+                                              colors: [blackColor, black1Color],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomCenter)),
+                                      child:
+                                          Image.asset("assets/images/right.png")
+                                              .paddingAll(3))
+                                  : Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          border:
+                                              Border.all(color: black1Color),
+                                          color: bg1),
+                                    ))),
                 )
               : const SizedBox(height: 10),
           Container(
             padding: EdgeInsets.only(
-                left: chatID.isNotEmpty
+                left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                     ? data.myMessage == false
                         ? 40
                         : 12
@@ -5195,6 +5355,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               chatContorller.userdetailschattModel.value!.messageList!.clear();
               print(
                   "xxxxxx:${chatContorller.userdetailschattModel.value!.messageList!.clear}");
+              chatID = [];
+              chatMessageList = [];
             },
             child: const Icon(
               Icons.arrow_back_ios_new_rounded,
@@ -5322,12 +5484,14 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     setState(() {
                       isSelectedmessage = "0";
                       chatID = [];
+                      chatMessageList = [];
                     });
                     chatContorller.isSendMsg.value = false;
                   } catch (e) {
                     setState(() {
                       isSelectedmessage = "0";
                       chatID = [];
+                      chatMessageList = [];
                     });
                     chatContorller.isSendMsg.value = false;
                   }

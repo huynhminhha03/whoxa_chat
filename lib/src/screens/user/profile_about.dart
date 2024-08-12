@@ -1,14 +1,19 @@
 // ignore_for_file: camel_case_types, unused_local_variable, avoid_print, use_build_context_synchronously, avoid_returning_null_for_void, prefer_if_null_operators
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:light_compressor/light_compressor.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:meyaoo_new/src/screens/user/about_2.dart';
 
 final ApiHelper apiHelper = ApiHelper();
 
@@ -20,13 +25,13 @@ class about extends StatefulWidget {
 }
 
 class _aboutState extends State<about> {
-  TextEditingController aboutController = TextEditingController();
+  //TextEditingController aboutController = TextEditingController();
   UserProfileModel userProfileModel = UserProfileModel();
   bool isSelectedmessage = false;
   String selectedabouttext = "";
   @override
   void initState() {
-    aboutController.text = Hive.box(userdata).get(userBio) == null
+    statusText = Hive.box(userdata).get(userBio) == null
         ? ""
         : Hive.box(userdata).get(userBio);
     selectedabouttext = Hive.box(userdata).get(userBio) == null
@@ -36,26 +41,29 @@ class _aboutState extends State<about> {
   }
 
   List<Module> bioList = [
+    Module("At work"),
     Module("Available"),
     Module("Busy"),
-    Module("At school"),
-    Module("At the movies"),
-    Module("At work"),
+    Module("At Office"),
     Module("Battery about to die"),
-    Module("Can't talk, ChatsApp only"),
     Module("In a metting"),
     Module("At the gym"),
     Module("Sleeping"),
-    Module("Urgent calls only"),
   ];
+
+  String statusText = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: appColorWhite,
       appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(0),
+          side: BorderSide(color: Colors.grey.shade200),
+        ),
         elevation: 0,
-        backgroundColor: chatownColor,
+        backgroundColor: Colors.white,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
@@ -66,12 +74,11 @@ class _aboutState extends State<about> {
             color: Colors.black,
           ),
         ),
-        centerTitle: true,
         title: const Text(
           'About',
           style: TextStyle(
               color: Colors.black,
-              fontSize: 15,
+              fontSize: 20,
               fontFamily: "Poppins",
               fontWeight: FontWeight.w500),
         ),
@@ -82,144 +89,200 @@ class _aboutState extends State<about> {
               onTap: () {
                 editApiCall();
               },
-              child: const Text(
-                // aboutController.text.isEmpty ? 'Edit' : 'Done',
-                "Edit",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500),
-              ),
+              child: statusText.isEmpty
+                  ? const SizedBox.shrink()
+                  : const Icon(Icons.check, color: Colors.black),
             ),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(
-                  height: 30,
-                ),
-                const Text(
-                  'CURRENTLY SET TO',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Colors.black,
+        child: Container(
+          color: const Color.fromRGBO(250, 250, 250, 1),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 15, right: 15),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(
+                    height: 20,
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  height: 60,
-                  width: MediaQuery.of(context).size.width,
-                  child: TextField(
-                      controller: aboutController,
-                      readOnly: false,
-                      maxLength: 50,
-                      textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration(
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(color: appgrey)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(color: appgrey),
-                            borderRadius: BorderRadius.circular(10)),
-                        contentPadding:
-                            const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                        hintText: 'Type here',
-                        hintStyle: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w400),
-                        filled: true,
-                        fillColor: Colors.transparent,
+                  const Text(
+                    'Currently set to',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 11,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Stack(
+                    children: [
+                      InkWell(
+                        onLongPress: () {
+                          Clipboard.setData(ClipboardData(text: statusText));
+                        },
+                        onTap: () async {
+                          final result = await Get.to(() => about2(
+                                initialText: statusText,
+                              ));
+                          if (result != null) {
+                            setState(() {
+                              statusText = result;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: Get.width * 0.90,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey.shade300)),
+                          child: SelectableText(
+                            statusText,
+                            style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500),
+                          ).paddingAll(12),
+                        ),
+                      ),
+                      const Positioned(
+                          top: 13,
+                          right: 5,
+                          child: Icon(Icons.arrow_forward_ios, size: 17))
+                    ],
+                  ),
+                  // SizedBox(
+                  //   height: 60,
+                  //   width: MediaQuery.of(context).size.width,
+                  //   child: TextField(
+                  //       controller: aboutController,
+                  //       readOnly: false,
+                  //       enabled: false,
+                  //       autofocus: false,
+                  //       maxLength: 50,
+                  //       style: const TextStyle(
+                  //           color: Colors.black,
+                  //           fontSize: 12,
+                  //           fontWeight: FontWeight.w500),
+                  //       textCapitalization: TextCapitalization.sentences,
+                  //       decoration: InputDecoration(
+                  //         enabledBorder: OutlineInputBorder(
+                  //             borderRadius: BorderRadius.circular(10),
+                  //             borderSide: const BorderSide(color: appgrey)),
+                  //         focusedBorder: OutlineInputBorder(
+                  //             borderSide: const BorderSide(color: appgrey),
+                  //             borderRadius: BorderRadius.circular(10)),
+                  //         disabledBorder: OutlineInputBorder(
+                  //             borderSide: const BorderSide(color: appgrey),
+                  //             borderRadius: BorderRadius.circular(10)),
+                  //         border: OutlineInputBorder(
+                  //           borderRadius: BorderRadius.circular(10),
+                  //           borderSide: const BorderSide(color: appgrey),
+                  //         ),
+                  //         contentPadding: const EdgeInsets.only(
+                  //             top: 1, left: 15, bottom: 1),
+                  //         suffixIcon: const Icon(Icons.arrow_forward_ios,
+                  //             size: 17, color: Colors.black),
+                  //         hintText: 'Type here',
+                  //         hintStyle: const TextStyle(
+                  //             fontSize: 12,
+                  //             color: Colors.grey,
+                  //             fontWeight: FontWeight.w400),
+                  //         filled: true,
+                  //         fillColor: Colors.white,
 
-                        // ),
-                      )),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                const Text(
-                  'SELECT YOUR ABOUT',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 12,
-                    color: Colors.black,
+                  //         // ),
+                  //       )),
+                  // ),
+                  const SizedBox(
+                    height: 20,
                   ),
-                ),
-                const SizedBox(
-                  height: 15,
-                ),
-                ListView.builder(
-                    itemCount: bioList.length,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                selectedabouttext =
-                                    bioList[index].name.toString();
-                                aboutController.text =
-                                    bioList[index].name.toString();
-                                selectedabouttext =
-                                    bioList[index].name.toString();
-                              });
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(bioList[index].name.toString(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 15,
-                                        color: Colors.black,
-                                      )),
+                  const Text(
+                    'Select your About',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 12,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
+                        border: Border.all(color: Colors.grey.shade300)),
+                    child: ListView.builder(
+                        itemCount: bioList.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        itemBuilder: (context, index) {
+                          return Column(
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    selectedabouttext =
+                                        bioList[index].name.toString();
+                                    statusText = bioList[index].name.toString();
+                                    selectedabouttext =
+                                        bioList[index].name.toString();
+                                  });
+                                },
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child:
+                                          Text(bioList[index].name.toString(),
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 12,
+                                                color: Colors.black,
+                                              )).paddingOnly(left: 12),
+                                    ),
+                                    // Your additional condition here
+
+                                    bioList[index].name.toString() ==
+                                            selectedabouttext
+                                        ? Container(
+                                            height: 20,
+                                            width: 20,
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: chatownColor),
+                                            child: const Icon(
+                                              Icons.check,
+                                              color: chatColor,
+                                              size: 15,
+                                            ),
+                                          ).paddingOnly(right: 12)
+                                        : const SizedBox()
+                                  ],
                                 ),
-                                // Your additional condition here
-
-                                bioList[index].name.toString() ==
-                                        selectedabouttext
-                                    ? Container(
-                                        height: 20,
-                                        width: 20,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: chatownColor),
-                                        child: const Icon(
-                                          Icons.check,
-                                          color: chatColor,
-                                          size: 15,
-                                        ),
-                                      )
-                                    : const SizedBox()
-                              ],
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                          Divider(
-                            height: 1,
-                            color: Colors.grey.shade300,
-                          ),
-                          const SizedBox(
-                            height: 15,
-                          ),
-                        ],
-                      );
-                    }),
-              ]),
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              if (index != bioList.length - 1)
+                                Divider(
+                                  height: 1,
+                                  color: Colors.grey.shade300,
+                                ),
+                            ],
+                          ).paddingOnly(top: 15);
+                        }),
+                  ),
+                ]),
+          ),
         ),
       ),
     );
@@ -240,7 +303,7 @@ class _aboutState extends State<about> {
       'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}'
     };
     request.headers.addAll(headers);
-    request.fields['bio'] = aboutController.text;
+    request.fields['bio'] = statusText;
 
     print(request.fields);
 
@@ -250,7 +313,7 @@ class _aboutState extends State<about> {
     var userData = json.decode(responseData);
     userProfileModel = UserProfileModel.fromJson(userData);
 
-    print(responseData);
+    print("DATA:$responseData");
 
     if (userProfileModel.success == true) {
       await Hive.box(userdata)

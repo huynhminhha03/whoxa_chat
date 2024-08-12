@@ -187,7 +187,7 @@ class _ContactSendState extends State<ContactSend> {
                   child: ListTile(
                     onTap: () {
                       if (widget.SelectedreplyText == true) {
-                        chatContorller.sendMessageContactReply(
+                        chatContorller.sendMessageContact(
                             widget.conversationID,
                             "contact",
                             contact.displayName,
@@ -198,7 +198,9 @@ class _ContactSendState extends State<ContactSend> {
                                 ? getAllDeviceContact
                                     .getList[matchingIndex].profileImage!
                                 : "",
+                            '',
                             widget.replyID);
+                        widget.SelectedreplyText = false;
                       } else {
                         chatContorller.sendMessageContact(
                             widget.conversationID,
@@ -210,7 +212,9 @@ class _ContactSendState extends State<ContactSend> {
                             matchingIndex != -1
                                 ? getAllDeviceContact
                                     .getList[matchingIndex].profileImage!
-                                : "");
+                                : "",
+                            '',
+                            '');
                       }
                     },
                     leading: Stack(

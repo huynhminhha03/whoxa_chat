@@ -1,25 +1,29 @@
 // ignore_for_file: avoid_print, unused_field, must_be_immutable
+import 'dart:io';
+import 'dart:typed_data';
 
-import 'dart:convert';
-import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
+import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
+import 'package:meyaoo_new/model/chatdetails/single_chat_list_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
-import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
-import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
+import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 
 class ForwardMessage extends StatefulWidget {
   String chatid;
   bool isMsgType;
-
-  ForwardMessage({super.key, required this.chatid, required this.isMsgType});
+  String? converstionID;
+  List<MessageList> forwardMsgList;
+  ForwardMessage(
+      {super.key,
+      required this.chatid,
+      required this.isMsgType,
+      this.converstionID,
+      required this.forwardMsgList});
 
   @override
   State<ForwardMessage> createState() => _ForwardMessageState();
@@ -27,6 +31,7 @@ class ForwardMessage extends StatefulWidget {
 
 class _ForwardMessageState extends State<ForwardMessage> {
   ChatListController chatListController = Get.find();
+  SingleChatContorller chatContorller = Get.find();
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   bool isview = false;
   TextEditingController controller = TextEditingController();
@@ -36,89 +41,10 @@ class _ForwardMessageState extends State<ForwardMessage> {
   void initState() {
     super.initState();
     print("chat_ID:${widget.chatid}");
-  }
-
-  bool isLoading = false;
-  sendfrowardmessage() async {
-    setState(() {
-      isLoading = true;
-    });
-    var uri = Uri.parse('${baseUrl()}GroupForwardMsg');
-    var request = http.MultipartRequest("POST", uri);
-
-    request.fields['from_user'] = Hive.box(userdata).get(userId);
-    request.fields['to_user'] = forwardmessageuser
-        .toString()
-        .replaceAll('[', '')
-        .replaceAll(']', '')
-        .removeAllWhitespace;
-    request.fields['group_id'] = groupUSERID
-        .toString()
-        .replaceAll('[', '')
-        .replaceAll(']', '')
-        .removeAllWhitespace;
-    request.fields['chat_id'] = widget.chatid;
-
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    print("SINGLE::::::::${request.fields}");
-    log(responseData);
-    if (response.statusCode == 200) {
-      // ignore: use_build_context_synchronously
-      // Navigator.pop(context);
-      setState(() {
-        isLoading = false;
-        isForward = true;
-      });
-      Get.off(() => TabbarScreen());
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  sendfrowardmessageGroup() async {
-    setState(() {
-      isLoading = true;
-    });
-    var uri = Uri.parse('${baseUrl()}GroupForwardMsg');
-    var request = http.MultipartRequest("POST", uri);
-
-    request.fields['from_user'] = Hive.box(userdata).get(userId);
-    request.fields['to_user'] = forwardmessageuser
-        .toString()
-        .replaceAll('[', '')
-        .replaceAll(']', '')
-        .removeAllWhitespace;
-    request.fields['group_id'] = groupUSERID
-        .toString()
-        .replaceAll('[', '')
-        .replaceAll(']', '')
-        .removeAllWhitespace;
-    request.fields['group_chat_id'] = widget.chatid;
-
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    print("::::::::${request.fields}");
-    log(responseData);
-    if (response.statusCode == 200) {
-      // ignore: use_build_context_synchronously
-      // Navigator.pop(context);
-      setState(() {
-        isLoading = false;
-        isForward = true;
-      });
-      Get.off(() => TabbarScreen());
-    }
-    setState(() {
-      isLoading = false;
-    });
+    print("conversation_ID:${widget.converstionID}");
   }
 
   List forwardmessageuser = [];
-  List groupUSERID = [];
 
   String username = '';
 
@@ -178,43 +104,29 @@ class _ForwardMessageState extends State<ForwardMessage> {
                         ],
                       ),
                     ),
-                    isLoading
-                        ? loader(context)
-                        : InkWell(
-                            onTap: () {
-                              if (widget.isMsgType == true) {
-                                forwardmessageuser.isNotEmpty ||
-                                        groupUSERID.isNotEmpty
-                                    ? sendfrowardmessage()
-                                    : Fluttertoast.showToast(
-                                        msg:
-                                            "Please select whom you want to send message");
-                              } else {
-                                forwardmessageuser.isNotEmpty ||
-                                        groupUSERID.isNotEmpty
-                                    ? sendfrowardmessageGroup()
-                                    : Fluttertoast.showToast(
-                                        msg:
-                                            "Please select whom you want to send message");
-                              }
-                            },
-                            child: Container(
-                              height: 35,
-                              width: 85,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(30),
-                                  color: const Color(0xffF4F5F6)),
-                              child: const Center(
-                                child: Text(
-                                  'Forward',
-                                  style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black),
+                    forwardmessageuser.isNotEmpty
+                        ? chatContorller.isSendMsg.value
+                            ? loader(context)
+                            : InkWell(
+                                onTap: onTap,
+                                child: Container(
+                                  height: 35,
+                                  width: 85,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: const Color(0xffF4F5F6)),
+                                  child: const Center(
+                                    child: Text(
+                                      'Forward',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
+                              )
+                        : const SizedBox.shrink(),
                   ],
                 ),
               ),
@@ -241,6 +153,129 @@ class _ForwardMessageState extends State<ForwardMessage> {
         ),
       ),
     );
+  }
+
+  onTap() {
+    try {
+      chatContorller.isSendMsg.value = true;
+
+// if (widget.isMsgType == true) {
+      //   forwardmessageuser.isNotEmpty ||
+      //           groupUSERID.isNotEmpty
+      //       ? sendfrowardmessage()
+      //       : Fluttertoast.showToast(
+      //           msg:
+      //               "Please select whom you want to send message");
+      // } else {
+      //   forwardmessageuser.isNotEmpty ||
+      //           groupUSERID.isNotEmpty
+      //       ? sendfrowardmessageGroup()
+      //       : Fluttertoast.showToast(
+      //           msg:
+      //               "Please select whom you want to send message");
+      // }
+      if (forwardmessageuser.isNotEmpty) {
+        for (var i = 0; i < forwardmessageuser.length; i++) {
+          for (var j = 0; j < widget.forwardMsgList.length; j++) {
+            //=============  TEXT MESSAGE FORWARD ======================
+            if (widget.forwardMsgList[j].messageType == 'text') {
+              chatContorller.sendMessageText(
+                  widget.forwardMsgList[j].message!,
+                  forwardmessageuser[i].toString(),
+                  'text',
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  IMAGE MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'image') {
+              chatContorller.sendMessageIMGDoc(
+                  forwardmessageuser[i].toString(),
+                  'image',
+                  widget.forwardMsgList[j].url,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  LOCATION MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'location') {
+              chatContorller.sendMessageLocation(
+                  forwardmessageuser[i].toString(),
+                  "location",
+                  widget.forwardMsgList[j].latitude!,
+                  widget.forwardMsgList[j].longitude!,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  VIDEO MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'video') {
+              chatContorller.sendMessageVideo(
+                  forwardmessageuser[i].toString(),
+                  "video",
+                  widget.forwardMsgList[j].url,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  DOCUMENT MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'document') {
+              chatContorller.sendMessageIMGDoc(
+                  forwardmessageuser[i].toString(),
+                  'document',
+                  widget.forwardMsgList[j].url,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  AUDIO MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'audio') {
+              chatContorller.sendMessageVoice(
+                  forwardmessageuser[i].toString(),
+                  "audio",
+                  File(''),
+                  widget.forwardMsgList[j].url!,
+                  widget.forwardMsgList[j].audioTime!,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  GIF MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'gif') {
+              chatContorller.sendMessageGIF(
+                  forwardmessageuser[i].toString(),
+                  'gif',
+                  Uint8List(0),
+                  widget.forwardMsgList[j].url!,
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  LINK MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'link') {
+              chatContorller.sendMessageText(
+                  widget.forwardMsgList[j].message!,
+                  forwardmessageuser[i].toString(),
+                  'text',
+                  '',
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+              //=============  CONTACT MESSAGE FORWARD ======================
+            } else if (widget.forwardMsgList[j].messageType == 'contact') {
+              chatContorller.sendMessageContact(
+                  forwardmessageuser[i].toString(),
+                  "contact",
+                  widget.forwardMsgList[j].sharedContactName,
+                  widget.forwardMsgList[j].sharedContactNumber,
+                  '',
+                  widget.forwardMsgList[j].sharedContactProfileImage,
+                  widget.forwardMsgList[j].messageId.toString(),
+                  '');
+            }
+          }
+        }
+        chatContorller.isSendMsg.value = false;
+      }
+    } catch (e) {
+      chatContorller.isSendMsg.value = false;
+    }
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => TabbarScreen(currentTab: 0)),
+        (route) => false);
   }
 
   Widget chatListScreen() {
@@ -384,23 +419,23 @@ class _ForwardMessageState extends State<ForwardMessage> {
                               isSelectedusername
                                   .contains(chatlist[index].groupName)
                           ? Container(
-                              width: 20.0,
-                              height: 20.0,
+                              width: 15.0,
+                              height: 15.0,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: bg1),
-                                  color: bg1),
-                              child: const Icon(
-                                Icons.check,
-                                size: 15.0,
-                                color: Colors.black,
-                              ))
+                                  color: bg1,
+                                  gradient: LinearGradient(
+                                      colors: [blackColor, black1Color],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomCenter)),
+                              child: Image.asset("assets/images/right.png")
+                                  .paddingAll(3))
                           : Container(
-                              width: 20.0,
-                              height: 20.0,
+                              width: 15.0,
+                              height: 15.0,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(25),
-                                  border: Border.all(color: bg1),
+                                  border: Border.all(color: black1Color),
                                   color: bg1),
                             ),
                     ],

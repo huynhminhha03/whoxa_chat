@@ -203,7 +203,9 @@ class SingleChatContorller extends GetxController {
   // }
 
   //================== send DOC message api ==================================
-  sendMessageIMGDoc(conversationID, msgtype, filePath, String mobileNum) async {
+  sendMessageIMGDoc(conversationID, msgtype, filePath, String mobileNum,
+      String forwardid, String replyid) async {
+    print("PATH:$filePath");
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
@@ -220,7 +222,13 @@ class SingleChatContorller extends GetxController {
     request.fields['message_type'] = msgtype;
     request.fields['conversation_id'] = conversationID;
     request.fields['phone_number'] = mobileNum;
-    request.files.add(await http.MultipartFile.fromPath('files', filePath));
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
+    if (filePath == File) {
+      request.files.add(await http.MultipartFile.fromPath('files', filePath));
+    } else {
+      request.fields['url'] = filePath;
+    }
 
     // send
     var response = await request.send();
@@ -250,7 +258,7 @@ class SingleChatContorller extends GetxController {
 
   //======================= send text message api ==============================
   sendMessageText(String message, String conversationID, String msgtype,
-      String mobileNum) async {
+      String mobileNum, String forwardid, String replyid) async {
     print(message);
     print(conversationID);
     print(msgtype);
@@ -270,6 +278,8 @@ class SingleChatContorller extends GetxController {
     request.fields['message_type'] = msgtype;
     request.fields['conversation_id'] = conversationID;
     request.fields['phone_number'] = mobileNum;
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
 
     print(request.fields);
     // send
@@ -301,7 +311,7 @@ class SingleChatContorller extends GetxController {
 
   //======================= Send Location message Api ==========================
   sendMessageLocation(String conversationID, String msgtype, String lat,
-      String long, String mobileNum) async {
+      String long, String mobileNum, String forwardid, String replyid) async {
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
@@ -321,6 +331,8 @@ class SingleChatContorller extends GetxController {
     request.fields['latitude'] = lat;
     request.fields['longitude'] = long;
     request.fields['phone_number'] = mobileNum;
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
     // send
     var response = await request.send();
 
@@ -349,8 +361,8 @@ class SingleChatContorller extends GetxController {
   }
 
   //====================== send GIF message =========================================
-  sendMessageGIF(
-      conversationID, msgtype, Uint8List? bytes, String mobileNum) async {
+  sendMessageGIF(conversationID, msgtype, Uint8List? bytes, String forwardurl,
+      String mobileNum, String forwardid, String replyid) async {
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
@@ -367,6 +379,9 @@ class SingleChatContorller extends GetxController {
     request.fields['message_type'] = msgtype;
     request.fields['conversation_id'] = conversationID;
     request.fields['phone_number'] = mobileNum;
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
+    request.fields['url'] = forwardurl;
     request.files.add(http.MultipartFile.fromBytes(
       'files',
       bytes!,
@@ -401,8 +416,15 @@ class SingleChatContorller extends GetxController {
   }
 
 //================================ send Voice message ===============================
-  sendMessageVoice(conversationID, msgtype, File filePath, duration,
-      String mobileNum) async {
+  sendMessageVoice(
+      String conversationID,
+      String msgtype,
+      File filePath,
+      forwardurl,
+      String duration,
+      String mobileNum,
+      String forwardid,
+      String replyid) async {
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
@@ -420,8 +442,15 @@ class SingleChatContorller extends GetxController {
     request.fields['conversation_id'] = conversationID;
     request.fields['audio_time'] = duration;
     request.fields['phone_number'] = mobileNum;
-    request.files
-        .add(await http.MultipartFile.fromPath('files', filePath.path));
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
+
+    if (filePath == File) {
+      request.files
+          .add(await http.MultipartFile.fromPath('files', filePath.path));
+    } else {
+      request.fields['url'] = forwardurl;
+    }
 
     // send
     var response = await request.send();
@@ -453,7 +482,8 @@ class SingleChatContorller extends GetxController {
   }
 
   //================================ Send Video Message ===================================
-  sendMessageVideo(conversationID, msgtype, filePath, String mobileNum) async {
+  sendMessageVideo(conversationID, msgtype, filePath, String mobileNum,
+      String forwardid, String replyid) async {
     print("RESPONSE:$filePath");
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
@@ -470,8 +500,14 @@ class SingleChatContorller extends GetxController {
     request.fields['message_type'] = msgtype;
     request.fields['conversation_id'] = conversationID;
     request.fields['phone_number'] = mobileNum;
-    for (String data in filePath) {
-      request.files.add(await http.MultipartFile.fromPath('files', data));
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
+    if (filePath == File) {
+      for (String data in filePath) {
+        request.files.add(await http.MultipartFile.fromPath('files', data));
+      }
+    } else {
+      request.fields['url'] = filePath;
     }
 
     // send
@@ -504,7 +540,7 @@ class SingleChatContorller extends GetxController {
 
   //========================= send contact message ==============================
   sendMessageContact(conversationID, msgtype, contactName, contactNumber,
-      String mobileNum, image) async {
+      String mobileNum, image, String forwardid, String replyid) async {
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -522,378 +558,8 @@ class SingleChatContorller extends GetxController {
     request.fields['shared_contact_number'] = contactNumber;
     request.fields['shared_contact_profile_image'] = image;
     request.fields['phone_number'] = mobileNum;
-
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    Get.back();
-    print("object: ${request.fields}");
-    print("object: ${request.files}");
-    print("RESPONSE: $responseData");
-
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageReplyText(String message, String conversationID, String msgtype,
-      chatID, String mobileNum) async {
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-
-    //add headers
-    request.headers.addAll(headers);
-
-    //adding params
-    request.fields['message'] = message;
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    print("object: ${request.fields}");
-    print(responseData);
-
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-
-      // for (var i = 0;
-      //     i < userdetailschattModel.value!.messageList!.length;
-      //     i++) {
-      //   if (userdetailschattModel.value!.messageList![i].replyId != 0) {
-      //     print("INDEXXXX:$i");
-      //     Get.put(ReplyMsgController()).replySingleDataApi(
-      //         replyMsgId: userdetailschattModel.value!.messageList![i].replyId
-      //             .toString(),
-      //         index: i);
-      //   }
-      // }
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-      // for (var i = 0;
-      //     i < userdetailschattModel.value!.messageList!.length;
-      //     i++) {
-      //   if (userdetailschattModel.value!.messageList![i].replyId != 0) {
-      //     print("INDEXXXX:$i");
-      //     Get.put(ReplyMsgController()).replySingleDataApi(
-      //         replyMsgId: userdetailschattModel.value!.messageList![i].replyId
-      //             .toString(),
-      //         index: i);
-      //   }
-      // }
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-
-    // getdetailschat(conversationID);
-  }
-
-  sendMessageRpltIMGDoc(
-      conversationID, msgtype, filePath, chatID, String mobileNum) async {
-    print(chatID);
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-
-    //add headers
-    request.headers.addAll(headers);
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['phone_number'] = mobileNum;
-    request.files.add(await http.MultipartFile.fromPath('files', filePath));
-    request.fields['reply_id'] = chatID;
-
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    print("object: ${request.fields}");
-    print(responseData);
-    isSendMsg(false);
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageLocationRply(String conversationID, String msgtype, String lat,
-      String long, chatID, String mobileNum) async {
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-
-    //add headers
-    request.headers.addAll(headers);
-
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['latitude'] = lat;
-    request.fields['longitude'] = long;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    print("object: ${request.fields}");
-    print(responseData);
-
-    isSendMsg(false);
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageVideoRply(
-      conversationID, msgtype, filePath, chatID, String mobileNum) async {
-    print("RESPONSE:$filePath");
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-    //add headers
-    request.headers.addAll(headers);
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
-    for (String data in filePath) {
-      request.files.add(await http.MultipartFile.fromPath('files', data));
-    }
-
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    isSendMsg(false);
-    print("object: ${request.fields}");
-    print("object: ${request.files}");
-    print("RESPONSE: $responseData");
-
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageGIFRply(conversationID, msgtype, Uint8List? bytes, chatID,
-      String mobileNum) async {
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-
-    //add headers
-    request.headers.addAll(headers);
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
-    request.files.add(http.MultipartFile.fromBytes(
-      'files',
-      bytes!,
-      filename: 'giphy.gif',
-    ));
-
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    isSendMsg(false);
-    print("object: ${request.fields}");
-    print(responseData);
-
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    final newMessage = MessageList.fromJson(useData);
-
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageVoiceRply(conversationID, msgtype, File filePath, duration, chatID,
-      String mobileNum) async {
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-
-    //add headers
-    request.headers.addAll(headers);
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['audio_time'] = duration;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
-    request.files
-        .add(await http.MultipartFile.fromPath('files', filePath.path));
-
-    // send
-    var response = await request.send();
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
-
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    isSendMsg(false);
-    print("object: ${request.fields}");
-    print(responseData);
-
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    if (duration != null) {
-      final newMessage = MessageList.fromJson(useData);
-
-      if (userdetailschattModel.value?.messageList == null) {
-        userdetailschattModel.value =
-            SingleChatListModel(messageList: [newMessage]);
-      } else {
-        print("check.......");
-        userdetailschattModel.value!.messageList!.insert(0, newMessage);
-      }
-    }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-  }
-
-  sendMessageContactReply(conversationID, msgtype, contactName, contactNumber,
-      String mobileNum, image, chatID) async {
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-
-    var request = http.MultipartRequest("POST", uri);
-
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
-    //add headers
-    request.headers.addAll(headers);
-    //adding params
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['shared_contact_name'] = contactName;
-    request.fields['shared_contact_number'] = contactNumber;
-    request.fields['shared_contact_profile_image'] = image;
-    request.fields['reply_id'] = chatID;
-    request.fields['phone_number'] = mobileNum;
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
 
     // send
     var response = await request.send();
@@ -979,6 +645,7 @@ class SingleChatContorller extends GetxController {
       request.headers.addAll(headers);
       request.fields['message_id'] = chatID;
       var response = await request.send();
+      print("chatid:${request.fields}");
 
       String responseData =
           await response.stream.transform(utf8.decoder).join();

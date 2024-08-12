@@ -466,10 +466,11 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                             height:
                                                                                 15,
                                                                             color:
-                                                                                chatColor,
+                                                                                Colors.grey,
                                                                           ),
                                                                           const Text(
-                                                                              " Document")
+                                                                              " Document",
+                                                                              style: TextStyle(color: Colors.grey, fontSize: 13))
                                                                         ],
                                                                       )
                                                                     : const SizedBox

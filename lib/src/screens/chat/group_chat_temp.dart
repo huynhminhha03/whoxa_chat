@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -31,6 +32,7 @@ import 'package:meyaoo_new/src/screens/chat/GroupProfile.dart';
 import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/contact_send.dart';
 import 'package:meyaoo_new/src/screens/chat/imageView.dart';
+import 'package:meyaoo_new/src/screens/forward_message/forward_message_list.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -112,6 +114,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   List? chatMsgList;
 
   List chatID = [];
+  List<MessageList> chatMessageList = [];
   final TextEditingController _searchController = TextEditingController();
   TextEditingController messagecontroller = TextEditingController();
   AudioPlayer audioPlayer = AudioPlayer();
@@ -291,7 +294,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                               .toString(),
                                                           "text",
                                                           widget.mobileNum
-                                                              .toString());
+                                                              .toString(),
+                                                          '',
+                                                          '');
                                                   chatContorller
                                                       .isSendMsg.value = false;
                                                   chatContorller.isTypingApi(
@@ -658,7 +663,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                   //     )
                                   //   :
                                   isSelectedmessage == "0"
-                                      ? floatbutton()
+                                      ? floatbuttonNew()
                                       // when isSelectedmessage == "1" then forward option show
                                       : floatbutton1())
                               : const SizedBox.shrink())
@@ -862,33 +867,24 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   Widget getTextMessageWidget(index, MessageList data) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
           print("ONTAPMSGID:$chatID");
@@ -906,43 +902,53 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.length == 0
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: InkWell(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(
                     height: 10,
                   ),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
                             ? 40
                             : 12
@@ -967,81 +973,45 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
-                          data.myMessage == false
-                              ? RichText(
-                                  text: TextSpan(children: [
-                                  WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Container(
-                                        height: 28,
-                                        width: 28,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(28)),
-                                        child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                            child: CachedNetworkImage(
-                                              imageUrl: data
-                                                  .senderData!.profileImage!,
-                                              imageBuilder:
-                                                  (context, imageProvider) =>
-                                                      Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              placeholder: (context, url) =>
-                                                  const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                color: chatownColor,
-                                              )),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      const Icon(
-                                                Icons.person,
-                                                color: Color(0xffBFBFBF),
-                                              ),
-                                            )),
-                                      )),
-                                  TextSpan(
-                                      text: capitalizeFirstLetter(
-                                          "  ${data.senderData!.firstName}"
-                                          " ${data.senderData!.lastName}"),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black))
-                                ]))
-                              : const SizedBox.shrink(),
-                          data.myMessage == false
-                              ? const SizedBox(height: 5)
-                              : const SizedBox.shrink(),
-                          Container(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * .6),
-                            decoration: BoxDecoration(
-                              borderRadius: data.myMessage == false
-                                  ? BorderRadius.circular(15)
-                                  : BorderRadius.circular(15),
-                              color: data.myMessage == false
-                                  ? Colors.grey.shade200
-                                  : chatownColor,
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              capitalizeFirstLetter(data.message!),
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: chatColor),
-                            ),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * .6),
+                                decoration: BoxDecoration(
+                                    borderRadius: data.myMessage == false
+                                        ? const BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            topRight: Radius.circular(15),
+                                            bottomRight: Radius.circular(15))
+                                        : const BorderRadius.only(
+                                            topRight: Radius.circular(15),
+                                            topLeft: Radius.circular(15),
+                                            bottomLeft: Radius.circular(15)),
+                                    color: data.myMessage == false
+                                        ? grey1Color
+                                        : null,
+                                    gradient: data.myMessage == false
+                                        ? null
+                                        : LinearGradient(
+                                            colors: [
+                                                yellow1Color,
+                                                yellow2Color
+                                              ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter)),
+                                padding: const EdgeInsets.all(10),
+                                child: Text(
+                                  capitalizeFirstLetter(data.message!),
+                                  style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: chatColor),
+                                ),
+                              ),
+                            ],
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 4.0),
@@ -1068,33 +1038,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1102,48 +1064,58 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -1166,58 +1138,6 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       ? CrossAxisAlignment.start
                       : CrossAxisAlignment.end,
                   children: [
-                    data.myMessage == false
-                        ? RichText(
-                            text: TextSpan(children: [
-                            WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: Container(
-                                  height: 28,
-                                  width: 28,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(28)),
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            data.senderData!.profileImage!,
-                                        imageBuilder:
-                                            (context, imageProvider) =>
-                                                Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        placeholder: (context, url) =>
-                                            const Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                          color: chatownColor,
-                                        )),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(
-                                          Icons.person,
-                                          color: Color(0xffBFBFBF),
-                                        ),
-                                      )),
-                                )),
-                            TextSpan(
-                                text: capitalizeFirstLetter(
-                                    "  ${data.senderData!.firstName}"
-                                    " ${data.senderData!.lastName}"),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black))
-                          ]))
-                        : const SizedBox.shrink(),
-                    data.myMessage == false
-                        ? const SizedBox(height: 5)
-                        : const SizedBox.shrink(),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -1232,20 +1152,37 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         );
                       },
                       child: Container(
-                        width: 200,
-                        height: 200,
+                        width: 150,
+                        height: 150,
                         decoration: BoxDecoration(
-                          borderRadius: data.myMessage == false
-                              ? BorderRadius.circular(15)
-                              : BorderRadius.circular(15),
-                          color: data.myMessage == false
-                              ? Colors.grey.shade200
-                              : chatownColor,
-                        ),
+                            borderRadius: data.myMessage == false
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15))
+                                : const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15)),
+                            color: data.myMessage == false ? grey1Color : null,
+                            gradient: data.myMessage == false
+                                ? null
+                                : LinearGradient(
+                                    colors: [yellow1Color, yellow2Color],
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter)),
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(2.0),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: data.myMessage == false
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15))
+                                : const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15)),
                             child: CachedNetworkImage(
                               imageUrl: data.url!,
                               imageBuilder: (context, imageProvider) => Stack(
@@ -1292,33 +1229,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1326,43 +1255,53 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
@@ -1378,7 +1317,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                     : Alignment.centerRight,
                 child: Padding(
                   padding: EdgeInsets.only(
-                      left: chatID.isNotEmpty
+                      left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                           ? data.myMessage == false
                               ? 40
                               : 12
@@ -1398,162 +1337,77 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               ? CrossAxisAlignment.start
                               : CrossAxisAlignment.end,
                           children: [
-                            data.myMessage == false
-                                ? RichText(
-                                    text: TextSpan(children: [
-                                    WidgetSpan(
-                                        alignment: PlaceholderAlignment.middle,
-                                        child: Container(
-                                          height: 28,
-                                          width: 28,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(28)),
-                                          child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                              child: CachedNetworkImage(
-                                                imageUrl: data
-                                                    .senderData!.profileImage!,
-                                                imageBuilder:
-                                                    (context, imageProvider) =>
-                                                        Container(
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                      image: imageProvider,
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                                placeholder: (context, url) =>
-                                                    const Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                  color: chatownColor,
-                                                )),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        const Icon(
-                                                  Icons.person,
-                                                  color: Color(0xffBFBFBF),
-                                                ),
-                                              )),
-                                        )),
-                                    TextSpan(
-                                        text: capitalizeFirstLetter(
-                                            "  ${data.senderData!.firstName}"
-                                            " ${data.senderData!.lastName}"),
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black))
-                                  ]))
-                                : const SizedBox.shrink(),
-                            data.myMessage == false
-                                ? const SizedBox(height: 5)
-                                : const SizedBox.shrink(),
                             Container(
                               decoration: BoxDecoration(
-                                borderRadius: data.myMessage == false
-                                    ? BorderRadius.circular(15)
-                                    : BorderRadius.circular(15),
-                                color: data.myMessage == false
-                                    ? Colors.grey.shade200
-                                    : chatownColor,
-                              ),
+                                  borderRadius: data.myMessage == false
+                                      ? const BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15),
+                                          bottomRight: Radius.circular(15))
+                                      : const BorderRadius.only(
+                                          topRight: Radius.circular(15),
+                                          topLeft: Radius.circular(15),
+                                          bottomLeft: Radius.circular(15)),
+                                  color: data.myMessage == false
+                                      ? grey1Color
+                                      : yellow1Color),
                               constraints: const BoxConstraints(
                                   minHeight: 10.0,
                                   minWidth: 10.0,
                                   maxWidth: 250),
-                              child: Container(
-                                height: 180,
-                                width: 180,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10)),
-                                  child: data.latitude.toString() == "" ||
-                                          data.longitude.toString() == ""
-                                      ? Container(
-                                          decoration: const BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      "assets/images/map_Blurr.png"),
-                                                  fit: BoxFit.cover)),
-                                          child: Icon(
-                                            Icons.error_outline,
-                                            color:
-                                                chatownColor.withOpacity(0.6),
-                                            size: 50,
+                              child: InkWell(
+                                onTap: () {
+                                  MapUtils.openMap(double.parse(data.latitude!),
+                                      double.parse(data.longitude!));
+                                },
+                                child: Container(
+                                  height: 130,
+                                  width: 250,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: data.latitude.toString() == "" ||
+                                            data.longitude.toString() == ""
+                                        ? Container(
+                                            decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                    topRight:
+                                                        Radius.circular(10)),
+                                                image: DecorationImage(
+                                                    image: AssetImage(
+                                                        "assets/images/map_Blurr.png"),
+                                                    fit: BoxFit.cover)),
+                                            child: Icon(
+                                              Icons.error_outline,
+                                              color:
+                                                  chatownColor.withOpacity(0.6),
+                                              size: 50,
+                                            ),
+                                          )
+                                        : GoogleMap(
+                                            zoomControlsEnabled: false,
+                                            zoomGesturesEnabled: false,
+                                            initialCameraPosition:
+                                                CameraPosition(
+                                                    target: LatLng(
+                                                        double.parse(
+                                                            data.latitude!),
+                                                        double.parse(
+                                                            data.longitude!)),
+                                                    zoom: 15),
+                                            mapType: MapType.normal,
+                                            onMapCreated: (GoogleMapController
+                                                controller111) {
+                                              // controller.complete();
+                                            },
                                           ),
-                                        )
-                                      : GoogleMap(
-                                          zoomControlsEnabled: false,
-                                          zoomGesturesEnabled: false,
-                                          initialCameraPosition: CameraPosition(
-                                              target: LatLng(
-                                                  double.parse(data.latitude!),
-                                                  double.parse(
-                                                      data.longitude!)),
-                                              zoom: 15),
-                                          mapType: MapType.normal,
-                                          onMapCreated: (GoogleMapController
-                                              controller111) {
-                                            // controller.complete();
-                                          },
-                                        ),
-                                ),
-                              ),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                MapUtils.openMap(double.parse(data.latitude!),
-                                    double.parse(data.longitude!));
-                              },
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    height: 40,
-                                    width: 180,
-                                    decoration: BoxDecoration(
-                                        color: data.myMessage == false
-                                            ? Colors.grey.shade200
-                                            : chatownColor,
-                                        borderRadius: const BorderRadius.only(
-                                            bottomLeft: Radius.circular(10),
-                                            bottomRight: Radius.circular(10))),
-                                    child: Center(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          const Text("View Location",
-                                              style: TextStyle(
-                                                color: chatColor,
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w500,
-                                              )),
-                                          data.messageType!
-                                                      .contains(".started") ==
-                                                  true
-                                              ? const Padding(
-                                                  padding:
-                                                      EdgeInsets.only(right: 5),
-                                                  child: Icon(
-                                                      CupertinoIcons.star_fill,
-                                                      size: 12,
-                                                      color: Colors.black),
-                                                )
-                                              : const SizedBox(),
-                                        ],
-                                      ),
-                                    ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ).paddingOnly(
+                                  left: 4, top: 4, right: 4, bottom: 4),
                             ),
                             Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
@@ -1580,33 +1434,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -1614,48 +1460,58 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -1673,159 +1529,123 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 alignment: data.myMessage == false
                     ? Alignment.centerLeft
                     : Alignment.centerRight,
-                child: Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: data.myMessage == false
-                          ? CrossAxisAlignment.start
-                          : CrossAxisAlignment.end,
-                      children: [
-                        data.myMessage == false
-                            ? RichText(
-                                text: TextSpan(children: [
-                                WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Container(
-                                      height: 28,
-                                      width: 28,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(28)),
-                                      child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                data.senderData!.profileImage!,
-                                            imageBuilder:
-                                                (context, imageProvider) =>
-                                                    Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                            placeholder: (context, url) =>
-                                                const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                              color: chatownColor,
-                                            )),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(
-                                              Icons.person,
-                                              color: Color(0xffBFBFBF),
-                                            ),
-                                          )),
-                                    )),
-                                TextSpan(
-                                    text: capitalizeFirstLetter(
-                                        "  ${data.senderData!.firstName}"
-                                        " ${data.senderData!.lastName}"),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black))
-                              ]))
-                            : const SizedBox.shrink(),
-                        data.myMessage == false
-                            ? const SizedBox(height: 5)
-                            : const SizedBox.shrink(),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => VideoViewFix(
-                                    username:
-                                        "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
-                                    url: data.url!,
-                                    play: true,
-                                    mute: false,
-                                    date: convertUTCTimeTo12HourFormat(
-                                        data.createdAt!),
-                                  ),
-                                ));
-                          },
-                          child: Container(
-                            width: 240,
-                            height: 280,
-                            decoration: BoxDecoration(
-                              borderRadius: data.myMessage == false
-                                  ? BorderRadius.circular(15)
-                                  : BorderRadius.circular(15),
-                              color: data.myMessage == false
-                                  ? Colors.grey.shade200
-                                  : chatownColor,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child:
-                                    // video thumbnail generater
-                                    //getUrlWidget(data.url!)
-                                    CachedNetworkImage(
-                                  imageUrl: data.thumbnail!,
-                                  imageBuilder: (context, imageProvider) =>
-                                      Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => VideoViewFix(
+                            username: data.myMessage == false
+                                ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
+                                : "You",
+                            url: data.url!,
+                            play: true,
+                            mute: false,
+                            date: convertUTCTimeTo12HourFormat(data.createdAt!),
+                          ),
+                        ));
+                  },
+                  child: Stack(
+                    children: [
+                      Column(
+                        crossAxisAlignment: data.myMessage == false
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.end,
+                        children: [
+                          Stack(
+                            children: [
+                              Container(
+                                width: 150,
+                                height: 176,
+                                decoration: BoxDecoration(
+                                    borderRadius: data.myMessage == false
+                                        ? const BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            topRight: Radius.circular(15),
+                                            bottomRight: Radius.circular(15))
+                                        : const BorderRadius.only(
+                                            topRight: Radius.circular(15),
+                                            topLeft: Radius.circular(15),
+                                            bottomLeft: Radius.circular(15)),
+                                    color: data.myMessage == false
+                                        ? grey1Color
+                                        : yellow1Color),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(3.0),
+                                  child: ClipRRect(
+                                    borderRadius: data.myMessage == false
+                                        ? const BorderRadius.only(
+                                            topLeft: Radius.circular(15),
+                                            topRight: Radius.circular(15),
+                                            bottomRight: Radius.circular(15))
+                                        : const BorderRadius.only(
+                                            topRight: Radius.circular(15),
+                                            topLeft: Radius.circular(15),
+                                            bottomLeft: Radius.circular(15)),
+                                    child:
+                                        // video thumbnail generater
+                                        //getUrlWidget(data.url!)
+                                        CachedNetworkImage(
+                                      imageUrl: data.thumbnail!,
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
+                                      placeholder: (context, url) =>
+                                          const Center(
+                                        child: CupertinoActivityIndicator(),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  placeholder: (context, url) => const Center(
-                                    child: CupertinoActivityIndicator(),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                  fit: BoxFit.cover,
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.only(top: 4.0),
-                            child: SizedBox(
-                              child: timestpa(data.messageRead.toString(),
-                                  data.createdAt!, data.isStarMessage!),
-                            ))
-                      ],
-                    ),
-                    Positioned(
-                        top: 100,
-                        left: 84,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => VideoViewFix(
-                                    username:
-                                        "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
-                                    url: data.url!,
-                                    play: true,
-                                    mute: false,
-                                    date: convertUTCTimeTo12HourFormat(
-                                        data.createdAt!),
-                                  ),
-                                ));
-                          },
-                          child: CircleAvatar(
-                              radius: 30,
-                              backgroundColor: Colors.grey.shade300,
-                              foregroundColor: chatownColor,
-                              child: Image.asset("assets/images/play1.png",
-                                  color: chatColor, height: 18)),
-                        )),
-                  ],
+                          Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: SizedBox(
+                                child: timestpa(data.messageRead.toString(),
+                                    data.createdAt!, data.isStarMessage!),
+                              ))
+                        ],
+                      ),
+                      Positioned(
+                          top: 68,
+                          left: 55,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => VideoViewFix(
+                                      username: data.myMessage == false
+                                          ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
+                                          : "You",
+                                      url: data.url!,
+                                      play: true,
+                                      mute: false,
+                                      date: convertUTCTimeTo12HourFormat(
+                                          data.createdAt!),
+                                    ),
+                                  ));
+                            },
+                            child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: blurColor,
+                                foregroundColor: chatownColor,
+                                child: Image.asset("assets/images/play2.png",
+                                    height: 12)),
+                          )),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -1840,77 +1660,79 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
             isSelectedmessage == "1"
                 ? Positioned(
-                    left: 10,
+                    left: 5,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
@@ -1924,204 +1746,113 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                   alignment: data.myMessage == false
                       ? Alignment.centerLeft
                       : Alignment.centerRight,
-                  child: Container(
-                    padding: EdgeInsets.only(
-                        left: chatID.isNotEmpty
-                            ? data.myMessage == false
-                                ? 35
-                                : 10
-                            : 5,
-                        right: 12,
-                        top: 0,
-                        bottom: 0),
-                    margin: const EdgeInsets.only(
-                      //  left: 10,
-                      bottom: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: data.myMessage == false
-                          ? BorderRadius.circular(15)
-                          : BorderRadius.circular(15),
-                      color: data.myMessage == false
-                          ? Colors.grey.shade200
-                          : chatownColor,
-                    ),
-                    constraints:
-                        const BoxConstraints(minHeight: 20.0, minWidth: 10.0),
-                    child: Column(
-                      children: [
-                        data.myMessage == false
-                            ? RichText(
-                                text: TextSpan(children: [
-                                WidgetSpan(
-                                    alignment: PlaceholderAlignment.middle,
-                                    child: Container(
-                                      height: 28,
-                                      width: 28,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(28)),
-                                      child: ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          child: CachedNetworkImage(
-                                            imageUrl:
-                                                data.senderData!.profileImage!,
-                                            imageBuilder:
-                                                (context, imageProvider) =>
-                                                    Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  image: imageProvider,
-                                                  fit: BoxFit.cover,
-                                                ),
+                  child: Column(
+                    crossAxisAlignment: data.myMessage == false
+                        ? CrossAxisAlignment.start
+                        : CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        height: 70,
+                        width: 250,
+                        padding: EdgeInsets.only(
+                            left:
+                                chatID.isNotEmpty || chatMessageList.isNotEmpty
+                                    ? data.myMessage == false
+                                        ? 35
+                                        : 10
+                                    : 3,
+                            right: 3,
+                            top: 0,
+                            bottom: 0),
+                        margin: const EdgeInsets.only(bottom: 5),
+                        decoration: BoxDecoration(
+                            borderRadius: data.myMessage == false
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10))
+                                : const BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
+                            color: data.myMessage == false
+                                ? grey1Color
+                                : yellow1Color),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.rightToLeft,
+                                        child: FileView(file: "${data.url}"),
+                                      ));
+                                },
+                                child: SizedBox(
+                                  width: Get.width * 0.50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(8.0),
+                                      bottomRight: data.myMessage == false
+                                          ? const Radius.circular(8)
+                                          : const Radius.circular(0.0),
+                                      topLeft: const Radius.circular(8.0),
+                                      bottomLeft: data.myMessage == false
+                                          ? const Radius.circular(0)
+                                          : const Radius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          const Image(
+                                            height: 30,
+                                            image: AssetImage(
+                                                'assets/images/pdf.png'),
+                                          ),
+                                          Container(
+                                            padding:
+                                                const EdgeInsets.only(left: 11),
+                                            child: Text(
+                                              extractFilename(data.url!)
+                                                  .toString()
+                                                  .split("-")
+                                                  .last,
+                                              style: const TextStyle(
+                                                color: chatColor,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
                                               ),
                                             ),
-                                            placeholder: (context, url) =>
-                                                const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                              color: chatownColor,
-                                            )),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Icon(
-                                              Icons.person,
-                                              color: Color(0xffBFBFBF),
-                                            ),
-                                          )),
-                                    )),
-                                TextSpan(
-                                    text: capitalizeFirstLetter(
-                                        "  ${data.senderData!.firstName}"
-                                        " ${data.senderData!.lastName}"),
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black))
-                              ]))
-                            : const SizedBox.shrink(),
-                        data.myMessage == false
-                            ? const SizedBox(height: 5)
-                            : const SizedBox.shrink(),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      curve: Curves.linear,
-                                      type: PageTransitionType.rightToLeft,
-                                      child: FileView(file: "${data.url}"),
-                                    ));
-                              },
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(5.0),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                        topRight: const Radius.circular(8.0),
-                                        bottomRight: data.myMessage == false
-                                            ? const Radius.circular(8)
-                                            : const Radius.circular(0.0),
-                                        topLeft: const Radius.circular(8.0),
-                                        bottomLeft: data.myMessage == false
-                                            ? const Radius.circular(0)
-                                            : const Radius.circular(8),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5),
-                                        child: Row(
-                                          children: [
-                                            Column(
-                                              children: [
-                                                Container(
-                                                    height: 35,
-                                                    width: 30,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.rectangle,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      color: const Color(
-                                                          0xffCCCCCC),
-                                                    ),
-                                                    child: const Padding(
-                                                      padding:
-                                                          EdgeInsets.all(3.0),
-                                                      child: Image(
-                                                        image: AssetImage(
-                                                            'assets/images/doc.png'),
-                                                      ),
-                                                    )),
-                                              ],
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.only(
-                                                  left: 11),
-                                              child: Text(
-                                                extractFilename(data.url!)
-                                                    .toString()
-                                                    .split("-")
-                                                    .last,
-                                                style: const TextStyle(
-                                                  color: chatColor,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 15)
-                                          ],
-                                        ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                            data.myMessage == false
-                                ? Column(
-                                    children: [
-                                      const SizedBox(height: 30),
-                                      Row(
-                                        children: [
-                                          Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 4.0),
-                                              child: SizedBox(
-                                                child: timestpa(
-                                                    data.messageRead.toString(),
-                                                    data.createdAt!,
-                                                    data.isStarMessage!),
-                                              )),
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                : Column(
-                                    children: [
-                                      const SizedBox(height: 30),
-                                      Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 4.0),
-                                          child: SizedBox(
-                                            child: timestpa(
-                                                data.messageRead.toString(),
-                                                data.createdAt!,
-                                                data.isStarMessage!),
-                                          )),
-                                      const SizedBox(width: 3),
-                                    ],
-                                  )
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
+                        ).paddingOnly(top: 3, bottom: 3),
+                      ),
+                      data.myMessage == false
+                          ? SizedBox(
+                              child: timestpa(data.messageRead.toString(),
+                                  data.createdAt!, data.isStarMessage!),
+                            )
+                          : SizedBox(
+                              child: timestpa(data.messageRead.toString(),
+                                  data.createdAt!, data.isStarMessage!),
+                            )
+                    ],
                   )),
             ),
           ],
@@ -2133,33 +1864,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   Widget getVoiceMessageWidget(index, MessageList data) {
     return InkWell(
       onLongPress: () {
-        msgDailogShow(
-            //message
-            data.message!,
-            // chat id
-            data.messageId.toString(),
-            // chat user id
-            data.conversationId.toString(),
-            data.messageType!,
-            "0",
-            // snapshot
-            //     .data!
-            //     .messageList![index1]
-            //     .messages![index]
-            //     .isStarted!,
-            data.isStarMessage!,
-            index,
-            data.myMessage!,
-            data.senderData!);
+        if (chatID.isEmpty || chatMessageList.isEmpty) {
+          msgDailogShow(data, data.senderData!);
+        }
       },
       onTap: () {
-        if (chatID.isNotEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
                 : chatID.add(data.messageId.toString());
+            //forward list
+            chatMessageList.contains(data)
+                ? chatMessageList.remove(data)
+                : chatMessageList.add(data);
+
+            print("MESSAGE_LISTTT:${chatMessageList.length}");
           });
         }
+        print("ONTAPMSGID:$chatID");
       },
       child: Stack(
         children: [
@@ -2167,47 +1890,55 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
               ? Positioned(
                   left: 10,
                   bottom: 35,
-                  child: GestureDetector(
+                  child: InkWell(
                       onTap: () {
                         // Handle checkbox state change if needed
                         setState(() {
                           chatID.contains(data.messageId.toString())
                               ? chatID.remove(data.messageId.toString())
                               : chatID.add(data.messageId.toString());
+                          chatMessageList.contains(data)
+                              ? chatMessageList.remove(data)
+                              : chatMessageList.add(data);
                         });
                         print("ONTAPMSGID:$chatID");
                       },
-                      child: chatID.isEmpty
+                      child: chatID.length == 0 || chatMessageList.length == 0
                           ? const SizedBox()
                           : Transform.scale(
                               scale: 1.1,
-                              child: GestureDetector(
-                                child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(color: bg1),
-                                        color: chatID.contains(
-                                                data.messageId.toString())
-                                            ? bg1
-                                            : bg1),
-                                    child: chatID
-                                            .contains(data.messageId.toString())
-                                        ? const Icon(
-                                            Icons.check,
-                                            size: 15.0,
-                                            color: Colors.black,
-                                          )
-                                        : const SizedBox(
-                                            height: 10,
-                                          )),
-                              ))),
+                              child: chatID.contains(
+                                          data.messageId.toString()) ||
+                                      chatMessageList.contains(data)
+                                  ? Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          color: bg1,
+                                          gradient: LinearGradient(
+                                              colors: [blackColor, black1Color],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomCenter)),
+                                      child:
+                                          Image.asset("assets/images/right.png")
+                                              .paddingAll(3))
+                                  : Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          border:
+                                              Border.all(color: black1Color),
+                                          color: bg1),
+                                    ))),
                 )
               : const SizedBox(height: 10),
           Container(
             padding: EdgeInsets.only(
-                left: chatID.isNotEmpty
+                left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                     ? data.myMessage == false
                         ? 40
                         : 0
@@ -2221,18 +1952,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         : isMsgHighLight)
                 ? chatStrokeColor // for when reply msg scoll then
                 : Colors.transparent,
-            child: myVoiceWidget(
-                data.myMessage!,
-                data.url!,
-                index,
-                data.audioTime!,
-                data.messageRead.toString(),
-                data.createdAt,
-                data.isStarMessage!,
-                data.senderData!.firstName!,
-                data.senderData!.lastName!,
-                data.senderData!.userName!,
-                data.senderData!.profileImage!),
+            child: myVoiceWidget(data, index),
           ),
         ],
       ),
@@ -2244,43 +1964,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
-          Navigator.push(
-            context,
-            PageTransition(
-                curve: Curves.linear,
-                type: PageTransitionType.rightToLeft,
-                child: ImageView(
-                  image: data.url!,
-                  userimg: "",
-                )),
-          );
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -2288,48 +1990,58 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
               padding: EdgeInsets.only(
-                  left: chatID.isNotEmpty
+                  left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                       ? data.myMessage == false
                           ? 40
                           : 12
@@ -2352,93 +2064,68 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       ? CrossAxisAlignment.start
                       : CrossAxisAlignment.end,
                   children: [
-                    data.myMessage == false
-                        ? RichText(
-                            text: TextSpan(children: [
-                            WidgetSpan(
-                                alignment: PlaceholderAlignment.middle,
-                                child: Container(
-                                  height: 28,
-                                  width: 28,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(28)),
-                                  child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CachedNetworkImage(
-                                        imageUrl:
-                                            data.senderData!.profileImage!,
-                                        imageBuilder:
-                                            (context, imageProvider) =>
-                                                Container(
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              image: imageProvider,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        placeholder: (context, url) =>
-                                            const Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                          color: chatownColor,
-                                        )),
-                                        errorWidget: (context, url, error) =>
-                                            const Icon(
-                                          Icons.person,
-                                          color: Color(0xffBFBFBF),
-                                        ),
-                                      )),
-                                )),
-                            TextSpan(
-                                text: capitalizeFirstLetter(
-                                    "  ${data.senderData!.firstName}"
-                                    " ${data.senderData!.lastName}"),
-                                style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black))
-                          ]))
-                        : const SizedBox.shrink(),
-                    data.myMessage == false
-                        ? const SizedBox(height: 5)
-                        : const SizedBox.shrink(),
-                    Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: data.myMessage == false
-                            ? BorderRadius.circular(15)
-                            : BorderRadius.circular(15),
-                        color: data.myMessage == false
-                            ? Colors.grey.shade200
-                            : chatownColor,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15),
-                          child: CachedNetworkImage(
-                            imageUrl: data.url!,
-                            imageBuilder: (context, imageProvider) => Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                      image: imageProvider,
-                                      fit: BoxFit.cover,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                              curve: Curves.linear,
+                              type: PageTransitionType.rightToLeft,
+                              child: ImageView(
+                                image: data.url!,
+                                userimg: "",
+                              )),
+                        );
+                      },
+                      child: Container(
+                        width: 150,
+                        height: 150,
+                        decoration: BoxDecoration(
+                            borderRadius: data.myMessage == false
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15))
+                                : const BorderRadius.only(
+                                    topRight: Radius.circular(15),
+                                    topLeft: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15)),
+                            color: data.myMessage == false
+                                ? grey1Color
+                                : yellow1Color),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: ClipRRect(
+                            borderRadius: data.myMessage == false
+                                ? const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10))
+                                : const BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10)),
+                            child: CachedNetworkImage(
+                              imageUrl: data.url!,
+                              imageBuilder: (context, imageProvider) => Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
+                              placeholder: (context, url) => const Center(
+                                child: CupertinoActivityIndicator(),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                              fit: BoxFit.cover,
                             ),
-                            placeholder: (context, url) => const Center(
-                              child: CupertinoActivityIndicator(),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                const Icon(Icons.error),
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
@@ -2464,35 +2151,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
-          launchURL(data.message!);
-          print(data.message!);
+          print("ONTAPMSGID:$chatID");
         },
         child: Stack(
           children: [
@@ -2500,48 +2177,58 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 ? Positioned(
                     left: 10,
                     bottom: 35,
-                    child: GestureDetector(
+                    child: InkWell(
                         onTap: () {
                           // Handle checkbox state change if needed
                           setState(() {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.isEmpty
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: GestureDetector(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(height: 10),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
                             ? 40
                             : 12
@@ -2566,143 +2253,179 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
-                          data.myMessage == false
-                              ? RichText(
-                                  text: TextSpan(children: [
-                                  WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Container(
-                                        height: 28,
-                                        width: 28,
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                    maxHeight:
+                                        MediaQuery.of(context).size.width / 3.7,
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * .8),
+                                decoration: BoxDecoration(
+                                    borderRadius: data.myMessage == false
+                                        ? const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomRight: Radius.circular(10))
+                                        : const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10)),
+                                    color: data.myMessage == false
+                                        ? grey1Color
+                                        : yellow1Color),
+                                padding: const EdgeInsets.only(
+                                    left: 5, right: 5, top: 5, bottom: 5),
+                                child: InkWell(
+                                  onTap: () {
+                                    launchURL(data.message!);
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.only(
+                                            left: 5,
+                                            right: 5,
+                                            top: 5,
+                                            bottom: 5),
                                         decoration: BoxDecoration(
+                                            color: Colors.white,
                                             borderRadius:
-                                                BorderRadius.circular(28)),
-                                        child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                            child: CachedNetworkImage(
-                                              imageUrl: data
-                                                  .senderData!.profileImage!,
-                                              imageBuilder:
-                                                  (context, imageProvider) =>
-                                                      Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              placeholder: (context, url) =>
-                                                  const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                color: chatownColor,
-                                              )),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      const Icon(
-                                                Icons.person,
-                                                color: Color(0xffBFBFBF),
-                                              ),
-                                            )),
-                                      )),
-                                  TextSpan(
-                                      text: capitalizeFirstLetter(
-                                          "  ${data.senderData!.firstName}"
-                                          " ${data.senderData!.lastName}"),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black))
-                                ]))
-                              : const SizedBox.shrink(),
-                          data.myMessage == false
-                              ? const SizedBox(height: 5)
-                              : const SizedBox.shrink(),
-                          Container(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * .6),
-                            decoration: BoxDecoration(
-                                borderRadius: data.myMessage == false
-                                    ? const BorderRadius.only(
-                                        topLeft: Radius.circular(7),
-                                        topRight: Radius.circular(7),
-                                        bottomRight: Radius.circular(7))
-                                    : const BorderRadius.only(
-                                        topLeft: Radius.circular(7),
-                                        topRight: Radius.circular(7),
-                                        bottomLeft: Radius.circular(7)),
-                                color: data.myMessage == false
-                                    ? Colors.grey.shade300
-                                    : chatownColor),
-                            padding: const EdgeInsets.all(10),
-                            child: FlutterLinkPreview(
-                              url: data.message!,
-                              builder: (info) {
-                                if (info is WebInfo) {
-                                  return info.title == null &&
-                                          info.description == null
-                                      ? Text(
-                                          data.message!,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
+                                                BorderRadius.circular(10)),
+                                        child: FlutterLinkPreview(
+                                          url: data.message!,
+                                          builder: (info) {
+                                            if (info is WebInfo) {
+                                              return info.title == null &&
+                                                      info.description == null
+                                                  ? Text(
+                                                      data.message!,
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: data.myMessage ==
+                                                                false
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                      ),
+                                                    )
+                                                  : Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        if (info.image != null)
+                                                          Container(
+                                                            height: 58,
+                                                            width: 57,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              child: Image.network(
+                                                                  info.image!,
+                                                                  fit: BoxFit
+                                                                      .cover),
+                                                            ),
+                                                          ),
+                                                        const SizedBox(
+                                                            width: 5),
+                                                        Expanded(
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            children: [
+                                                              if (info.title !=
+                                                                  null)
+                                                                Text(
+                                                                  info.title!,
+                                                                  maxLines: 1,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        14,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                  ),
+                                                                ).paddingAll(2),
+                                                              info.image == null
+                                                                  ? const SizedBox(
+                                                                      height: 5)
+                                                                  : const SizedBox
+                                                                      .shrink(),
+                                                              if (info.description !=
+                                                                  null)
+                                                                Text(
+                                                                  info.description!,
+                                                                  maxLines: 2,
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: const TextStyle(
+                                                                      color: Color
+                                                                          .fromRGBO(
+                                                                              68,
+                                                                              68,
+                                                                              68,
+                                                                              1),
+                                                                      fontSize:
+                                                                          9,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400),
+                                                                ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                            }
+                                            return const CircularProgressIndicator();
+                                          },
+                                          titleStyle: TextStyle(
                                             color: data.myMessage == false
                                                 ? Colors.white
                                                 : Colors.black,
+                                            fontWeight: FontWeight.bold,
                                           ),
-                                        )
-                                      : Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            if (info.image != null)
-                                              Image.network(info.image!,
-                                                  fit: BoxFit.cover),
-                                            if (info.title != null)
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.black12,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            7)),
-                                                child: Text(
-                                                  info.title!,
-                                                  style: TextStyle(
-                                                    color:
-                                                        data.myMessage == false
-                                                            ? Colors.white
-                                                            : Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ).paddingAll(2),
-                                              ).paddingOnly(top: 5),
-                                            if (info.description != null)
-                                              Text(
-                                                info.description!,
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: data.myMessage == false
-                                                      ? Colors.white
-                                                      : Colors.black,
-                                                ),
-                                              ),
-                                          ],
-                                        );
-                                }
-                                return const CircularProgressIndicator();
-                              },
-                              titleStyle: TextStyle(
-                                color: data.myMessage == false
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 3),
+                                      Text(
+                                        data.message!,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                            color: linkColor,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w400),
+                                      ).paddingOnly(left: 10)
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 4.0),
@@ -2726,34 +2449,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
 
   Widget getContactMessage(index, MessageList data) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: GestureDetector(
+      padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+      child: InkWell(
         onLongPress: () {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              // snapshot
-              //     .data!
-              //     .messageList![index1]
-              //     .messages![index]
-              //     .isStarted!,
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
+          if (chatID.isEmpty || chatMessageList.isEmpty) {
+            msgDailogShow(data, data.senderData!);
+          }
         },
         onTap: () {
-          if (chatID.isNotEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
                   : chatID.add(data.messageId.toString());
+              //forward list
+              chatMessageList.contains(data)
+                  ? chatMessageList.remove(data)
+                  : chatMessageList.add(data);
+
+              print("MESSAGE_LISTTT:${chatMessageList.length}");
             });
           }
           print("ONTAPMSGID:$chatID");
@@ -2762,7 +2476,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           children: [
             isSelectedmessage == "1"
                 ? Positioned(
-                    left: 10,
+                    left: 5,
                     bottom: 35,
                     child: InkWell(
                         onTap: () {
@@ -2771,48 +2485,58 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             chatID.contains(data.messageId.toString())
                                 ? chatID.remove(data.messageId.toString())
                                 : chatID.add(data.messageId.toString());
+                            chatMessageList.contains(data)
+                                ? chatMessageList.remove(data)
+                                : chatMessageList.add(data);
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.length == 0
+                        child: chatID.length == 0 || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
-                                child: InkWell(
-                                  child: Container(
-                                      width: 20.0,
-                                      height: 20.0,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(25),
-                                          border: Border.all(color: bg1),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? bg1
-                                              : bg1),
-                                      child: chatID.contains(
-                                              data.messageId.toString())
-                                          ? const Icon(
-                                              Icons.check,
-                                              size: 15.0,
-                                              color: Colors.black,
-                                            )
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
-                                ))),
+                                child: chatID.contains(
+                                            data.messageId.toString()) ||
+                                        chatMessageList.contains(data)
+                                    ? Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            color: bg1,
+                                            gradient: LinearGradient(
+                                                colors: [
+                                                  blackColor,
+                                                  black1Color
+                                                ],
+                                                begin: Alignment.topLeft,
+                                                end: Alignment.bottomCenter)),
+                                        child: Image.asset(
+                                                "assets/images/right.png")
+                                            .paddingAll(3))
+                                    : Container(
+                                        width: 15.0,
+                                        height: 15.0,
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(25),
+                                            border:
+                                                Border.all(color: black1Color),
+                                            color: bg1),
+                                      ))),
                   )
                 : const SizedBox(
                     height: 10,
                   ),
             Container(
                 padding: EdgeInsets.only(
-                    left: chatID.isNotEmpty
+                    left: chatID.isNotEmpty || chatMessageList.isNotEmpty
                         ? data.myMessage == false
-                            ? 40
-                            : 12
-                        : 12,
-                    right: 12,
+                            ? 35
+                            : 10
+                        : 3,
+                    right: 3,
                     top: 0,
                     bottom: 0),
                 color: highlightedIndex == index &&
@@ -2832,81 +2556,116 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
-                          data.myMessage == false
-                              ? RichText(
-                                  text: TextSpan(children: [
-                                  WidgetSpan(
-                                      alignment: PlaceholderAlignment.middle,
-                                      child: Container(
-                                        height: 28,
-                                        width: 28,
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(28)),
-                                        child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                            child: CachedNetworkImage(
-                                              imageUrl: data
-                                                  .senderData!.profileImage!,
-                                              imageBuilder:
-                                                  (context, imageProvider) =>
-                                                      Container(
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
+                          Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                constraints: BoxConstraints(
+                                    maxWidth:
+                                        MediaQuery.of(context).size.width * .6),
+                                decoration: BoxDecoration(
+                                    borderRadius: data.myMessage == false
+                                        ? const BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                            bottomRight: Radius.circular(10))
+                                        : const BorderRadius.only(
+                                            topRight: Radius.circular(10),
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10)),
+                                    color: data.myMessage == false
+                                        ? grey1Color
+                                        : yellow1Color),
+                                padding: const EdgeInsets.all(3),
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      width: 200,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10)),
+                                          color: Colors.white),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            height: 30,
+                                            width: 30,
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(35)),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(35),
+                                              child: CustomCachedNetworkImage(
+                                                  imageUrl: data
+                                                      .sharedContactProfileImage!,
+                                                  placeholderColor:
+                                                      chatownColor,
+                                                  errorWidgeticon: const Icon(
+                                                    Icons.groups,
+                                                    size: 30,
+                                                  )),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                capitalizeFirstLetter(
+                                                    data.sharedContactName!),
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: chatColor),
                                               ),
-                                              placeholder: (context, url) =>
-                                                  const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                color: chatownColor,
-                                              )),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      const Icon(
-                                                Icons.person,
-                                                color: Color(0xffBFBFBF),
+                                              Text(
+                                                capitalizeFirstLetter(
+                                                    data.sharedContactNumber!),
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: chatColor),
                                               ),
-                                            )),
-                                      )),
-                                  TextSpan(
-                                      text: capitalizeFirstLetter(
-                                          "  ${data.senderData!.firstName}"
-                                          " ${data.senderData!.lastName}"),
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black))
-                                ]))
-                              : const SizedBox.shrink(),
-                          data.myMessage == false
-                              ? const SizedBox(height: 5)
-                              : const SizedBox.shrink(),
-                          Container(
-                            constraints: BoxConstraints(
-                                maxWidth:
-                                    MediaQuery.of(context).size.width * .6),
-                            decoration: BoxDecoration(
-                              borderRadius: data.myMessage == false
-                                  ? BorderRadius.circular(15)
-                                  : BorderRadius.circular(15),
-                              color: data.myMessage == false
-                                  ? Colors.grey.shade200
-                                  : chatownColor,
-                            ),
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              "${capitalizeFirstLetter(data.sharedContactName!)}\n${capitalizeFirstLetter(data.sharedContactNumber!)}",
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: chatColor),
-                            ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Container(
+                                      height: 30,
+                                      width: 200,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(10),
+                                              bottomRight: Radius.circular(10)),
+                                          color: Colors.white),
+                                      child: const Column(
+                                        children: [
+                                          SizedBox(height: 3),
+                                          Text(
+                                            "Message",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: chatColor),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           Padding(
                               padding: const EdgeInsets.only(top: 4.0),
@@ -2931,165 +2690,142 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   Widget getReplyMessage(index, MessageList data) {
     return InkWell(
       onLongPress: () {
-        setState(() {
-          msgDailogShow(
-              //message
-              data.message!,
-              // chat id
-              data.messageId.toString(),
-              // chat user id
-              data.conversationId.toString(),
-              data.messageType!,
-              "0",
-              data.isStarMessage!,
-              index,
-              data.myMessage!,
-              data.senderData!);
-        });
+        if (chatID.isEmpty || chatMessageList.isEmpty) {
+          msgDailogShow(data, data.senderData!);
+        }
       },
       onTap: () {
-        if (chatID.isNotEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
                 : chatID.add(data.messageId.toString());
+            //forward list
+            chatMessageList.contains(data)
+                ? chatMessageList.remove(data)
+                : chatMessageList.add(data);
+
+            print("MESSAGE_LISTTT:${chatMessageList.length}");
           });
         }
         print("ONTAPMSGID:$chatID");
       },
       child: replyMSGWidget(
-          data.myMessage!,
-          //replyTime
-          data.replyId!,
-          //text message
-          data.message!,
-          // msg id
-          data.messageId.toString(),
-          //msg type
-          data.messageType!,
-          // msg time
-          data.createdAt!,
-          // url doc,image, video, audio
-          data.url!,
-          // user image
-          data.senderData!.profileImage!,
-          // video thumbnail
-          data.thumbnail!,
-          // location lat
-          data.latitude!,
-          // location lat
-          data.longitude!,
+          data,
           // msg list index
           index,
-          // audio string
-          data.audioTime!,
-          data.sharedContactName!,
-          data.sharedContactNumber!,
-          data.senderData!,
-          data.isStarMessage!,
-          data.messageRead.toString()
-          //data.resData!.messageId.toString(),
-          //data
-          ),
+          data.senderData!),
     );
   }
+
 //================================================================= KEYBOARD =================================================================================
 
   bool click = false;
 
-  Widget floatbutton() {
+  Widget floatbuttonNew() {
     return Column(
       children: [
-        Divider(
-          height: 1,
-          thickness: 1,
-          color: Colors.grey[200],
-        ),
-        const SizedBox(height: 10),
         Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: InkWell(
-                onTap: () {
-                  setState(() {
-                    closekeyboard();
-                    click = !click;
-                  });
-                },
-                child: CircleAvatar(
-                    backgroundColor: chatownColor,
-                    radius: 20,
-                    child: Center(
-                        child: Icon(click ? Icons.remove : Icons.add,
-                            color: chatColor))),
-              ),
-            ),
-            const SizedBox(
-              width: 5,
-            ),
+            const SizedBox(width: 20),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.grey),
+                    color: Colors.white),
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextFormField(
-                    onTap: () {
-                      isKeyboard = true;
-                      click = false;
-                    },
-                    maxLines: 4,
-                    minLines: 1, // Minimum lines to show initially
-                    cursorColor: Colors.black,
-                    textCapitalization: TextCapitalization.sentences,
-                    style: TextStyle(
-                        color: isURL(messagecontroller.text.trim())
-                            ? const Color.fromARGB(255, 6, 6, 252)
-                            : Colors.black),
-                    controller: messagecontroller,
-                    decoration: const InputDecoration(
-                        alignLabelWithHint: true,
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 2, vertical: 1),
-                        border: InputBorder.none,
-                        hintText: "New Chat",
-                        hintStyle: TextStyle(color: Colors.grey, fontSize: 15),
-                        isDense: true),
-                    onChanged: (value) {
-                      setState(() {
-                        if (value.trim().isEmpty) {
-                          // If only whitespace characters are entered
-                          isSendbutton = false;
-                          isHttpSendbutton = false;
-                        } else if (isURL(value)) {
-                          // If it's a URL
-                          isSendbutton = true;
-                          isHttpSendbutton = true;
-                        } else {
-                          // If it's not a URL
-                          isSendbutton = true; // Adjusted condition
-                          isHttpSendbutton = false;
-                        }
-                      });
-                      if (value.isNotEmpty &&
-                          isSendbutton &&
-                          typingstart == '0') {
-                        typingstart = "1";
-                        chatContorller.isTypingApi(widget.conversationID!, "1");
-                        controller.isTyping();
-                      }
-                      typingTimer?.cancel();
-                      startTypingTimer();
-                      if (value.isNotEmpty &&
-                          isSendbutton &&
-                          typingstart == '0') {
-                        typingstart = '1';
-                        chatContorller.isTypingApi(widget.conversationID!, "1");
-                        controller.isTyping();
-                      }
-                    },
+                  padding: const EdgeInsets.all(5.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          onTap: () {
+                            isKeyboard = true;
+                          },
+                          maxLines: 4,
+                          minLines: 1, // Minimum lines to show initially
+                          cursorColor: Colors.black,
+                          textCapitalization: TextCapitalization.sentences,
+                          style: TextStyle(
+                              color: isURL(messagecontroller.text.trim())
+                                  ? const Color.fromARGB(255, 6, 6, 252)
+                                  : Colors.black),
+                          controller: messagecontroller,
+                          decoration: InputDecoration(
+                              alignLabelWithHint: true,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 2, vertical: 5),
+                              border: InputBorder.none,
+                              hintText: "Type Message",
+                              hintStyle: TextStyle(
+                                  color: darkGreyColor,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w400),
+                              isDense: true),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value.trim().isEmpty) {
+                                // If only whitespace characters are entered
+                                isSendbutton = false;
+                                isHttpSendbutton = false;
+                              } else if (isURL(value)) {
+                                // If it's a URL
+                                isSendbutton = true;
+                                isHttpSendbutton = true;
+                              } else {
+                                // If it's not a URL
+                                isSendbutton = true; // Adjusted condition
+                                isHttpSendbutton = false;
+                              }
+                              if (value.isNotEmpty &&
+                                  isSendbutton &&
+                                  typingstart == '0') {
+                                print("START-TYPING-1");
+                                typingstart = "1";
+                                chatContorller.isTypingApi(
+                                    widget.conversationID!, "1");
+                                controller.isTyping();
+                              }
+                              typingTimer?.cancel();
+                              startTypingTimer();
+                              if (value.isNotEmpty &&
+                                  isSendbutton &&
+                                  typingstart == '0') {
+                                print("START-TYPING-1");
+                                typingstart = '1';
+                                chatContorller.isTypingApi(
+                                    widget.conversationID!, "1");
+                                controller.isTyping();
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                click = !click;
+                                closekeyboard();
+                              });
+                            },
+                            child: Image.asset("assets/images/pin.png",
+                                height: 20, color: darkGreyColor),
+                          ),
+                          const SizedBox(width: 10),
+                          InkWell(
+                            onTap: () {
+                              getImageFromCamera();
+                              messagecontroller.clear();
+                            },
+                            child: Image.asset("assets/images/camera1.png",
+                                height: 20, color: darkGreyColor),
+                          ),
+                        ],
+                      )
+                    ],
                   ),
                 ),
               ),
@@ -3101,57 +2837,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
               padding: const EdgeInsets.only(right: 12.0),
               child: InkWell(
                   onTap: () {
-                    // if (widget.isBlocked == "1") {
-                    //   //Fluttertoast.showToast(msg: "msg");
-                    //   openBlockSheet(context);
-                    // } else {
-                    //   if (SelectedreplyText == true) {
-                    //     if (messagecontroller.text.isNotEmpty) {
-                    //       if (messagecontroller.text.startsWith('http://') ||
-                    //           messagecontroller.text.startsWith('https://')) {
-                    //         replyMsgApiLink(messagecontroller.text.trim(),
-                    //             reply_chatID, rplyTime);
-                    //       } else if (isSendbutton) {
-                    //         replyMsgApi(messagecontroller.text.trim(),
-                    //             reply_chatID, rplyTime);
-                    //       }
-                    //       messagecontroller.clear();
-                    //     }
-                    //   } else {
-                    //     if (messagecontroller.text.isNotEmpty) {
-                    //       if (messagecontroller.text.startsWith('http://') ||
-                    //           messagecontroller.text.startsWith('https://')) {
-                    //         sendHttpmessage(messagecontroller.text.trim());
-                    //       } else if (isSendbutton) {
-                    //         sendmessage(messagecontroller.text.trim());
-                    //       }
-                    //       messagecontroller.clear();
-                    //     }
-                    //   }
-                    // }
+                    //--------- reply text api call -----------------//
                     if (messagecontroller.text.isNotEmpty && isSendbutton) {
                       if (SelectedreplyText == true) {
-                        try {
-                          chatContorller.isSendMsg.value = true;
-                          chatContorller.sendMessageReplyText(
-                              messagecontroller.text.trim(),
-                              widget.conversationID.toString(),
-                              'text',
-                              reply_chatID,
-                              widget.mobileNum.toString());
-                          chatContorller.isSendMsg.value = false;
-                          SelectedreplyText = false;
-                          chatContorller.isTypingApi(
-                              widget.conversationID!, "0");
-                          typingstart = "0";
-                          controller.isTyping();
-                        } catch (e) {
-                          chatContorller.isSendMsg.value = false;
-                          print(e);
-                          showCustomToast("Something Error2");
-                        }
-                        messagecontroller.clear();
-                      } else {
                         try {
                           chatContorller.isSendMsg.value = true;
                           print(messagecontroller.text.trim());
@@ -3162,12 +2850,41 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               messagecontroller.text.trim(),
                               widget.conversationID.toString(),
                               'text',
-                              widget.mobileNum.toString());
-                          chatContorller.isSendMsg.value = false;
+                              widget.mobileNum.toString(),
+                              '',
+                              reply_chatID);
+                          SelectedreplyText = false;
                           chatContorller.isTypingApi(
                               widget.conversationID!, "0");
-                          typingstart = "0";
                           controller.isTyping();
+                          typingstart = "0";
+                          chatContorller.isSendMsg.value = false;
+                        } catch (e) {
+                          chatContorller.isSendMsg.value = false;
+                          print(e);
+                          showCustomToast("Something Error1");
+                        }
+                        messagecontroller.clear();
+                      } else {
+                        //================ text api call =============//
+                        try {
+                          chatContorller.isSendMsg.value = true;
+                          print(messagecontroller.text.trim());
+                          print(widget.conversationID);
+                          print('text');
+                          print(widget.mobileNum);
+                          chatContorller.sendMessageText(
+                              messagecontroller.text.trim(),
+                              widget.conversationID.toString(),
+                              'text',
+                              widget.mobileNum.toString(),
+                              '',
+                              '');
+                          chatContorller.isTypingApi(
+                              widget.conversationID!, "0");
+                          controller.isTyping();
+                          typingstart = "0";
+                          chatContorller.isSendMsg.value = false;
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
@@ -3181,16 +2898,22 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       closekeyboard();
                     }
                   },
-                  child: CircleAvatar(
-                      backgroundColor: chatownColor,
-                      radius: 20,
+                  child: Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          gradient: LinearGradient(
+                              colors: [yellow1Color, yellow2Color],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
                       child: messagecontroller.text.isNotEmpty && isSendbutton
-                          ? const Icon(
-                              Icons.send,
-                              color: chatColor,
-                            )
+                          ? Image.asset("assets/images/send.png",
+                                  color: chatColor)
+                              .paddingAll(12)
                           : Image.asset("assets/images/microphone-2.png",
-                              height: 20, color: chatColor))),
+                                  color: chatColor)
+                              .paddingAll(12))),
             )
           ],
         ),
@@ -3199,18 +2922,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             : const SizedBox(height: 10),
         click
             ? Container(
-                height: 370,
+                height: 250,
                 width: MediaQuery.of(context).size.width * 0.99,
                 color: Colors.white,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey[200],
-                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 40, vertical: 15),
@@ -3229,28 +2947,14 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                   color: Colors.transparent),
                               child: Column(
                                 children: [
-                                  Container(
-                                      height: 50,
-                                      width: 50,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle, color: bg1),
-                                      child: const Padding(
-                                        padding: EdgeInsets.all(12),
-                                        child: Image(
-                                          image: AssetImage(
-                                            'assets/images/paperclip-2.png',
-                                          ),
-                                          color: chatColor,
-                                        ),
-                                      )),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
+                                  Image.asset("assets/images/doc1.png",
+                                      height: 50),
+                                  const SizedBox(height: 8),
                                   const Text('File',
                                       style: TextStyle(
                                           color: chatColor,
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 14))
+                                          fontSize: 13))
                                 ],
                               ),
                             ),
@@ -3268,19 +2972,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                       click = !click;
                                     });
                                   },
-                                  child: Container(
+                                  child: const Image(
                                     height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle, color: bg1),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(12.0),
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/images/gallery.png',
-                                        ),
-                                        color: chatColor,
-                                      ),
+                                    image: AssetImage(
+                                      'assets/images/photos.png',
                                     ),
                                   ),
                                 ),
@@ -3290,60 +2985,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                 const Text('Photo',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w400,
-                                        fontSize: 14))
+                                        fontSize: 13))
                               ],
                             ),
                           ),
-                          Container(
-                            decoration:
-                                const BoxDecoration(color: Colors.transparent),
-                            child: Column(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    getImageFromCamera();
-                                    setState(() {
-                                      click = !click;
-                                    });
-                                  },
-                                  child: Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle, color: bg1),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(12.0),
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/images/camera.png',
-                                        ),
-                                        color: chatColor,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                const Text('Camera',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14))
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
                           InkWell(
                             onTap: () {
                               getImageFromGallery2();
@@ -3354,37 +2999,34 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.transparent),
-                              child: Column(
+                              child: const Column(
                                 children: [
-                                  Container(
+                                  Image(
                                     height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        // border: Border.all(
-                                        //     color: Colors.grey
-                                        //         .shade200),
-                                        color: bg1),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(13.0),
-                                      child: Image(
-                                          image: AssetImage(
-                                            'assets/images/video.png',
-                                          ),
-                                          color: chatColor),
+                                    image: AssetImage(
+                                      'assets/images/video_gallery.png',
                                     ),
                                   ),
-                                  const SizedBox(
+                                  SizedBox(
                                     height: 8,
                                   ),
-                                  const Text('Video',
+                                  Text('Video',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 14))
+                                          fontSize: 13))
                                 ],
                               ),
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 40, vertical: 15),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
                           Container(
                             decoration:
                                 const BoxDecoration(color: Colors.transparent),
@@ -3397,28 +3039,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                       click = !click;
                                     });
                                   },
-                                  child: Container(
+                                  child: const Image(
                                     height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle, color: bg1),
-                                    child: const Center(
-                                        child: Text(
-                                      'GIF',
-                                      style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: chatColor),
-                                    )),
+                                    image: AssetImage(
+                                      'assets/images/gif1.png',
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 8,
-                                ),
+                                const SizedBox(height: 10),
                                 const Text('Gif',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w400,
-                                        fontSize: 14))
+                                        fontSize: 13))
                               ],
                             ),
                           ),
@@ -3433,86 +3065,37 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.transparent),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle, color: bg1),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(12.0),
-                                      child: Image(
-                                        image: AssetImage(
-                                          'assets/images/location.png',
-                                        ),
-                                        color: chatColor,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    height: 8,
-                                  ),
-                                  const Text('Location',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 14))
-                                ],
+                              child: const Image(
+                                height: 82,
+                                image: AssetImage(
+                                  'assets/images/loca1.png',
+                                ),
                               ),
                             ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                click = !click;
+                              });
+                              Get.to(
+                                  () => ContactSend(
+                                        conversationID: widget.conversationID!,
+                                        mobileNum: widget.mobileNum.toString(),
+                                        SelectedreplyText: SelectedreplyText,
+                                        replyID: reply_chatID,
+                                      ),
+                                  transition: Transition.leftToRight);
+                            },
+                            child: const Image(
+                                height: 82,
+                                image: AssetImage(
+                                  'assets/images/cont1.png',
+                                )),
                           ),
                         ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
-                      child: InkWell(
-                        onTap: () {
-                          setState(() {
-                            click = !click;
-                          });
-                          Get.to(
-                              () => ContactSend(
-                                    conversationID: widget.conversationID!,
-                                    mobileNum: widget.mobileNum.toString(),
-                                    SelectedreplyText: SelectedreplyText,
-                                    replyID: reply_chatID,
-                                  ),
-                              transition: Transition.leftToRight);
-                        },
-                        child: Container(
-                          decoration:
-                              const BoxDecoration(color: Colors.transparent),
-                          child: Column(
-                            children: [
-                              Container(
-                                  height: 50,
-                                  width: 50,
-                                  decoration: const BoxDecoration(
-                                      shape: BoxShape.circle, color: bg1),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(12),
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/icons/profile_outline.png',
-                                      ),
-                                      color: chatColor,
-                                    ),
-                                  )),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              const Text('Contact',
-                                  style: TextStyle(
-                                      color: chatColor,
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14))
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               )
@@ -3523,7 +3106,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
 
   Widget floatbutton1() {
     return chatID.isEmpty
-        ? floatbutton()
+        ? floatbuttonNew()
         : Padding(
             padding: const EdgeInsets.only(bottom: 35),
             child: Column(
@@ -3544,20 +3127,22 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         padding: const EdgeInsets.only(left: 18.0),
                         child: InkWell(
                           onTap: () {
-                            // Navigator.push(
-                            //     context,
-                            //     PageTransition(
-                            //       curve: Curves.linear,
-                            //       type: PageTransitionType.bottomToTop,
-                            //       child: ForwardMessage(
-                            //         chatid: chatID
-                            //             .toString()
-                            //             .removeAllWhitespace
-                            //             .replaceAll(']', '')
-                            //             .replaceAll('[', ''),
-                            //         isMsgType: true,
-                            //       ),
-                            //     ));
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                  curve: Curves.linear,
+                                  type: PageTransitionType.bottomToTop,
+                                  child: ForwardMessage(
+                                    chatid: chatID
+                                        .toString()
+                                        .removeAllWhitespace
+                                        .replaceAll(']', '')
+                                        .replaceAll('[', ''),
+                                    isMsgType: true,
+                                    forwardMsgList: chatMessageList,
+                                  ),
+                                ));
+                            chatMessageList = [];
                           },
                           child: Image.asset("assets/images/forward.png",
                               height: 20, color: chatColor),
@@ -3594,6 +3179,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               setState(() {
                                 isSelectedmessage = "0";
                                 chatID = [];
+                                chatMessageList = [];
                               });
                             },
                             child: const Text(
@@ -3930,17 +3516,28 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       audioController.isRecording.value = false;
       audioController.isSending.value = true;
       print("DURATION:::${audioController.total}");
-      // await selectedreplyText == true
-      //     ? uploadAudioReply(
-      //         File(recordFilePath), "voicemessage", audioController.total)
-      //     : uploadAudio(
-      //         File(recordFilePath), "voicemessage", audioController.total);
-      chatContorller.sendMessageVoice(
-          widget.conversationID,
-          "audio",
-          File(recordFilePath),
-          audioController.total,
-          widget.mobileNum.toString());
+      if (SelectedreplyText == true) {
+        chatContorller.sendMessageVoice(
+            widget.conversationID!,
+            "audio",
+            File(recordFilePath),
+            '',
+            audioController.total,
+            widget.mobileNum.toString(),
+            '',
+            reply_chatID);
+        SelectedreplyText = false;
+      } else {
+        chatContorller.sendMessageVoice(
+            widget.conversationID!,
+            "audio",
+            File(recordFilePath),
+            '',
+            audioController.total,
+            widget.mobileNum.toString(),
+            '',
+            '');
+      }
     }
   }
 
@@ -4126,87 +3723,39 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         });
   }
 
-  Widget myVoiceWidget(
-      bool myMessage,
-      String audiourl,
-      int index,
-      String audioduration,
-      messageSeen,
-      timestamp,
-      isStarted,
-      String fname,
-      String lname,
-      String username,
-      String profile) {
+  Widget myVoiceWidget(MessageList data, index) {
     return Container(
       padding: const EdgeInsets.only(right: 12, top: 0, bottom: 0),
       child: Column(
         children: [
           Align(
-            alignment:
-                (myMessage == false ? Alignment.topLeft : Alignment.topRight),
+            alignment: (data.myMessage == false
+                ? Alignment.topLeft
+                : Alignment.topRight),
             child: Column(
-              crossAxisAlignment: myMessage == false
+              crossAxisAlignment: data.myMessage == false
                   ? CrossAxisAlignment.start
                   : CrossAxisAlignment.end,
               children: [
-                myMessage == false
-                    ? RichText(
-                        text: TextSpan(children: [
-                        WidgetSpan(
-                            alignment: PlaceholderAlignment.middle,
-                            child: Container(
-                              height: 28,
-                              width: 28,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(28)),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(100),
-                                  child: CachedNetworkImage(
-                                    imageUrl: profile,
-                                    imageBuilder: (context, imageProvider) =>
-                                        Container(
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    placeholder: (context, url) => const Center(
-                                        child: CircularProgressIndicator(
-                                      color: chatownColor,
-                                    )),
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(
-                                      Icons.person,
-                                      color: Color(0xffBFBFBF),
-                                    ),
-                                  )),
-                            )),
-                        TextSpan(
-                            text: capitalizeFirstLetter("  $fname"
-                                " $lname}"),
-                            style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black))
-                      ]))
-                    : const SizedBox.shrink(),
-                myMessage == false
-                    ? const SizedBox(height: 5)
-                    : const SizedBox.shrink(),
-                _audio(
-                    message: audiourl,
-                    isCurrentUser: myMessage == false,
-                    index: index,
-                    duration: audioduration.toString()),
-                Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: SizedBox(
-                      child: timestpa(messageSeen!, timestamp!, isStarted!),
-                    ))
+                data.replyId == 0
+                    ? _audio(
+                        message: data.url!,
+                        isCurrentUser: data.myMessage == false,
+                        index: index,
+                        duration: data.audioTime!)
+                    : _audioReply(
+                        message: data.url!,
+                        isCurrentUser: data.myMessage == false,
+                        index: index,
+                        duration: data.audioTime!),
+                data.replyId == 0
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 4.0),
+                        child: SizedBox(
+                          child: timestpa(data.messageRead.toString(),
+                              data.createdAt!, data.isStarMessage!),
+                        ))
+                    : const SizedBox.shrink()
               ],
             ),
           ),
@@ -4296,6 +3845,74 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
     );
   }
 
+  Widget _audioReply({
+    required String message,
+    required bool isCurrentUser,
+    required int index,
+    required String duration,
+  }) {
+    return Row(
+      children: [
+        const SizedBox(width: 5),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              audioController.onPressedPlayButton(index, message);
+            });
+          },
+          onSecondaryTap: () {
+            audioPlayer.stop();
+          },
+          child: Obx(
+            () => (audioController.isRecordPlaying &&
+                    audioController.currentId == index)
+                ? const Icon(
+                    CupertinoIcons.pause_circle_fill,
+                    color: appColorBlack,
+                  )
+                : const Icon(
+                    CupertinoIcons.play_circle_fill,
+                    color: appColorBlack,
+                  ),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Obx(
+          () => Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  LinearProgressIndicator(
+                    minHeight: 5,
+                    backgroundColor: Colors.grey,
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.black),
+                    value: (audioController.isRecordPlaying &&
+                            audioController.currentId == index)
+                        ? (audioController.totalDuration.value > 0
+                            ? audioController.completedPercentage.value
+                            : 0.0)
+                        : 0.0,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          duration,
+          style: const TextStyle(
+              fontSize: 10, fontWeight: FontWeight.w400, color: Colors.grey),
+        ),
+        const SizedBox(width: 10)
+      ],
+    );
+  }
+
 //================================================================== IMAGE SELECT FROM CAMERA =============================================
 //================================================================== IMAGE SELECT FROM CAMERA =============================================
 //================================================================== IMAGE SELECT FROM CAMERA =============================================
@@ -4314,12 +3931,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           quality: 50,
         ).then((value) {
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageRpltIMGDoc(widget.conversationID, 'image',
-                value!.path, reply_chatID, widget.mobileNum.toString());
+            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
+                value!.path, widget.mobileNum.toString(), '', reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString());
+                value!.path, widget.mobileNum.toString(), '', '');
           }
         });
       } else {}
@@ -4352,16 +3969,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           print("RPLY:$SelectedreplyText");
           print(reply_chatID);
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageRpltIMGDoc(
-                widget.conversationID.toString(),
-                'image',
-                value!.path,
-                reply_chatID,
-                widget.mobileNum.toString());
+            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
+                value!.path, widget.mobileNum.toString(), '', reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString());
+                value!.path, widget.mobileNum.toString(), '', '');
           }
         });
       }
@@ -4387,12 +4000,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         // print('file type =============== > file $image');
 
         if (SelectedreplyText == true) {
-          chatContorller.sendMessageRpltIMGDoc(widget.conversationID,
-              'document', doc!.path, reply_chatID, widget.mobileNum.toString());
+          chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
+              doc!.path, widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
         } else {
           chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
-              doc!.path, widget.mobileNum.toString());
+              doc!.path, widget.mobileNum.toString(), '', '');
         }
 
         // print('Api Complete');
@@ -4514,12 +4127,17 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           compressedVideos = [compressedVideoPath, value];
 
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageVideoRply(widget.conversationID, "video",
-                compressedVideos, reply_chatID, widget.mobileNum.toString());
+            chatContorller.sendMessageVideo(
+                widget.conversationID,
+                "video",
+                compressedVideos,
+                widget.mobileNum.toString(),
+                '',
+                reply_chatID);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageVideo(widget.conversationID, "video",
-                compressedVideos, widget.mobileNum.toString());
+                compressedVideos, widget.mobileNum.toString(), '', '');
           }
         }
       } else {
@@ -4571,12 +4189,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       if (response.statusCode == 200) {
         Uint8List bytes = response.bodyBytes;
         if (SelectedreplyText == true) {
-          chatContorller.sendMessageGIFRply(widget.conversationID, 'gif', bytes,
-              reply_chatID, widget.mobileNum.toString());
+          chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
+              widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
         } else {
-          chatContorller.sendMessageGIF(
-              widget.conversationID, 'gif', bytes, widget.mobileNum.toString());
+          chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
+              widget.mobileNum.toString(), '', '');
         }
 
         print(bytes.toString());
@@ -4609,12 +4227,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       _placeLong = result.latLng!.longitude.toString();
     });
     if (SelectedreplyText == true) {
-      chatContorller.sendMessageLocationRply(widget.conversationID!, "location",
-          _placeLat!, _placeLong!, reply_chatID, widget.mobileNum.toString());
+      chatContorller.sendMessageLocation(
+          widget.conversationID!,
+          "location",
+          _placeLat!,
+          _placeLong!,
+          widget.mobileNum.toString(),
+          '',
+          reply_chatID);
       SelectedreplyText = false;
     } else {
       chatContorller.sendMessageLocation(widget.conversationID!, "location",
-          _placeLat!, _placeLong!, widget.mobileNum.toString());
+          _placeLat!, _placeLong!, widget.mobileNum.toString(), '', '');
     }
 
     // Handle the result in your way
@@ -4628,239 +4252,295 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   String USERTEXT = '';
   bool SelectedreplyText = false;
   String rplyTime = '';
-  Future msgDailogShow(String msg, String msgID, String userID, String msgType,
-      String time, bool isStar, int index, bool myMessage, SenderData users) {
+  Future msgDailogShow(MessageList data, SenderData users) {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(25.0),
-          ),
-          title: Container(
-            width: MediaQuery.of(context).size.width * 0.9,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: bg1,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                msgType == "location"
-                    ? capitalizeFirstLetter("📌 Location")
-                    : msgType == "video"
-                        ? capitalizeFirstLetter("🎥 Video")
-                        : msgType == "image"
-                            ? capitalizeFirstLetter("📷 Photo")
-                            : msgType == "document"
-                                ? capitalizeFirstLetter("📄 Documenet")
-                                : msgType == "audio"
-                                    ? capitalizeFirstLetter("🔊 Voice message")
-                                    : msgType == "link"
-                                        ? capitalizeFirstLetter(msg)
-                                        : msgType == "gif"
-                                            ? "GIF"
-                                            : capitalizeFirstLetter(msg),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: chatColor,
-                ),
+        return Stack(
+          children: [
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+              child: Container(
+                color: const Color.fromRGBO(30, 30, 30, 0.37),
               ),
             ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              msgType != "location" &&
-                      msgType != "image" &&
-                      msgType != "video" &&
-                      msgType != "document" &&
-                      msgType != "audio" &&
-                      msgType != "gif"
-                  ? SizedBox(
-                      height: 45,
-                      child: ListTile(
-                        leading: const Text(
-                          'Copy',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        trailing: Image.asset("assets/images/copy.png",
-                            height: 18, color: chatColor),
-                        onTap: () {
-                          setState(() {
-                            // chatID.add(msgID);
-                            // isSelectedmessage = "1";
-                          });
-                          Navigator.pop(context);
-                          Clipboard.setData(ClipboardData(text: msg));
-                          showCustomToast("Message copied");
-                          // Add your copy functionality here
-                        },
-                      ),
-                    )
-                  : const SizedBox.shrink(),
-              // Add SizedBox between Copy and Forward
-              msgType != "location" &&
-                      msgType != "image" &&
-                      msgType != "video" &&
-                      msgType != "document" &&
-                      msgType != "audio" &&
-                      msgType != "gif" &&
-                      msgType != 'contact'
-                  ? Divider(
-                      height: 1,
-                      thickness: 1,
-                      color: Colors.grey[200],
-                    )
-                  : const SizedBox.shrink(),
-              SizedBox(
-                height: 45,
-                child: ListTile(
-                  leading: const Text(
-                    'Reply',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  trailing: const Icon(
-                    Icons.replay_10,
-                    size: 16,
-                    color: Colors.black,
-                  ),
-                  onTap: () {
-                    print("INDEX:$index");
-                    Navigator.pop(context);
-                    setState(() {
-                      SelectedreplyText = !SelectedreplyText;
-                      USERTEXT = myMessage == false
-                          ? "${users.firstName} ${users.lastName!}"
-                          : "You";
-                      replyText = msgType == "text"
-                          ? msg
-                          : msgType == "location"
-                              ? "📌 Location"
-                              : msgType == "image"
-                                  ? "📷 Photo"
-                                  : msgType == "video"
-                                      ? "🎥 Video"
-                                      : msgType == "document"
-                                          ? "📄 Documenet"
-                                          : msgType == "audio"
-                                              ? "🔊 Voice message"
-                                              : msgType == "gif"
-                                                  ? "GIF"
-                                                  : msg;
-                      reply_chatID = msgID;
-                      rplyTime = time;
-                      print("TEXT:$replyText");
-                      print("RPLYTIME:$rplyTime");
-                      print("RPLY$SelectedreplyText");
-                      print("SELECT_MSG_ID:$reply_chatID");
-                    });
-                  },
+            AlertDialog(
+              insetPadding: const EdgeInsets.all(15),
+              alignment: Alignment.bottomCenter,
+              backgroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(25.0),
+              ),
+              title: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: bg1,
                 ),
-              ),
-
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              // Add your forward functionality here
-              SizedBox(
-                height: 45,
-                child: ListTile(
-                  leading: const Text(
-                    'Forward',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  trailing: Image.asset("assets/images/forward.png",
-                      height: 12, color: chatColor),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      chatID.add(msgID);
-                      isSelectedmessage = "1";
-                      print("MSGID:$msgID");
-                    });
-                    // Add your forward functionality here
-                  },
-                ),
-              ),
-
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              SizedBox(
-                height: 45,
-                child: ListTile(
-                  leading: const Text(
-                    'Delete',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ), //trash
-                  trailing: Image.asset("assets/images/trash.png",
-                      height: 18, color: chatColor),
-                  onTap: () {
-                    Navigator.pop(context);
-                    setState(() {
-                      chatID.add(msgID);
-                      isSelectedmessage = "1";
-                      print("MSGID:$msgID");
-                    });
-                  },
-                ),
-              ),
-              Divider(
-                height: 1,
-                thickness: 1,
-                color: Colors.grey[200],
-              ),
-              SizedBox(
-                height: 45,
-                child: ListTile(
-                  leading: Text(
-                    isStar != false ? 'Unstarted' : 'Started',
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    data.messageType == "location"
+                        ? capitalizeFirstLetter("📌 Location")
+                        : data.messageType == "video"
+                            ? capitalizeFirstLetter("🎥 Video")
+                            : data.messageType == "image"
+                                ? capitalizeFirstLetter("📷 Photo")
+                                : data.messageType == "document"
+                                    ? capitalizeFirstLetter("📄 Documenet")
+                                    : data.messageType == "audio"
+                                        ? capitalizeFirstLetter(
+                                            "🔊 Voice message")
+                                        : data.messageType == "link"
+                                            ? capitalizeFirstLetter(
+                                                data.message!)
+                                            : data.messageType == "gif"
+                                                ? "GIF"
+                                                : data.messageType == "contact"
+                                                    ? "Contact"
+                                                    : capitalizeFirstLetter(
+                                                        data.message!),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w400,
+                      color: chatColor,
                     ),
                   ),
-                  trailing: isStar != false
-                      ? Image.asset("assets/images/starfill.png",
-                          color: chatColor, height: 18) //starUnfill
-                      : Image.asset("assets/images/starUnfill.png",
-                          color: chatColor, height: 18),
-                  onTap: () {
-                    Navigator.pop(context);
-                    if (isStar != false) {
-                      print("******");
-                      chatContorller.removeStarApi(msgID);
-                    } else {
-                      chatContorller.addStarApi(msgID);
-                      print("+++++++");
-                    }
-                  },
                 ),
               ),
-            ],
-          ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  //================ COPY ===============================
+                  data.messageType != "location" &&
+                          data.messageType != "image" &&
+                          data.messageType != "video" &&
+                          data.messageType != "document" &&
+                          data.messageType != "audio" &&
+                          data.messageType != "gif" &&
+                          data.messageType != "contact"
+                      ? SizedBox(
+                          height: 45,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                // chatID.add(msgID);
+                                // isSelectedmessage = "1";
+                              });
+                              Navigator.pop(context);
+                              Clipboard.setData(
+                                  ClipboardData(text: data.message!));
+                              showCustomToast("Message copied");
+                              // Add your copy functionality here
+                            },
+                            child: Row(
+                              children: [
+                                const SizedBox(width: 10),
+                                Image.asset("assets/images/copy.png",
+                                    height: 18, color: chatColor),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Copy',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ))
+                      : const SizedBox.shrink(),
+                  // Add SizedBox between Copy and Forward
+                  data.messageType != "location" &&
+                          data.messageType != "image" &&
+                          data.messageType != "video" &&
+                          data.messageType != "docdocument" &&
+                          data.messageType != "audio" &&
+                          data.messageType != "gif" &&
+                          data.messageType != "contact"
+                      ? Divider(
+                          height: 1,
+                          thickness: 1,
+                          color: Colors.grey[200],
+                        )
+                      : const SizedBox.shrink(),
+                  //================================== REPLY ================================
+                  SizedBox(
+                      height: 45,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            SelectedreplyText = !SelectedreplyText;
+                            USERTEXT = data.myMessage == false
+                                ? "${users.firstName} ${users.lastName!}"
+                                : "You";
+                            replyText = (data.messageType == "text"
+                                ? data.message
+                                : data.messageType == "location"
+                                    ? "📌 Location"
+                                    : data.messageType == "image"
+                                        ? "📷 Photo"
+                                        : data.messageType == "video"
+                                            ? "🎥 Video"
+                                            : data.messageType == "docdocument"
+                                                ? "📄 Documenet"
+                                                : data.messageType == "audio"
+                                                    ? "🔊 Voice message"
+                                                    : data.messageType == "gif"
+                                                        ? "GIF"
+                                                        : data.messageType ==
+                                                                "contact"
+                                                            ? "Contact"
+                                                            : data.message)!;
+                            reply_chatID = data.messageId.toString();
+                            // rplyTime = time;
+                            print("TEXT:$replyText");
+                            print("RPLYTIME:$rplyTime");
+                            print("RPLY$SelectedreplyText");
+                            print("SELECT_MSG_ID:$reply_chatID");
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 10),
+                            Image.asset("assets/images/reply.png",
+                                height: 18, color: chatColor),
+                            const SizedBox(width: 10),
+                            const Text(
+                              'Reply',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            )
+                          ],
+                        ),
+                      )),
+
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
+                  ),
+                  // Add your forward functionality here
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          chatID.add(data.messageId.toString());
+                          chatMessageList.add(data);
+                          isSelectedmessage = "1";
+                          print("MSGID:${data.messageId}");
+                          print("MESSAGE_LIST:${chatMessageList.length}");
+                        });
+                        // Add your forward functionality here
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/forward1.png",
+                              height: 18, color: chatColor),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Forward',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
+                  ),
+                  // ========================== delete =============================
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          chatID.add(data.messageId.toString());
+                          chatMessageList.add(data);
+                          isSelectedmessage = "1";
+                          print("MSGID:${data.messageId}");
+                          print("MESSAGE_LIST:$chatMessageList");
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/trash.png",
+                              height: 18, color: chatColor),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Delete',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    height: 1,
+                    thickness: 1,
+                    color: Colors.grey[200],
+                  ),
+                  SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        if (data.isStarMessage != false) {
+                          print("******");
+                          chatContorller
+                              .removeStarApi(data.messageId.toString());
+                        } else {
+                          chatContorller.addStarApi(data.messageId.toString());
+                          print("+++++++");
+                        }
+                        // starchat(msgID);
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          data.isStarMessage != false
+                              ? Image.asset("assets/images/star-slash.png",
+                                  color: chatColor, height: 18) //starUnfill
+                              : Image.asset("assets/images/starUnfill.png",
+                                  color: chatColor, height: 18),
+                          const SizedBox(width: 10),
+                          Text(
+                            data.isStarMessage != false
+                                ? 'Unstar Message'
+                                : 'Star Message',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         );
       },
     );
@@ -4951,51 +4631,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
     return "You"; // This return might be a default case if no match is found
   }
 
-  Widget replyMSGWidget(
-      bool myMessage,
-      int rplyID,
-      String msg,
-      String msgID,
-      String messageType,
-      String timeStemp,
-      String url,
-      String userProfile,
-      String videoThumb,
-      String lat,
-      String lon,
-      int index,
-      String audioduration,
-      String contactName,
-      String contactNumber,
-      SenderData users,
-      bool isStared,
-      String messageRead
-      //String iddd,
-      //MessageList data
-      ) {
-    // String isMatching1(String msgID) {
-    //   if (data.resData!.messageType == "text") {
-    //     return data.resData!.message!;
-    //   } else if (data.resData!.messageType == "image") {
-    //     return "📷 Photo";
-    //   } else if (data.resData!.messageType == "location") {
-    //     return "📌 Location";
-    //   } else if (data.resData!.messageType == "document") {
-    //     return "📄 Document";
-    //   } else if (data.resData!.messageType == "video") {
-    //     return "🎥 Video";
-    //   } else if (data.resData!.messageType == "audio") {
-    //     return "🔊 Audio";
-    //   } else if (data.resData!.messageType == "link") {
-    //     return data.resData!.message!;
-    //   } else if (data.resData!.messageType == "gif") {
-    //     return "GIF";
-    //   } else if (data.resData!.messageType == "contact") {
-    //     return "Contact";
-    //   }
-    //   return "message removed";
-    // }
-
+  Widget replyMSGWidget(MessageList data, int index, SenderData users) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Stack(
@@ -5008,42 +4644,52 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       onTap: () {
                         // Handle checkbox state change if needed
                         setState(() {
-                          chatID.contains(msgID.toString())
-                              ? chatID.remove(msgID.toString())
-                              : chatID.add(msgID.toString());
+                          chatID.contains(data.messageId.toString())
+                              ? chatID.remove(data.messageId.toString())
+                              : chatID.add(data.messageId.toString());
+                          chatMessageList.contains(data)
+                              ? chatMessageList.remove(data)
+                              : chatMessageList.add(data);
                         });
                         print("ONTAPMSGID:$chatID");
                       },
-                      child: chatID.isEmpty
+                      child: chatID.length == 0 || chatMessageList.length == 0
                           ? const SizedBox()
                           : Transform.scale(
                               scale: 1.1,
-                              child: GestureDetector(
-                                child: Container(
-                                    width: 20.0,
-                                    height: 20.0,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(25),
-                                        border: Border.all(color: bg1),
-                                        color: chatID.contains(msgID.toString())
-                                            ? bg1
-                                            : bg1),
-                                    child: chatID.contains(msgID.toString())
-                                        ? const Icon(
-                                            Icons.check,
-                                            size: 15.0,
-                                            color: Colors.black,
-                                          )
-                                        : const SizedBox(
-                                            height: 10,
-                                          )),
-                              ))),
+                              child: chatID.contains(
+                                          data.messageId.toString()) ||
+                                      chatMessageList.contains(data)
+                                  ? Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          color: bg1,
+                                          gradient: LinearGradient(
+                                              colors: [blackColor, black1Color],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomCenter)),
+                                      child:
+                                          Image.asset("assets/images/right.png")
+                                              .paddingAll(3))
+                                  : Container(
+                                      width: 15.0,
+                                      height: 15.0,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(25),
+                                          border:
+                                              Border.all(color: black1Color),
+                                          color: bg1),
+                                    ))),
                 )
               : const SizedBox(height: 10),
           Container(
             padding: EdgeInsets.only(
-                left: chatID.isNotEmpty
-                    ? myMessage == false
+                left: chatID.isNotEmpty || chatMessageList.isNotEmpty
+                    ? data.myMessage == false
                         ? 40
                         : 12
                     : 12,
@@ -5059,625 +4705,598 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             child: Column(
               children: [
                 Align(
-                  alignment: (myMessage == false
+                  alignment: (data.myMessage == false
                       ? Alignment.topLeft
                       : Alignment.topRight),
                   child: Column(
-                    crossAxisAlignment: myMessage == false
+                    crossAxisAlignment: data.myMessage == false
                         ? CrossAxisAlignment.start
                         : CrossAxisAlignment.end,
                     children: [
-                      myMessage == false
-                          ? RichText(
-                              text: TextSpan(children: [
-                              WidgetSpan(
-                                  alignment: PlaceholderAlignment.middle,
-                                  child: Container(
-                                    height: 28,
-                                    width: 28,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(28)),
-                                    child: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        child: CachedNetworkImage(
-                                          imageUrl: users.profileImage!,
-                                          imageBuilder:
-                                              (context, imageProvider) =>
-                                                  Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                image: imageProvider,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                          placeholder: (context, url) =>
-                                              const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                            color: chatownColor,
-                                          )),
-                                          errorWidget: (context, url, error) =>
-                                              const Icon(
-                                            Icons.person,
-                                            color: Color(0xffBFBFBF),
-                                          ),
-                                        )),
-                                  )),
-                              TextSpan(
-                                  text: capitalizeFirstLetter(
-                                      "  ${users.firstName}"
-                                      " ${users.lastName}"),
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black))
-                            ]))
-                          : const SizedBox.shrink(),
-                      myMessage == false
-                          ? const SizedBox(height: 5)
-                          : const SizedBox.shrink(),
-                      Container(
-                        constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * .6),
-                        padding: const EdgeInsets.only(
-                            left: 12, right: 12, top: 0, bottom: 0),
-                        decoration: BoxDecoration(
-                            color: myMessage == false
-                                ? Colors.grey.shade200
-                                : chatownColor,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(15))),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                for (int i = 0;
-                                    i <
-                                        chatContorller.userdetailschattModel
-                                            .value!.messageList!.length;
-                                    i++) {
-                                  if (chatContorller.userdetailschattModel
-                                          .value!.messageList![i].messageId ==
-                                      rplyID) {
-                                    gotoindex = i;
-                                    _scrollToIndex(gotoindex, callback: () {
-                                      setState(() {
-                                        highlightedIndex = gotoindex;
-                                        isMsgHighLight = true;
-                                      });
-                                      Timer(const Duration(seconds: 2), () {
-                                        setState(() {
-                                          isMsgHighLight = false;
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * .6),
+                            padding: const EdgeInsets.only(
+                                left: 5, right: 5, top: 0, bottom: 0),
+                            decoration: BoxDecoration(
+                                borderRadius: data.myMessage == false
+                                    ? const BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                        bottomRight: Radius.circular(10))
+                                    : const BorderRadius.only(
+                                        topRight: Radius.circular(10),
+                                        topLeft: Radius.circular(10),
+                                        bottomLeft: Radius.circular(10)),
+                                color:
+                                    data.myMessage == false ? grey1Color : null,
+                                gradient: data.myMessage == false
+                                    ? null
+                                    : LinearGradient(
+                                        colors: [yellow1Color, yellow2Color],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    for (int i = 0;
+                                        i <
+                                            chatContorller.userdetailschattModel
+                                                .value!.messageList!.length;
+                                        i++) {
+                                      if (chatContorller
+                                              .userdetailschattModel
+                                              .value!
+                                              .messageList![i]
+                                              .messageId ==
+                                          data.replyId) {
+                                        gotoindex = i;
+                                        _scrollToIndex(gotoindex, callback: () {
+                                          setState(() {
+                                            highlightedIndex = gotoindex;
+                                            isMsgHighLight = true;
+                                          });
+                                          Timer(const Duration(seconds: 2), () {
+                                            setState(() {
+                                              isMsgHighLight = false;
+                                            });
+                                          });
                                         });
-                                      });
-                                    });
-                                    print("GOTOINDEX: $gotoindex");
-                                  }
-                                }
-                              },
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(bottom: 5, top: 10),
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.black12,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8))),
+                                        print("GOTOINDEX: $gotoindex");
+                                      }
+                                    }
+                                  },
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 15, top: 8, bottom: 8, right: 15),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        RichText(
-                                            textAlign: TextAlign.start,
-                                            text: TextSpan(children: [
-                                              TextSpan(
-                                                text: isUserMatch(
-                                                    rplyID.toString(),
-                                                    users.userId!),
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.black),
-                                              )
-                                            ])),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          isMatching(rplyID.toString()),
-                                          maxLines: 1,
-                                          style: TextStyle(
-                                              color: Colors.grey[700],
-                                              fontSize: 12),
+                                        bottom: 5, top: 5),
+                                    child: Container(
+                                      width: double.infinity,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 15,
+                                            top: 8,
+                                            bottom: 8,
+                                            right: 15),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            RichText(
+                                                textAlign: TextAlign.start,
+                                                text: TextSpan(children: [
+                                                  TextSpan(
+                                                    text: isUserMatch(
+                                                        data.replyId.toString(),
+                                                        users.userId!),
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Colors.black),
+                                                  )
+                                                ])),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              isMatching(
+                                                  data.replyId.toString()),
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                  color: Colors.grey[700],
+                                                  fontSize: 12),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: messageType == "text"
-                                  ? Text(msg)
-                                  : messageType == "document"
-                                      ? InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                PageTransition(
-                                                  curve: Curves.linear,
-                                                  type: PageTransitionType
-                                                      .rightToLeft,
-                                                  child: FileView(file: url),
-                                                ));
-                                          },
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                  height: 35,
-                                                  width: 35,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.rectangle,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    color:
-                                                        const Color(0xffCCCCCC),
-                                                  ),
-                                                  child: const Padding(
-                                                    padding:
-                                                        EdgeInsets.all(3.0),
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                          'assets/images/doc.png'),
-                                                    ),
-                                                  )),
-                                              Container(
-                                                padding: const EdgeInsets.only(
-                                                    left: 11),
-                                                child: Text(
-                                                  extractFilename(url)
-                                                      .toString()
-                                                      .split("-")
-                                                      .last,
-                                                  style: const TextStyle(
-                                                    color: chatColor,
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(height: 15)
-                                            ],
-                                          ),
-                                        )
-                                      : messageType == "image"
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: data.messageType == "text"
+                                      ? Text(data.message!)
+                                      : data.messageType == "document"
                                           ? InkWell(
                                               onTap: () {
                                                 Navigator.push(
-                                                  context,
-                                                  PageTransition(
+                                                    context,
+                                                    PageTransition(
                                                       curve: Curves.linear,
                                                       type: PageTransitionType
                                                           .rightToLeft,
-                                                      child: ImageView(
-                                                        image: url,
-                                                        userimg: userProfile,
-                                                      )),
-                                                );
+                                                      child: FileView(
+                                                          file: data.url!),
+                                                    ));
                                               },
-                                              child: SizedBox(
-                                                height: 200,
-                                                child: ClipRRect(
-                                                  borderRadius:
-                                                      BorderRadius.circular(15),
-                                                  child: CachedNetworkImage(
-                                                    imageUrl: url,
-                                                    imageBuilder: (context,
-                                                            imageProvider) =>
-                                                        Stack(
+                                              child: Row(
+                                                children: [
+                                                  const Image(
+                                                    height: 30,
+                                                    image: AssetImage(
+                                                        'assets/images/pdf.png'),
+                                                  ),
+                                                  Container(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 11),
+                                                    child: Text(
+                                                      extractFilename(data.url!)
+                                                          .toString()
+                                                          .split("-")
+                                                          .last,
+                                                      style: const TextStyle(
+                                                        color: chatColor,
+                                                        fontSize: 15,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 15)
+                                                ],
+                                              ),
+                                            )
+                                          : data.messageType == "image"
+                                              ? InkWell(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                          curve: Curves.linear,
+                                                          type:
+                                                              PageTransitionType
+                                                                  .rightToLeft,
+                                                          child: ImageView(
+                                                            image: data.url!,
+                                                            userimg: users
+                                                                .profileImage!,
+                                                          )),
+                                                    );
+                                                  },
+                                                  child: SizedBox(
+                                                    width: 210,
+                                                    height: 150,
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: data.url!,
+                                                        imageBuilder: (context,
+                                                                imageProvider) =>
+                                                            Stack(
+                                                          children: [
+                                                            Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                image:
+                                                                    DecorationImage(
+                                                                  image:
+                                                                      imageProvider,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                const Center(
+                                                          child:
+                                                              CupertinoActivityIndicator(),
+                                                        ),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const Icon(
+                                                                Icons.error),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                              : data.messageType == "video"
+                                                  ? Stack(
                                                       children: [
-                                                        Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            image:
-                                                                DecorationImage(
-                                                              image:
-                                                                  imageProvider,
+                                                        SizedBox(
+                                                          width: 210,
+                                                          height: 150,
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child:
+                                                                CachedNetworkImage(
+                                                              imageUrl: data
+                                                                  .thumbnail!,
+                                                              imageBuilder:
+                                                                  (context,
+                                                                          imageProvider) =>
+                                                                      Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  image:
+                                                                      DecorationImage(
+                                                                    image:
+                                                                        imageProvider,
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              placeholder: (context,
+                                                                      url) =>
+                                                                  const Center(
+                                                                child:
+                                                                    CupertinoActivityIndicator(),
+                                                              ),
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Center(
+                                                                child: Icon(
+                                                                    Icons
+                                                                        .error),
+                                                              ),
                                                               fit: BoxFit.cover,
                                                             ),
                                                           ),
                                                         ),
+                                                        Positioned(
+                                                            top: 50,
+                                                            left: 74,
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                Navigator.push(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              VideoViewFix(
+                                                                        username:
+                                                                            "${capitalizeFirstLetter(users.firstName!)} ${capitalizeFirstLetter(users.lastName!)}",
+                                                                        url: data
+                                                                            .url!,
+                                                                        play:
+                                                                            true,
+                                                                        mute:
+                                                                            false,
+                                                                        date: convertUTCTimeTo12HourFormat(
+                                                                            data.createdAt!),
+                                                                      ),
+                                                                    ));
+                                                              },
+                                                              child: CircleAvatar(
+                                                                  radius: 20,
+                                                                  backgroundColor:
+                                                                      blurColor,
+                                                                  foregroundColor:
+                                                                      chatownColor,
+                                                                  child: Image.asset(
+                                                                      "assets/images/play2.png",
+                                                                      height:
+                                                                          12)),
+                                                            ))
                                                       ],
-                                                    ),
-                                                    placeholder:
-                                                        (context, url) =>
-                                                            const Center(
-                                                      child:
-                                                          CupertinoActivityIndicator(),
-                                                    ),
-                                                    errorWidget: (context, url,
-                                                            error) =>
-                                                        const Icon(Icons.error),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            )
-                                          : messageType == "video"
-                                              ? Stack(
-                                                  children: [
-                                                    SizedBox(
-                                                      height: 200,
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        child:
-                                                            CachedNetworkImage(
-                                                          imageUrl: videoThumb,
-                                                          imageBuilder: (context,
-                                                                  imageProvider) =>
-                                                              Container(
+                                                    )
+                                                  : data.messageType ==
+                                                          "location"
+                                                      ? InkWell(
+                                                          onTap: () {
+                                                            MapUtils.openMap(
+                                                                double.parse(data
+                                                                    .latitude!),
+                                                                double.parse(data
+                                                                    .longitude!));
+                                                          },
+                                                          child: Container(
                                                             decoration:
                                                                 BoxDecoration(
-                                                              image:
-                                                                  DecorationImage(
-                                                                image:
-                                                                    imageProvider,
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          placeholder:
-                                                              (context, url) =>
-                                                                  const Center(
-                                                            child:
-                                                                CupertinoActivityIndicator(),
-                                                          ),
-                                                          errorWidget: (context,
-                                                                  url, error) =>
-                                                              const Center(
-                                                            child: Icon(
-                                                                Icons.error),
-                                                          ),
-                                                          fit: BoxFit.cover,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Positioned(
-                                                        top: 80,
-                                                        left: 74,
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) =>
-                                                                          VideoViewFix(
-                                                                    username:
-                                                                        "${capitalizeFirstLetter(users.firstName!)} ${capitalizeFirstLetter(users.lastName!)}",
-                                                                    url: url,
-                                                                    play: true,
-                                                                    mute: false,
-                                                                    date: convertUTCTimeTo12HourFormat(
-                                                                        timeStemp),
-                                                                  ),
-                                                                ));
-                                                          },
-                                                          child: CircleAvatar(
-                                                              radius: 20,
-                                                              backgroundColor:
-                                                                  Colors.grey
-                                                                      .shade300,
-                                                              foregroundColor:
-                                                                  chatownColor,
-                                                              child: Image.asset(
-                                                                  "assets/images/play1.png",
-                                                                  color:
-                                                                      chatColor,
-                                                                  height: 18)),
-                                                        ))
-                                                  ],
-                                                )
-                                              : messageType == "location"
-                                                  ? Column(
-                                                      children: [
-                                                        Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15),
-                                                          ),
-                                                          constraints:
-                                                              const BoxConstraints(
-                                                                  minHeight:
-                                                                      10.0,
-                                                                  minWidth:
-                                                                      10.0,
-                                                                  maxWidth:
-                                                                      250),
-                                                          child: Container(
-                                                            height: 180,
-                                                            decoration: BoxDecoration(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10)),
-                                                            child: ClipRRect(
                                                               borderRadius:
                                                                   BorderRadius
                                                                       .circular(
-                                                                          10),
-                                                              child: lat ==
-                                                                          "" ||
-                                                                      lon == ""
-                                                                  ? Container(
-                                                                      decoration: const BoxDecoration(
-                                                                          image: DecorationImage(
-                                                                              image: AssetImage("assets/images/map_Blurr.png"),
-                                                                              fit: BoxFit.cover)),
-                                                                      child:
-                                                                          Icon(
-                                                                        Icons
-                                                                            .error_outline,
-                                                                        color: chatownColor
-                                                                            .withOpacity(0.6),
-                                                                        size:
-                                                                            50,
+                                                                          15),
+                                                            ),
+                                                            constraints:
+                                                                const BoxConstraints(
+                                                                    minHeight:
+                                                                        10.0,
+                                                                    minWidth:
+                                                                        10.0,
+                                                                    maxWidth:
+                                                                        250),
+                                                            child: Container(
+                                                              height: 130,
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10)),
+                                                              child: ClipRRect(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10),
+                                                                child: data.latitude ==
+                                                                            "" ||
+                                                                        data.longitude ==
+                                                                            ""
+                                                                    ? Container(
+                                                                        decoration:
+                                                                            const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/map_Blurr.png"), fit: BoxFit.cover)),
+                                                                        child:
+                                                                            Icon(
+                                                                          Icons
+                                                                              .error_outline,
+                                                                          color:
+                                                                              chatownColor.withOpacity(0.6),
+                                                                          size:
+                                                                              50,
+                                                                        ),
+                                                                      )
+                                                                    : GoogleMap(
+                                                                        zoomControlsEnabled:
+                                                                            false,
+                                                                        zoomGesturesEnabled:
+                                                                            false,
+                                                                        initialCameraPosition: CameraPosition(
+                                                                            target:
+                                                                                LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
+                                                                            zoom: 15),
+                                                                        mapType:
+                                                                            MapType.normal,
+                                                                        onMapCreated:
+                                                                            (GoogleMapController
+                                                                                controller111) {
+                                                                          // controller.complete();
+                                                                        },
                                                                       ),
-                                                                    )
-                                                                  : GoogleMap(
-                                                                      zoomControlsEnabled:
-                                                                          false,
-                                                                      zoomGesturesEnabled:
-                                                                          false,
-                                                                      initialCameraPosition: CameraPosition(
-                                                                          target: LatLng(
-                                                                              double.parse(lat),
-                                                                              double.parse(lon)),
-                                                                          zoom: 15),
-                                                                      mapType:
-                                                                          MapType
-                                                                              .normal,
-                                                                      onMapCreated:
-                                                                          (GoogleMapController
-                                                                              controller111) {
-                                                                        // controller.complete();
-                                                                      },
-                                                                    ),
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                        const SizedBox(
-                                                            height: 5),
-                                                        InkWell(
-                                                          onTap: () {
-                                                            MapUtils.openMap(
-                                                                double.parse(
-                                                                    lat),
-                                                                double.parse(
-                                                                    lon));
-                                                          },
-                                                          child: Stack(
-                                                            children: [
-                                                              Container(
-                                                                height: 30,
-                                                                decoration: const BoxDecoration(
-                                                                    borderRadius: BorderRadius.only(
-                                                                        bottomLeft:
-                                                                            Radius.circular(
-                                                                                10),
-                                                                        bottomRight:
-                                                                            Radius.circular(10))),
-                                                                child:
-                                                                    const Center(
-                                                                  child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      Text(
-                                                                          "View Location",
-                                                                          style:
-                                                                              TextStyle(
-                                                                            color:
-                                                                                chatColor,
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          )),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  : messageType == "audio"
-                                                      ? myVoiceWidget(
-                                                          myMessage,
-                                                          url,
-                                                          index,
-                                                          audioduration,
-                                                          messageRead,
-                                                          timeStemp,
-                                                          0,
-                                                          users.firstName!,
-                                                          users.lastName!,
-                                                          users.userName!,
-                                                          users.profileImage!)
-                                                      : messageType == "link"
-                                                          ? FlutterLinkPreview(
-                                                              url: msg,
-                                                              builder: (info) {
-                                                                if (info
-                                                                    is WebInfo) {
-                                                                  return info.title ==
-                                                                              null &&
-                                                                          info.description ==
-                                                                              null
-                                                                      ? Text(
-                                                                          msg,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                14,
-                                                                            fontWeight:
-                                                                                FontWeight.w400,
-                                                                            color: myMessage == false
-                                                                                ? Colors.white
-                                                                                : Colors.black,
-                                                                          ),
-                                                                        )
-                                                                      : Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            if (info.image !=
-                                                                                null)
-                                                                              Image.network(info.image!, fit: BoxFit.cover),
-                                                                            if (info.title !=
-                                                                                null)
-                                                                              Container(
-                                                                                decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(7)),
-                                                                                child: Text(
-                                                                                  info.title!,
-                                                                                  style: TextStyle(
-                                                                                    color: myMessage == false ? Colors.white : Colors.black,
-                                                                                    fontWeight: FontWeight.bold,
+                                                        )
+                                                      : data.messageType ==
+                                                              "audio"
+                                                          ? myVoiceWidget(
+                                                              data, index)
+                                                          : data.messageType ==
+                                                                  "link"
+                                                              ? FlutterLinkPreview(
+                                                                  url: data
+                                                                      .message!,
+                                                                  builder:
+                                                                      (info) {
+                                                                    if (info
+                                                                        is WebInfo) {
+                                                                      return info.title == null &&
+                                                                              info.description == null
+                                                                          ? Text(
+                                                                              data.message!,
+                                                                              style: TextStyle(
+                                                                                fontSize: 14,
+                                                                                fontWeight: FontWeight.w400,
+                                                                                color: data.myMessage == false ? Colors.white : Colors.black,
+                                                                              ),
+                                                                            )
+                                                                          : Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.start,
+                                                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                                                              children: [
+                                                                                if (info.image != null)
+                                                                                  Container(
+                                                                                    height: 58,
+                                                                                    width: 57,
+                                                                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                                                                    child: ClipRRect(
+                                                                                      borderRadius: BorderRadius.circular(10),
+                                                                                      child: Image.network(info.image!, fit: BoxFit.cover),
+                                                                                    ),
                                                                                   ),
-                                                                                ).paddingAll(2),
-                                                                              ).paddingOnly(top: 5),
-                                                                            if (info.description !=
-                                                                                null)
-                                                                              Text(
-                                                                                info.description!,
-                                                                                maxLines: 3,
-                                                                                overflow: TextOverflow.ellipsis,
-                                                                                style: TextStyle(
-                                                                                  color: myMessage == false ? Colors.white : Colors.black,
+                                                                                const SizedBox(width: 5),
+                                                                                Expanded(
+                                                                                  child: Column(
+                                                                                    mainAxisAlignment: MainAxisAlignment.start,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      if (info.title != null)
+                                                                                        Text(
+                                                                                          info.title!,
+                                                                                          maxLines: 1,
+                                                                                          overflow: TextOverflow.ellipsis,
+                                                                                          style: const TextStyle(
+                                                                                            fontSize: 14,
+                                                                                            fontWeight: FontWeight.w600,
+                                                                                          ),
+                                                                                        ).paddingAll(2),
+                                                                                      info.image == null ? const SizedBox(height: 5) : const SizedBox.shrink(),
+                                                                                      if (info.description != null)
+                                                                                        Text(
+                                                                                          info.description!,
+                                                                                          maxLines: 2,
+                                                                                          overflow: TextOverflow.ellipsis,
+                                                                                          style: const TextStyle(color: Color.fromRGBO(68, 68, 68, 1), fontSize: 9, fontWeight: FontWeight.w400),
+                                                                                        ),
+                                                                                    ],
+                                                                                  ),
                                                                                 ),
-                                                                              ),
-                                                                          ],
-                                                                        );
-                                                                }
-                                                                return const CircularProgressIndicator();
-                                                              },
-                                                              titleStyle:
-                                                                  TextStyle(
-                                                                color: myMessage ==
-                                                                        false
-                                                                    ? Colors
-                                                                        .white
-                                                                    : Colors
-                                                                        .black,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
-                                                            )
-                                                          : messageType == "gif"
-                                                              ? InkWell(
-                                                                  onTap: () {
-                                                                    Navigator
-                                                                        .push(
-                                                                      context,
-                                                                      PageTransition(
-                                                                          curve: Curves
-                                                                              .linear,
-                                                                          type: PageTransitionType
-                                                                              .rightToLeft,
-                                                                          child:
-                                                                              ImageView(
-                                                                            image:
-                                                                                url,
-                                                                            userimg:
-                                                                                userProfile,
-                                                                          )),
-                                                                    );
+                                                                              ],
+                                                                            );
+                                                                    }
+                                                                    return const CircularProgressIndicator();
                                                                   },
-                                                                  child:
-                                                                      SizedBox(
-                                                                    height: 150,
-                                                                    child:
-                                                                        ClipRRect(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              15),
-                                                                      child:
-                                                                          CachedNetworkImage(
-                                                                        imageUrl:
-                                                                            url,
-                                                                        imageBuilder:
-                                                                            (context, imageProvider) =>
-                                                                                Stack(
-                                                                          children: [
-                                                                            Container(
-                                                                              decoration: BoxDecoration(
-                                                                                image: DecorationImage(
-                                                                                  image: imageProvider,
-                                                                                  fit: BoxFit.cover,
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        placeholder:
-                                                                            (context, url) =>
-                                                                                const Center(
-                                                                          child:
-                                                                              CupertinoActivityIndicator(),
-                                                                        ),
-                                                                        errorWidget: (context,
-                                                                                url,
-                                                                                error) =>
-                                                                            const Icon(Icons.error),
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      ),
-                                                                    ),
+                                                                  titleStyle:
+                                                                      TextStyle(
+                                                                    color: data.myMessage ==
+                                                                            false
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
                                                                   ),
                                                                 )
-                                                              : messageType ==
-                                                                      "contact"
-                                                                  ? Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        Text(
-                                                                            contactName),
-                                                                        Text(
-                                                                            contactNumber),
-                                                                      ],
+                                                              : data.messageType ==
+                                                                      "gif"
+                                                                  ? InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        Navigator
+                                                                            .push(
+                                                                          context,
+                                                                          PageTransition(
+                                                                              curve: Curves.linear,
+                                                                              type: PageTransitionType.rightToLeft,
+                                                                              child: ImageView(
+                                                                                image: data.url!,
+                                                                                userimg: users.profileImage!,
+                                                                              )),
+                                                                        );
+                                                                      },
+                                                                      child:
+                                                                          SizedBox(
+                                                                        height:
+                                                                            150,
+                                                                        child:
+                                                                            ClipRRect(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(10),
+                                                                          child:
+                                                                              CachedNetworkImage(
+                                                                            imageUrl:
+                                                                                data.url!,
+                                                                            imageBuilder: (context, imageProvider) =>
+                                                                                Stack(
+                                                                              children: [
+                                                                                Container(
+                                                                                  decoration: BoxDecoration(
+                                                                                    image: DecorationImage(
+                                                                                      image: imageProvider,
+                                                                                      fit: BoxFit.cover,
+                                                                                    ),
+                                                                                  ),
+                                                                                ),
+                                                                              ],
+                                                                            ),
+                                                                            placeholder: (context, url) =>
+                                                                                const Center(
+                                                                              child: CupertinoActivityIndicator(),
+                                                                            ),
+                                                                            errorWidget: (context, url, error) =>
+                                                                                const Icon(Icons.error),
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                          ),
+                                                                        ),
+                                                                      ),
                                                                     )
-                                                                  : const SizedBox(),
-                            )
-                          ],
-                        ),
+                                                                  : data.messageType ==
+                                                                          "contact"
+                                                                      ? Column(
+                                                                          children: [
+                                                                            Container(
+                                                                              height: 50,
+                                                                              width: 210,
+                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                                                children: [
+                                                                                  Container(
+                                                                                    height: 30,
+                                                                                    width: 30,
+                                                                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
+                                                                                    child: ClipRRect(
+                                                                                      borderRadius: BorderRadius.circular(35),
+                                                                                      child: CustomCachedNetworkImage(
+                                                                                          imageUrl: data.sharedContactProfileImage!,
+                                                                                          placeholderColor: chatownColor,
+                                                                                          errorWidgeticon: const Icon(
+                                                                                            Icons.groups,
+                                                                                            size: 30,
+                                                                                          )),
+                                                                                    ),
+                                                                                  ),
+                                                                                  const SizedBox(width: 5),
+                                                                                  Column(
+                                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                    children: [
+                                                                                      Text(
+                                                                                        capitalizeFirstLetter(data.sharedContactName!),
+                                                                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: chatColor),
+                                                                                      ),
+                                                                                      Text(
+                                                                                        capitalizeFirstLetter(data.sharedContactNumber!),
+                                                                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: chatColor),
+                                                                                      ),
+                                                                                    ],
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                            const SizedBox(height: 3),
+                                                                            Container(
+                                                                              height: 30,
+                                                                              width: 210,
+                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
+                                                                              child: const Column(
+                                                                                children: [
+                                                                                  SizedBox(height: 3),
+                                                                                  Text(
+                                                                                    "Message",
+                                                                                    textAlign: TextAlign.center,
+                                                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        )
+                                                                      : const SizedBox(),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       Padding(
                           padding: const EdgeInsets.only(top: 4.0),
                           child: SizedBox(
-                            child: timestpa(messageRead, timeStemp, isStared),
+                            child: timestpa(data.messageRead.toString(),
+                                data.createdAt!, isStarred),
                           ))
                     ],
                   ),
@@ -5917,6 +5536,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
               chatContorller.userdetailschattModel.value!.messageList!.clear();
               print(
                   "xxxxxx:${chatContorller.userdetailschattModel.value!.messageList!.clear}");
+              chatID = [];
+              chatMessageList = [];
             },
             child: const Icon(
               Icons.arrow_back_ios_new_rounded,
@@ -5997,15 +5618,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 chatContorller.isSendMsg.value = true;
                 chatContorller.deleteChatApi(
                     chatID, false, widget.mobileNum.toString());
+
                 setState(() {
                   isSelectedmessage = "0";
                   chatID = [];
+                  chatMessageList = [];
                 });
                 chatContorller.isSendMsg.value = false;
               } catch (e) {
                 setState(() {
                   isSelectedmessage = "0";
                   chatID = [];
+                  chatMessageList = [];
                 });
                 chatContorller.isSendMsg.value = false;
               }
