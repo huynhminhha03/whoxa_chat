@@ -5,7 +5,6 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:http/http.dart' as http;
@@ -924,12 +923,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                       data.messageId.toString())
                                                   ? Colors.transparent
                                                   : black1Color),
-                                          color: chatID.contains(
-                                                  data.messageId.toString())
-                                              ? null
+                                          color: chatID.contains(data.messageId.toString())
+                                              ? Colors.transparent
                                               : bg1,
-                                          gradient: chatID.contains(
-                                                  data.messageId.toString())
+                                          gradient: chatID.contains(data.messageId.toString())
                                               ? LinearGradient(
                                                   colors: [
                                                       blackColor,
@@ -938,12 +935,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                   begin: Alignment.topLeft,
                                                   end: Alignment.bottomCenter)
                                               : null),
-                                      child: chatID
-                                              .contains(data.messageId.toString())
-                                          ? Image.asset("assets/images/right.png").paddingAll(4)
-                                          : const SizedBox(
-                                              height: 10,
-                                            )),
+                                      child: chatID.contains(data.messageId.toString())
+                                          ? Image.asset("assets/images/right.png")
+                                              .paddingAll(4)
+                                          : null),
                                 ))),
                   )
                 : const SizedBox(
