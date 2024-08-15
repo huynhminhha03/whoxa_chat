@@ -8,7 +8,6 @@ import 'package:get/get.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
-
 import '../../../controller/get_contact_controller.dart';
 
 class ContactSend extends StatefulWidget {
@@ -35,6 +34,7 @@ class _ContactSendState extends State<ContactSend> {
   SingleChatContorller chatContorller = Get.put(SingleChatContorller());
   List<Contact> filteredContacts = [];
   String searchText = '';
+  Contact? selectedContact;
 
   @override
   void initState() {
@@ -82,57 +82,127 @@ class _ContactSendState extends State<ContactSend> {
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: chatownColor,
-        title: const Text(
-          "Contact to send",
-          style: TextStyle(fontSize: 17),
+        backgroundColor: appColorWhite,
+        titleSpacing: 0,
+        leadingWidth: 50,
+        leading: InkWell(
+          onTap: () {
+            Get.back();
+          },
+          child:
+              const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
         ),
+        title: const Text(
+          "Send to",
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        ),
+        actions: [
+          InkWell(
+            onTap: () {
+              if (widget.SelectedreplyText == true) {
+                //=============================== logic for match profile img =================================
+                String mobileNum = getMobile(
+                    selectedContact!.phones.map((e) => e.number).toString());
+                int matchingIndex = isMatchinginvite(mobileNum);
+                String profileImage = matchingIndex != -1
+                    ? getAllDeviceContact.getList[matchingIndex].profileImage!
+                    : "";
+                //=============================================================================================
+                chatContorller.sendMessageContact(
+                    widget.conversationID,
+                    "contact",
+                    selectedContact!.displayName,
+                    getMobile(selectedContact!.phones
+                        .map((e) => e.number)
+                        .toString()),
+                    widget.mobileNum,
+                    profileImage,
+                    '',
+                    widget.replyID);
+                widget.SelectedreplyText = false;
+              } else {
+                //=============================== logic for match profile img =================================
+                String mobileNum = getMobile(
+                    selectedContact!.phones.map((e) => e.number).toString());
+                int matchingIndex = isMatchinginvite(mobileNum);
+                String profileImage = matchingIndex != -1
+                    ? getAllDeviceContact.getList[matchingIndex].profileImage!
+                    : "";
+                //=============================================================================================
+                chatContorller.sendMessageContact(
+                    widget.conversationID,
+                    "contact",
+                    selectedContact!.displayName,
+                    getMobile(selectedContact!.phones
+                        .map((e) => e.number)
+                        .toString()),
+                    widget.mobileNum,
+                    profileImage,
+                    '',
+                    '');
+              }
+            },
+            child: Container(
+              height: 30,
+              width: 63,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13), color: yellow1Color),
+              child: const Center(
+                  child: Text(
+                "Next",
+                style: TextStyle(fontSize: 12),
+              )),
+            ).paddingOnly(right: 20),
+          )
+        ],
       ),
       body: //To of search bar
           Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            color: chatownColor,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    decoration: BoxDecoration(
-                        color: const Color(0xffFFFFFF),
-                        borderRadius: BorderRadius.circular(7)),
-                    child: TextField(
-                      controller: controller,
-                      onChanged: (value) {
-                        setState(() {
-                          searchText = value.toLowerCase().trim();
-                        });
-                      },
-                      decoration: const InputDecoration(
-                        suffixIcon: Padding(
-                          padding: EdgeInsets.all(17),
-                          child: Image(
-                            image: AssetImage('assets/icons/search.png'),
-                          ),
+          Center(
+            child: Container(
+              color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffFFFFFF),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: TextField(
+                    controller: controller,
+                    onChanged: (value) {
+                      setState(() {
+                        searchText = value.toLowerCase().trim();
+                      });
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.all(17),
+                        child: Image(
+                          image: AssetImage('assets/icons/search.png'),
                         ),
-                        hintText: '  What are you looking for?',
-                        hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.transparent,
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide.none,
-                        ),
+                      ),
+                      hintText: 'Search name or number',
+                      hintStyle:
+                          const TextStyle(fontSize: 12, color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide.none,
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
+          const Text(
+            "Frequently Contacted",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          ).paddingSymmetric(horizontal: 20, vertical: 5),
           Expanded(
               child: SingleChildScrollView(
             child: inviteFriend(searchText),
@@ -185,90 +255,112 @@ class _ContactSendState extends State<ContactSend> {
               children: [
                 Expanded(
                   child: ListTile(
-                    onTap: () {
-                      if (widget.SelectedreplyText == true) {
-                        chatContorller.sendMessageContact(
-                            widget.conversationID,
-                            "contact",
-                            contact.displayName,
-                            getMobile(
-                                contact.phones.map((e) => e.number).toString()),
-                            widget.mobileNum,
-                            matchingIndex != -1
-                                ? getAllDeviceContact
-                                    .getList[matchingIndex].profileImage!
-                                : "",
-                            '',
-                            widget.replyID);
-                        widget.SelectedreplyText = false;
-                      } else {
-                        chatContorller.sendMessageContact(
-                            widget.conversationID,
-                            "contact",
-                            contact.displayName,
-                            getMobile(
-                                contact.phones.map((e) => e.number).toString()),
-                            widget.mobileNum,
-                            matchingIndex != -1
-                                ? getAllDeviceContact
-                                    .getList[matchingIndex].profileImage!
-                                : "",
-                            '',
-                            '');
-                      }
-                    },
-                    leading: Stack(
-                      children: <Widget>[
-                        Container(
-                          height: 50,
-                          width: 50,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            shape: BoxShape.circle,
+                      onTap: () {
+                        setState(() {
+                          selectedContact =
+                              contact; // Update the selected contact
+                        });
+                        // if (widget.SelectedreplyText == true) {
+                        //   chatContorller.sendMessageContact(
+                        //       widget.conversationID,
+                        //       "contact",
+                        //       contact.displayName,
+                        //       getMobile(
+                        //           contact.phones.map((e) => e.number).toString()),
+                        //       widget.mobileNum,
+                        // matchingIndex != -1
+                        //     ? getAllDeviceContact
+                        //         .getList[matchingIndex].profileImage!
+                        //     : "",
+                        //       '',
+                        //       widget.replyID);
+                        //   widget.SelectedreplyText = false;
+                        // } else {
+                        //   chatContorller.sendMessageContact(
+                        //       widget.conversationID,
+                        //       "contact",
+                        //       contact.displayName,
+                        //       getMobile(
+                        //           contact.phones.map((e) => e.number).toString()),
+                        //       widget.mobileNum,
+                        //       matchingIndex != -1
+                        //           ? getAllDeviceContact
+                        //               .getList[matchingIndex].profileImage!
+                        //           : "",
+                        //       '',
+                        //       '');
+                        // }
+                      },
+                      leading: Stack(
+                        children: <Widget>[
+                          Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              shape: BoxShape.circle,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: matchingIndex != -1
+                                  ? CustomCachedNetworkImage(
+                                      imageUrl: getAllDeviceContact
+                                          .getList[matchingIndex].profileImage!,
+                                      placeholderColor: chatownColor,
+                                      errorWidgeticon: const Icon(
+                                        Icons.person,
+                                        size: 30,
+                                      ))
+                                  : (Center(
+                                      child: Text(
+                                        contact.displayName != null
+                                            ? contact.displayName[0]
+                                            : "?",
+                                        style: const TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 20,
+                                            fontFamily: "MontserratBold",
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )),
+                            ),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: matchingIndex != -1
-                                ? CustomCachedNetworkImage(
-                                    imageUrl: getAllDeviceContact
-                                        .getList[matchingIndex].profileImage!,
-                                    placeholderColor: chatownColor,
-                                    errorWidgeticon: const Icon(
-                                      Icons.person,
-                                      size: 30,
-                                    ))
-                                : (Center(
-                                    child: Text(
-                                      contact.displayName != null
-                                          ? contact.displayName[0]
-                                          : "?",
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 20,
-                                          fontFamily: "MontserratBold",
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )),
-                          ),
-                        ),
-                      ],
-                    ),
-                    title: Text(
-                      contact.displayName,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w500,
+                        ],
                       ),
-                    ),
-                    subtitle: Container(
-                        padding: const EdgeInsets.only(top: 2.0),
-                        child: Text(
-                          getMobile(
-                              contact.phones.map((e) => e.number).toString()),
-                          maxLines: 1,
-                        )),
-                  ),
+                      title: Text(
+                        contact.displayName,
+                        maxLines: 1,
+                        style: const TextStyle(
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      subtitle: Container(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            getMobile(
+                                contact.phones.map((e) => e.number).toString()),
+                            maxLines: 1,
+                          )),
+                      trailing: selectedContact == contact
+                          ? Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(22),
+                                  color: yellow2Color),
+                              child: const Center(
+                                child: Icon(Icons.check, size: 13),
+                              ),
+                            )
+                          : Container(
+                              height: 20,
+                              width: 20,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(22),
+                                  color: Colors.white,
+                                  border: Border.all(color: yellow2Color)),
+                            )),
                 ),
               ],
             ),

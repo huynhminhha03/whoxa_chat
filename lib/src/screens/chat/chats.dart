@@ -155,34 +155,11 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 50),
+                const SizedBox(height: 150),
                 Image.asset(
-                  "assets/images/no_chat_list.png",
-                  height: 300,
+                  "assets/images/no_contact_found.png",
+                  height: 250,
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width / 1,
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: const Padding(
-                    padding: EdgeInsets.all(15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "You don't have any Message.",
-                          softWrap: true,
-                          maxLines: 2,
-                          style: TextStyle(
-                              color: chatColor,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w300),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).paddingSymmetric(horizontal: 30),
               ],
             ),
           );

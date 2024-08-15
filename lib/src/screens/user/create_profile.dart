@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/Models/username_check_model.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
@@ -23,8 +23,9 @@ import 'package:meyaoo_new/src/global/global.dart';
 final ApiHelper apiHelper = ApiHelper();
 
 class AddPersonaDetails extends StatefulWidget {
+  bool isRought;
   bool isback;
-  AddPersonaDetails({super.key, required this.isback});
+  AddPersonaDetails({super.key, required this.isRought, required this.isback});
 
   @override
   State<AddPersonaDetails> createState() => _AddPersonaDetailsState();
@@ -199,7 +200,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     closeKeyboard();
 
     setState(() {
-      isLoading = true;
+      buttonClick = true;
     });
 
     var uri = Uri.parse(apiHelper.userCreateProfile);
@@ -247,23 +248,27 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       }
 
       setState(() {
-        isLoading = false;
+        buttonClick = false;
       });
 
       log(responseData);
 
-      Navigator.pushAndRemoveUntil(
-          context,
-          PageTransition(
-            curve: Curves.linear,
-            type: PageTransitionType.rightToLeft,
-            child: TabbarScreen(),
-          ),
-          (route) => false);
+      if (widget.isRought == true) {
+        Get.back();
+      } else {
+        Navigator.pushAndRemoveUntil(
+            context,
+            PageTransition(
+              curve: Curves.linear,
+              type: PageTransitionType.rightToLeft,
+              child: TabbarScreen(),
+            ),
+            (route) => false);
+      }
       showCustomToast("Success");
     } else {
       setState(() {
-        isLoading = false;
+        buttonClick = false;
       });
       showCustomToast("Error");
     }
@@ -341,161 +346,205 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-            side: BorderSide(color: Colors.grey.shade200)),
-        backgroundColor: appColorWhite,
-        automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            widget.isback == true
-                ? InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back_ios,
-                        color: chatColor, size: 19))
-                : const SizedBox.shrink(),
-            const Text(" Add Personal Details",
-                style: TextStyle(fontSize: 20, color: chatColor)),
-          ],
-        ),
-      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
       body: isLoading
           ? loader(context)
           : Container(
               width: MediaQuery.of(context).size.width,
-              color: appColorWhite,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 30, right: 30, bottom: 20, top: 0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            _imgWidget(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            UserNameWid(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Firstname(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Lastname(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            gender(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Nationality(),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            MobileNumber(),
-                            const SizedBox(
-                              height: 20,
-                            ),
-                            // _submitButton()
-                          ],
-                        ),
-                      ),
+              color: const Color.fromRGBO(250, 250, 250, 1),
+              child: Stack(
+                children: [
+                  SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: Image.asset(
+                      cacheHeight: 140,
+                      "assets/images/back_img1.png",
+                      fit: BoxFit.cover,
                     ),
-                    _submitButton(context)
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 25, right: 25, bottom: 20, top: 80),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                _imgWidget(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                UserNameWid(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Firstname(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Lastname(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                gender(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                MobileNumber(),
+                                const SizedBox(
+                                  height: 15,
+                                ),
+                                Nationality(),
+                                const SizedBox(
+                                  height: 20,
+                                ),
+                                // _submitButton()
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Positioned(
+                      top: 45,
+                      left: 15,
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      )),
+                  Positioned(
+                      top: 45,
+                      right: 15,
+                      child: InkWell(
+                          onTap: () {
+                            closekeyboard();
+
+                            if (userController.text.isNotEmpty &&
+                                fNameController.text.isNotEmpty &&
+                                lNameController.text.isNotEmpty) {
+                              editApiCall();
+                            } else {
+                              if (userController.text.isEmpty) {
+                                showCustomToast("Please enter username");
+                              } else if (fNameController.text.isEmpty) {
+                                showCustomToast("Please enter first name");
+                              } else if (lNameController.text.isEmpty) {
+                                showCustomToast("Please enter last name");
+                              }
+                            }
+                          },
+                          child: buttonClick
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 3, color: Colors.black),
+                                  ),
+                                )
+                              : const Icon(Icons.check, size: 25)))
+                ],
               )),
     );
   }
 
   bool buttonClick = false;
-  Widget _submitButton(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        closekeyboard();
+  // Widget _submitButton(BuildContext context) {
+  //   return InkWell(
+  //     onTap: () {
+  //       closekeyboard();
 
-        if (userController.text.isNotEmpty &&
-            fNameController.text.isNotEmpty &&
-            lNameController.text.isNotEmpty) {
-          editApiCall();
-        } else {
-          if (userController.text.isEmpty) {
-            showCustomToast("Please enter username");
-          } else if (fNameController.text.isEmpty) {
-            showCustomToast("Please enter first name");
-          } else if (lNameController.text.isEmpty) {
-            showCustomToast("Please enter last name");
-          }
-        }
-      },
-      child: buttonClick
-          ? Center(
-              child: Lottie.asset(
-                'assets/icons/Loader.json',
-                width: 80,
-                animate: true,
-                repeat: true,
-              ),
-            )
-          : Container(
-              height: 50,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                // border: Border.all(color:  Colors.black, width: 1),
-                borderRadius: BorderRadius.circular(25),
-                color: chatownColor,
-              ),
-              child: const Center(
-                child: Text(
-                  'Continue',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16),
-                ),
-              ),
-            ),
-    );
-  }
+  //       if (userController.text.isNotEmpty &&
+  //           fNameController.text.isNotEmpty &&
+  //           lNameController.text.isNotEmpty) {
+  //         editApiCall();
+  //       } else {
+  //         if (userController.text.isEmpty) {
+  //           showCustomToast("Please enter username");
+  //         } else if (fNameController.text.isEmpty) {
+  //           showCustomToast("Please enter first name");
+  //         } else if (lNameController.text.isEmpty) {
+  //           showCustomToast("Please enter last name");
+  //         }
+  //       }
+  //     },
+  //     child: buttonClick
+  //         ? Center(
+  //             child: Lottie.asset(
+  //               'assets/icons/Loader.json',
+  //               width: 80,
+  //               animate: true,
+  //               repeat: true,
+  //             ),
+  //           )
+  //         : Container(
+  //             height: 50,
+  //             width: MediaQuery.of(context).size.width,
+  //             decoration: BoxDecoration(
+  //               // border: Border.all(color:  Colors.black, width: 1),
+  //               borderRadius: BorderRadius.circular(25),
+  //               color: chatownColor,
+  //             ),
+  //             child: const Center(
+  //               child: Text(
+  //                 'Continue',
+  //                 style: TextStyle(
+  //                     color: Colors.black,
+  //                     fontWeight: FontWeight.w500,
+  //                     fontSize: 16),
+  //               ),
+  //             ),
+  //           ),
+  //   );
+  // }
 
   Widget _imgWidget() {
     return Container(
       height: 110,
       width: 110,
       decoration:
-          const BoxDecoration(shape: BoxShape.circle, color: Color(0xffF4F5F6)),
+          const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
       child: isLoading
           ? const SizedBox.shrink()
-          : Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                userImg(),
-                InkWell(
-                  onTap: () {
-                    selectImageSource();
-                  },
-                  child: Container(
-                    height: 35,
-                    width: 35,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(35),
-                        color: const Color(0xffF4F5F6)),
-                    child: const Center(child: Icon(Icons.edit, size: 16)),
-                  ),
-                )
-              ],
+          : Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  userImg(),
+                  InkWell(
+                    onTap: () {
+                      selectImageSource();
+                    },
+                    child: Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(35),
+                          color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30),
+                                gradient: LinearGradient(
+                                    colors: [yellow1Color, yellow2Color],
+                                    begin: Alignment.topRight,
+                                    end: Alignment.bottomCenter)),
+                            child: Center(
+                                child: Image.asset("assets/images/edit-1.png",
+                                    height: 10))),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
     );
   }
@@ -510,8 +559,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               Text(
                 'Gender',
                 style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
                     color: Colors.black),
               ),
             ],
@@ -522,37 +571,34 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        isselected = true;
-                        isselected2 = false;
-                        isselected3 = false;
-                        genderData = 'male';
-                      });
-                    },
-                    child: Container(
-                      height: 20,
-                      width: 20,
+              const SizedBox(width: 20),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    isselected = true;
+                    isselected2 = false;
+                    isselected3 = false;
+                    genderData = 'male';
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      height: 14,
+                      width: 14,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(
-                              width: 1,
-                              color: isselected == true
-                                  ? Colors.black
-                                  : Colors.black)),
+                          border: Border.all(width: 1, color: Colors.black)),
                       child: Padding(
                         padding: const EdgeInsets.all(2),
                         child: Container(
                           decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: isselected == true
-                                  ? const LinearGradient(
-                                      colors: [Colors.black, Colors.black],
-                                      begin: Alignment.centerRight,
-                                      end: Alignment.centerLeft,
+                                  ? LinearGradient(
+                                      colors: [blackcolor, black1Color],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
                                     )
                                   : const LinearGradient(
                                       colors: [
@@ -563,36 +609,37 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Male',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: isselected == true ? Colors.black : Colors.grey),
-                  )
-                ],
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Male',
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isselected == true ? Colors.black : Colors.grey),
+                    )
+                  ],
+                ),
               ),
               const SizedBox(
                 width: 15,
               ),
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        isselected = false;
-                        isselected2 = true;
-                        isselected3 = false;
-                        genderData = 'female';
-                      });
-                    },
-                    child: Container(
-                      height: 20,
-                      width: 20,
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    isselected = false;
+                    isselected2 = true;
+                    isselected3 = false;
+                    genderData = 'female';
+                  });
+                },
+                child: Row(
+                  children: [
+                    Container(
+                      height: 14,
+                      width: 14,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
@@ -606,10 +653,10 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                           decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               gradient: isselected2 == true
-                                  ? const LinearGradient(
-                                      colors: [Colors.black, Colors.black],
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.centerRight,
+                                  ? LinearGradient(
+                                      colors: [blackcolor, black1Color],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
                                     )
                                   : const LinearGradient(
                                       colors: [
@@ -620,19 +667,19 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    'Female',
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color:
-                            isselected2 == true ? Colors.black : Colors.grey),
-                  )
-                ],
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Female',
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color:
+                              isselected2 == true ? Colors.black : Colors.grey),
+                    )
+                  ],
+                ),
               ),
             ],
           ),
@@ -654,15 +701,13 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               Text(
                 'Username',
                 style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
                     color: Colors.black),
               ),
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
+          const SizedBox(height: 5),
           SizedBox(
             height: 50,
             width: MediaQuery.of(context).size.width,
@@ -671,15 +716,17 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 onChanged: (String searchText) {
                   checkUserName(searchText);
                 },
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 readOnly: false,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: appgrey)),
                   focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(color: appgrey),
-                      borderRadius: BorderRadius.circular(25)),
+                      borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
                   // hintText: 'Add a brief description',
@@ -688,7 +735,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       color: Colors.grey,
                       fontWeight: FontWeight.w400),
                   filled: true,
-                  fillColor: Colors.transparent,
+                  fillColor: Colors.white,
 
                   // ),
                 )),
@@ -706,14 +753,14 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             Text(
               'Last Name',
               style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
                   color: Colors.black),
             ),
           ],
         ),
         const SizedBox(
-          height: 10,
+          height: 4,
         ),
         SizedBox(
           height: 50,
@@ -721,15 +768,16 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
           child: TextField(
               controller: lNameController,
               readOnly: false,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               keyboardType: TextInputType.text,
               textCapitalization: TextCapitalization.sentences,
               decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(10),
                     borderSide: const BorderSide(color: appgrey)),
                 focusedBorder: OutlineInputBorder(
                     borderSide: const BorderSide(color: appgrey),
-                    borderRadius: BorderRadius.circular(25)),
+                    borderRadius: BorderRadius.circular(10)),
                 contentPadding:
                     const EdgeInsets.only(top: 1, left: 15, bottom: 1),
                 // hintText: 'Add a brief description',
@@ -738,7 +786,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     color: Colors.grey,
                     fontWeight: FontWeight.w400),
                 filled: true,
-                fillColor: Colors.transparent,
+                fillColor: Colors.white,
 
                 // ),
               )),
@@ -928,14 +976,14 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               Text(
                 'First Name',
                 style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 12,
                     color: Colors.black),
               ),
             ],
           ),
           const SizedBox(
-            height: 10,
+            height: 5,
           ),
           SizedBox(
             height: 50,
@@ -943,15 +991,17 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             child: TextField(
                 controller: fNameController,
                 readOnly: false,
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 keyboardType: TextInputType.text,
                 textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: appgrey)),
                   focusedBorder: OutlineInputBorder(
                       borderSide: const BorderSide(color: appgrey),
-                      borderRadius: BorderRadius.circular(25)),
+                      borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
                   // hintText: 'Add a brief description',
@@ -960,7 +1010,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       color: Colors.grey,
                       fontWeight: FontWeight.w400),
                   filled: true,
-                  fillColor: Colors.transparent,
+                  fillColor: Colors.white,
 
                   // ),
                 )),
@@ -971,122 +1021,164 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   }
 
   Widget Nationality() {
+    final String nation = nationController.text;
     return Container(
-      decoration: const BoxDecoration(),
-      child: Column(
+      height: 48,
+      width: Get.width * 0.90,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300)),
+      child: Row(
         children: [
-          const Row(
+          const SizedBox(width: 10),
+          Image.asset("assets/images/location1.png", height: 21),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Nationality',
+              const Text(
+                "Country",
                 style: TextStyle(
+                    fontSize: 9,
                     fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                    color: Colors.black),
+                    color: Color.fromRGBO(80, 80, 80, 1)),
               ),
+              Text(
+                nation,
+                style:
+                    const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+              )
             ],
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          SizedBox(
-            height: 50,
-            width: MediaQuery.of(context).size.width,
-            child: TextField(
-                controller: nationController,
-                readOnly: false,
-                enabled: false,
-                style: TextStyle(color: Colors.grey.shade500),
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: appgrey)),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: appgrey)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: appgrey),
-                      borderRadius: BorderRadius.circular(25)),
-                  contentPadding:
-                      const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                  // hintText: 'Add a brief description',
-                  hintStyle: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400),
-                  filled: true,
-                  fillColor: const Color.fromARGB(255, 235, 235, 235),
-
-                  // ),
-                )),
           )
         ],
       ),
+      // child: SizedBox(
+      //   height: 50,
+      //   width: MediaQuery.of(context).size.width,
+      //   child: TextField(
+      //       controller: nationController,
+      //       readOnly: false,
+      //       enabled: false,
+      //       style: TextStyle(color: Colors.grey.shade500),
+      //       keyboardType: TextInputType.number,
+      //       decoration: InputDecoration(
+      //         border: OutlineInputBorder(
+      //             borderRadius: BorderRadius.circular(10),
+      //             borderSide: const BorderSide(color: appgrey)),
+      //         enabledBorder: OutlineInputBorder(
+      //             borderRadius: BorderRadius.circular(10),
+      //             borderSide: const BorderSide(color: appgrey)),
+      //         focusedBorder: OutlineInputBorder(
+      //             borderSide: const BorderSide(color: appgrey),
+      //             borderRadius: BorderRadius.circular(10)),
+      //         contentPadding:
+      //             const EdgeInsets.only(top: 1, left: 15, bottom: 1),
+      //         // hintText: 'Add a brief description',
+      //         hintStyle: const TextStyle(
+      //             fontSize: 17,
+      //             color: Colors.grey,
+      //             fontWeight: FontWeight.w400),
+      //         filled: true,
+      //         fillColor: const Color.fromARGB(255, 235, 235, 235),
+
+      //         // ),
+      //       )),
+      // ),
     );
   }
 
   Widget MobileNumber() {
+    final String number = mobController.text;
     return Container(
-      decoration: const BoxDecoration(
-          //     border: Border(
-          //   bottom: BorderSide(
-          //     //                   <--- left side
-          //     color: Color(0xffD1D1D1),
-          //     width: 1.0,
-          //   ),
-          // )
-          ),
-      child: Column(
+      height: 48,
+      width: Get.width * 0.90,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade300)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Row(
+          Row(
             children: [
-              Text(
-                'Mobile Number',
-                style: TextStyle(
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13,
-                    color: Colors.black),
-              ),
+              Image.asset("assets/images/call_1.png",
+                  color: Colors.black, height: 21),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    "Phone",
+                    style: TextStyle(
+                        fontSize: 9,
+                        fontWeight: FontWeight.w400,
+                        color: Color.fromRGBO(80, 80, 80, 1)),
+                  ),
+                  Text(
+                    number,
+                    style: const TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.w600),
+                  )
+                ],
+              )
             ],
           ),
-          const SizedBox(
-            height: 10,
-          ),
-          SizedBox(
-            height: 50,
-            width: MediaQuery.of(context).size.width,
-            child: TextField(
-                controller: mobController,
-                readOnly: false,
-                enabled: false,
-                style: TextStyle(color: Colors.grey.shade500),
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: appgrey)),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25),
-                      borderSide: const BorderSide(color: appgrey)),
-                  focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: appgrey),
-                      borderRadius: BorderRadius.circular(25)),
-                  contentPadding:
-                      const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                  // hintText: 'Add a brief description',
-                  hintStyle: const TextStyle(
-                      fontSize: 17,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w400),
-                  filled: true,
-                  fillColor: const Color.fromARGB(255, 235, 235, 235),
-
-                  // ),
-                )),
-          )
+          Image.asset("assets/images/verify.png", height: 17)
         ],
-      ),
+      ).paddingSymmetric(horizontal: 10),
+      // child: Column(
+      //   children: [
+      //     const Row(
+      //       children: [
+      //         Text(
+      //           'Mobile Number',
+      //           style: TextStyle(
+      //               fontWeight: FontWeight.w400,
+      //               fontSize: 13,
+      //               color: Colors.black),
+      //         ),
+      //       ],
+      //     ),
+      //     const SizedBox(
+      //       height: 10,
+      //     ),
+      //     SizedBox(
+      //       height: 50,
+      //       width: MediaQuery.of(context).size.width,
+      //       child: TextField(
+      //           controller: mobController,
+      //           readOnly: false,
+      //           enabled: false,
+      //           style: TextStyle(color: Colors.grey.shade500),
+      //           keyboardType: TextInputType.number,
+      //           decoration: InputDecoration(
+      //             border: OutlineInputBorder(
+      //                 borderRadius: BorderRadius.circular(25),
+      //                 borderSide: const BorderSide(color: appgrey)),
+      //             enabledBorder: OutlineInputBorder(
+      //                 borderRadius: BorderRadius.circular(25),
+      //                 borderSide: const BorderSide(color: appgrey)),
+      //             focusedBorder: OutlineInputBorder(
+      //                 borderSide: const BorderSide(color: appgrey),
+      //                 borderRadius: BorderRadius.circular(25)),
+      //             contentPadding:
+      //                 const EdgeInsets.only(top: 1, left: 15, bottom: 1),
+      //             // hintText: 'Add a brief description',
+      //             hintStyle: const TextStyle(
+      //                 fontSize: 17,
+      //                 color: Colors.grey,
+      //                 fontWeight: FontWeight.w400),
+      //             filled: true,
+      //             fillColor: const Color.fromARGB(255, 235, 235, 235),
+
+      //             // ),
+      //           )),
+      //     )
+      //   ],
+      // ),
     );
   }
 

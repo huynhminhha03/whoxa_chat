@@ -106,7 +106,7 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
         box.get(firstName) == null) {
       return const Welcome();
     } else {
-      return AddPersonaDetails(isback: false);
+      return AddPersonaDetails(isRought: false, isback: false);
     }
   }
 

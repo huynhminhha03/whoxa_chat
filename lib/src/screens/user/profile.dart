@@ -1,11 +1,10 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously, unnecessary_null_comparison
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -15,7 +14,7 @@ import 'package:meyaoo_new/src/screens/chat/allstarred_msg_list.dart';
 import 'package:meyaoo_new/src/screens/layout/tell_friend_list.dart';
 import 'package:meyaoo_new/src/screens/user/FinalLogin.dart';
 import 'package:meyaoo_new/src/screens/user/block_contact_list.dart';
-import 'package:meyaoo_new/src/screens/user/profile2.dart';
+import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/src/screens/user/profile_about.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -49,114 +48,25 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: appColorWhite,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          backgroundColor: chatownColor,
-          scrolledUnderElevation: 0,
-          title: const Center(
-            child: Text(
-              "Profile",
-              style: TextStyle(fontSize: 18, color: Colors.black),
+        extendBodyBehindAppBar: true,
+        backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+        body: Stack(children: [
+          SizedBox(
+            height: 200,
+            width: double.infinity,
+            child: Image.asset(
+              cacheHeight: 140,
+              "assets/images/back_img1.png",
+              fit: BoxFit.cover,
             ),
           ),
-        ),
-        body: SafeArea(
-            child: Stack(children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.9,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  profileWidget(),
-                  Divider(
-                    color: Colors.grey.shade300,
-                  ),
-                  aboutWidget(),
-                  // InkWell(
-                  //   onTap: () {
-                  //     // if (internetController.isOnline.value) {
-                  //     //   //deleteAccApi();
-                  //     //   deleteAccAsk();
-                  //     // } else {
-                  //     //   Fluttertoast.showToast(
-                  //     //       msg: "Check your connectivity",
-                  //     //       gravity: ToastGravity.BOTTOM);
-                  //     // }
-                  //     deleteAccAsk();
-                  //   },
-                  //   child: Container(
-                  //     height: 55,
-                  //     width: MediaQuery.sizeOf(context).width * 0.90,
-                  //     decoration: BoxDecoration(
-                  //         borderRadius: BorderRadius.circular(5),
-                  //         color: const Color.fromRGBO(255, 244, 244, 1.000)),
-                  //     child: Row(
-                  //       crossAxisAlignment: CrossAxisAlignment.center,
-                  //       children: [
-                  //         const SizedBox(width: 15),
-                  //         Image.asset("assets/images/trash.png"),
-                  //         const SizedBox(width: 7),
-                  //         const Padding(
-                  //           padding: EdgeInsets.only(top: 4),
-                  //           child: Text(
-                  //             "Delete Account",
-                  //             style: TextStyle(
-                  //                 fontSize: 13,
-                  //                 fontWeight: FontWeight.w400,
-                  //                 color: Color.fromRGBO(255, 40, 40, 1.000)),
-                  //           ),
-                  //         )
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  //const SizedBox(height: 15),
-                  InkWell(
-                    onTap: () {
-                      //when app logout then user offline
-                      //store all uerData clear
-                      Hive.box(userdata).clear();
-                      // then navigate to login page
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const Flogin(),
-                          ),
-                          (route) => false);
-                    },
-                    child: Container(
-                      height: 55,
-                      width: MediaQuery.sizeOf(context).width * 0.90,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: chatStrokeColor),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const SizedBox(width: 15),
-                          Image.asset("assets/images/logout.png",
-                              height: 20, color: chatownColor),
-                          const SizedBox(width: 7),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 3),
-                            child: Text(
-                              "Logout",
-                              style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: chatownColor),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
-            ),
+          Column(
+            children: [
+              const SizedBox(height: 80),
+              profileWidget(),
+              Expanded(child: SingleChildScrollView(child: aboutWidget())),
+              const SizedBox(height: 10),
+            ],
           ),
           // internetController.isOnline.value
           //     ? const SizedBox.shrink()
@@ -172,102 +82,70 @@ class _ProfileState extends State<Profile> {
           //               ).paddingSymmetric(vertical: 8),
           //             )),
           //       ),
-        ])));
+        ]));
   }
 
   Widget profileWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            children: [
-              Hero(
-                tag: '1',
-                child: Center(
-                  child: Container(
-                    width: 80,
-                    height: 80,
-                    decoration: const BoxDecoration(),
-                    child: Padding(
-                        padding: const EdgeInsets.only(left: 1),
-                        child: CustomCachedNetworkImage(
-                          imageUrl: Hive.box(userdata).get(userImage),
-                          placeholderColor: chatownColor,
-                          errorWidgeticon: const Icon(Icons.person),
-                        )),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 20),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500, fontSize: 18),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        "assets/images/call_1.png",
-                        height: 20,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      Text('${Hive.box(userdata).get(userMobile)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ))
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: InkWell(
-              onTap: () {
-                // internetController.isOnline.value
-                //     ?
-                Get.to(const profile2(),
-                        duration: const Duration(milliseconds: 800),
-                        transition: Transition.rightToLeft)!
-                    .then((_) {
-                  setState(() {});
-                });
-
-                // : Fluttertoast.showToast(
-                //     msg: "Check your connectivity",
-                //     gravity: ToastGravity.BOTTOM);
-              },
+          Hero(
+            tag: '1',
+            child: Center(
               child: Container(
-                height: 32,
-                width: 62,
+                width: 110,
+                height: 110,
                 decoration: BoxDecoration(
-                    border: Border.all(color: chatownColor),
-                    borderRadius: BorderRadius.circular(10),
-                    color: chatStrokeColor),
-                child: const Center(
-                    child: Text(
-                  "Edit",
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
-                )),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(110)),
+                child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: CustomCachedNetworkImage(
+                      imageUrl: Hive.box(userdata).get(userImage),
+                      placeholderColor: chatownColor,
+                      errorWidgeticon: const Icon(Icons.person),
+                    )),
               ),
             ),
           ),
+          const SizedBox(height: 20),
+          Text(
+            '${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}',
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 22),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(width: 3),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Lottie.asset(
+                    'assets/Lottie ANIMATION/call_recieve_animation.json',
+                    height: 15,
+                    width: 15,
+                    fit: BoxFit.cover,
+                  ),
+                  Container(
+                    height: 5,
+                    width: 5,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5),
+                        color: Colors.green),
+                  )
+                ],
+              ),
+              const SizedBox(width: 3),
+              const Text(
+                "Online",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+              )
+            ],
+          )
         ],
       ),
     );
@@ -278,81 +156,48 @@ class _ProfileState extends State<Profile> {
       padding: const EdgeInsets.only(left: 18, right: 18),
       child: Column(
         children: [
+          //_________________________________ PROFILE _____________________________________________
+          containerProfileDesign(
+              onTap: () {
+                // internetController.isOnline.value
+                //     ?
+                Get.to(AddPersonaDetails(isRought: true, isback: true),
+                        duration: const Duration(milliseconds: 800),
+                        transition: Transition.rightToLeft)!
+                    .then((_) {
+                  setState(() {});
+                });
+
+                // : Fluttertoast.showToast(
+                //     msg: "Check your connectivity",
+                //     gravity: ToastGravity.BOTTOM);
+              },
+              image: 'assets/images/about.png',
+              title: 'Profile',
+              about: ''),
+
           const SizedBox(height: 10),
-          //___________________________________AOBUT____________________________
-          InkWell(
-            onTap: () {
-              // internetController.isOnline.value
-              //     ?
-              Get.to(() => const about(), transition: Transition.rightToLeft)!
-                  .then((value) {
-                print("BACK");
-                setState(() {});
-              });
-              // : Fluttertoast.showToast(
-              //     msg: "Check your connectivity",
-              //     gravity: ToastGravity.BOTTOM);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45),
-                          color: Colors.grey.shade200),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/images/message-text.svg',
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "About",
-                      style: TextStyle(
-                          fontSize: 14.5, fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: Get.width * .45,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text(
-                          Hive.box(userdata).get(userBio) == null
-                              ? ""
-                              : capitalizeFirstLetter(
-                                  Hive.box(userdata).get(userBio)),
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w400,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                    const Icon(Icons.arrow_forward_ios, size: 17)
-                  ],
-                )
-              ],
-            ),
-          ),
+          //__________________________________ AOBUT_______________________________________________
+          containerProfileDesign(
+              onTap: () {
+                // internetController.isOnline.value
+                //     ?
+                Get.to(() => const about(), transition: Transition.rightToLeft)!
+                    .then((value) {
+                  print("BACK");
+                  setState(() {});
+                });
+                // : Fluttertoast.showToast(
+                //     msg: "Check your connectivity",
+                //     gravity: ToastGravity.BOTTOM);
+              },
+              image: 'assets/images/about.png',
+              title: 'About',
+              about: Hive.box(userdata).get(userBio) == null
+                  ? ""
+                  : capitalizeFirstLetter(Hive.box(userdata).get(userBio))),
           const SizedBox(height: 10),
-          Divider(
-            thickness: 1,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 10),
-          //____________________________________ Starred Messaged ________________________________
+          //_________________________________ Starred Messaged _____________________________________
           InkWell(
             onTap: () {
               // internetController.isOnline.value
@@ -363,59 +208,54 @@ class _ProfileState extends State<Profile> {
               //     msg: "Check your connectivity",
               //     gravity: ToastGravity.BOTTOM);
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45),
-                          color: Colors.grey.shade200),
-                      child: Center(
-                        child: Image.asset("assets/images/starUnfill.png",
-                            color: chatColor, height: 20),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "Starred Messages",
-                      style: TextStyle(
-                          fontSize: 14.5, fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Obx(() {
-                      return Text(
-                        allStaredMsgController.allStarred.isEmpty
-                            ? "0"
-                            : allStaredMsgController.allStarred.length
-                                .toString(),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      );
-                    }),
-                    const SizedBox(width: 15),
-                    const Icon(Icons.arrow_forward_ios, size: 17)
-                  ],
-                )
-              ],
+            child: Container(
+              height: 46,
+              width: Get.width * 90,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade200)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset("assets/images/starUnfill.png",
+                          color: black1Color, height: 16),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Starred Messages",
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Obx(() {
+                        return Text(
+                          allStaredMsgController.allStarred.isEmpty
+                              ? "0"
+                              : allStaredMsgController.allStarred.length
+                                  .toString(),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        );
+                      }),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  )
+                ],
+              ).paddingSymmetric(horizontal: 10),
             ),
           ),
           const SizedBox(height: 10),
-          Divider(
-            thickness: 1,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 10),
-          //_______________________________________________ BLOCK CONTACTS_____________________________
+          //_________________________________ BLOCK CONTACTS_________________________________________
           InkWell(
             onTap: () {
               // internetController.isOnline.value
@@ -428,145 +268,134 @@ class _ProfileState extends State<Profile> {
               //     msg: "Check your connectivity",
               //     gravity: ToastGravity.BOTTOM);
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45),
-                          color: Colors.grey.shade200),
-                      child: Center(
-                          child: SvgPicture.asset(
-                        'assets/images/stop-circle.svg',
+            child: Container(
+              height: 46,
+              width: Get.width * 90,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade200)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/block1.png',
                         fit: BoxFit.cover,
-                      )),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "Block Contacts",
-                      style: TextStyle(
-                          fontSize: 14.5, fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-                Row(
-                  children: [
-                    Obx(() {
-                      return Text(
-                        allBlockListController.allBlock.isEmpty
-                            ? "0"
-                            : allBlockListController.allBlock.length.toString(),
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      );
-                    }),
-                    const SizedBox(width: 15),
-                    const Icon(Icons.arrow_forward_ios, size: 17)
-                  ],
-                )
-              ],
+                        height: 16,
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Block Contacts",
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Obx(() {
+                        return Text(
+                          allBlockListController.allBlock.isEmpty
+                              ? "0"
+                              : allBlockListController.allBlock.length
+                                  .toString(),
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        );
+                      }),
+                      const Icon(Icons.arrow_forward_ios, size: 16),
+                    ],
+                  )
+                ],
+              ).paddingSymmetric(horizontal: 10),
             ),
-          ),
-          const SizedBox(height: 10),
-          Divider(
-            thickness: 1,
-            color: Colors.grey.shade300,
           ),
           const SizedBox(height: 10),
           //_________________________________ TELL FRIEND_____________________________________________
+          containerProfileDesign(
+              onTap: () {
+                // internetController.isOnline.value
+                //     ?
+                Get.to(const InviteFriend(),
+                    transition: Transition.rightToLeft);
+                // : Fluttertoast.showToast(
+                //     msg: "Check your connectivity",
+                //     gravity: ToastGravity.BOTTOM);
+              },
+              image: 'assets/images/share1.png',
+              title: "Tell a firend",
+              about: ''),
+          const SizedBox(height: 10),
+          //_________________________________ SHARE LINK_____________________________________________
+          containerProfileDesign(
+              onTap: () {
+                // internetController.isOnline.value
+                //     ?
+                Share.share('https://pub.dev/packages/share_plus',
+                    subject: 'Check out this website');
+                // : Fluttertoast.showToast(
+                //     msg: "Check your connectivity",
+                //     gravity: ToastGravity.BOTTOM);
+              },
+              image: 'assets/images/share2.png',
+              title: "Share a link",
+              about: ''),
+          const SizedBox(height: 10),
+          //________________________________ LOGOUT ___________________________________________________
           InkWell(
             onTap: () {
-              // internetController.isOnline.value
-              //     ?
-              Get.to(const InviteFriend(), transition: Transition.rightToLeft);
-              // : Fluttertoast.showToast(
-              //     msg: "Check your connectivity",
-              //     gravity: ToastGravity.BOTTOM);
+              //when app logout then user offline
+              //store all uerData clear
+              Hive.box(userdata).clear();
+              // then navigate to login page
+              Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Flogin(),
+                  ),
+                  (route) => false);
             },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45),
-                          color: Colors.grey.shade200),
-                      child: Center(
-                        child: Image.asset("assets/images/sms-notification.png",
-                            color: chatColor, height: 20),
+            child: Container(
+              height: 46,
+              width: Get.width * 90,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade200)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        "assets/images/logout.png",
+                        fit: BoxFit.cover,
+                        color: Colors.red,
+                        height: 16,
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "Tell a firend",
-                      style: TextStyle(
-                          fontSize: 14.5, fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-                const Icon(Icons.arrow_forward_ios, size: 17)
-              ],
+                      const SizedBox(width: 10),
+                      const Text(
+                        "Logout",
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.red,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ),
+                  const Icon(Icons.arrow_forward_ios, size: 16)
+                ],
+              ).paddingSymmetric(horizontal: 10),
             ),
           ),
-          const SizedBox(height: 10),
-          Divider(
-            thickness: 1,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 10),
-          InkWell(
-            onTap: () {
-              // internetController.isOnline.value
-              //     ?
-              Share.share('https://pub.dev/packages/share_plus',
-                  subject: 'Check out this website');
-              // : Fluttertoast.showToast(
-              //     msg: "Check your connectivity",
-              //     gravity: ToastGravity.BOTTOM);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(45),
-                          color: Colors.grey.shade200),
-                      child: const Center(
-                        child: Icon(CupertinoIcons.share, size: 20),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    const Text(
-                      "Share a link",
-                      style: TextStyle(
-                          fontSize: 14.5, fontWeight: FontWeight.w500),
-                    )
-                  ],
-                ),
-                const Icon(Icons.arrow_forward_ios, size: 17)
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          Divider(
-            thickness: 1,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 10),
         ],
       ),
     );

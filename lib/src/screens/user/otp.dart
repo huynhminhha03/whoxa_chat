@@ -419,7 +419,7 @@ class _otpState extends State<otp> {
           PageTransition(
             curve: Curves.linear,
             type: PageTransitionType.rightToLeft,
-            child: AddPersonaDetails(isback: false),
+            child: AddPersonaDetails(isRought: false, isback: false),
           ),
         );
         _timer?.cancel();
@@ -484,7 +484,7 @@ class _otpState extends State<otp> {
           PageTransition(
             curve: Curves.linear,
             type: PageTransitionType.rightToLeft,
-            child: AddPersonaDetails(isback: false),
+            child: AddPersonaDetails(isRought: false, isback: false),
           ),
         );
         _timer?.cancel();

@@ -1,20 +1,14 @@
 // // ignore_for_file: avoid_print, must_be_immutable, use_full_hex_values_for_flutter_colors, file_names, use_build_context_synchronously
 
 // ignore_for_file: avoid_print, must_be_immutable, use_build_context_synchronously, non_constant_identifier_names, file_names, use_full_hex_values_for_flutter_colors, unused_field
-
-import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:http/http.dart' as http;
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/chat_profile_model.dart';
-import 'package:meyaoo_new/model/group_audio_call_model.dart';
-import 'package:meyaoo_new/model/groupvideocall_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/chat/Media.dart';
@@ -78,85 +72,6 @@ class _GroupProfileState extends State<GroupProfile> {
 
         print("MYADMIN$isIamAdmin");
       }
-    }
-  }
-
-  GroupAudioCallModel grpAudioCallModel = GroupAudioCallModel();
-  groupAudiocalling() async {
-    setState(() {
-      isLoading = true;
-    });
-    print("Audio_call_api");
-    var uri = Uri.parse('${baseUrl()}GroupAudioCall');
-    var request = http.MultipartRequest("POST", uri);
-    Map<String, String> headers = {
-      "Accept": "application/json",
-    };
-
-    request.headers.addAll(headers);
-    request.fields['group_id'] = "";
-    request.fields['from_user'] = Hive.box(userdata).get(userId);
-
-    var response = await request.send();
-    print(request.fields);
-    print(response.statusCode);
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var userData = jsonDecode(responseData);
-
-    grpAudioCallModel = GroupAudioCallModel.fromJson(userData);
-    log(responseData);
-    setState(() {
-      isLoading = false;
-    });
-    if (grpAudioCallModel.responseCode == "1") {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  GroupVideocallModel videoCallModel = GroupVideocallModel();
-
-  videocall() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    var uri = Uri.parse('${baseUrl()}GroupVideoCall');
-    var request = http.MultipartRequest("POST", uri);
-    Map<String, String> headers = {
-      "Accept": "application/json",
-    };
-
-    request.headers.addAll(headers);
-    request.fields['from_user'] = Hive.box(userdata).get(userId);
-    request.fields['group_id'] = "";
-    var response = await request.send();
-    print(response.statusCode);
-
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var userData = jsonDecode(responseData);
-
-    videoCallModel = GroupVideocallModel.fromJson(userData);
-    log(responseData);
-    setState(() {
-      isLoading = false;
-    });
-    if (response.statusCode == 200) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
     }
   }
 
@@ -377,15 +292,12 @@ class _GroupProfileState extends State<GroupProfile> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 InkWell(
-                    onTap: () {
-                      groupAudiocalling();
-                    },
+                    onTap: () {},
                     child: Container(
                       height: 53,
                       width: 68,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(5),
-                          border: Border.all(color: chatownColor),
                           color: chatStrokeColor),
                       child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -410,15 +322,12 @@ class _GroupProfileState extends State<GroupProfile> {
                   width: 30,
                 ),
                 InkWell(
-                  onTap: () {
-                    videocall();
-                  },
+                  onTap: () {},
                   child: Container(
                     height: 53,
                     width: 68,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: chatownColor),
                         color: chatStrokeColor),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -450,7 +359,6 @@ class _GroupProfileState extends State<GroupProfile> {
                     width: 68,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(5),
-                        border: Border.all(color: chatownColor),
                         color: chatStrokeColor),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -684,7 +592,7 @@ class _GroupProfileState extends State<GroupProfile> {
           const SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
                 child: Text(

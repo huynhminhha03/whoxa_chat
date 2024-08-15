@@ -29,18 +29,19 @@ class _BlockListState extends State<BlockList> {
         backgroundColor: appColorWhite,
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: chatownColor,
-          centerTitle: true,
+          scrolledUnderElevation: 0,
+          backgroundColor: appColorWhite,
           leading: InkWell(
             onTap: () {
-              Navigator.pop(context);
+              Get.back();
             },
             child:
                 const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
           ),
           title: const Text(
-            "Block list",
-            style: TextStyle(fontSize: 18, color: Colors.black),
+            "Block List",
+            style: TextStyle(
+                fontSize: 20, color: Colors.black, fontWeight: FontWeight.w500),
           ),
         ),
         body: Obx(() {
@@ -74,32 +75,9 @@ class _BlockListState extends State<BlockList> {
                         children: [
                           const SizedBox(height: 100),
                           Image.asset(
-                            "assets/images/no_chat_list.png",
+                            "assets/images/empty_block.png",
                             height: 300,
                           ),
-                          Container(
-                            width: MediaQuery.of(context).size.width / 1,
-                            decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(10)),
-                            child: const Padding(
-                              padding: EdgeInsets.all(15.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "You don't have any block list.",
-                                    softWrap: true,
-                                    maxLines: 2,
-                                    style: TextStyle(
-                                        color: chatColor,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w300),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ).paddingSymmetric(horizontal: 30),
                         ],
                       ),
                     );
@@ -116,8 +94,8 @@ class _BlockListState extends State<BlockList> {
             Row(
               children: [
                 Container(
-                  height: 40,
-                  width: 40,
+                  height: 45,
+                  width: 45,
                   decoration:
                       BoxDecoration(borderRadius: BorderRadius.circular(50)),
                   child: ClipRRect(
@@ -139,7 +117,8 @@ class _BlockListState extends State<BlockList> {
                                 .blockedUserDetails![0].firstName! +
                             data.conversation!.blockedUserDetails![0]
                                 .lastName!),
-                        style: const TextStyle(fontWeight: FontWeight.w500)),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w500, fontSize: 14)),
                     Text(
                       data.conversation!.blockedUserDetails![0].phoneNumber!,
                       style: const TextStyle(
@@ -157,16 +136,16 @@ class _BlockListState extends State<BlockList> {
                 allBlockListController.allBlock.remove(data);
               },
               child: Container(
-                height: 25,
-                width: 60,
+                height: 28,
+                width: 80,
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     color: chatStrokeColor,
                     border: Border.all(color: chatownColor)),
                 child: const Center(
                   child: Text(
                     "Unblock",
-                    style: TextStyle(fontSize: 9, fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),

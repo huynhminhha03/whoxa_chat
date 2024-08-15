@@ -48,8 +48,6 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
     await Permission.contacts.request();
   }
 
-  String isSearchSelect = "0";
-
   @override
   void initState() {
     super.initState();
@@ -83,45 +81,35 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Colors.white,
-        appBar: isSearchSelect == "0"
-            ? PreferredSize(
-                preferredSize: const Size.fromHeight(70),
-                child: AppBar(
-                  scrolledUnderElevation: 0,
-                  backgroundColor: chatownColor,
-                  elevation: 0,
-                  leading: IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.arrow_back_ios,
-                          color: Colors.black)),
-                  centerTitle: true,
-                  title: const Text(
-                    'Archive list',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 20,
-                        color: Colors.black),
-                  ),
-                  actions: [
-                    InkWell(
-                      onTap: () {
-                        setState(() {
-                          isSearchSelect = "1";
-                        });
-                      },
-                      child: Image.asset("assets/images/search-normal.png",
-                          color: Colors.black, height: 20),
-                    ).paddingOnly(right: 20)
-                  ],
-                ),
-              )
-            : appbarSearch(context),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(70),
+          child: AppBar(
+            shape: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+            scrolledUnderElevation: 0,
+            backgroundColor: appColorWhite,
+            elevation: 0,
+            titleSpacing: 0,
+            leadingWidth: 50,
+            leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back_ios, color: Colors.black)),
+            title: const Text(
+              'Archive list',
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  color: Colors.black),
+            ),
+          ),
+        ),
         body: Container(
           color: Colors.white,
           child: Column(
             children: [
+              const SizedBox(height: 10),
+              searchBar(),
               Expanded(child: SingleChildScrollView(child: chatListScreen1()))
             ],
           ),
@@ -170,34 +158,11 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 150),
                   Image.asset(
-                    "assets/images/no_chat_list.png",
-                    height: 300,
+                    "assets/images/no_contact_found.png",
+                    height: 250,
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width / 1,
-                    decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(10)),
-                    child: const Padding(
-                      padding: EdgeInsets.all(15.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "You don't have any Message.",
-                            softWrap: true,
-                            maxLines: 2,
-                            style: TextStyle(
-                                color: chatColor,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w300),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ).paddingSymmetric(horizontal: 30),
                 ],
               ),
             );
@@ -1019,6 +984,32 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
     return formattedTime;
   }
 
+  Widget searchBar() {
+    return Container(
+      height: 50,
+      width: MediaQuery.of(context).size.width * 0.9,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10), color: Colors.grey.shade100),
+      child: TextField(
+        controller: controller,
+        onChanged: onSearchTextChanged,
+        decoration: const InputDecoration(
+          prefixIcon: Padding(
+            padding: EdgeInsets.all(17),
+            child: Image(
+              image: AssetImage('assets/icons/search.png'),
+            ),
+          ),
+          hintText: 'Search User',
+          hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+          filled: true,
+          fillColor: Colors.transparent,
+          border: OutlineInputBorder(borderSide: BorderSide.none),
+        ),
+      ),
+    );
+  }
+
 //_________________________________________________________________________________________________________________________________________________________
 
   Future dialogBox(String isblock, String cID, bool isGroup, String uname,
@@ -1101,56 +1092,6 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
             ),
           );
         });
-  }
-
-  PreferredSize appbarSearch(BuildContext context) {
-    return PreferredSize(
-      preferredSize: const Size.fromHeight(70),
-      child: AppBar(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(0),
-            side: const BorderSide(color: Colors.white)),
-        backgroundColor: chatownColor,
-        scrolledUnderElevation: 0,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Container(
-          height: 50,
-          width: MediaQuery.of(context).size.width * 0.9,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(7), color: Colors.white),
-          child: TextField(
-            controller: controller,
-            onChanged: onSearchTextChanged,
-            decoration: const InputDecoration(
-              suffixIcon: Padding(
-                padding: EdgeInsets.all(17),
-                child: Image(
-                  image: AssetImage('assets/icons/search.png'),
-                ),
-              ),
-              hintText: '  What are you looking for?',
-              hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
-              filled: true,
-              fillColor: Colors.transparent,
-              border: OutlineInputBorder(borderSide: BorderSide.none),
-            ),
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 15, left: 0),
-            child: InkWell(
-                onTap: () {
-                  setState(() {
-                    isSearchSelect = '0';
-                  });
-                },
-                child: const Icon(Icons.close, color: chatColor, size: 25)),
-          )
-        ],
-      ),
-    );
   }
 
 // This function search chats user/group name

@@ -1901,3 +1901,54 @@ Widget messageSelector({
                           height: 10,
                         ))));
 }
+
+Widget containerProfileDesign(
+    {required Function() onTap,
+    required String image,
+    required String title,
+    String? about}) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      height: 46,
+      width: Get.width * 90,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey.shade200)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Image.asset(image, height: 16),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                    fontSize: 12,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600),
+              )
+            ],
+          ),
+          Row(
+            children: [
+              Text(
+                about!,
+                style: const TextStyle(
+                  color: Colors.grey,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16),
+            ],
+          )
+        ],
+      ).paddingSymmetric(horizontal: 10),
+    ),
+  );
+}

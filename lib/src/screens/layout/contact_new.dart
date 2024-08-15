@@ -97,33 +97,13 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
       appBar: AppBar(
-        backgroundColor: chatownColor,
+        backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
-        title: Row(
-          children: [
-            const SizedBox(width: 5),
-            widget.isValue == true
-                ? InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back_ios,
-                        color: chatColor, size: 20))
-                : const SizedBox.shrink(),
-            const SizedBox(width: 10),
-            const Text(
-              'Contacts',
-              style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 20,
-                  color: Colors.black),
-            )
-          ],
-        ),
+        title: Image.asset("assets/images/logo.png", height: 45),
       ),
       body: Stack(
         children: [
@@ -132,7 +112,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
             children: [
               //To of search bar
               Container(
-                color: chatownColor,
+                color: const Color.fromRGBO(250, 250, 250, 1),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,8 +123,8 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                         height: 50,
                         width: MediaQuery.of(context).size.width * 0.9,
                         decoration: BoxDecoration(
-                            color: const Color(0xffFFFFFF),
-                            borderRadius: BorderRadius.circular(7)),
+                            color: const Color.fromRGBO(238, 238, 238, 1),
+                            borderRadius: BorderRadius.circular(10)),
                         child: TextField(
                           controller: controller,
                           onChanged: (value) {
@@ -153,13 +133,13 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                             });
                           },
                           decoration: const InputDecoration(
-                            suffixIcon: Padding(
+                            prefixIcon: Padding(
                               padding: EdgeInsets.all(17),
                               child: Image(
                                 image: AssetImage('assets/icons/search.png'),
                               ),
                             ),
-                            hintText: '  What are you looking for?',
+                            hintText: 'Search name or number',
                             hintStyle:
                                 TextStyle(fontSize: 12, color: Colors.grey),
                             filled: true,
@@ -182,6 +162,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                 child: SingleChildScrollView(
                   child: Obx(() {
                     return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         getAllDeviceContact.getList.isNotEmpty
                             ? contactsWidget()
@@ -190,21 +171,19 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                             ? const SizedBox(height: 5)
                             : const SizedBox.shrink(),
                         controller.text.trim().isEmpty
-                            ? Container(
-                                height: 50,
-                                color: Colors.grey[200],
-                                child: Row(
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 15),
-                                      child: Text(
-                                        'Invite Friend to $appName',
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ],
+                            ? Divider(
+                                thickness: 1.5,
+                                color: Colors.grey.shade200,
+                              )
+                            : const SizedBox.shrink(),
+                        controller.text.trim().isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.only(left: 18, top: 10),
+                                child: Text(
+                                  'Invite Friend to Chatweb ',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               )
                             : const SizedBox.shrink(),
@@ -293,6 +272,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                       contact.fullName!,
                       style: const TextStyle(
                         fontSize: 15.0,
+                        fontFamily: 'Poppins',
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -300,13 +280,12 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                       padding: const EdgeInsets.only(top: 2.0),
                       child: Text(
                         contact.phoneNumber.toString(),
-                        style: const TextStyle(fontSize: 13),
+                        style: const TextStyle(
+                            fontSize: 13, color: Color.fromRGBO(73, 73, 73, 1)),
                       ),
                     ),
-                    trailing: const Text(
-                      "Chat ",
-                      style: TextStyle(fontSize: 14, color: Colors.green),
-                    ),
+                    trailing:
+                        Image.asset("assets/images/Chat1.png", height: 10),
                   ),
                 ],
               );
@@ -374,30 +353,43 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                       height: 50,
                       width: 50,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        shape: BoxShape.circle,
-                      ),
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                              colors: [
+                                blackColor,
+                                black1Color,
+                              ],
+                              stops: const [
+                                1.0,
+                                3.0
+                              ],
+                              begin: FractionalOffset.topLeft,
+                              end: FractionalOffset.bottomRight,
+                              tileMode: TileMode.repeated)),
                       child: ClipRRect(
                           borderRadius: BorderRadius.circular(100),
-                          child: contact.photo != null
-                              ? Image.memory(
-                                  image!,
-                                  fit: BoxFit.cover,
-                                  width: 50,
-                                  height: 50,
-                                )
-                              : Center(
-                                  child: Text(
-                                    contact.displayName != null
-                                        ? contact.displayName[0]
-                                        : "?",
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 20,
-                                        fontFamily: "MontserratBold",
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                )),
+                          child:
+                              // contact.photo != null
+                              //     ? Image.memory(
+                              //         image!,
+                              //         fit: BoxFit.cover,
+                              //         width: 50,
+                              //         height: 50,
+                              //       )
+                              //     :
+                              Center(
+                            child: Text(
+                              contact.displayName != null
+                                  ? contact.displayName[0]
+                                  : "?",
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontFamily: "MontserratBold",
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          )),
                     ),
                     title: Text(
                       contact.displayName,
@@ -413,10 +405,15 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                           getMobile(
                               contact.phones.map((e) => e.number).toString()),
                           maxLines: 1,
+                          style: const TextStyle(
+                              color: Color.fromRGBO(73, 73, 73, 1)),
                         )),
                     trailing: const Text(
                       "Invite  ",
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: chatownColor,
+                          fontWeight: FontWeight.w500),
                     ),
                   ),
           ],
@@ -457,15 +454,16 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
             child: Row(
               children: [
                 Container(
-                  height: 50,
-                  width: 50,
+                  height: 45,
+                  width: 45,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     shape: BoxShape.circle,
                   ),
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: const Center(child: Icon(Icons.groups_2))),
+                      child: Center(
+                          child: Image.asset("assets/images/group1.png"))),
                 ),
                 const SizedBox(width: 10),
                 const Text(
@@ -479,21 +477,16 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
         const SizedBox(height: 8),
         Divider(
           thickness: 1.5,
-          color: Colors.grey.shade300,
+          color: Colors.grey.shade200,
         ),
-        const SizedBox(height: 15),
         const Padding(
-          padding: EdgeInsets.only(left: 20),
+          padding: EdgeInsets.only(left: 20, top: 10),
           child: Text(
-            "CONTACTS",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            "Contact on Chatweb",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
-        const SizedBox(height: 12),
-        Divider(
-          thickness: 1.5,
-          color: Colors.grey.shade300,
-        ),
+        const SizedBox(height: 8),
       ],
     );
   }
