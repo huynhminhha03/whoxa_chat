@@ -402,5 +402,8 @@ Future<void> openHiveBox(String boxName) async {
 SocketIntilized socketIntilized = SocketIntilized();
 
 Future<void> initSocket() async {
-  await socketIntilized.initlizedsocket();
+  if (Hive.box(userdata).get(authToken) != '' &&
+      Hive.box(userdata).get(authToken) != null) {
+    await socketIntilized.initlizedsocket();
+  }
 }

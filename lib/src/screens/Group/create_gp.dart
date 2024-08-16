@@ -1,5 +1,6 @@
-import 'dart:io';
+// ignore_for_file: avoid_types_as_parameter_names
 
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -54,6 +55,8 @@ class _MyWidgetState extends State<MyWidget> {
                       showCustomToast("Enter group name");
                     } else if (image == null) {
                       showCustomToast("Set group profile");
+                    } else if (widget.contactData.isEmpty) {
+                      showCustomToast("Please add member");
                     } else {
                       gpCreateController.groupCreateApi(
                           controller.text.toString(),
@@ -118,6 +121,7 @@ class _MyWidgetState extends State<MyWidget> {
               child: TextFormField(
             controller: controller,
             maxLines: 1,
+            textCapitalization: TextCapitalization.sentences,
             readOnly: false,
             cursorColor: Colors.black,
             decoration: const InputDecoration(
@@ -153,13 +157,13 @@ class _MyWidgetState extends State<MyWidget> {
                     widget.contactData.removeAt(index);
                   });
                 },
-                child: Stack(
+                child: Column(
                   children: [
-                    Column(
+                    Stack(
                       children: [
                         Container(
-                          height: 50,
-                          width: 50,
+                          height: 40,
+                          width: 40,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade200,
                             shape: BoxShape.circle,
@@ -174,39 +178,39 @@ class _MyWidgetState extends State<MyWidget> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          widget.contactData[index].userName,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400),
-                        )
+                        Positioned(
+                            top: 1,
+                            right: 1,
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  widget.contactData.removeAt(index);
+                                });
+                              },
+                              child: Container(
+                                height: 12,
+                                width: 12,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.black),
+                                    color: chatLogoColor),
+                                child: const Center(
+                                  child: Icon(Icons.close,
+                                      color: Colors.black, size: 7),
+                                ),
+                              ),
+                            ))
                       ],
                     ),
-                    Positioned(
-                        top: 2,
-                        right: 2,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              widget.contactData.removeAt(index);
-                            });
-                          },
-                          child: Container(
-                            height: 12,
-                            width: 12,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black),
-                                color: chatLogoColor),
-                            child: const Center(
-                              child: Icon(Icons.close,
-                                  color: Colors.black, size: 7),
-                            ),
-                          ),
-                        ))
+                    const SizedBox(height: 5),
+                    Text(
+                      widget.contactData[index].userName,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 9.5, fontWeight: FontWeight.w400),
+                    )
                   ],
                 ).paddingOnly(right: 20),
               );
@@ -332,6 +336,7 @@ class _MyWidgetState extends State<MyWidget> {
       if (pickedFile != null) {
         image = File(pickedFile.path);
       } else {
+        // ignore: avoid_print
         print('No image selected.');
       }
     });
@@ -344,6 +349,7 @@ class _MyWidgetState extends State<MyWidget> {
       if (pickedFile != null) {
         image = File(pickedFile.path);
       } else {
+        // ignore: avoid_print
         print('No image selected.');
       }
     });

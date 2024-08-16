@@ -25,6 +25,7 @@ import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/global/pdf.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Onlichat/ChatOnline.dart';
 import 'package:meyaoo_new/src/screens/chat/FileView.dart';
@@ -1818,20 +1819,87 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                             image: AssetImage(
                                                 'assets/images/pdf.png'),
                                           ),
-                                          Container(
-                                            padding:
-                                                const EdgeInsets.only(left: 11),
-                                            child: Text(
-                                              extractFilename(data.url!)
-                                                  .toString()
-                                                  .split("-")
-                                                  .last,
-                                              style: const TextStyle(
-                                                color: chatColor,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
+                                          FutureBuilder<Map<String, dynamic>>(
+                                            future: getPdfInfo(data.url!),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      extractFilename(data.url!)
+                                                          .toString()
+                                                          .split("-")
+                                                          .last,
+                                                      style: const TextStyle(
+                                                        color: chatColor,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      '0 Page - 0 KB',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ).paddingOnly(left: 12);
+                                              } else if (snapshot.hasError) {
+                                                return const Text('');
+                                              } else if (snapshot.hasData) {
+                                                final int pageCount =
+                                                    snapshot.data!['pageCount'];
+                                                final String fileSize =
+                                                    snapshot.data!['fileSize'];
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 11),
+                                                      child: Text(
+                                                        extractFilename(
+                                                                data.url!)
+                                                            .toString()
+                                                            .split("-")
+                                                            .last,
+                                                        style: const TextStyle(
+                                                          color: chatColor,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '$pageCount Page - $fileSize',
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ).paddingOnly(left: 12),
+                                                  ],
+                                                );
+                                              } else {
+                                                return const Text(
+                                                    'No PDF info available');
+                                              }
+                                            },
                                           ),
                                         ],
                                       ),
@@ -3931,12 +3999,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           quality: 50,
         ).then((value) {
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString(), '', reply_chatID);
+            chatContorller.sendMessageIMGDoc(
+                widget.conversationID,
+                'image',
+                value!.path,
+                widget.mobileNum.toString(),
+                '',
+                reply_chatID,
+                false);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString(), '', '');
+                value!.path, widget.mobileNum.toString(), '', '', false);
           }
         });
       } else {}
@@ -3969,12 +4043,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           print("RPLY:$SelectedreplyText");
           print(reply_chatID);
           if (SelectedreplyText == true) {
-            chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString(), '', reply_chatID);
+            chatContorller.sendMessageIMGDoc(
+                widget.conversationID,
+                'image',
+                value!.path,
+                widget.mobileNum.toString(),
+                '',
+                reply_chatID,
+                false);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
-                value!.path, widget.mobileNum.toString(), '', '');
+                value!.path, widget.mobileNum.toString(), '', '', false);
           }
         });
       }
@@ -4001,11 +4081,11 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
 
         if (SelectedreplyText == true) {
           chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
-              doc!.path, widget.mobileNum.toString(), '', reply_chatID);
+              doc!.path, widget.mobileNum.toString(), '', reply_chatID, false);
           SelectedreplyText = false;
         } else {
           chatContorller.sendMessageIMGDoc(widget.conversationID, 'document',
-              doc!.path, widget.mobileNum.toString(), '', '');
+              doc!.path, widget.mobileNum.toString(), '', '', false);
         }
 
         // print('Api Complete');
@@ -4133,11 +4213,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 compressedVideos,
                 widget.mobileNum.toString(),
                 '',
-                reply_chatID);
+                reply_chatID,
+                false);
             SelectedreplyText = false;
           } else {
             chatContorller.sendMessageVideo(widget.conversationID, "video",
-                compressedVideos, widget.mobileNum.toString(), '', '');
+                compressedVideos, widget.mobileNum.toString(), '', '', false);
           }
         }
       } else {
@@ -4846,22 +4927,114 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                     image: AssetImage(
                                                         'assets/images/pdf.png'),
                                                   ),
-                                                  Container(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 11),
-                                                    child: Text(
-                                                      extractFilename(data.url!)
-                                                          .toString()
-                                                          .split("-")
-                                                          .last,
-                                                      style: const TextStyle(
-                                                        color: chatColor,
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
+                                                  FutureBuilder<
+                                                      Map<String, dynamic>>(
+                                                    future:
+                                                        getPdfInfo(data.url!),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        return Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              extractFilename(
+                                                                      data.url!)
+                                                                  .toString()
+                                                                  .split("-")
+                                                                  .last,
+                                                              style:
+                                                                  const TextStyle(
+                                                                color:
+                                                                    chatColor,
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                            const Text(
+                                                              '0 Page - 0 KB',
+                                                              style: TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ).paddingOnly(left: 12);
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return const Text('');
+                                                      } else if (snapshot
+                                                          .hasData) {
+                                                        final int pageCount =
+                                                            snapshot.data![
+                                                                'pageCount'];
+                                                        final String fileSize =
+                                                            snapshot.data![
+                                                                'fileSize'];
+                                                        return Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 11),
+                                                              child: Text(
+                                                                extractFilename(
+                                                                        data.url!)
+                                                                    .toString()
+                                                                    .split("-")
+                                                                    .last,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color:
+                                                                      chatColor,
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              '$pageCount Page - $fileSize',
+                                                              style:
+                                                                  const TextStyle(
+                                                                color:
+                                                                    Colors.grey,
+                                                                fontSize: 10,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                            ).paddingOnly(
+                                                                left: 12),
+                                                          ],
+                                                        );
+                                                      } else {
+                                                        return const Text(
+                                                            'No PDF info available');
+                                                      }
+                                                    },
                                                   ),
                                                   const SizedBox(height: 15)
                                                 ],

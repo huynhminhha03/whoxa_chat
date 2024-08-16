@@ -9,7 +9,6 @@ import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/Group/addGroupMembers.dart';
 import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 
 final ApiHelper apiHelper = ApiHelper();
@@ -35,10 +34,11 @@ class GroupCreateController extends GetxController {
 
       request.headers.addAll(headers);
       request.fields['group_name'] = gpname;
-      //request.fields['conversation_id'] = conversation_id;
+      //request.fields['conversation_id'] = conversationId;
       request.files.add(await http.MultipartFile.fromPath('files', file));
 
       print(request.fields);
+      print(request.files);
       var response = await request.send();
       String responseData =
           await response.stream.transform(utf8.decoder).join();
@@ -50,9 +50,8 @@ class GroupCreateController extends GetxController {
       print(responseData);
 
       if (createModel.value!.success == true) {
-        Get.to(() => AddMembersinGroup(
-              grpId: createModel.value!.conversationId.toString(),
-            ));
+        addToGroupMember(createModel.value!.conversationId.toString(),
+            contactData.map((e) => e.userId.toString()).toList());
         showCustomToast(createModel.value!.message!);
         isCreate(false);
       } else {
@@ -84,6 +83,8 @@ class GroupCreateController extends GetxController {
           .replaceAll("[", "")
           .replaceAll("]", "")
           .replaceAll(" ", "");
+
+      print(request.fields);
 
       var response = await request.send();
       String responseData =

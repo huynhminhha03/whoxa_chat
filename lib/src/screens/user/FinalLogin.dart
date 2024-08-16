@@ -477,10 +477,12 @@ class _FloginState extends State<Flogin> {
     Timer _timer = Timer.periodic(onsec, (timer) {
       print(start);
       if (start == 0) {
-        setState(() {
-          timer.cancel();
-          wait = false;
-        });
+        // setState(() {
+        //   timer.cancel();
+        //   wait = false;
+        // });
+        timer.cancel();
+        wait = false;
       } else {
         start--;
         // setState(() {

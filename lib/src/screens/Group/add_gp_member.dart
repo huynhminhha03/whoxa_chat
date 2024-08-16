@@ -1,11 +1,9 @@
 // ignore_for_file: avoid_types_as_parameter_names, avoid_function_literals_in_foreach_calls, empty_catches, prefer_typing_uninitialized_variables, avoid_print, library_prefixes, must_be_immutable, file_names, unused_field
 
 import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
-import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -23,7 +21,6 @@ class AddMembersinGroup1 extends StatefulWidget {
 class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
   GetAllDeviceContact getAllDeviceContact = Get.find();
   ChatListController chatListController = Get.find();
-  GroupCreateController gpCreateController = Get.find();
   @override
   void initState() {
     var contactJson = json.encode(mobileContacts);
@@ -166,7 +163,7 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
       color: Colors.white,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-            0, 0, 0, 10), // Reduced bottom padding to 10
+            0, 0, 0, 5), // Reduced bottom padding to 10
         child: ListView.builder(
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
@@ -214,14 +211,14 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
             print("CONTACT-DATA:$contactData");
           },
           child: SizedBox(
-            height: 85,
+            height: 70,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const SizedBox(width: 0),
                 Container(
-                  height: 50,
-                  width: 50,
+                  height: 45,
+                  width: 45,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade200,
                     shape: BoxShape.circle,
@@ -242,19 +239,23 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 25),
+                      const SizedBox(height: 17),
                       Text(
                         capitalizeFirstLetter(data.userName!),
                         textAlign: TextAlign.left,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w500, fontSize: 16),
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         data.phoneNumber!,
                         textAlign: TextAlign.left,
                         style: const TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 12),
+                            fontWeight: FontWeight.w400,
+                            fontSize: 12,
+                            color: Color.fromRGBO(73, 73, 73, 1)),
                       ),
                     ],
                   ),
@@ -378,14 +379,14 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                 });
               },
               child: SizedBox(
-                height: 85,
+                height: 70,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const SizedBox(width: 0),
                     Container(
-                      height: 50,
-                      width: 50,
+                      height: 45,
+                      width: 45,
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         shape: BoxShape.circle,
@@ -406,12 +407,12 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 25),
+                          const SizedBox(height: 17),
                           Text(
                             capitalizeFirstLetter(data.userName!),
                             textAlign: TextAlign.left,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 16),
+                                fontWeight: FontWeight.w500, fontSize: 15),
                           ),
                           const SizedBox(height: 2),
                           Row(
@@ -420,7 +421,9 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                                 data.phoneNumber!,
                                 textAlign: TextAlign.left,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w400, fontSize: 12),
+                                    color: Color.fromRGBO(73, 73, 73, 1),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12),
                               ),
                             ],
                           ),
@@ -471,39 +474,39 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
     }
   }
 
-  Widget create() {
-    return Obx(() {
-      return gpCreateController.isMember.value
-          ? loader(context)
-          : InkWell(
-              onTap: () {
-                log(persons.length.toString());
-                contactID.isNotEmpty
-                    ? gpCreateController.addToGroupMember(
-                        widget.grpId!, contactID)
-                    : showCustomToast("Please select member");
-              },
-              child: Container(
-                height: 50,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  // border: Border.all(color:  Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(25),
-                  color: chatownColor,
-                ),
-                child: const Center(
-                  child: Text(
-                    'Create',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16),
-                  ),
-                ),
-              ),
-            );
-    });
-  }
+  // Widget create() {
+  //   return Obx(() {
+  //     return gpCreateController.isMember.value
+  //         ? loader(context)
+  //         : InkWell(
+  //             onTap: () {
+  //               log(persons.length.toString());
+  //               contactID.isNotEmpty
+  //                   ? gpCreateController.addToGroupMember(
+  //                       widget.grpId!, contactID)
+  //                   : showCustomToast("Please select member");
+  //             },
+  //             child: Container(
+  //               height: 50,
+  //               width: MediaQuery.of(context).size.width,
+  //               decoration: BoxDecoration(
+  //                 // border: Border.all(color:  Colors.black, width: 1),
+  //                 borderRadius: BorderRadius.circular(25),
+  //                 color: chatownColor,
+  //               ),
+  //               child: const Center(
+  //                 child: Text(
+  //                   'Create',
+  //                   style: TextStyle(
+  //                       color: Colors.black,
+  //                       fontWeight: FontWeight.w500,
+  //                       fontSize: 16),
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //   });
+  // }
 
   Widget selectedUsersList() {
     return SizedBox(
@@ -525,13 +528,13 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                     contactData.removeAt(index);
                   });
                 },
-                child: Stack(
+                child: Column(
                   children: [
-                    Column(
+                    Stack(
                       children: [
                         Container(
-                          height: 50,
-                          width: 50,
+                          height: 40,
+                          width: 40,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade200,
                             shape: BoxShape.circle,
@@ -546,39 +549,39 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        Text(
-                          contactData[index].userName,
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w400),
-                        )
+                        Positioned(
+                            top: 1,
+                            right: 1,
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  contactData.removeAt(index);
+                                });
+                              },
+                              child: Container(
+                                height: 12,
+                                width: 12,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.black),
+                                    color: chatLogoColor),
+                                child: const Center(
+                                  child: Icon(Icons.close,
+                                      color: Colors.black, size: 7),
+                                ),
+                              ),
+                            ))
                       ],
                     ),
-                    Positioned(
-                        top: 2,
-                        right: 2,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              contactData.removeAt(index);
-                            });
-                          },
-                          child: Container(
-                            height: 12,
-                            width: 12,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: Colors.black),
-                                color: chatLogoColor),
-                            child: const Center(
-                              child: Icon(Icons.close,
-                                  color: Colors.black, size: 7),
-                            ),
-                          ),
-                        ))
+                    const SizedBox(height: 5),
+                    Text(
+                      contactData[index].userName,
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 9.5, fontWeight: FontWeight.w500),
+                    )
                   ],
                 ).paddingOnly(right: 20),
               );

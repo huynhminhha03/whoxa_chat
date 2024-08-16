@@ -1,6 +1,8 @@
 // // ignore_for_file: avoid_print, must_be_immutable, use_full_hex_values_for_flutter_colors, file_names, use_build_context_synchronously
 
 // ignore_for_file: avoid_print, must_be_immutable, use_build_context_synchronously, non_constant_identifier_names, file_names, use_full_hex_values_for_flutter_colors, unused_field
+import 'dart:developer';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,9 +15,12 @@ import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/chat/Media.dart';
 import 'package:meyaoo_new/src/screens/chat/allstarred_msg_list.dart';
+import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/group_memberlist.dart';
 import 'package:meyaoo_new/src/screens/chat/group_profile_update.dart';
+import 'package:meyaoo_new/src/screens/chat/imageView.dart';
 import 'package:meyaoo_new/src/screens/chat/single_chat.dart';
+import 'package:page_transition/page_transition.dart';
 
 class GroupProfile extends StatefulWidget {
   String conversationID;
@@ -78,44 +83,8 @@ class _GroupProfileState extends State<GroupProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: appColorWhite,
-      appBar: AppBar(
-        scrolledUnderElevation: 0,
-        backgroundColor: chatownColor,
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        leading: InkWell(
-          onTap: () {
-            Get.back();
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: Image.asset("assets/images/arrow-left.png",
-                height: 18, color: chatColor),
-          ),
-        ),
-        title: const Center(
-          child: Text(
-            'Group Info',
-            style: TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 19),
-          ),
-        ),
-        actions: [
-          Obx(() {
-            return chatProfileController.isLoading.value
-                ? const Icon(
-                    Icons.more_vert,
-                    color: chatColor,
-                    size: 24,
-                  ).paddingOnly(right: 5)
-                : _popMenu(
-                    context,
-                    chatProfileController
-                        .profileModel.value!.conversationDetails!);
-          })
-        ],
-      ),
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
       bottomNavigationBar: isIamAdmin == true
           ? BottomAppBar(
               elevation: 0,
@@ -133,117 +102,66 @@ class _GroupProfileState extends State<GroupProfile> {
               ),
             )
           : null,
-      body: SafeArea(
-          child: Stack(children: [
-        Container(
-          width: MediaQuery.of(context).size.width,
-          decoration: const BoxDecoration(),
-        ),
-        Obx(() {
-          return chatProfileController.isLoading.value
-              ? loader(context)
-              : SingleChildScrollView(
-                  child: SizedBox(
+      body: Obx(() {
+        return chatProfileController.isLoading.value
+            ? loader(context)
+            : Stack(
+                children: [
+                  SizedBox(
+                    height: Get.height * 0.27,
+                    width: double.infinity,
+                    child: Image.asset(
+                      cacheHeight: 140,
+                      "assets/images/back_img1.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(0.0),
                     child: Column(
                       children: [
-                        profilePic(chatProfileController
-                            .profileModel.value!.conversationDetails!),
-                        const SizedBox(height: 20),
-                        Divider(thickness: 1, color: Colors.grey.shade300),
-                        groupprofiledetails(chatProfileController
-                            .profileModel.value!.conversationDetails!),
-                        isLoading
-                            ? Container()
-                            : Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 25,
-                                        top: 20,
-                                        right: 25,
-                                        bottom: 10),
-                                    child: InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          isParticipantsOpen =
-                                              !isParticipantsOpen; // Toggle the state
-                                        });
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Container(
-                                                height: 45,
-                                                width: 45,
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Color.fromRGBO(
-                                                      243, 243, 243, 1.000),
-                                                ),
-                                                child: Center(
-                                                    child: Image.asset(
-                                                        "assets/icons/eye.png",
-                                                        height: 17)),
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              const Padding(
-                                                padding:
-                                                    EdgeInsets.only(top: 2),
-                                                child: Text(
-                                                  'View Participants',
-                                                  style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w400),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                chatProfileController
-                                                    .profileModel
-                                                    .value!
-                                                    .conversationDetails!
-                                                    .conversationsUsers!
-                                                    .length
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    color: Colors.grey),
-                                              ),
-                                              Icon(
-                                                isParticipantsOpen
-                                                    ? Icons.keyboard_arrow_down
-                                                    : Icons.keyboard_arrow_up,
-                                                size: 23,
-                                                color: Colors.grey,
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  if (isParticipantsOpen) // Render the widget conditionally based on the state
-                                    participants(),
-
-                                  // medialinks(profileModel!),
-
-                                  // blockandnotificaion(),
-                                ],
-                              ),
+                        Expanded(
+                            child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 100),
+                              profilePic(chatProfileController
+                                  .profileModel.value!.conversationDetails!),
+                              const SizedBox(height: 10),
+                              groupprofiledetails(chatProfileController
+                                  .profileModel.value!.conversationDetails!),
+                            ],
+                          ),
+                        )),
                       ],
                     ),
                   ),
-                );
-        }),
-      ])),
+                  Positioned(
+                      top: 45,
+                      left: 5,
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(Icons.arrow_back_ios, size: 19))),
+                  Positioned(
+                      top: 45,
+                      right: 5,
+                      child: Obx(() {
+                        return chatProfileController.isLoading.value
+                            ? const Icon(
+                                Icons.more_vert,
+                                color: chatColor,
+                                size: 24,
+                              ).paddingOnly(right: 5)
+                            : _popMenu(
+                                context,
+                                chatProfileController
+                                    .profileModel.value!.conversationDetails!);
+                      }))
+                ],
+              );
+      }),
     );
   }
 
@@ -258,13 +176,15 @@ class _GroupProfileState extends State<GroupProfile> {
             ));
       },
       child: Container(
-        height: 48,
+        height: 47,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          // border: Border.all(color:  Colors.black, width: 1),
-          borderRadius: BorderRadius.circular(5),
-          color: chatownColor,
-        ),
+            // border: Border.all(color:  Colors.black, width: 1),
+            borderRadius: BorderRadius.circular(5),
+            gradient: LinearGradient(
+                colors: [yellow1Color, yellow2Color],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter)),
         child: const Center(
           child: Text(
             'Add Participants',
@@ -278,8 +198,7 @@ class _GroupProfileState extends State<GroupProfile> {
 
   Widget groupprofiledetails(ConversationDetails data) {
     return Container(
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(10)),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -291,339 +210,73 @@ class _GroupProfileState extends State<GroupProfile> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                InkWell(
+                buttonContainer(
                     onTap: () {},
-                    child: Container(
-                      height: 53,
-                      width: 68,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: chatStrokeColor),
-                      child: const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image(
-                            image: AssetImage(
-                              "assets/images/call_1.png",
-                            ),
-                            color: chatColor,
-                            height: 15,
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Audio",
-                            style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.w400),
-                          )
-                        ],
-                      ),
-                    )),
+                    img: "assets/images/call_1.png",
+                    title: "Audio"),
                 const SizedBox(
                   width: 30,
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: Container(
-                    height: 53,
-                    width: 68,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: chatStrokeColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/images/video_1.png",
-                          color: chatColor,
-                          height: 16,
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          "Video",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w400),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                buttonContainer(
+                    onTap: () {},
+                    img: "assets/images/video_1.png",
+                    title: "Video"),
                 const SizedBox(
                   width: 30,
                 ),
-                InkWell(
-                  onTap: () {
-                    Get.back(result: "1");
-                  },
-                  child: Container(
-                    height: 53,
-                    width: 68,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: chatStrokeColor),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          "assets/icons/search-normal.png",
-                          color: chatColor,
-                          height: 15,
-                        ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          "Search",
-                          style: TextStyle(
-                              fontSize: 12, fontWeight: FontWeight.w400),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+                buttonContainer(
+                    onTap: () {
+                      Get.back(result: "1");
+                    },
+                    img: "assets/icons/search-normal.png",
+                    title: "Search")
               ],
-            ),
-            const SizedBox(
-              height: 25,
-            ),
-            Container(
-              height: 50,
-              width: double.infinity,
-              color: chatStrokeColor,
-              child: const Padding(
-                padding: EdgeInsets.only(left: 32, top: 15),
-                child: Text("Preferences",
-                    style: TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.w600)),
-              ),
             ),
             const SizedBox(
               height: 15,
             ),
-            InkWell(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Media(
-                            peeid: widget.conversationID,
-                            peername: data.groupName!)));
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 25, top: 10, right: 25, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          height: 45,
-                          width: 45,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(243, 243, 243, 1.000),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(14.0),
-                            child: Image(
-                              image: AssetImage('assets/icons/gallery.png'),
-                              color: Colors.black,
-                              height: 25,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 2),
-                          child: Text(
-                            'Media',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          chatProfileController.totalCount.toString(),
-                          style: const TextStyle(color: Colors.grey),
-                        ),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 15,
-                          color: appgrey2,
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
+            mediaContainer(),
             const SizedBox(
               height: 10,
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25),
-              child: Divider(
-                height: 2,
-                color: Colors.grey.shade300,
-              ),
-            ),
+            stareContainer(),
             const SizedBox(
               height: 10,
             ),
-            InkWell(
-              onTap: () {
-                Get.to(
-                    () => AllStarredMsgList(
-                        conversationid: widget.conversationID,
-                        isPersonal: true),
-                    transition: Transition.rightToLeft);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 25, top: 10, right: 25, bottom: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          height: 45,
-                          width: 45,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color.fromRGBO(243, 243, 243, 1.000),
-                          ),
-                          child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: Image.asset("assets/icons/star2.png",
-                                  color: chatColor)),
-                        ),
-                        const SizedBox(
-                          width: 10,
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 10),
-                          child: Text(
-                            'Started Messages',
-                            style: TextStyle(
-                                fontSize: 15, fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Obx(() {
-                          return Text(
-                            allStaredMsgController.allStarred.isEmpty
-                                ? "0"
-                                : allStaredMsgController.allStarred.length
-                                    .toString(),
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          );
-                        }),
-                        const Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          size: 15,
-                          color: appgrey2,
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 25, right: 25),
-              child: Divider(
-                height: 2,
-                color: Colors.grey.shade300,
-              ),
-            )
+            memberListWidget()
           ],
         ));
   }
 
   Widget profilePic(ConversationDetails data) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 25, top: 20),
-      child: Row(
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset(
-                    0.0,
-                    0.0,
-                  ),
-                  blurRadius: 1.0,
-                  spreadRadius: 0.0,
-                ), //BoxShadow
-                BoxShadow(
-                  color: Colors.white,
-                  offset: Offset(0.0, 0.0),
-                  blurRadius: 0.0,
-                  spreadRadius: 0.0,
-                ), //BoxShadow
-              ],
-            ),
-            child: CustomCachedNetworkImage(
-              imageUrl: data.groupProfileImage!,
-              errorWidgeticon: const Icon(Icons.groups, size: 50),
+    return Column(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: CustomCachedNetworkImage(
+                imageUrl: data.groupProfileImage!,
+                errorWidgeticon: const Icon(Icons.groups, size: 50),
+              ),
             ),
           ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                child: Text(
-                  capitalizeFirstLetter(data.groupName!),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 20),
-                ),
-              ),
-              const SizedBox(height: 10),
-              RichText(
-                  text: TextSpan(children: [
-                WidgetSpan(
-                    alignment: PlaceholderAlignment.middle,
-                    child: Image.asset(
-                      "assets/icons/people.png",
-                      height: 21,
-                      color: chatColor,
-                    )),
-                const WidgetSpan(child: SizedBox(width: 5)),
-                TextSpan(
-                  text: data.conversationsUsers!.length.toString(),
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                      color: Color(0xffA59FAC)),
-                ),
-              ])),
-            ],
-          )
-        ],
-      ),
+        ),
+        const SizedBox(height: 25),
+        Text(
+          capitalizeFirstLetter(data.groupName!),
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
+        )
+      ],
     );
   }
 
@@ -1070,6 +723,263 @@ class _GroupProfileState extends State<GroupProfile> {
             },
             child: const Text('Group edit')),
       ],
+    );
+  }
+
+  Widget mediaContainer() {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+          blurRadius: 0.5,
+          spreadRadius: 0,
+          offset: Offset(0, 0.4),
+          color: Color.fromRGBO(239, 239, 239, 1),
+        )
+      ]),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => Media(
+                      peeid: widget.conversationID,
+                      peername: chatProfileController.profileModel.value!
+                          .conversationDetails!.groupName!)));
+        },
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Media, links and docs",
+                  style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey),
+                ),
+                Row(
+                  children: [
+                    Text(
+                      chatProfileController.totalCount.toString(),
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                    const Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 12,
+                      color: appgrey2,
+                    ),
+                  ],
+                )
+              ],
+            ).paddingSymmetric(horizontal: 20, vertical: 10),
+            SizedBox(
+              height: 100,
+              child: chatProfileController
+                      .profileModel.value!.mediaData!.isEmpty
+                  ? const Center(
+                      child: Text(
+                        "You haven't share any media",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          shrinkWrap: true,
+                          itemCount: chatProfileController
+                              .profileModel.value!.mediaData!.length
+                              .clamp(0, 4),
+                          padding: const EdgeInsets.only(left: 20),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return chatProfileController
+                                    .profileModel.value!.mediaData![index].url
+                                    .toString()
+                                    .contains(".mp4")
+                                ? InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => VideoViewFix(
+                                              username:
+                                                  "${capitalizeFirstLetter("")} ${capitalizeFirstLetter("")}",
+                                              url: chatProfileController
+                                                  .profileModel
+                                                  .value!
+                                                  .mediaData![index]
+                                                  .url!,
+                                              play: true,
+                                              mute: false,
+                                              date: "",
+
+                                              ///convertUTCTimeTo12HourFormat(data.createdAt!),
+                                            ),
+                                          ));
+                                    },
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          height: 100,
+                                          width: 100,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200,
+                                          ),
+                                          child: ClipRRect(
+                                            child: CachedNetworkImage(
+                                              imageUrl: chatProfileController
+                                                  .profileModel
+                                                  .value!
+                                                  .mediaData![index]
+                                                  .thumbnail!,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                            top: 40,
+                                            child: Image.asset(
+                                                "assets/images/play1.png",
+                                                height: 22,
+                                                color: chatColor))
+                                      ],
+                                    ),
+                                  ).paddingOnly(right: 10)
+                                : InkWell(
+                                    onTap: () {
+                                      log(chatProfileController.profileModel
+                                          .value!.mediaData![index].url!);
+                                      Navigator.push(
+                                        context,
+                                        PageTransition(
+                                            curve: Curves.linear,
+                                            type:
+                                                PageTransitionType.rightToLeft,
+                                            child: ImageView(
+                                              image: chatProfileController
+                                                  .profileModel
+                                                  .value!
+                                                  .mediaData![index]
+                                                  .url!,
+                                              userimg: "",
+                                            )),
+                                      );
+                                    },
+                                    child: Container(
+                                        height: 100,
+                                        width: 100,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                        ),
+                                        child: ClipRRect(
+                                          child: CachedNetworkImage(
+                                            imageUrl: chatProfileController
+                                                .profileModel
+                                                .value!
+                                                .mediaData![index]
+                                                .url!,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )),
+                                  ).paddingOnly(right: 10);
+                          }),
+                    ),
+            ),
+            const SizedBox(height: 10)
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget stareContainer() {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+          blurRadius: 0.5,
+          spreadRadius: 0,
+          offset: Offset(0, 0.4),
+          color: Color.fromRGBO(239, 239, 239, 1),
+        )
+      ]),
+      child: InkWell(
+        onTap: () {
+          Get.to(
+              () => AllStarredMsgList(
+                  conversationid: widget.conversationID, isPersonal: true),
+              transition: Transition.rightToLeft);
+        },
+        child: Padding(
+          padding:
+              const EdgeInsets.only(left: 25, top: 10, right: 25, bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset("assets/icons/star2.png", color: chatColor),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  const Text(
+                    'Started Messages',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Obx(() {
+                    return Text(
+                      allStaredMsgController.allStarred.isEmpty
+                          ? "0"
+                          : allStaredMsgController.allStarred.length.toString(),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    );
+                  }),
+                  const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    size: 15,
+                    color: appgrey2,
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget memberListWidget() {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+          blurRadius: 0.5,
+          spreadRadius: 0,
+          offset: Offset(0, 0.4),
+          color: Color.fromRGBO(239, 239, 239, 1),
+        )
+      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "${chatProfileController.profileModel.value!.conversationDetails!.conversationsUsers!.length.toString()} Group Members",
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+          ).paddingOnly(left: 23, top: 10),
+          participants()
+        ],
+      ),
     );
   }
 }

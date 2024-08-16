@@ -9,7 +9,7 @@ import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/model/chat_profile_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
-import 'package:buttons_tabbar/buttons_tabbar.dart';
+import 'package:meyaoo_new/src/global/pdf.dart';
 import 'package:meyaoo_new/src/screens/chat/FileView.dart';
 import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/imageView.dart';
@@ -29,7 +29,7 @@ class _MediaState extends State<Media> {
   ChatProfileController chatProfileController = Get.find();
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       chatProfileController.getProfileDATA(widget.peeid!);
     });
     super.initState();
@@ -38,37 +38,24 @@ class _MediaState extends State<Media> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: chatownColor,
+        backgroundColor: Colors.grey.shade100,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leadingWidth: 50,
+        titleSpacing: 0,
         leading: InkWell(
           onTap: () {
             Navigator.pop(context);
           },
           child:
-              const Icon(Icons.arrow_back_ios, size: 23, color: Colors.black),
+              const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
         ),
-        centerTitle: true,
-        title: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 10,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                capitalizeFirstLetter(widget.peername.toString()),
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: chatColor),
-              ),
-            ],
-          ),
+        title: Text(
+          capitalizeFirstLetter(widget.peername.toString()),
+          style: const TextStyle(
+              fontWeight: FontWeight.w500, fontSize: 18, color: chatColor),
         ),
       ),
       body: Obx(() {
@@ -83,28 +70,34 @@ class _MediaState extends State<Media> {
                 const SizedBox(
                   height: 10,
                 ),
-                ButtonsTabBar(
-                  borderWidth: 1,
-                  unselectedBorderColor: chatownColor,
-                  borderColor: chatownColor,
-                  backgroundColor: chatownColor,
-                  unselectedBackgroundColor: Colors.transparent,
-                  unselectedLabelStyle: const TextStyle(color: Colors.black),
-                  labelStyle: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14),
-                  tabs: const [
-                    Tab(
-                      text: '      Media        ',
+                Container(
+                  width: double.maxFinite,
+                  color: Colors.white,
+                  child: const Center(
+                    child: TabBar(
+                      dividerColor: Color.fromRGBO(236, 236, 236, 1),
+                      indicatorColor: chatownColor,
+                      unselectedLabelStyle: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15),
+                      labelStyle: TextStyle(
+                          color: chatownColor,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15),
+                      tabs: [
+                        Tab(
+                          text: '      Media        ',
+                        ),
+                        Tab(
+                          text: "      Links       ",
+                        ),
+                        Tab(
+                          text: "      Docs        ",
+                        ),
+                      ],
                     ),
-                    Tab(
-                      text: "      Links       ",
-                    ),
-                    Tab(
-                      text: "      Docs        ",
-                    ),
-                  ],
+                  ),
                 ),
                 chatProfileController.isLoading.value &&
                         chatProfileController
@@ -445,25 +438,25 @@ class _MediaState extends State<Media> {
                       ),
                     ));
               },
-              child: Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.grey.shade200,
-                ),
-                child: Center(
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      getUrlWidget(data.url!),
-                      Positioned(
-                          top: 47,
-                          child: Image.asset("assets/images/play1.png",
-                              height: 22, color: chatColor))
-                    ],
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    height: 100,
+                    width: 100,
+                    color: Colors.grey.shade200,
+                    child: ClipRRect(
+                      child: CachedNetworkImage(
+                        imageUrl: data.thumbnail!,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                      top: 42,
+                      child: Image.asset("assets/images/play1.png",
+                          height: 22, color: chatColor))
+                ],
               ),
             )
           : InkWell(
@@ -483,12 +476,8 @@ class _MediaState extends State<Media> {
               child: Container(
                   height: 100,
                   width: 100,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.grey.shade200,
-                  ),
+                  color: Colors.grey.shade200,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
                     child: CachedNetworkImage(
                       imageUrl: data.url!,
                       fit: BoxFit.cover,
@@ -504,63 +493,112 @@ class _MediaState extends State<Media> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
       child: Container(
         decoration: BoxDecoration(
-            color: const Color(0xffFCFCFC),
-            borderRadius: BorderRadius.circular(20),
+            color: yellow1Color,
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(width: 1, color: const Color(0xffE8E8E8))),
         // height: 90,
         width: MediaQuery.of(context).size.width * 0.90,
-        child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: FlutterLinkPreview(
-              url: data.message!,
-              builder: (info) {
-                if (info is WebInfo) {
-                  return info.title == null && info.description == null
-                      ? Text(
-                          data.message!,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
-                          ),
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (info.image != null)
-                              Image.network(info.image!, fit: BoxFit.cover),
-                            if (info.title != null)
-                              Container(
-                                decoration: BoxDecoration(
-                                    color: Colors.black12,
-                                    borderRadius: BorderRadius.circular(7)),
-                                child: Text(
-                                  info.title!,
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ).paddingAll(2),
-                              ).paddingOnly(top: 5),
-                            if (info.description != null)
-                              Text(
-                                info.description!,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.black,
-                                ),
+        child: InkWell(
+          onTap: () {
+            launchURL(data.message!);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.only(left: 5, right: 5, top: 5, bottom: 5),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10)),
+                child: FlutterLinkPreview(
+                  url: data.message!,
+                  builder: (info) {
+                    if (info is WebInfo) {
+                      return info.title == null && info.description == null
+                          ? Text(
+                              data.message!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black,
                               ),
-                          ],
-                        );
-                }
-                return const CircularProgressIndicator();
-              },
-              titleStyle: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (info.image != null)
+                                  Container(
+                                    height: 58,
+                                    width: 57,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(info.image!,
+                                          fit: BoxFit.cover),
+                                    ),
+                                  ),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (info.title != null)
+                                        Text(
+                                          info.title!,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ).paddingAll(2),
+                                      info.image == null
+                                          ? const SizedBox(height: 5)
+                                          : const SizedBox.shrink(),
+                                      if (info.description != null)
+                                        Text(
+                                          info.description!,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              color:
+                                                  Color.fromRGBO(68, 68, 68, 1),
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            );
+                    }
+                    return const CircularProgressIndicator();
+                  },
+                  titleStyle: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            )),
+              const SizedBox(height: 3),
+              Text(
+                data.message!,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    color: linkColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w400),
+              ).paddingOnly(left: 10)
+            ],
+          ),
+        ).paddingAll(5),
       ),
     );
   }
@@ -580,50 +618,96 @@ class _MediaState extends State<Media> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 3),
         child: Container(
+          padding: const EdgeInsets.all(7),
           decoration: BoxDecoration(
-              color: const Color(0xffFCFCFC),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(width: 1, color: const Color(0xffE8E8E8))),
-          height: 70,
-          width: MediaQuery.of(context).size.width * 0.90,
-          child: Row(
-            children: [
-              const SizedBox(
-                width: 10,
-              ),
-              Container(
-                  height: 40,
-                  width: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.circular(10),
-                    color: const Color(0xffCCCCCC),
-                  ),
-                  child: const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Image(
-                      image: AssetImage('assets/images/doc.png'),
-                    ),
-                  )),
-              const SizedBox(
-                width: 10,
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.65,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              borderRadius: BorderRadius.circular(10), color: yellow1Color),
+          child: Container(
+            width: Get.width * 0.50,
+            height: 58,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10), color: Colors.white),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Row(
                   children: [
-                    Text(
-                      data.url.toString().split('/').last,
-                      textAlign: TextAlign.left,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 14),
-                    )
+                    const Image(
+                      height: 28,
+                      image: AssetImage('assets/images/pdf.png'),
+                    ),
+                    FutureBuilder<Map<String, dynamic>>(
+                      future: getPdfInfo(data.url!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                extractFilename(data.url!)
+                                    .toString()
+                                    .split("-")
+                                    .last,
+                                style: const TextStyle(
+                                  color: chatColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const Text(
+                                '0 Page - 0 KB',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              )
+                            ],
+                          ).paddingOnly(left: 12);
+                        } else if (snapshot.hasError) {
+                          return const Text('');
+                        } else if (snapshot.hasData) {
+                          final int pageCount = snapshot.data!['pageCount'];
+                          final String fileSize = snapshot.data!['fileSize'];
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.only(left: 11),
+                                child: Text(
+                                  extractFilename(data.url!)
+                                      .toString()
+                                      .split("-")
+                                      .last,
+                                  style: const TextStyle(
+                                    color: chatColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '$pageCount Page - $fileSize',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ).paddingOnly(left: 12),
+                            ],
+                          );
+                        } else {
+                          return const Text('No PDF info available');
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

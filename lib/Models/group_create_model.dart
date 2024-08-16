@@ -1,7 +1,7 @@
 class GroupCreateModel {
   bool? success;
   String? message;
-  String? conversationId;
+  int? conversationId;
   ConversationDetails? conversationDetails;
 
   GroupCreateModel(

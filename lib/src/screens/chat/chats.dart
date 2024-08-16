@@ -1006,7 +1006,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
       title: const Row(
         children: [
           Text(
-            'Whoxa',
+            'Chatapp',
             style: TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 20, color: Colors.black),
           ),
@@ -1182,6 +1182,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
     return showDialog(
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
           return Stack(
             children: [
@@ -1192,7 +1193,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                 ),
               ),
               AlertDialog(
-                insetPadding: const EdgeInsets.all(8),
+                insetPadding: const EdgeInsets.all(5),
                 alignment: Alignment.bottomCenter,
                 backgroundColor: Colors.white,
                 elevation: 0,
@@ -1200,7 +1201,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 content: SizedBox(
-                  height: isGroup == false ? 87 : 50,
+                  height: isGroup == false ? 87 : 45,
                   child: Column(
                     children: [
                       SizedBox(

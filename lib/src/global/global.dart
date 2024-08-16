@@ -1999,3 +1999,35 @@ class SelectedContact {
   int get hashCode =>
       userId.hashCode ^ userName.hashCode ^ profileImage.hashCode;
 }
+
+int pageCount = 0;
+
+Widget buttonContainer(
+    {required Function() onTap, required String img, required String title}) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      height: 53,
+      width: 68,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5), color: yellow1Color),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image(
+            image: AssetImage(
+              img,
+            ),
+            color: chatColor,
+            height: 15,
+          ),
+          const SizedBox(height: 5),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+          )
+        ],
+      ),
+    ),
+  );
+}

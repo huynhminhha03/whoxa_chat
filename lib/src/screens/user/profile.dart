@@ -52,7 +52,7 @@ class _ProfileState extends State<Profile> {
         backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
         body: Stack(children: [
           SizedBox(
-            height: 200,
+            height: Get.height * 0.27,
             width: double.infinity,
             child: Image.asset(
               cacheHeight: 140,

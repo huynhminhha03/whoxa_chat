@@ -194,7 +194,8 @@ class _ForwardMessageState extends State<ForwardMessage> {
                   widget.forwardMsgList[j].url,
                   '',
                   widget.forwardMsgList[j].messageId.toString(),
-                  '');
+                  '',
+                  true);
               //=============  LOCATION MESSAGE FORWARD ======================
             } else if (widget.forwardMsgList[j].messageType == 'location') {
               chatContorller.sendMessageLocation(
@@ -213,7 +214,8 @@ class _ForwardMessageState extends State<ForwardMessage> {
                   widget.forwardMsgList[j].url,
                   '',
                   widget.forwardMsgList[j].messageId.toString(),
-                  '');
+                  '',
+                  true);
               //=============  DOCUMENT MESSAGE FORWARD ======================
             } else if (widget.forwardMsgList[j].messageType == 'document') {
               chatContorller.sendMessageIMGDoc(
@@ -222,7 +224,8 @@ class _ForwardMessageState extends State<ForwardMessage> {
                   widget.forwardMsgList[j].url,
                   '',
                   widget.forwardMsgList[j].messageId.toString(),
-                  '');
+                  '',
+                  true);
               //=============  AUDIO MESSAGE FORWARD ======================
             } else if (widget.forwardMsgList[j].messageType == 'audio') {
               chatContorller.sendMessageVoice(

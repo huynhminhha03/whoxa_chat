@@ -39,58 +39,51 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
         scrolledUnderElevation: 0,
         backgroundColor: appColorWhite,
         elevation: 0,
+        titleSpacing: 0,
+        leadingWidth: 50,
         automaticallyImplyLeading: false,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: const Icon(Icons.arrow_back_ios, size: 17),
+        ),
         title: const Text(
           'Add Participants',
           style: TextStyle(color: Colors.black, fontSize: 18),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ),
-              ],
-            ),
-          )
+              padding: const EdgeInsets.only(right: 15),
+              child: Obx(() {
+                return gpCreateController.isMember.value
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: Center(
+                          child: CircularProgressIndicator(
+                              strokeWidth: 3, color: Colors.black),
+                        ),
+                      )
+                    : containerWidget(
+                        onTap: () {
+                          contactID.isNotEmpty
+                              ? gpCreateController.addToGroupMember(
+                                  widget.grpId!, contactID)
+                              : showCustomToast("Please select member");
+                        },
+                        title: "Next");
+              }))
         ],
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        elevation: 0,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: block(),
-              ),
-            ),
-          ],
-        ),
       ),
       body: Obx(() {
         return SafeArea(
             child: Container(
           color: Colors.white,
-          child: Column(
-            children: [
-              Expanded(
-                  child: SingleChildScrollView(
-                      child: Column(
-                children: [getlistOfContactWidget(context), contactList()],
-              )))
-            ],
-          ),
+          child: SingleChildScrollView(
+              child: Column(
+            children: [getlistOfContactWidget(context), contactList()],
+          )),
         ));
       }),
     );
@@ -169,14 +162,16 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                               });
                             },
                             child: Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                   border: Border(
                                 bottom: BorderSide(
-                                  color: Colors.grey,
+                                  color: (index != allContacts.length - 1)
+                                      ? Colors.grey
+                                      : Colors.transparent,
                                   width: 0.2,
                                 ),
                               )),
-                              height: 85,
+                              height: 70,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -185,8 +180,8 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                                     width: 0,
                                   ),
                                   Container(
-                                    height: 50,
-                                    width: 50,
+                                    height: 45,
+                                    width: 45,
                                     decoration: BoxDecoration(
                                       color: Colors.grey.shade200,
                                       shape: BoxShape.circle,
@@ -211,7 +206,7 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         const SizedBox(
-                                          height: 25,
+                                          height: 17,
                                         ),
                                         Text(
                                           contact.userName!,
@@ -245,15 +240,19 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                                           color:
                                               contactID.contains(contact.userId)
                                                   ? Colors.white
-                                                  : Colors.blueAccent,
+                                                  : chatownColor,
                                         ),
                                         shape: BoxShape.circle,
                                         color:
                                             contactID.contains(contact.userId)
-                                                ? Colors.blueAccent
+                                                ? chatownColor
                                                 : Colors.white),
-                                    child: const Icon(Icons.check,
-                                        size: 15, color: Colors.white),
+                                    child: Icon(Icons.check,
+                                        size: 15,
+                                        color:
+                                            contactID.contains(contact.userId)
+                                                ? Colors.black
+                                                : Colors.white),
                                   ),
                                   const SizedBox(
                                     width: 5,
@@ -284,7 +283,7 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
             width: 0.2,
           ),
         )),
-        height: 85,
+        height: 70,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -292,8 +291,8 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
               width: 0,
             ),
             Container(
-              height: 50,
-              width: 50,
+              height: 45,
+              width: 45,
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 shape: BoxShape.circle,
@@ -313,9 +312,7 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(
-                    height: 25,
-                  ),
+                  const SizedBox(height: 17),
                   Text(
                     Hive.box(userdata).get(userId) == data.user!.userId
                         ? "You"
@@ -343,16 +340,12 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
             Container(
               height: 22,
               width: 22,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.grey,
-                  ),
-                  shape: BoxShape.circle,
-                  color: Colors.grey),
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: yellow1Color),
               child: const Icon(
                 Icons.check,
                 size: 15,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
             const SizedBox(

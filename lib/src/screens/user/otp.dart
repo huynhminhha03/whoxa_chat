@@ -13,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/VerifyotpModel.dart';
 import 'package:meyaoo_new/Models/firebase_otp_model.dart';
+import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -516,6 +517,8 @@ class _otpState extends State<otp> {
         userMobile,
         profileDetailResponse.resData!.countryCode! +
             profileDetailResponse.resData!.phoneNumber!);
+
+    await socketIntilized.initlizedsocket();
   }
 
 //============ SET DATA FIREBASE OPT RESPONSE DATA TO HIVE SAVE DATA =========================

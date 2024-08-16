@@ -356,7 +356,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               child: Stack(
                 children: [
                   SizedBox(
-                    height: 200,
+                    height: Get.height * 0.27,
                     width: double.infinity,
                     child: Image.asset(
                       cacheHeight: 140,

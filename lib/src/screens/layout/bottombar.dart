@@ -16,6 +16,7 @@ import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
+import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -221,9 +222,12 @@ class _TabbarScreenState extends State<TabbarScreen>
   }
 
   @override
-  void initState() {
+  initState() {
     WidgetsBinding.instance.addObserver(this);
-
+    if (Hive.box(userdata).get(authToken) == '' &&
+        Hive.box(userdata).get(authToken) == null) {
+      socketIntilized.initlizedsocket();
+    }
     editApiCall();
     _fetchTimeZone();
     permissionAcessPhone();

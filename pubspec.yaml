@@ -96,6 +96,8 @@ dependencies:
   percent_indicator: ^4.2.3
   flutter_callkit_incoming: ^2.0.0+2
   firebase_dynamic_links: ^5.4.8
+  pdf: ^3.11.1
+  pdf_render: ^1.4.10
 
 dev_dependencies:
   flutter_test:

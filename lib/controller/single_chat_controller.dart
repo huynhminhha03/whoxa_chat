@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, prefer_conditional_assignment
+// ignore_for_file: avoid_print, prefer_conditional_assignment, unrelated_type_equality_checks, unnecessary_null_comparison
 
 import 'dart:convert';
 import 'dart:developer';
@@ -204,7 +204,7 @@ class SingleChatContorller extends GetxController {
 
   //================== send DOC message api ==================================
   sendMessageIMGDoc(conversationID, msgtype, filePath, String mobileNum,
-      String forwardid, String replyid) async {
+      String forwardid, String replyid, bool isforwardUrl) async {
     print("PATH:$filePath");
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
@@ -224,10 +224,10 @@ class SingleChatContorller extends GetxController {
     request.fields['phone_number'] = mobileNum;
     request.fields['forward_id'] = forwardid;
     request.fields['reply_id'] = replyid;
-    if (filePath == File) {
-      request.files.add(await http.MultipartFile.fromPath('files', filePath));
-    } else {
+    if (isforwardUrl == true) {
       request.fields['url'] = filePath;
+    } else {
+      request.files.add(await http.MultipartFile.fromPath('files', filePath));
     }
 
     // send
@@ -237,7 +237,7 @@ class SingleChatContorller extends GetxController {
     var useData = json.decode(responseData);
 
     sendMsgModel.value = SendMsgModel.fromJson(useData);
-    print("object: ${request.fields}");
+    print("IMAGE-FILEDS: ${request.fields}");
     print(responseData);
     isSendMsg(false);
     // final respo = MessageList.fromJson(useData);
@@ -483,7 +483,7 @@ class SingleChatContorller extends GetxController {
 
   //================================ Send Video Message ===================================
   sendMessageVideo(conversationID, msgtype, filePath, String mobileNum,
-      String forwardid, String replyid) async {
+      String forwardid, String replyid, bool isforwardUrl) async {
     print("RESPONSE:$filePath");
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
@@ -502,14 +502,15 @@ class SingleChatContorller extends GetxController {
     request.fields['phone_number'] = mobileNum;
     request.fields['forward_id'] = forwardid;
     request.fields['reply_id'] = replyid;
-    if (filePath == File) {
+    if (isforwardUrl == true) {
+      request.fields['url'] = filePath;
+    } else {
       for (String data in filePath) {
         request.files.add(await http.MultipartFile.fromPath('files', data));
       }
-    } else {
-      request.fields['url'] = filePath;
     }
-
+    print("VIDEO-FILES:${request.fields}");
+    print("VIDEO-FILES:${request.files}");
     // send
     var response = await request.send();
 
