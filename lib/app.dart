@@ -57,8 +57,6 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     // asknotificationpermmision();
     requestPermissions();
     _checkPermissions();
-
-    FirebaseMessagingService().openNotificationSettings;
     FirebaseMessagingService()
         .setUpFirebase(); // Initialize Firebase messaging service
 

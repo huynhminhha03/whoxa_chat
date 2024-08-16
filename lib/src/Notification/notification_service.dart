@@ -5,47 +5,59 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/incoming_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 
 class LocalNotificationService {
   static final FlutterLocalNotificationsPlugin notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  static createanddisplaynotification(RemoteMessage message) async {
+  final RoomIdController roomIdController = Get.put(RoomIdController());
+
+  createanddisplaynotification(RemoteMessage message) async {
     try {
       print("display_notifcation");
       final id = DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
       NotificationDetails notificationDetails = NotificationDetails(
-        iOS: DarwinNotificationDetails(),
-        android: message.data['call_type'] == 'video_call' ||
-                message.data['title'] == 'Audio call' ||
-                message.data['title'] == 'Group Audio call' ||
-                message.data['title'] == 'Group Video call'
-            ? AndroidNotificationDetails("meyaooapp", "meyaoochannel",
+        iOS: DarwinNotificationDetails(
+          presentSound: true,
+          presentAlert: true,
+          presentBadge: true,
+        ),
+        android: message.data['call_type'] == 'video_call'
+            ? AndroidNotificationDetails(
+                "meyaooapp",
+                "meyaoochannel",
                 importance: Importance.max,
                 priority: Priority.high,
                 icon: "@mipmap/ic_launcher",
                 playSound: true,
+                enableVibration: true,
+                showWhen: true,
+                sound: RawResourceAndroidNotificationSound('calling'),
+                audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
                 category: AndroidNotificationCategory.call,
                 actions: [
-                    AndroidNotificationAction(
-                      "accept",
-                      '📞 Accept',
-                      cancelNotification: false,
-                      allowGeneratedReplies: true,
-                      showsUserInterface: true,
-                      titleColor: Colors.green,
-                    ),
-                    const AndroidNotificationAction(
-                      "decline",
-                      '🚫 Decline',
-                      cancelNotification: false,
-                      allowGeneratedReplies: true,
-                      showsUserInterface: true,
-                      titleColor: Colors.red,
-                    ),
-                  ])
+                  AndroidNotificationAction(
+                    "accept",
+                    '📞 Accept',
+                    cancelNotification: false,
+                    allowGeneratedReplies: true,
+                    showsUserInterface: true,
+                    titleColor: Colors.green,
+                  ),
+                  const AndroidNotificationAction(
+                    "decline",
+                    '🚫 Decline',
+                    cancelNotification: false,
+                    allowGeneratedReplies: true,
+                    showsUserInterface: true,
+                    titleColor: Colors.red,
+                  ),
+                ],
+              )
             : AndroidNotificationDetails(
                 "meyaooapp",
                 "meyaoochannel",
@@ -56,9 +68,6 @@ class LocalNotificationService {
                 category: AndroidNotificationCategory.social,
               ),
       );
-
-      ///NORMAL NOTIFICATION
-
       await notificationsPlugin.show(
         id,
         message.notification!.title,
@@ -66,54 +75,137 @@ class LocalNotificationService {
         notificationDetails,
         payload: json.encode(message.data),
       );
+
+      InitializationSettings initializationSettings = InitializationSettings(
+        android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+        iOS: DarwinInitializationSettings(
+          onDidReceiveLocalNotification: (id, title, body, payload) {
+            return;
+          },
+        ),
+      );
+
+      notificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveBackgroundNotificationResponse: (details) async {
+          Map data = json.decode(details.payload!);
+          if (details.actionId == 'accept') {
+            print("accept");
+            if (data['call_type'] == 'video_call') {
+              print("FirebaseMessaging.service 1 video call");
+              // Navigate to the desired screen based on the payload'
+              Get.to(VideoCallScreen(
+                roomID: data['room_id'],
+                conversation_id: data['conversation_id'],
+              ));
+            }
+          } else if (details.actionId == 'decline') {
+            print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
+            if (data['call_type'] == 'video_call') {
+              roomIdController.callCutByReceiver(
+                conversationID: data['conversation_id'],
+                message_id: data['senderId'],
+                caller_id: data['message_id'],
+              );
+            }
+          } else {
+            if (data['call_type'] == 'video_call') {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['senderId'],
+                caller_id: message.data['message_id'],
+              ));
+            }
+          }
+        },
+        onDidReceiveNotificationResponse: (details) {
+          Map data = json.decode(details.payload!);
+          if (details.actionId == 'accept') {
+            print("accept");
+            if (data['call_type'] == 'video_call') {
+              print("FirebaseMessaging.service 2 video call");
+              Get.to(VideoCallScreen(
+                roomID: data['room_id'],
+                conversation_id: data['conversation_id'],
+              ));
+            }
+          } else if (details.actionId == 'decline') {
+            print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
+            if (data['call_type'] == 'video_call') {
+              roomIdController.callCutByReceiver(
+                conversationID: data['conversation_id'],
+                message_id: data['senderId'],
+                caller_id: data['message_id'],
+              );
+            }
+          } else {
+            if (data['call_type'] == 'video_call') {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: data['senderId'],
+                caller_id: data['message_id'],
+              ));
+            }
+          }
+          // }
+        },
+      );
+
+      ///NORMAL NOTIFICATION
     } on Exception catch (e) {
       // ignore: avoid_print
       print(e);
     }
   }
 
-  static void initialize() {
-    InitializationSettings initializationSettings = InitializationSettings(
-      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-      iOS: DarwinInitializationSettings(
-        onDidReceiveLocalNotification: (id, title, body, payload) {
-          return;
-        },
-      ),
-    );
+  // static void initialize() {
+  //   InitializationSettings initializationSettings = InitializationSettings(
+  //     android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+  //     iOS: DarwinInitializationSettings(
+  //       onDidReceiveLocalNotification: (id, title, body, payload) {
+  //         return;
+  //       },
+  //     ),
+  //   );
 
-    notificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveBackgroundNotificationResponse: (details) async {
-        Map data = json.decode(details.payload!);
-        if (details.actionId == 'accept') {
-          print("accept");
-          if (data['call_type'] == 'video_call') {
-            print("FirebaseMessaging.service 1 video call");
-            // Navigate to the desired screen based on the payload'
-            Get.to(VideoCallScreen(
-              roomID: data['room_id'],
-            ));
-          }
-        } else if (details.actionId == 'decline') {
-          print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
-        } else {}
-      },
-      onDidReceiveNotificationResponse: (details) {
-        Map data = json.decode(details.payload!);
-        if (details.actionId == 'accept') {
-          print("accept");
-          if (data['call_type'] == 'video_call') {
-            print("FirebaseMessaging.service 2 video call");
-            Get.to(VideoCallScreen(
-              roomID: data['room_id'],
-            ));
-          }
-        } else if (details.actionId == 'decline') {
-          print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
-        } else {}
-        // }
-      },
-    );
-  }
+  //   notificationsPlugin.initialize(
+  //     initializationSettings,
+  //     onDidReceiveBackgroundNotificationResponse: (details) async {
+  //       Map data = json.decode(details.payload!);
+  //       if (details.actionId == 'accept') {
+  //         print("accept");
+  //         if (data['call_type'] == 'video_call') {
+  //           print("FirebaseMessaging.service 1 video call");
+  //           // Navigate to the desired screen based on the payload'
+  //           Get.to(VideoCallScreen(
+  //             roomID: data['room_id'],
+  //           ));
+  //         }
+  //       } else if (details.actionId == 'decline') {
+  //         print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
+  //       } else {}
+  //     },
+  //     onDidReceiveNotificationResponse: (details) {
+  //       Map data = json.decode(details.payload!);
+  //       if (details.actionId == 'accept') {
+  //         print("accept");
+  //         if (data['call_type'] == 'video_call') {
+  //           print("FirebaseMessaging.service 2 video call");
+  //           Get.to(VideoCallScreen(
+  //             roomID: data['room_id'],
+  //           ));
+  //         }
+  //       } else if (details.actionId == 'decline') {
+  //         print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
+  //       } else {}
+  //       // }
+  //     },
+  //   );
+  // }
 }

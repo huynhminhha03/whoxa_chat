@@ -921,7 +921,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           });
                           print("ONTAPMSGID:$chatID");
                         },
-                        child: chatID.length == 0 || chatMessageList.length == 0
+                        child: chatID.isEmpty || chatMessageList.length == 0
                             ? const SizedBox()
                             : Transform.scale(
                                 scale: 1.1,
@@ -5219,7 +5219,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               .roomModel
                               .value!
                               .roomId,
-                          // conversation_id: '',
+                          conversation_id: widget.conversationID ?? "",
+                          isCaller: true,
                         ));
                   },
                   child: Image.asset(

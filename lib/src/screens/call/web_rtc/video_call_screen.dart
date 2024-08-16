@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
+import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -14,8 +15,13 @@ import 'package:uuid/uuid.dart';
 
 class VideoCallScreen extends StatefulWidget {
   String? roomID;
-  String? conversation_id;
-  VideoCallScreen({super.key, this.roomID, this.conversation_id});
+  String conversation_id;
+  bool isCaller = false;
+  VideoCallScreen(
+      {super.key,
+      this.roomID,
+      required this.conversation_id,
+      this.isCaller = false});
 
   @override
   State<VideoCallScreen> createState() => _VideoCallScreenState();
@@ -30,6 +36,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   // List<RTCVideoRenderer> remoteRenderer = [];
   final Map<String, RTCVideoRenderer> remoteRenderers = {};
 
+  final RoomIdController roomIdController = getx.Get.put(RoomIdController());
+
   // RTCVideoRenderer remoteRenderer = RTCVideoRenderer();
   // RTCVideoRenderer remote2Renderer = RTCVideoRenderer();
 
@@ -37,6 +45,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   String? peerid;
   bool inCall = false;
   bool isScreenBig = true;
+  bool isReciverConnect = false;
+  bool isCallCutByMe = false;
 
   @override
   void initState() {
@@ -191,6 +201,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             remoteRenderers[call.peer]!.srcObject = remoteStream;
           });
           print("remoteRenderers length ${remoteRenderers.length}");
+          print("remoteStream $remoteStream");
         });
       });
       socketIntilized.socket!.on(
@@ -198,9 +209,22 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         (userId) {
           print("PEERID☺☺☺☺☺☺☺ remote: $userId");
           connectNewUser(userId, mediaStream);
+          isReciverConnect = true;
+          // setState(() {});
         },
       );
     });
+
+    // socketIntilized.socket!.on(
+    //   "call_decline",
+    //   (response) {
+    //     print("PEERID☺☺☺☺☺☺☺ remote call_decline: ${response}");
+    //     print(
+    //         "PEERID☺☺☺☺☺☺☺ remote conversation_id: ${response["conversation_id"]}");
+    //     print("PEERID☺☺☺☺☺☺☺ remote message_id: ${response["message_id"]}");
+    //     // setState(() {});
+    //   },
+    // );
     socketIntilized.socket!.on(
         "user-disconnected-from-call",
         (userId) => {
@@ -223,130 +247,18 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   print("remoteRenderers length ${remoteRenderers.length}"),
                 }
             });
+
+    socketIntilized.socket!.on("call_decline", (data) {
+      print("call_decline data : $data");
+    });
   }
 
-  // navigator.mediaDevices
-  //     .getUserMedia({'video': true, 'audio': true}).then((stream) {
-  //   localRenderer.srcObject = stream;
-  //   print('my stream $stream');
-  //   setState(() {});
-  //   myPeer!.on("call", context, (ev, context) {
-  //     print("call from ${ev.eventData} to $peerid");
-  //     MediaConnection call = ev as MediaConnection;
-  //     call.answer(stream);
-  //     call.on("stream", context, (userVideoStream, context) {
-  //       remoteRenderer.srcObject = userVideoStream as MediaStream;
-  //       setState(() {});
-  //     });
-  //   });
-  //   socketIntilized.socket!.on(
-  //     "user-connected",
-  //     (userId) {
-  //       print("PEERID☺☺☺☺☺☺☺ remote: $userId");
-  //       connectNewUser(userId, stream);
-  //     },
-  //   );
-  // });
-
-  // connectNewUser(userId, stream) {
-  //   print('new connected user...');
-  //   print('new connected userid $userId');
-  //   print('new connected stream $stream');
-  //   MediaConnection call = myPeer!.call(userId, stream);
-  //   setState(() {});
-  //   call.on("stream", context, (userVideoStream, context) {
-  //     print('new user stream...');
-  //     setState(() {
-  //       remote2Renderer.srcObject = userVideoStream as MediaStream;
-  //     });
-  //   });
-  //   call.on("close", context, (ev, context) {
-  //     remoteRenderer.srcObject = null;
-  //     setState(() {});
-  //   });
-  //   peers[userId] = call;
-  // }
-
-  // _startLocalStream();
-
-  // // Handle incoming calls
-  //  peer!.on('call', context, (event, context) {
-  //   final MediaConnection call = event as MediaConnection;
-  //   call.answer(localStream!);
-  //   call.on('stream', context, (stream, context) {
-  //     final MediaStream remoteStream = stream as MediaStream;
-  //     setState(() {
-  //       this.remoteStream = remoteStream;
-  //       remoteRenderer.srcObject = remoteStream;
-  //     });
-  //   });
-  // });
-
-  // peer!.on('error', context, ((error, _) {
-  //   print("ERROR CHECK:${error.eventData}");
-  // }));
-
-  // Future<void> _startLocalStream() async {
-  //   try {
-  //     localStream = await navigator.mediaDevices
-  //         .getUserMedia({'video': true, 'audio': true});
-  //     setState(() {
-  //       localRenderer.srcObject = localStream;
-  //     });
-  //     _startCall('remote-peer-id');
-  //   } catch (e) {
-  //     print('Error accessing media devices: $e');
-  //   }
-  // }
-
-  // Future<void> _startCall(String userId) async {
-  //   localStream = await navigator.mediaDevices
-  //       .getUserMedia({'video': true, 'audio': true});
-  //   localRenderer.srcObject = localStream;
-
-  //   // Replace 'remote-peer-id' with the actual remote peer ID
-  //   final call = myPeer!.call(userId, localStream!);
-  //   call.on('stream', context, ((stream, context) {
-  //     final MediaStream st = stream as MediaStream;
-  //     setState(() {
-  //       remoteStream = st;
-  //       remoteRenderer.srcObject = remoteStream;
-  //       inCall = true; // Set the call state
-  //     });
-  //   }));
-  //   setState(() {
-  //     connection = call; // Store the current call
-  //   });
-  // }
-
-  // void _endCall() {
-  //   // Consider adding logic to close or hang up the connection
-  //   // Close the peer connection
-  //   // Close the peer connection if it exists
-  //   if (call != null) {
-  //     call!.close(); // Close the current call
-  //     setState(() {
-  //       remote2Renderer.srcObject = null;
-  //       remoteStream = null;
-  //       call = null;
-  //       localRenderer.srcObject = null;
-  //       localStream = null;
-  //       inCall = false;
-  //     });
-  //     print('conection_closed');
-  //     getx.Get.back();
-  //   } else {
-  //     setState(() {
-  //       localRenderer.srcObject = null;
-  //       localStream = null;
-  //       inCall = false;
-  //     });
-  //     print('conection_closed');
-  //     getx.Get.back();
-  //   }
-  // }
-
   void _endCall() {
+    if (isReciverConnect == false && widget.isCaller == true) {
+      print("callCutByMe calling...");
+      roomIdController.callCutByMe(
+          conversationID: widget.conversation_id, callType: "video_call");
+    }
     socketIntilized.socket!
         .emit("leave-call", {"room_id": widget.roomID, "user_id": myPeer!.id});
     localRenderer.dispose();
@@ -354,6 +266,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     remoteRenderers.forEach((key, renderer) {
       renderer.dispose();
     });
+
     setState(() {
       inCall = false;
     });
@@ -384,7 +297,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ? await Helper.setSpeakerphoneOn(false)
         : await Helper.setSpeakerphoneOn(true);
     specker = !specker;
-
     setState(() {});
   }
 
@@ -826,6 +738,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void dispose() {
     localRenderer.dispose();
     // remoteRenderer.dispose();
+
     remoteRenderers.forEach((key, renderer) {
       renderer.dispose();
     });

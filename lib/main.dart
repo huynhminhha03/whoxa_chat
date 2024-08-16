@@ -1,19 +1,15 @@
 // ignore_for_file: avoid_print
 //flutter version 3.19.6
-import 'dart:developer';
 import 'dart:io';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meyaoo_new/app.dart';
-import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/socket_initiallize.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -288,19 +284,20 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 //   // LocalNotificationService.createanddisplaynotification(message);
 // }
 
+@pragma('vm:entry-point')
 Future<void> _firebasebackgroundmessagehendler(RemoteMessage message) async {
-//   await Firebase.initializeApp();
   print("BackgroundDATA:${message.data.toString()}");
   print("BackgroundTITLE:${message.notification!.title}");
+  await Firebase.initializeApp();
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
 
+  // LocalNotificationService.initialize();
   await Firebase.initializeApp();
-  dynamicLinkIsPending();
-  LocalNotificationService.initialize();
+  // dynamicLinkIsPending();
+  FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
   Directory directory = await getApplicationDocumentsDirectory();
   await Permission.location.request();
   // Initialize the time zone data
@@ -357,28 +354,28 @@ void main() async {
   ));
 }
 
-dynamicLinkIsPending() async {
-  print("deepLinking");
-  final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
+// dynamicLinkIsPending() async {
+//   print("deepLinking");
+//   final initialLink = await FirebaseDynamicLinks.instance.getInitialLink();
 
-  print("initialLink 1 $initialLink");
-  if (initialLink != null) {
-    final Uri deepLink = initialLink.link;
-    print("deepLink 1 $deepLink");
-  }
+//   print("initialLink 1 $initialLink");
+//   if (initialLink != null) {
+//     final Uri deepLink = initialLink.link;
+//     print("deepLink 1 $deepLink");
+//   }
 
-  FirebaseDynamicLinks.instance.onLink.listen(
-    (pendingDynamicLinkData) {
-      print("FirebaseDynamicLinks cheking");
-      final Uri deepLink = pendingDynamicLinkData.link;
-      log("deepLink 2 $deepLink");
-      if (deepLink.path == "/incoming_video_call") {
-        print("NAVIGAT TO VIDEO CALL SCREEN");
-        Get.to(VideoCallScreen());
-      }
-    },
-  );
-}
+//   FirebaseDynamicLinks.instance.onLink.listen(
+//     (pendingDynamicLinkData) {
+//       print("FirebaseDynamicLinks cheking");
+//       final Uri deepLink = pendingDynamicLinkData.link;
+//       log("deepLink 2 $deepLink");
+//       if (deepLink.path == "/incoming_video_call") {
+//         print("NAVIGAT TO VIDEO CALL SCREEN");
+//         Get.to(VideoCallScreen());
+//       }
+//     },
+//   );
+// }
 
 Future<void> openHiveBox(String boxName) async {
   final box = await Hive.openBox(boxName).onError((error, stackTrace) async {
