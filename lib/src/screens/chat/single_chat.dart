@@ -5408,10 +5408,25 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           return chatListController.blockModel.value!.isBlock == true
               ? const SizedBox.shrink()
               : InkWell(
-                  onTap: () {
-                    Get.to(
-                      () => const AudioCallScreen(),
-                    );
+                  onTap: () async {
+                    await getRoomController.getRoomModelApi(
+                        conversationID: widget.conversationID,
+                        callType: "audio_call");
+                    print(
+                        "ROOMID 2 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
+                    Get.to(() => AudioCallScreen(
+                          roomID: Get.find<RoomIdController>()
+                              .roomModel
+                              .value!
+                              .roomId,
+                          conversation_id: widget.conversationID ?? "",
+                          isCaller: true,
+                          receiverImage: widget.userPic!,
+                          receiverUserName: widget.username!,
+                        ));
+                    // Get.to(
+                    //   () =>  AudioCallScreen(),
+                    // );
                     // getRoomController.getRoomModelApi(
                     //     conversationID: widget.conversationID,
                     //     callType: "voice_call");

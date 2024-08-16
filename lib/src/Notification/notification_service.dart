@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/incoming_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 
@@ -26,7 +27,10 @@ class LocalNotificationService {
           presentAlert: true,
           presentBadge: true,
         ),
-        android: message.data['call_type'] == 'video_call'
+        android: (message.data['call_type'] == 'video_call' &&
+                    message.data['missed_call'] == "false") ||
+                (message.data['call_type'] == 'audio_call' &&
+                    message.data['missed_call'] == "false")
             ? AndroidNotificationDetails(
                 "meyaooapp",
                 "meyaoochannel",
@@ -94,9 +98,18 @@ class LocalNotificationService {
             if (data['call_type'] == 'video_call') {
               print("FirebaseMessaging.service 1 video call");
               // Navigate to the desired screen based on the payload'
-              Get.to(VideoCallScreen(
+              Get.off(VideoCallScreen(
                 roomID: data['room_id'],
                 conversation_id: data['conversation_id'],
+              ));
+            } else if (data['call_type'] == 'audio_call') {
+              print("FirebaseMessaging.service 1 video call");
+              // Navigate to the desired screen based on the payload'
+              Get.off(AudioCallScreen(
+                roomID: data['room_id'],
+                conversation_id: data['conversation_id'],
+                receiverImage: data["sender_profile_image"],
+                receiverUserName: data["senderName"],
               ));
             }
           } else if (details.actionId == 'decline') {
@@ -104,22 +117,40 @@ class LocalNotificationService {
             if (data['call_type'] == 'video_call') {
               roomIdController.callCutByReceiver(
                 conversationID: data['conversation_id'],
-                message_id: data['senderId'],
-                caller_id: data['message_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+              );
+            } else if (data['call_type'] == 'audio_call') {
+              roomIdController.callCutByReceiver(
+                conversationID: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
               );
             }
           } else {
             if (data['call_type'] == 'video_call') {
               Get.to(IncomingCallScrenn(
-                roomID: message.data['room_id'],
-                callerImage: message.data['sender_profile_image'],
-                senderName: message.data['senderName'],
-                conversation_id: message.data['conversation_id'],
-                message_id: message.data['senderId'],
-                caller_id: message.data['message_id'],
+                roomID: data['room_id'],
+                callerImage: data['sender_profile_image'],
+                senderName: data['senderName'],
+                conversation_id: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+              ));
+            } else if (data['call_type'] == 'audio_call') {
+              Get.to(IncomingCallScrenn(
+                roomID: data['room_id'],
+                callerImage: data['sender_profile_image'],
+                senderName: data['senderName'],
+                conversation_id: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+                forVideoCall: false,
+                receiverImage: data['receiver_profile_image'],
               ));
             }
           }
+          LocalNotificationService.notificationsPlugin.cancelAll();
         },
         onDidReceiveNotificationResponse: (details) {
           Map data = json.decode(details.payload!);
@@ -127,9 +158,18 @@ class LocalNotificationService {
             print("accept");
             if (data['call_type'] == 'video_call') {
               print("FirebaseMessaging.service 2 video call");
-              Get.to(VideoCallScreen(
+              Get.off(VideoCallScreen(
                 roomID: data['room_id'],
                 conversation_id: data['conversation_id'],
+              ));
+            } else if (data['call_type'] == 'audio_call') {
+              print("FirebaseMessaging.service 1 video call");
+              // Navigate to the desired screen based on the payload'
+              Get.off(AudioCallScreen(
+                roomID: data['room_id'],
+                conversation_id: data['conversation_id'],
+                receiverImage: data["sender_profile_image"],
+                receiverUserName: data["senderName"],
               ));
             }
           } else if (details.actionId == 'decline') {
@@ -137,22 +177,40 @@ class LocalNotificationService {
             if (data['call_type'] == 'video_call') {
               roomIdController.callCutByReceiver(
                 conversationID: data['conversation_id'],
-                message_id: data['senderId'],
-                caller_id: data['message_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+              );
+            } else if (data['call_type'] == 'audio_call') {
+              roomIdController.callCutByReceiver(
+                conversationID: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
               );
             }
           } else {
             if (data['call_type'] == 'video_call') {
               Get.to(IncomingCallScrenn(
-                roomID: message.data['room_id'],
-                callerImage: message.data['sender_profile_image'],
-                senderName: message.data['senderName'],
-                conversation_id: message.data['conversation_id'],
-                message_id: data['senderId'],
-                caller_id: data['message_id'],
+                roomID: data['room_id'],
+                callerImage: data['sender_profile_image'],
+                senderName: data['senderName'],
+                conversation_id: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+              ));
+            } else if (data['call_type'] == 'audio_call') {
+              Get.to(IncomingCallScrenn(
+                roomID: data['room_id'],
+                callerImage: data['sender_profile_image'],
+                senderName: data['senderName'],
+                conversation_id: data['conversation_id'],
+                message_id: data['message_id'],
+                caller_id: data['senderId'],
+                forVideoCall: false,
+                receiverImage: data['receiver_profile_image'],
               ));
             }
           }
+          LocalNotificationService.notificationsPlugin.cancelAll();
           // }
         },
       );

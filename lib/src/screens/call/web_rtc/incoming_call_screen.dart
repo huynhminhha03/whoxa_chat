@@ -1,12 +1,15 @@
 // ignore_for_file: must_be_immutable, non_constant_identifier_names
 
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 
 class IncomingCallScrenn extends StatefulWidget {
@@ -16,6 +19,8 @@ class IncomingCallScrenn extends StatefulWidget {
   String conversation_id;
   String caller_id;
   String message_id;
+  bool forVideoCall = true;
+  String? receiverImage;
   IncomingCallScrenn({
     super.key,
     required this.roomID,
@@ -24,6 +29,8 @@ class IncomingCallScrenn extends StatefulWidget {
     required this.conversation_id,
     required this.caller_id,
     required this.message_id,
+    this.forVideoCall = true,
+    this.receiverImage,
   });
 
   @override
@@ -67,11 +74,54 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                 bottomLeft: Radius.circular(10),
                 bottomRight: Radius.circular(10),
               ),
-              child: RTCVideoView(
-                localRenderer,
-                mirror: true,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-              ),
+              child: widget.forVideoCall == true
+                  ? RTCVideoView(
+                      localRenderer,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    )
+                  :
+                  //  Container(
+                  //     decoration: BoxDecoration(
+                  //       color: appColorWhite.withOpacity(0.1),
+                  //       image: DecorationImage(
+                  //         image: NetworkImage(widget.receiverImage!),
+                  //         fit: BoxFit.cover,
+                  //       ),
+                  //     ),
+                  //     child: BackdropFilter(
+                  //       filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                  //       child: Text(""),
+                  // child:
+                  Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: widget.callerImage,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) {
+                            return const Center(
+                              child: CircularProgressIndicator(
+                                color: appIconColor,
+                              ),
+                            );
+                          },
+                          errorWidget: (context, url, error) {
+                            return const Icon(
+                              Icons.person,
+                              size: 30,
+                            );
+                          },
+                        ),
+                        BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                          child: Container(
+                            color: Colors.black.withOpacity(0.1),
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
           Positioned(
@@ -224,12 +274,25 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        getx.Get.off(
-                          VideoCallScreen(
-                            roomID: widget.roomID,
-                            conversation_id: widget.conversation_id,
-                          ),
-                        );
+                        LocalNotificationService.notificationsPlugin
+                            .cancelAll();
+                        if (widget.forVideoCall == true) {
+                          getx.Get.off(
+                            VideoCallScreen(
+                              roomID: widget.roomID,
+                              conversation_id: widget.conversation_id,
+                            ),
+                          );
+                        } else {
+                          getx.Get.off(
+                            AudioCallScreen(
+                              roomID: widget.roomID,
+                              conversation_id: widget.conversation_id,
+                              receiverImage: widget.callerImage,
+                              receiverUserName: widget.senderName,
+                            ),
+                          );
+                        }
                       },
                       child: Column(
                         children: [
@@ -280,5 +343,14 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    localRenderer.srcObject?.getTracks().forEach((track) {
+      track.stop();
+    });
+    localRenderer.dispose();
+    super.dispose();
   }
 }

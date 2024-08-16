@@ -16,38 +16,37 @@ class FirebaseMessagingService {
           print('data--->> ${message.data}');
           print('title-----> ${message.notification!.title}');
           print(message.data['message']);
-
-          if (message.data['call_type'] == 'video_call') {
-            print("onMessageOpenedApp 1 video call");
-            // launchURL("https://meyaoo.page.link/incoming_video_call");
-            // // _currentUuid = _uuid.v4();
-            // // // showInCommingCall(_currentUuid!, message);
-            Get.to(IncomingCallScrenn(
-              roomID: message.data['room_id'],
-              callerImage: message.data['sender_profile_image'],
-              senderName: message.data['senderName'],
-              conversation_id: message.data['conversation_id'],
-              message_id: message.data['senderId'],
-              caller_id: message.data['message_id'],
-            ));
-          }
-          // else {
           if (message.data['call_type'] == 'video_call') {
             print("onMessageOpenedApp video call screen");
-            // launchURL("https://meyaoo.page.link/incoming_video_call");
-            // Get.to(VideoCallScreen(
-            //   roomID: message.data['room_id'],
-            // ));
-            Get.to(IncomingCallScrenn(
-              roomID: message.data['room_id'],
-              callerImage: message.data['sender_profile_image'],
-              senderName: message.data['senderName'],
-              conversation_id: message.data['conversation_id'],
-              message_id: message.data['senderId'],
-              caller_id: message.data['message_id'],
-            ));
+            if (message.data['missed_call'] == "true") {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+              ));
+            }
+          } else if (message.data['call_type'] == 'audio_call') {
+            print("onMessageOpenedApp audio call screen");
+            if (message.data['missed_call'] == "true") {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+                forVideoCall: false,
+                receiverImage: message.data['receiver_profile_image'],
+              ));
+            }
           }
-          // }
         }
       },
     );
@@ -62,22 +61,36 @@ class FirebaseMessagingService {
           LocalNotificationService.notificationsPlugin.cancelAll();
           LocalNotificationService().createanddisplaynotification(message);
 
-          // FlutterCallkitIncoming.endAllCalls();
-
           if (message.data['call_type'] == 'video_call') {
             print("FirebaseMessaging.onMessage video call");
-            // launchURL("https://meyaoo.page.link/incoming_video_call");
-            // Get.to(VideoCallScreen(
-            //   roomID: message.data['room_id'],
-            // ));
-            Get.to(IncomingCallScrenn(
-              roomID: message.data['room_id'],
-              callerImage: message.data['sender_profile_image'],
-              senderName: message.data['senderName'],
-              conversation_id: message.data['conversation_id'],
-              message_id: message.data['senderId'],
-              caller_id: message.data['message_id'],
-            ));
+            if (message.data['missed_call'] == 'true') {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+              ));
+            }
+          } else if (message.data['call_type'] == 'audio_call') {
+            print("FirebaseMessaging.onMessage audio call screen");
+            if (message.data['missed_call'] == "true") {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+                forVideoCall: false,
+                receiverImage: message.data['receiver_profile_image'],
+              ));
+            }
           }
         }
       },
@@ -91,66 +104,39 @@ class FirebaseMessagingService {
           print(message.data['message']);
           print('data--->> ${message.data}');
 
-          // FlutterCallkitIncoming.endAllCalls();
-
           if (message.data['call_type'] == 'video_call') {
             print("FirebaseMessaging.onMessageOpenedApp 1 video call");
-            // launchURL("https://meyaoo.page.link/incoming_video_call");
-            // Get.to(VideoCallScreen(
-            //   roomID: message.data['room_id'],
-            // ));
-            Get.to(IncomingCallScrenn(
-              roomID: message.data['room_id'],
-              callerImage: message.data['sender_profile_image'],
-              senderName: message.data['senderName'],
-              conversation_id: message.data['conversation_id'],
-              message_id: message.data['senderId'],
-              caller_id: message.data['message_id'],
-            ));
+            if (message.data['missed_call'] == 'true') {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+              ));
+            }
+          } else if (message.data['call_type'] == 'audio_call') {
+            print("FirebaseMessaging.onMessageOpenedApp audio call screen");
+            if (message.data['missed_call'] == "true") {
+              Get.back();
+            } else {
+              Get.to(IncomingCallScrenn(
+                roomID: message.data['room_id'],
+                callerImage: message.data['sender_profile_image'],
+                senderName: message.data['senderName'],
+                conversation_id: message.data['conversation_id'],
+                message_id: message.data['message_id'],
+                caller_id: message.data['senderId'],
+                forVideoCall: false,
+                receiverImage: message.data['receiver_profile_image'],
+              ));
+            }
           }
         }
       },
     );
-
-    // FirebaseMessaging.onBackgroundMessage((message) async {
-    //   print("FirebaseMessaging.onBackgroundMessage.listen");
-
-    //   if (message.notification != null) {
-    //     print('title-----> ${message.notification!.title}');
-    //     print(message.data['message']);
-    //     print('data--->> ${message.data}');
-    //     print("message.data ${message.data}");
-    //     print("NOTIFICATION:::: ${message.data}");
-
-    //     LocalNotificationService.notificationsPlugin.cancelAll();
-    //     LocalNotificationService.createanddisplaynotification(message);
-    //     if (message.data['call_type'] == 'video_call') {
-    //       print("FirebaseMessaging.onBackgroundMessage 1 video call");
-    //       // launchURL("https://meyaoo.page.link/incoming_video_call");
-    //       // Get.to(VideoCallScreen(
-    //       //   roomID: message.data['room_id'],
-    //       // ));
-    //       Get.to(IncomingCallScrenn(
-    //         roomID: message.data['room_id'],
-    //         callerImage: message.data['sender_profile_image'],
-    //         senderName: message.data['senderName'],
-    //       ));
-    //     }
-    //     // else {
-    //     if (message.data['call_type'] == 'video_call') {
-    //       print("FirebaseMessaging.onBackgroundMessage 2 video call");
-    //       // launchURL("https://meyaoo.page.link/incoming_video_call");
-    //       // Get.to(VideoCallScreen(
-    //       //   roomID: message.data['room_id'],
-    //       // ));
-    //       Get.to(IncomingCallScrenn(
-    //         roomID: message.data['room_id'],
-    //         callerImage: message.data['sender_profile_image'],
-    //         senderName: message.data['senderName'],
-    //       ));
-    //     }
-    //     // }
-    //   }
-    // });
   }
 }

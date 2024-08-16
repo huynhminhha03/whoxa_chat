@@ -5590,7 +5590,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 onTap: () {
                   getRoomController.getRoomModelApi(
                       conversationID: widget.conversationID,
-                      callType: "voice_call");
+                      callType: "audio_call");
                 },
                 child: Image.asset(
                   "assets/images/call_1.png",

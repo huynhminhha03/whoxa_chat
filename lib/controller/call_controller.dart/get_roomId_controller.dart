@@ -129,7 +129,7 @@ class RoomIdController extends GetxController {
           await response.stream.transform(utf8.decoder).join();
       var callCutByReceiverData = json.decode(responseData);
 
-      print("callCutByMeData: $callCutByReceiverData");
+      print("callCutByRcecieverData: $callCutByReceiverData");
 
       if (callCutByReceiverData["success"] == true) {
         LocalNotificationService.notificationsPlugin.cancelAll();

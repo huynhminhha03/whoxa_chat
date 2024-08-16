@@ -4,12 +4,15 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
+import 'package:hive/hive.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:peerdart/peerdart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -51,10 +54,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   @override
   void initState() {
     super.initState();
-
     _initializeRenderers();
-
-    // _initSocket();
   }
 
   Future<void> _initializeRenderers() async {
@@ -63,7 +63,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     await _initPeer();
   }
 
-  // static const CLOUD_HOST = "192.168.0.17";
   static const CLOUD_HOST = "62.72.36.245";
   static const CLOUD_PORT = 4001;
   // ignore: unused_field
@@ -78,43 +77,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     ],
   };
 
-  // final List<RTCVideoRenderer> _remoteRenderers = [];
-  // _createPeerConnection() async {
-  //   final configuration = {
-  //     'iceServers': [
-  //       {'urls': 'stun:stun.l.google.com:19302'},
-  //       {
-  //         'urls': 'turn:192.168.0.14:4001',
-  //         'username': 'peerjs',
-  //         'credential': 'peerjsp',
-  //       }
-  //     ],
-  //   };
-  //   final peerConnection = await createPeerConnection(configuration);
-  //   // print("join room success ${peerConnection.connectionState}");
-  //   peerConnection.onIceCandidate = (candidate) {
-  //     print("join room success");
-  //     socketIntilized.socket!
-  //         .emit("join-room", {widget.roomID, candidate.candidate});
-  //   };
-  //   peerConnection.onTrack = (event) {
-  //     print("join room success ${peerConnection.connectionState}");
-
-  //     // if (event.track.kind == 'video') {
-  //     //   final renderer = RTCVideoRenderer();
-  //     //   _remoteRenderers.add(renderer);
-  //     //   renderer.initialize();
-  //     //   renderer.srcObject = event.streams[0];
-  //     //   setState(() {});
-  //     // }
-  //   };
-  //   // return peerConnection;
-  // }
-
   Future<void> _initPeer() async {
     try {
       myPeer = Peer(
-        id: const Uuid().v4(),
+        id: "${const Uuid().v4()}/${Hive.box(userdata).get(userId).toString()}",
         options: PeerOptions(
           port: CLOUD_PORT,
           host: CLOUD_HOST,
@@ -127,9 +93,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     } catch (e) {
       print('Unhandled exception in _initPeer: $e');
     }
-    // myPeer!.on<MediaConnection>().listen((event) {
 
-    // });
     myPeer!.on("open").listen((event) {
       setState(() {
         peerid = event.toString();
@@ -182,16 +146,12 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         print("call from ${call.peer} to $peerid");
         print('my stream $mediaStream');
         call.answer(mediaStream);
-        // call.on("close").listen((event) {
-        //   setState(() {
-        //     inCall = false;
-        //   });
-        // });
 
         call.on<MediaStream>("stream").listen((remoteStream) async {
           // remoteRenderer.srcObject = remoteStream;
           if (!remoteRenderers.containsKey(call.peer)) {
             RTCVideoRenderer renderer = RTCVideoRenderer();
+
             await renderer.initialize();
             setState(() {
               remoteRenderers[call.peer] = renderer;
@@ -203,6 +163,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           print("remoteRenderers length ${remoteRenderers.length}");
           print("remoteStream $remoteStream");
         });
+        print("call peer ${call.peer}");
+        peers[call.peer] = call;
       });
       socketIntilized.socket!.on(
         "user-connected-to-call",
@@ -215,20 +177,11 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
       );
     });
 
-    // socketIntilized.socket!.on(
-    //   "call_decline",
-    //   (response) {
-    //     print("PEERID☺☺☺☺☺☺☺ remote call_decline: ${response}");
-    //     print(
-    //         "PEERID☺☺☺☺☺☺☺ remote conversation_id: ${response["conversation_id"]}");
-    //     print("PEERID☺☺☺☺☺☺☺ remote message_id: ${response["message_id"]}");
-    //     // setState(() {});
-    //   },
-    // );
     socketIntilized.socket!.on(
         "user-disconnected-from-call",
         (userId) => {
               print("disconnected  $userId"),
+              print("peers $peers"),
               if (peers[userId] != null)
                 {
                   print("disconnected userid $userId"),
@@ -246,10 +199,25 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   print("disconnected peers[userId] ${peers[userId]}"),
                   print("remoteRenderers length ${remoteRenderers.length}"),
                 }
+              else
+                {
+                  print("peers else $peers"),
+                }
             });
 
     socketIntilized.socket!.on("call_decline", (data) {
       print("call_decline data : $data");
+      getx.Get.back();
+      setState(() {
+        localRenderer.srcObject?.getTracks().forEach((track) {
+          track.stop();
+        });
+        remoteRenderers.forEach((key, renderer) {
+          renderer.dispose();
+        });
+        localRenderer.dispose();
+        myPeer!.dispose();
+      });
     });
   }
 
@@ -261,6 +229,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     }
     socketIntilized.socket!
         .emit("leave-call", {"room_id": widget.roomID, "user_id": myPeer!.id});
+
     localRenderer.dispose();
     // remoteRenderer.dispose();
     remoteRenderers.forEach((key, renderer) {
@@ -676,7 +645,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             ),
             child: RTCVideoView(
               localRenderer,
-              mirror: true,
+              mirror: false,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
           ),

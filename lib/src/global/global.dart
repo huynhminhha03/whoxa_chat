@@ -90,6 +90,7 @@ const Color bg1 = Color(0xffEEEEEE);
 const Color appgrey = Color(0xffD9D9D9);
 const Color colorE04300 = Color(0xffE04300);
 const Color color3CE000 = Color(0xff3CE000);
+const Color colorFFEDAB = Color(0xffFFEDAB);
 const Color appgrey2 = Color.fromARGB(255, 150, 150, 150);
 const Color chatcolor2 = Color(0xFF393738);
 Color chatLogoColor = const Color.fromRGBO(252, 198, 4, 1);
