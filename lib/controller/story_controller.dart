@@ -128,9 +128,9 @@ class StroyGetxController extends GetxController {
   void setImagePath(String path) {
     imagePath.value = path;
     if (kDebugMode) {
-      print("${imagePath.value} PATH");
+      print("${imagePath.value} PATH☺☺☺");
     }
-    addImageStory(imagePath.value);
+    //addImageStory(imagePath.value);
   }
 
   Future<void> openImagePicker(bool isForCamera) async {
@@ -154,6 +154,7 @@ class StroyGetxController extends GetxController {
 
   addImageStory(
     String imagePath,
+    String text,
   ) async {
     try {
       isUploadStoryLoad(true);
@@ -163,7 +164,7 @@ class StroyGetxController extends GetxController {
           "files": await dd.MultipartFile.fromFile(
             imagePath,
           ),
-        "status_text": '',
+        "status_text": text,
       });
 
       final result = await dio.post(apiHelper.addStoryUrl,
@@ -197,6 +198,7 @@ class StroyGetxController extends GetxController {
 
   addVideoStory(
     String imagePath,
+    String text,
   ) async {
     try {
       log("Image Path $imagePath");
@@ -217,7 +219,7 @@ class StroyGetxController extends GetxController {
         "files": await dd.MultipartFile.fromFile(
           imagePath,
         ),
-        "status_text": ""
+        "status_text": text
         // "user_id": Hive.box(userdata).get(userId),
         // // "video_thumbnail": thumbnailFile,
         // "type": "video",

@@ -1952,3 +1952,49 @@ Widget containerProfileDesign(
     ),
   );
 }
+
+Widget containerWidget({required Function() onTap, required String title}) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      height: 30,
+      width: 65,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(13), color: yellow1Color),
+      child: Center(
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
+      ),
+    ),
+  );
+}
+
+String pawanTOKEN =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJwaG9uZV9udW1iZXIiOiI3NDMzMDcyMzUxIiwiZGV2aWNlX3Rva2VuIjoiIiwidXNlcl9uYW1lIjoiIiwiYmlvIjoiIiwiZG9iIjoiIiwic3RhdHVzIjowLCJjb3VudHJ5X2NvZGUiOiIrOTEiLCJwYXNzd29yZCI6IiIsIm90cCI6MTYwOTA2LCJnZW5kZXIiOiIiLCJwcm9maWxlX2ltYWdlIjoiIiwiY3JlYXRlZEF0IjoiMjAyNC0wNi0wN1QxMDoxMjowOS4wMDBaIiwidXBkYXRlZEF0IjoiMjAyNC0wNi0wN1QxMDoxMjowOS4wMDBaIiwiaWF0IjoxNzE3NzU1MzI1fQ.bSCZoiGyn39Lp-lSLEefNYrV8H5VEG_Tu7QwPlibftA";
+
+class SelectedContact {
+  final int userId;
+  final String userName;
+  final String profileImage;
+
+  SelectedContact({
+    required this.userId,
+    required this.userName,
+    required this.profileImage,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SelectedContact &&
+          runtimeType == other.runtimeType &&
+          userId == other.userId &&
+          userName == other.userName &&
+          profileImage == other.profileImage;
+
+  @override
+  int get hashCode =>
+      userId.hashCode ^ userName.hashCode ^ profileImage.hashCode;
+}

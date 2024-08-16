@@ -102,7 +102,7 @@ class _create_groupState extends State<create_group> {
                 gpCreateController.groupCreateApi(
                     groupnameController.text.toString(),
                     image!.path.toString(),
-                    "");
+                    "", []);
               }
             },
             child: Container(

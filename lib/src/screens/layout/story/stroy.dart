@@ -145,7 +145,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                         child: const Icon(
                                           Icons.add,
                                           color: Colors.black,
-                                          size: 17,
+                                          size: 15,
                                         ),
                                       ).paddingAll(2),
                                     ),
@@ -190,10 +190,14 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                 ],
                               ),
                             ),
-                            Container(
-                              height: 15,
-                              color: const Color(0xfff2f2f2).withOpacity(0.5),
-                            ),
+                            const Divider(),
+                            const Text(
+                              "Recent",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: "Poppins"),
+                            ).paddingSymmetric(horizontal: 20),
                             storyController.isAllUserStoryLoad.value
                                 ? const SizedBox()
                                 : storyController
@@ -346,7 +350,14 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                 ).paddingOnly(bottom: 5);
                                           //: const SizedBox();
                                         },
-                                      )
+                                      ),
+                            // const Text(
+                            //   "Viewed",
+                            //   style: TextStyle(
+                            //       fontSize: 16,
+                            //       fontWeight: FontWeight.w600,
+                            //       fontFamily: "Poppins"),
+                            // ).paddingSymmetric(horizontal: 20),
                           ]),
                     ),
                   ),

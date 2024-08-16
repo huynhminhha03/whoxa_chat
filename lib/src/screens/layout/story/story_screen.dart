@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, depend_on_referenced_packages, unused_field
+// ignore_for_file: avoid_print, depend_on_referenced_packages, unused_field, prefer_is_empty
 
 import 'dart:async';
 import 'dart:developer';
@@ -715,76 +715,101 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 32),
                                 child: Obx(() {
-                                  return Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      InkWell(
-                                        onTap: () {
-                                          indicatorAnimationController.value =
-                                              IndicatorAnimationCommand.pause;
-                                          showModalForSeenUsersList();
-                                        },
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Image.asset('assets/images/eye.png',
-                                                height: 20,
-                                                color: Colors.white),
-                                            const SizedBox(width: 3),
-                                            storyGetxController
-                                                        .isMyStorySeenLoading
-                                                        .value ||
-                                                    storyGetxController
-                                                        .isAllUserStoryLoad
-                                                        .value
-                                                ? const SizedBox.shrink()
-                                                : Text(
-                                                    storyGetxController
-                                                                .myStorySeenData
-                                                                .value
-                                                                .statusViewsList!
-                                                                .isEmpty ||
-                                                            storyGetxController
-                                                                    .myStorySeenData
-                                                                    .value
-                                                                    .statusViewsList!
-                                                                    .length ==
-                                                                0
-                                                        ? "0"
-                                                        : storyGetxController
-                                                            .myStorySeenData
-                                                            .value
-                                                            .statusViewsList!
-                                                            .length
-                                                            .toString(),
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 12,
-                                                        fontWeight:
-                                                            FontWeight.w600),
+                                  return storyGetxController
+                                              .isMyStorySeenLoading.value ||
+                                          storyGetxController
+                                              .isAllUserStoryLoad.value
+                                      ? const SizedBox.shrink()
+                                      : storyGetxController.myStorySeenData
+                                                  .value.statusViewsList ==
+                                              null
+                                          ? const SizedBox.shrink()
+                                          : Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    indicatorAnimationController
+                                                            .value =
+                                                        IndicatorAnimationCommand
+                                                            .pause;
+                                                    showModalForSeenUsersList();
+                                                    //seendUserList();
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/images/eye.png',
+                                                          height: 20,
+                                                          color: Colors.white),
+                                                      const SizedBox(width: 3),
+                                                      storyGetxController
+                                                                  .isMyStorySeenLoading
+                                                                  .value ||
+                                                              storyGetxController
+                                                                      .isAllUserStoryLoad
+                                                                      .value &&
+                                                                  storyGetxController
+                                                                          .myStorySeenData
+                                                                          .value
+                                                                          .statusViewsList ==
+                                                                      null
+                                                          ? const SizedBox
+                                                              .shrink()
+                                                          : Text(
+                                                              storyGetxController
+                                                                          .myStorySeenData
+                                                                          .value
+                                                                          .statusViewsList!
+                                                                          .isEmpty ||
+                                                                      storyGetxController
+                                                                              .myStorySeenData
+                                                                              .value
+                                                                              .statusViewsList!
+                                                                              .length ==
+                                                                          0
+                                                                  ? "0"
+                                                                  : storyGetxController
+                                                                      .myStorySeenData
+                                                                      .value
+                                                                      .statusViewsList!
+                                                                      .length
+                                                                      .toString(),
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 12,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                    ],
                                                   ),
-                                          ],
-                                        ),
-                                      ),
-                                      IconButton(
-                                        padding: EdgeInsets.zero,
-                                        color: const Color.fromARGB(
-                                            255, 46, 46, 46),
-                                        icon:
-                                            const Icon(Icons.keyboard_arrow_up),
-                                        iconSize: 30,
-                                        onPressed: () {
-                                          indicatorAnimationController.value =
-                                              IndicatorAnimationCommand.pause;
-                                          showModalForSeenUsersList();
-                                          // Navigator.pop(context);
-                                        },
-                                      ),
-                                    ],
-                                  );
+                                                ),
+                                                IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  color: const Color.fromARGB(
+                                                      255, 46, 46, 46),
+                                                  icon: const Icon(
+                                                      Icons.keyboard_arrow_up),
+                                                  iconSize: 30,
+                                                  onPressed: () {
+                                                    indicatorAnimationController
+                                                            .value =
+                                                        IndicatorAnimationCommand
+                                                            .pause;
+                                                    showModalForSeenUsersList();
+                                                    // Navigator.pop(context);
+                                                  },
+                                                ),
+                                              ],
+                                            );
                                 }),
                               ),
                             )
@@ -792,6 +817,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                     },
                   );
                 }),
+                //====================================== TOP OF USER NAME ==============================
                 Positioned(
                   top: 66,
                   left: 16,
@@ -842,9 +868,158 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                     ],
                   ),
                 ),
+                Positioned(
+                  top: 66,
+                  right: 16,
+                  child: widget.isForMyStory
+                      ? InkWell(
+                          onTap: () {
+                            indicatorAnimationController.value =
+                                IndicatorAnimationCommand.pause;
+                            deleteDialog();
+                          },
+                          child: const Icon(
+                            Icons.more_horiz,
+                            size: 20,
+                            color: Colors.black,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
+                )
               ],
             ));
     // });
+  }
+
+  Future deleteDialog() {
+    return showDialog(
+        context: context,
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+        builder: (BuildContext context) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.all(15),
+            alignment: Alignment.bottomCenter,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            contentPadding: const EdgeInsets.only(left: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            content: SizedBox(
+              height: 70,
+              width: double.maxFinite,
+              child: InkWell(
+                onTap: () {
+                  print("PRESSED");
+                  indicatorAnimationController.value =
+                      IndicatorAnimationCommand.pause;
+                  Navigator.pop(context);
+                  deleteDialog1();
+                  //Navigator.pop(context);
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image.asset("assets/images/trash1.png", height: 20),
+                    const SizedBox(width: 10),
+                    const Text("Delete",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w400))
+                  ],
+                ),
+              ),
+            ),
+          );
+        }).whenComplete(() {
+      indicatorAnimationController.value = IndicatorAnimationCommand.resume;
+      // controller.play();
+    });
+  }
+
+  Future deleteDialog1() {
+    return showDialog(
+        context: context,
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+        builder: (BuildContext context) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.all(20),
+            alignment: Alignment.bottomCenter,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            contentPadding:
+                const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            content: SizedBox(
+              height: Get.height * 0.18,
+              width: double.maxFinite,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Are you sure you want to Delete?",
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "Are you sure you want to delete your status?",
+                    style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey.shade400),
+                  ),
+                  const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          height: 39,
+                          width: Get.width * 0.35,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: yellow2Color)),
+                          child: const Center(
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w400),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 27),
+                      Container(
+                        height: 39,
+                        width: Get.width * 0.35,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            gradient: LinearGradient(
+                                colors: [yellow1Color, yellow2Color],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter)),
+                        child: const Center(
+                          child: Text(
+                            "Delete",
+                            style: TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        }).whenComplete(() {
+      indicatorAnimationController.value = IndicatorAnimationCommand.resume;
+      // controller.play();
+    });
   }
 
   Future showModalForSeenUsersList() {
@@ -853,10 +1028,11 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-            insetPadding: const EdgeInsets.all(8),
+            insetPadding: const EdgeInsets.all(15),
             alignment: Alignment.bottomCenter,
             backgroundColor: Colors.white,
             elevation: 0,
+            contentPadding: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
             ),
@@ -881,80 +1057,104 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                             ).paddingSymmetric(horizontal: 40),
                           ),
                         )
-                      : ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(18),
-                            topRight: Radius.circular(18),
-                          ),
-                          child: Column(
-                            children: [
-                              // const Icon(
-                              //   Icons.keyboard_arrow_down,
-                              //   size: 30,
-                              //   color: Colors.black,
-                              // ),
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                decoration:
-                                    const BoxDecoration(color: chatownColor),
-                                child: Text(
-                                  "View By ${storyGetxController.myStorySeenData.value.statusViewsList!.length.toString()}",
-                                  style: const TextStyle(
-                                      fontSize: 18, color: Colors.black),
-                                )
-                                    .paddingSymmetric(vertical: 12)
-                                    .paddingOnly(left: 15),
-                              ),
-                              Expanded(
-                                child: ListView.builder(
+                      : SizedBox(
+                          height: 350,
+                          width: double.maxFinite,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(18),
+                              topRight: Radius.circular(18),
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 40,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: const BoxDecoration(
+                                      color: chatownColor,
+                                      gradient: LinearGradient(
+                                          colors: [
+                                            Color.fromRGBO(255, 237, 171, 0.2),
+                                            Color.fromRGBO(252, 198, 4, 0.2)
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter)),
+                                  child: Center(
+                                      child: Text(
+                                    "View By ${storyGetxController.myStorySeenData.value.statusViewsList!.length.toString()}",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black),
+                                  )),
+                                ).paddingOnly(top: 10),
+                                ListView.builder(
                                   shrinkWrap: true,
                                   scrollDirection: Axis.vertical,
                                   itemCount: storyGetxController.myStorySeenData
                                       .value.statusViewsList!.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return ListTile(
-                                      leading: ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.black,
-                                          child: CachedNetworkImage(
-                                            imageUrl: storyGetxController
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          leading: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            child: CircleAvatar(
+                                              backgroundColor: Colors.black,
+                                              child: CachedNetworkImage(
+                                                imageUrl: storyGetxController
+                                                    .myStorySeenData
+                                                    .value
+                                                    .statusViewsList![index]
+                                                    .user!
+                                                    .profileImage!,
+                                                fit: BoxFit.fill,
+                                              ),
+                                            ),
+                                          ),
+                                          title: Text(
+                                            capitalizeFirstLetter(
+                                                storyGetxController
+                                                    .myStorySeenData
+                                                    .value
+                                                    .statusViewsList![index]
+                                                    .user!
+                                                    .userName!),
+                                            style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.black),
+                                          ),
+                                          subtitle: Text(
+                                            formatCreateDate(storyGetxController
                                                 .myStorySeenData
                                                 .value
                                                 .statusViewsList![index]
-                                                .user!
-                                                .profileImage!,
-                                            fit: BoxFit.fill,
+                                                .createdAt!),
+                                            style: const TextStyle(
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                                color: Colors.grey),
                                           ),
                                         ),
-                                      ),
-                                      title: Text(
-                                        capitalizeFirstLetter(
+                                        if (index <
                                             storyGetxController
-                                                .myStorySeenData
-                                                .value
-                                                .statusViewsList![index]
-                                                .user!
-                                                .userName!),
-                                        style: const TextStyle(
-                                            fontSize: 15, color: Colors.black),
-                                      ),
-                                      subtitle: Text(
-                                        formatCreateDate(storyGetxController
-                                            .myStorySeenData
-                                            .value
-                                            .statusViewsList![index]
-                                            .createdAt!),
-                                        style: const TextStyle(
-                                            fontSize: 13, color: Colors.grey),
-                                      ),
+                                                    .myStorySeenData
+                                                    .value
+                                                    .statusViewsList!
+                                                    .length -
+                                                1)
+                                          Divider(
+                                            color: Colors.grey.shade100,
+                                          ), // Add a Divider between items except after the last item
+                                      ],
                                     );
                                   },
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
             }));

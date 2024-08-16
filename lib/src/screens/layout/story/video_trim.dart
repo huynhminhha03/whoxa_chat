@@ -143,7 +143,8 @@ class _VideoTrimmerState extends State<VideoTrimmer> {
                         log("Duration $duration");
                         var outputPath = await _trimVideo(start, duration, end);
                         if (outputPath != null) {
-                          await stroyGetxController.addVideoStory(outputPath);
+                          await stroyGetxController.addVideoStory(
+                              outputPath, "");
                         }
                       },
                       child: const Text('Upload'),
@@ -168,7 +169,6 @@ class _VideoTrimmerState extends State<VideoTrimmer> {
       int durationInMilliseconds = (duration * 1000).round();
       log("START TIME IN MILLI SECOND $startTimeInMilliseconds");
       log("DURATION TIME IN MILLI SECOND $durationInMilliseconds");
-
 
       // await flutterFFmpeg.execute(command);
 

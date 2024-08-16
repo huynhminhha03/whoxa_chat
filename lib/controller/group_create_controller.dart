@@ -22,7 +22,8 @@ class GroupCreateController extends GetxController {
   RxBool isMember = false.obs;
   Rx<AddMemberGroupModel?> model = AddMemberGroupModel().obs;
 
-  groupCreateApi(String gpname, file, String conversationId) async {
+  groupCreateApi(String gpname, file, String conversationId,
+      List<SelectedContact> contactData) async {
     isCreate(true);
     try {
       var uri = Uri.parse(apiHelper.createGroup);

@@ -10,6 +10,8 @@ import 'package:hive/hive.dart';
 import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
+import 'package:meyaoo_new/src/screens/Group/addGroupMembers.dart';
+import 'package:meyaoo_new/src/screens/Group/add_gp_member.dart';
 import 'package:meyaoo_new/src/screens/chat/create_group.dart';
 import 'package:meyaoo_new/src/screens/chat/single_chat.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -447,7 +449,8 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
         const SizedBox(height: 15),
         InkWell(
           onTap: () {
-            images();
+            //images();
+            Get.to(() => AddMembersinGroup1());
           },
           child: Padding(
             padding: const EdgeInsets.only(left: 17),

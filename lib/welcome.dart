@@ -4,7 +4,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:meyaoo_new/src/screens/chat/chats.dart';
 import 'package:meyaoo_new/src/screens/user/FinalLogin.dart';
 import 'package:meyaoo_new/web_view.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -193,7 +196,8 @@ class _WelcomeState extends State<Welcome> {
                     height: 40,
                   ),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
+                      //await Hive.box(userdata).put(authToken, pawanTOKEN);
                       check == true
                           ? Navigator.pushAndRemoveUntil(
                               context,
