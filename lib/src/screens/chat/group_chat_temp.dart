@@ -28,6 +28,7 @@ import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/pdf.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Onlichat/ChatOnline.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/chat/FileView.dart';
 import 'package:meyaoo_new/src/screens/chat/GroupProfile.dart';
 import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
@@ -5570,10 +5571,20 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             // widget.isBlocked == "0"
             //     ?
             InkWell(
-                onTap: () {
-                  getRoomController.getRoomModelApi(
+                onTap: () async {
+                  await getRoomController.getRoomModelApi(
                       conversationID: widget.conversationID,
                       callType: "video_call");
+                  print(
+                      "ROOMID 1 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
+                  Get.to(() => VideoCallScreen(
+                        roomID: Get.find<RoomIdController>()
+                            .roomModel
+                            .value!
+                            .roomId,
+                        conversation_id: widget.conversationID ?? "",
+                        isCaller: true,
+                      ));
                 },
                 child: Image.asset(
                   "assets/images/video_1.png",

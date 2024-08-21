@@ -23,6 +23,7 @@ import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/welcome.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
@@ -56,6 +57,10 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     // asknotificationpermmision();
     requestPermissions();
+    // OneSignal.Notifications.addClickListener((event) {
+    //   final data = event.notification.additionalData;
+    //   print("OneSignal data ${data?['screen']}");
+    // });
     _checkPermissions();
     FirebaseMessagingService()
         .setUpFirebase(); // Initialize Firebase messaging service

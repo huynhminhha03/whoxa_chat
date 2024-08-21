@@ -15,7 +15,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 
-
 @pragma('vm:entry-point')
 Future<void> _firebasebackgroundmessagehendler(RemoteMessage message) async {
   print("BackgroundDATA:${message.data.toString()}");
@@ -30,6 +29,9 @@ void main() async {
   await Firebase.initializeApp();
   // dynamicLinkIsPending();
   FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
+  // OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+  // OneSignal.initialize("fa0d2111-1ab5-49d7-ad5d-976b8d9d66a4");
+  // OneSignal.Notifications.requestPermission(true);
   Directory directory = await getApplicationDocumentsDirectory();
   await Permission.location.request();
   // Initialize the time zone data

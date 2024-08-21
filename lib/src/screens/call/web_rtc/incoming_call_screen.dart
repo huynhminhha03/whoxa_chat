@@ -181,10 +181,12 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                 const SizedBox(
                   height: 9,
                 ),
-                const Text(
-                  "Incoming Video Call",
+                Text(
+                  widget.forVideoCall == true
+                      ? "Incoming Video Call"
+                      : "Incoming Audio Call",
                   style: TextStyle(
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                     fontSize: 12,
                     fontFamily: "Poppins",
                   ),

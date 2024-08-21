@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use, file_names, depend_on_referenced_packages, use_key_in_widget_constructors, library_private_types_in_public_api, avoid_print, unnecessary_new, prefer_const_constructors, sort_child_properties_last, prefer_final_fields, prefer_typing_uninitialized_variables, use_build_context_synchronously, sized_box_for_whitespace, unnecessary_string_escapes, avoid_unnecessary_containers, prefer_const_literals_to_create_immutables, prefer_is_empty, no_leading_underscores_for_local_identifiers, prefer_interpolation_to_compose_strings, duplicate_ignore, use_super_parameters, prefer_if_null_operators, curly_braces_in_flow_control_structures, unnecessary_const, unnecessary_this, must_be_immutable, no_logic_in_create_state, avoid_function_literals_in_foreach_calls, unnecessary_string_interpolations, avoid_single_cascade_in_expression_statements, prefer_const_declarations, unnecessary_null_comparison, prefer_const_constructors_in_immutables, await_only_futures
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -37,12 +38,9 @@ class LocalNotificationService {
                 importance: Importance.max,
                 priority: Priority.high,
                 icon: "@mipmap/ic_launcher",
-                playSound: true,
                 enableVibration: true,
-                showWhen: true,
-                sound: RawResourceAndroidNotificationSound('calling'),
-                audioAttributesUsage: AudioAttributesUsage.notificationRingtone,
-                category: AndroidNotificationCategory.call,
+                vibrationPattern: Int64List.fromList(
+                    [0, 1000, 500, 2000, 500, 3000, 500, 4000]),
                 actions: [
                   AndroidNotificationAction(
                     "accept",
@@ -68,8 +66,6 @@ class LocalNotificationService {
                 importance: Importance.max,
                 priority: Priority.high,
                 icon: "@mipmap/ic_launcher",
-                playSound: true,
-                category: AndroidNotificationCategory.social,
               ),
       );
       await notificationsPlugin.show(

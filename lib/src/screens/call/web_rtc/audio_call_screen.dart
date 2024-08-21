@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, depend_on_referenced_packages, constant_identifier_names, avoid_print, non_constant_identifier_names
 
 // // ignore_for_file: avoid_print, use_build_context_synchronously
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -125,6 +126,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
           });
         }
         remoteRenderers[userId]!.srcObject = stream;
+        startTimer();
         print("remoteStream $stream");
         print("remoteRenderers length ${remoteRenderers.length}");
       });
@@ -167,6 +169,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
           });
           print("remoteRenderers length ${remoteRenderers.length}");
           print("remoteStream $remoteStream");
+          startTimer();
         });
         print("call peer ${call.peer}");
         peers[call.peer] = call;
@@ -274,6 +277,23 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     });
   }
 
+  Timer? _timer;
+  int _seconds = 0;
+
+  void startTimer() {
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        _seconds++;
+      });
+    });
+  }
+
+  String getFormattedTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final remainingSeconds = (seconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$remainingSeconds";
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -303,6 +323,19 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                     ),
                     const Text(
                       "Audio Calling",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
+                        fontFamily: "Poppins",
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 9,
+                    ),
+                    Text(
+                      remoteRenderers.isEmpty
+                          ? "00:00"
+                          : getFormattedTime(_seconds),
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
@@ -497,6 +530,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
       renderer.dispose();
     });
     myPeer!.dispose();
+    _timer?.cancel();
     super.dispose();
   }
 }
