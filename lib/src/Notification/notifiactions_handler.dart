@@ -28,6 +28,7 @@ class FirebaseMessagingService {
                 conversation_id: message.data['conversation_id'],
                 message_id: message.data['message_id'],
                 caller_id: message.data['senderId'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           } else if (message.data['call_type'] == 'audio_call') {
@@ -44,6 +45,7 @@ class FirebaseMessagingService {
                 caller_id: message.data['senderId'],
                 forVideoCall: false,
                 receiverImage: message.data['receiver_profile_image'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           }
@@ -73,6 +75,7 @@ class FirebaseMessagingService {
                 conversation_id: message.data['conversation_id'],
                 message_id: message.data['message_id'],
                 caller_id: message.data['senderId'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           } else if (message.data['call_type'] == 'audio_call') {
@@ -89,6 +92,7 @@ class FirebaseMessagingService {
                 caller_id: message.data['senderId'],
                 forVideoCall: false,
                 receiverImage: message.data['receiver_profile_image'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           }
@@ -116,6 +120,7 @@ class FirebaseMessagingService {
                 conversation_id: message.data['conversation_id'],
                 message_id: message.data['message_id'],
                 caller_id: message.data['senderId'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           } else if (message.data['call_type'] == 'audio_call') {
@@ -132,6 +137,7 @@ class FirebaseMessagingService {
                 caller_id: message.data['senderId'],
                 forVideoCall: false,
                 receiverImage: message.data['receiver_profile_image'],
+                isGroupCall: message.data['is_group'],
               ));
             }
           }

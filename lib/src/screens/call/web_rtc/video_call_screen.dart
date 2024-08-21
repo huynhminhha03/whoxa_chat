@@ -3,6 +3,7 @@
 // // ignore_for_file: avoid_print, use_build_context_synchronously
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -291,7 +292,10 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         ? forFour()
                         : remoteRenderers.length == 4
                             ? forFive()
-                            : const SizedBox(),
+                            : remoteRenderers.length > 5 &&
+                                    remoteRenderers.length < 12
+                                ? forSixToTwelve()
+                                : forTwo(),
             Positioned(
               top: 40,
               left: 20,
@@ -391,6 +395,83 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  bool isSwap = false;
+  int swapIndex = 0;
+
+  Widget forSixToTwelve() {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(10),
+                  bottomRight: Radius.circular(10),
+                ),
+                child: RTCVideoView(
+                  isSwap == true
+                      ? remoteRenderers[
+                          remoteRenderers.keys.elementAt(swapIndex)]!
+                      : localRenderer,
+                  mirror: false,
+                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                ),
+              ),
+            ),
+          ],
+        ),
+        Positioned.fill(
+          bottom: 110,
+          top: getx.Get.height * 0.71,
+          right: 20,
+          child: ListView.builder(
+            itemCount: remoteRenderers.length,
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(left: 250),
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  isSwap = !isSwap;
+                  swapIndex = index;
+                  setState(() {});
+                },
+                child: Container(
+                  height: 110,
+                  width: 85,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: colorB0B0B0,
+                    ),
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(10),
+                    ),
+                    child: RTCVideoView(
+                      isSwap == true && index == swapIndex
+                          ? localRenderer
+                          : remoteRenderers[
+                              remoteRenderers.keys.elementAt(index)]!,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  ),
+                ).paddingSymmetric(horizontal: 1),
+              );
+            },
+          ),
+        )
+      ],
     );
   }
 

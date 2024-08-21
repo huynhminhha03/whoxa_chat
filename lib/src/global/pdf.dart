@@ -2,11 +2,8 @@
 
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:meyaoo_new/src/global/global.dart';
 import 'package:pdf_render/pdf_render.dart' as pdf_render;
-import 'package:pdf/pdf.dart' as pdf_lib;
 
 Future<Map<String, dynamic>> getPdfInfo(String url) async {
   try {

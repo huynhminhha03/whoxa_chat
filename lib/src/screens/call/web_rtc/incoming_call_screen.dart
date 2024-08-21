@@ -21,6 +21,7 @@ class IncomingCallScrenn extends StatefulWidget {
   String message_id;
   bool forVideoCall = true;
   String? receiverImage;
+  String isGroupCall;
   IncomingCallScrenn({
     super.key,
     required this.roomID,
@@ -31,6 +32,7 @@ class IncomingCallScrenn extends StatefulWidget {
     required this.message_id,
     this.forVideoCall = true,
     this.receiverImage,
+    required this.isGroupCall,
   });
 
   @override
@@ -185,7 +187,7 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                   widget.forVideoCall == true
                       ? "Incoming Video Call"
                       : "Incoming Audio Call",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 12,
                     fontFamily: "Poppins",
@@ -227,11 +229,15 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        roomIdController.callCutByReceiver(
-                          conversationID: widget.conversation_id,
-                          message_id: widget.message_id,
-                          caller_id: widget.caller_id,
-                        );
+                        if (widget.isGroupCall == "true") {
+                          getx.Get.back();
+                        } else {
+                          roomIdController.callCutByReceiver(
+                            conversationID: widget.conversation_id,
+                            message_id: widget.message_id,
+                            caller_id: widget.caller_id,
+                          );
+                        }
                       },
                       child: Column(
                         children: [

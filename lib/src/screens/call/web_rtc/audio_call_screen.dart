@@ -336,7 +336,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                       remoteRenderers.isEmpty
                           ? "00:00"
                           : getFormattedTime(_seconds),
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
                         fontFamily: "Poppins",

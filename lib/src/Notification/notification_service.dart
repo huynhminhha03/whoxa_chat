@@ -111,17 +111,25 @@ class LocalNotificationService {
           } else if (details.actionId == 'decline') {
             print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_background");
             if (data['call_type'] == 'video_call') {
-              roomIdController.callCutByReceiver(
-                conversationID: data['conversation_id'],
-                message_id: data['message_id'],
-                caller_id: data['senderId'],
-              );
+              if (data['is_group'] == "true") {
+                Get.back();
+              } else {
+                roomIdController.callCutByReceiver(
+                  conversationID: data['conversation_id'],
+                  message_id: data['message_id'],
+                  caller_id: data['senderId'],
+                );
+              }
             } else if (data['call_type'] == 'audio_call') {
-              roomIdController.callCutByReceiver(
-                conversationID: data['conversation_id'],
-                message_id: data['message_id'],
-                caller_id: data['senderId'],
-              );
+              if (data['is_group'] == "true") {
+                Get.back();
+              } else {
+                roomIdController.callCutByReceiver(
+                  conversationID: data['conversation_id'],
+                  message_id: data['message_id'],
+                  caller_id: data['senderId'],
+                );
+              }
             }
           } else {
             if (data['call_type'] == 'video_call') {
@@ -132,6 +140,7 @@ class LocalNotificationService {
                 conversation_id: data['conversation_id'],
                 message_id: data['message_id'],
                 caller_id: data['senderId'],
+                isGroupCall: data['is_group'],
               ));
             } else if (data['call_type'] == 'audio_call') {
               Get.to(IncomingCallScrenn(
@@ -143,6 +152,7 @@ class LocalNotificationService {
                 caller_id: data['senderId'],
                 forVideoCall: false,
                 receiverImage: data['receiver_profile_image'],
+                isGroupCall: data['is_group'],
               ));
             }
           }
@@ -171,17 +181,25 @@ class LocalNotificationService {
           } else if (details.actionId == 'decline') {
             print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
             if (data['call_type'] == 'video_call') {
-              roomIdController.callCutByReceiver(
-                conversationID: data['conversation_id'],
-                message_id: data['message_id'],
-                caller_id: data['senderId'],
-              );
+              if (data['is_group'] == "true") {
+                Get.back();
+              } else {
+                roomIdController.callCutByReceiver(
+                  conversationID: data['conversation_id'],
+                  message_id: data['message_id'],
+                  caller_id: data['senderId'],
+                );
+              }
             } else if (data['call_type'] == 'audio_call') {
-              roomIdController.callCutByReceiver(
-                conversationID: data['conversation_id'],
-                message_id: data['message_id'],
-                caller_id: data['senderId'],
-              );
+              if (data['is_group'] == "true") {
+                Get.back();
+              } else {
+                roomIdController.callCutByReceiver(
+                  conversationID: data['conversation_id'],
+                  message_id: data['message_id'],
+                  caller_id: data['senderId'],
+                );
+              }
             }
           } else {
             if (data['call_type'] == 'video_call') {
@@ -192,6 +210,7 @@ class LocalNotificationService {
                 conversation_id: data['conversation_id'],
                 message_id: data['message_id'],
                 caller_id: data['senderId'],
+                isGroupCall: data['is_group'],
               ));
             } else if (data['call_type'] == 'audio_call') {
               Get.to(IncomingCallScrenn(
@@ -203,6 +222,7 @@ class LocalNotificationService {
                 caller_id: data['senderId'],
                 forVideoCall: false,
                 receiverImage: data['receiver_profile_image'],
+                isGroupCall: data['is_group'],
               ));
             }
           }
