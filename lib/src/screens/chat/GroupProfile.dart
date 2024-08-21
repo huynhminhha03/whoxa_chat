@@ -105,61 +105,53 @@ class _GroupProfileState extends State<GroupProfile> {
       body: Obx(() {
         return chatProfileController.isLoading.value
             ? loader(context)
-            : Stack(
-                children: [
-                  SizedBox(
-                    height: Get.height * 0.27,
-                    width: double.infinity,
-                    child: Image.asset(
-                      cacheHeight: 140,
-                      "assets/images/back_img1.png",
-                      fit: BoxFit.cover,
+            : SingleChildScrollView(
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      height: Get.height * 0.27,
+                      width: double.infinity,
+                      child: Image.asset(
+                        cacheHeight: 140,
+                        "assets/images/back_img1.png",
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: Column(
+                    Column(
                       children: [
-                        Expanded(
-                            child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 100),
-                              profilePic(chatProfileController
-                                  .profileModel.value!.conversationDetails!),
-                              const SizedBox(height: 10),
-                              groupprofiledetails(chatProfileController
-                                  .profileModel.value!.conversationDetails!),
-                            ],
-                          ),
-                        )),
+                        const SizedBox(height: 100),
+                        profilePic(chatProfileController
+                            .profileModel.value!.conversationDetails!),
+                        const SizedBox(height: 10),
+                        groupprofiledetails(chatProfileController
+                            .profileModel.value!.conversationDetails!),
                       ],
                     ),
-                  ),
-                  Positioned(
-                      top: 45,
-                      left: 5,
-                      child: IconButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: const Icon(Icons.arrow_back_ios, size: 19))),
-                  Positioned(
-                      top: 45,
-                      right: 5,
-                      child: Obx(() {
-                        return chatProfileController.isLoading.value
-                            ? const Icon(
-                                Icons.more_vert,
-                                color: chatColor,
-                                size: 24,
-                              ).paddingOnly(right: 5)
-                            : _popMenu(
-                                context,
-                                chatProfileController
-                                    .profileModel.value!.conversationDetails!);
-                      }))
-                ],
+                    Positioned(
+                        top: 40,
+                        left: 5,
+                        child: IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(Icons.arrow_back_ios, size: 19))),
+                    Positioned(
+                        top: 40,
+                        right: 5,
+                        child: Obx(() {
+                          return chatProfileController.isLoading.value
+                              ? const Icon(
+                                  Icons.more_vert,
+                                  color: chatColor,
+                                  size: 24,
+                                ).paddingOnly(right: 5)
+                              : _popMenu(
+                                  context,
+                                  chatProfileController.profileModel.value!
+                                      .conversationDetails!);
+                        }))
+                  ],
+                ),
               );
       }),
     );
@@ -197,55 +189,49 @@ class _GroupProfileState extends State<GroupProfile> {
   }
 
   Widget groupprofiledetails(ConversationDetails data) {
-    return Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(
+          height: 25,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            buttonContainer(
+                onTap: () {}, img: "assets/images/call_1.png", title: "Audio"),
             const SizedBox(
-              height: 25,
+              width: 30,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                buttonContainer(
-                    onTap: () {},
-                    img: "assets/images/call_1.png",
-                    title: "Audio"),
-                const SizedBox(
-                  width: 30,
-                ),
-                buttonContainer(
-                    onTap: () {},
-                    img: "assets/images/video_1.png",
-                    title: "Video"),
-                const SizedBox(
-                  width: 30,
-                ),
-                buttonContainer(
-                    onTap: () {
-                      Get.back(result: "1");
-                    },
-                    img: "assets/icons/search-normal.png",
-                    title: "Search")
-              ],
-            ),
+            buttonContainer(
+                onTap: () {}, img: "assets/images/video_1.png", title: "Video"),
             const SizedBox(
-              height: 15,
+              width: 30,
             ),
-            mediaContainer(),
-            const SizedBox(
-              height: 10,
-            ),
-            stareContainer(),
-            const SizedBox(
-              height: 10,
-            ),
-            memberListWidget()
+            buttonContainer(
+                onTap: () {
+                  Get.back(result: "1");
+                },
+                img: "assets/icons/search-normal.png",
+                title: "Search")
           ],
-        ));
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        mediaContainer(),
+        const SizedBox(
+          height: 10,
+        ),
+        stareContainer(),
+        const SizedBox(
+          height: 10,
+        ),
+        memberListWidget()
+      ],
+    );
   }
 
   Widget profilePic(ConversationDetails data) {
@@ -460,6 +446,7 @@ class _GroupProfileState extends State<GroupProfile> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -525,15 +512,15 @@ class _GroupProfileState extends State<GroupProfile> {
                         const SizedBox(
                           height: 5,
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: 155,
                           height: 30,
                           child: Text(
-                            'bio',
+                            data.user!.bio!,
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontWeight: FontWeight.w400,
                                 fontSize: 10,
                                 color: Colors.grey),
@@ -544,12 +531,12 @@ class _GroupProfileState extends State<GroupProfile> {
                   ],
                 ),
                 data.isAdmin == true
-                    ? Padding(
-                        padding: const EdgeInsets.only(right: 10),
+                    ? const Padding(
+                        padding: EdgeInsets.only(right: 10, top: 7),
                         child: Text(
                           "Admin",
                           style: TextStyle(
-                              color: Colors.grey.shade400,
+                              color: Colors.green,
                               fontSize: 10,
                               fontWeight: FontWeight.w500),
                         ),

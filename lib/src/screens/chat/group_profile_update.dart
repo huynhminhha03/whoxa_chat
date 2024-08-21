@@ -39,8 +39,12 @@ class _group_profileState extends State<group_profile> {
     return Scaffold(
       backgroundColor: appColorWhite,
       appBar: AppBar(
+        shape: Border(bottom: BorderSide(color: Colors.grey.shade300)),
         elevation: 0,
-        backgroundColor: chatownColor,
+        leadingWidth: 50,
+        titleSpacing: 0,
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -51,7 +55,6 @@ class _group_profileState extends State<group_profile> {
                 Image.asset("assets/images/arrow-left.png", color: chatColor),
           ),
         ),
-        centerTitle: true,
         title: const Text(
           'Group Profile',
           style: TextStyle(
@@ -79,9 +82,7 @@ class _group_profileState extends State<group_profile> {
                         height: 70,
                         width: MediaQuery.of(context).size.width,
                         child: TextFormField(
-                            maxLength: 16,
-                            // textAlign: TextAlign.center,
-                            // textAlignVertical: TextAlignVertical.s,
+                            maxLength: 20,
                             controller: groupnameController,
                             readOnly: false,
                             autofocus: false,
@@ -203,17 +204,21 @@ class _group_profileState extends State<group_profile> {
               selectImageSource();
             },
             child: Container(
-              width: 35,
-              height: 35,
               decoration: const BoxDecoration(
-                color: chatownColor,
-                shape: BoxShape.circle,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child:
-                    Image.asset("assets/images/edit-2.png", color: chatColor),
-              ),
+                  shape: BoxShape.circle, color: Colors.white),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(
+                  color: chatownColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child:
+                      Image.asset("assets/images/edit-2.png", color: chatColor),
+                ),
+              ).paddingAll(4),
             ),
           ),
         ),

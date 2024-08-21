@@ -130,6 +130,7 @@ class User {
   String? userName;
   String? firstName;
   String? lastName;
+  String? bio;
 
   User(
       {this.profileImage,
@@ -139,7 +140,8 @@ class User {
       this.country,
       this.userName,
       this.firstName,
-      this.lastName});
+      this.lastName,
+      this.bio});
 
   User.fromJson(Map<String, dynamic> json) {
     profileImage = json['profile_image'];
@@ -150,6 +152,7 @@ class User {
     userName = json['user_name'];
     firstName = json['first_name'];
     lastName = json['last_name'];
+    bio = json['bio'];
   }
 
   Map<String, dynamic> toJson() {
@@ -162,6 +165,7 @@ class User {
     data['user_name'] = userName;
     data['first_name'] = firstName;
     data['last_name'] = lastName;
+    data['bio'] = bio;
     return data;
   }
 }

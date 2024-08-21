@@ -11,6 +11,7 @@ import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/common_widget.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/screens/Group/add_gp_member.dart';
 import 'package:meyaoo_new/src/screens/chat/ArchivedChat.dart';
 import 'package:meyaoo_new/src/screens/chat/group_chat_temp.dart';
 import 'package:meyaoo_new/src/screens/chat/single_chat.dart';
@@ -1047,24 +1048,29 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                   fontWeight: FontWeight.w600,
                   fontFamily: "Poppins"),
             ),
-            Container(
-              height: 32,
-              width: 105,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10), color: chatYColor),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset("assets/images/new-add.png", height: 15),
-                  const SizedBox(width: 5),
-                  const Text(
-                    "New Group",
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        fontFamily: "Poppins"),
-                  )
-                ],
+            InkWell(
+              onTap: () {
+                Get.to(() => AddMembersinGroup1());
+              },
+              child: Container(
+                height: 32,
+                width: 105,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10), color: chatYColor),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/images/new-add.png", height: 15),
+                    const SizedBox(width: 5),
+                    const Text(
+                      "New Group",
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: "Poppins"),
+                    )
+                  ],
+                ),
               ),
             )
           ],

@@ -395,29 +395,33 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                               InkWell(
                                                 onTap: () {
                                                   //sendApiBydefult();
-                                                  // widget.isBlock == true
-                                                  //     ? showCustomToast(
-                                                  //         "User bloked")
-                                                  //     : widget.mobileNum ==
-                                                  //                 null &&
-                                                  //             widget.mobileNum ==
-                                                  //                 ""
-                                                  //         ? chatContorller
-                                                  //             .sendMessageText(
-                                                  //                 "Hi",
-                                                  //                 widget
-                                                  //                     .conversationID!,
-                                                  //                 "text",
-                                                  //                 widget
-                                                  //                     .mobileNum
-                                                  //                     .toString())
-                                                  //         : chatContorller
-                                                  //             .sendMessageText(
-                                                  //                 "Hi",
-                                                  //                 widget
-                                                  //                     .conversationID!,
-                                                  //                 "text",
-                                                  //                 "");
+                                                  widget.isBlock == true
+                                                      ? showCustomToast(
+                                                          "User bloked")
+                                                      : widget.mobileNum ==
+                                                                  null &&
+                                                              widget.mobileNum ==
+                                                                  ""
+                                                          ? chatContorller
+                                                              .sendMessageText(
+                                                                  "Hi",
+                                                                  widget
+                                                                      .conversationID!,
+                                                                  "text",
+                                                                  widget
+                                                                      .mobileNum
+                                                                      .toString(),
+                                                                  '',
+                                                                  '')
+                                                          : chatContorller
+                                                              .sendMessageText(
+                                                                  "Hi",
+                                                                  widget
+                                                                      .conversationID!,
+                                                                  "text",
+                                                                  "",
+                                                                  '',
+                                                                  '');
                                                 },
                                                 child: Container(
                                                   width: MediaQuery.of(context)

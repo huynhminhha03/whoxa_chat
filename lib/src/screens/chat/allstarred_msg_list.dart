@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, must_be_immutable
+// ignore_for_file: avoid_print, must_be_immutable, prefer_is_empty
 import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -140,26 +140,58 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: appColorWhite,
+        backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
         appBar: AppBar(
-            backgroundColor: chatownColor,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: true,
-            leading: InkWell(
-              onTap: () {
-                Get.back();
-              },
-              child:
-                  const Icon(Icons.arrow_back_ios, size: 20, color: chatColor),
-            ),
-            title: Text(
-              widget.isPersonal == true
-                  ? "Starred Messages"
-                  : 'All Starred Messages',
-              style: const TextStyle(
-                  fontWeight: FontWeight.w500, fontSize: 18, color: chatColor),
-            )),
+          shape: RoundedRectangleBorder(
+              side: BorderSide(color: Colors.grey.shade300)),
+          scrolledUnderElevation: 0,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leadingWidth: 50,
+          titleSpacing: -10,
+          leading: InkWell(
+            onTap: () {
+              Get.back();
+            },
+            child: const Icon(Icons.arrow_back_ios, size: 20, color: chatColor),
+          ),
+          title: Text(
+            widget.isPersonal == true ? "Starred Messages" : 'Starred Messages',
+            style: const TextStyle(
+                fontWeight: FontWeight.w500, fontSize: 19, color: chatColor),
+          ),
+          actions: [
+            containerWidget(
+                    onTap: () {
+                      setState(() {
+                        isSelectedmessage = "1";
+                        starId.add(0);
+                      });
+                    },
+                    title: "Edit")
+                .paddingOnly(right: 10)
+          ],
+        ),
+        bottomNavigationBar: starId.isEmpty
+            ? null
+            : BottomAppBar(
+                height: 70,
+                elevation: 0,
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    InkWell(
+                        onTap: () {
+                          setState(() {
+                            isSelectedmessage = "0";
+                            starId = [];
+                          });
+                        },
+                        child: Image.asset("assets/images/star-slash.png",
+                            height: 25))
+                  ],
+                ),
+              ),
         body: Obx(() {
           return allStaredMsgController.isLoading.value &&
                   allStaredMsgController.allStarred.isEmpty
@@ -1066,257 +1098,205 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   }
 
   Widget getVideoMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 95,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                  height: 120,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: Colors.grey.shade200),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      data.chat!.thumbnail!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => VideoViewFix(
-                                            username: "",
-                                            //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
-                                            url: data.chat!.url!,
-                                            play: true,
-                                            mute: false,
-                                            date: ""
-                                            // convertUTCTimeTo12HourFormat(
-                                            //     data.createdAt!),
-                                            ),
-                                      ));
-                                },
-                                child: CircleAvatar(
-                                    radius: 18,
-                                    backgroundColor: Colors.grey.shade300,
-                                    foregroundColor: chatownColor,
-                                    child: Image.asset(
-                                        "assets/images/play1.png",
-                                        color: chatColor,
-                                        height: 15)),
-                              )
-                            ],
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
                             Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    border:
+                                        Border.all(color: Colors.grey.shade200),
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    data.chat!.thumbnail!,
+                                    fit: BoxFit.cover,
                                   ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
+                                )),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoViewFix(
+                                          username: "",
+                                          //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
+                                          url: data.chat!.url!,
+                                          play: true,
+                                          mute: false,
+                                          date: ""
+                                          // convertUTCTimeTo12HourFormat(
+                                          //     data.createdAt!),
+                                          ),
+                                    ));
+                              },
+                              child: CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: Colors.grey.shade300,
+                                  foregroundColor: chatownColor,
+                                  child: Image.asset("assets/images/play1.png",
+                                      color: chatColor, height: 15)),
+                            )
                           ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
+      ),
     );
   }
 

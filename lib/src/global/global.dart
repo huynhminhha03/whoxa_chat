@@ -937,7 +937,7 @@ DateTime parsedate(String dateString) {
 
 String date(String dateString) {
   DateTime date = parseDate(dateString);
-  return DateFormat('dd-MM-yyyy').format(date);
+  return DateFormat('dd/MM/yyyy').format(date);
 }
 
 String convertToLocalDate(String? dateString) {
@@ -2030,5 +2030,30 @@ Widget buttonContainer(
         ],
       ),
     ),
+  );
+}
+
+Widget checkContainer() {
+  return Container(
+      width: 12.0,
+      height: 12.0,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          color: bg1,
+          gradient: LinearGradient(
+              colors: [blackColor, black1Color],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomCenter)),
+      child: Image.asset("assets/images/right.png").paddingAll(3));
+}
+
+Widget removeCheckContainer() {
+  return Container(
+    width: 12.0,
+    height: 12.0,
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: black1Color),
+        color: bg1),
   );
 }
