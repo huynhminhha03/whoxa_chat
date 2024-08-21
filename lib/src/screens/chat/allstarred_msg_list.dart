@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
@@ -17,6 +18,7 @@ import 'package:meyaoo_new/controller/reply_msg_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/global/pdf.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Onlichat/ChatOnline.dart';
 import 'package:meyaoo_new/src/screens/chat/FileView.dart';
@@ -323,778 +325,593 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   }
 
   Widget getTextMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 60,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId)
+                              ? starId.remove(data.chat!.messageId)
+                              : starId.add(data.chat!.messageId);
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.grey.shade200,
+                          ),
+                          child: Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 10,
+                              ),
+                              child: Container(
+                                constraints: const BoxConstraints(
+                                  minHeight: 20.0,
+                                  minWidth: 10.0,
+                                  maxWidth: 230,
+                                ),
+                                child: Text(
+                                  data.chat!.message.toString(),
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey.shade200,
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 10,
-                                  ),
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minHeight: 20.0,
-                                      minWidth: 10.0,
-                                      maxWidth: 230,
-                                    ),
-                                    child: Text(
-                                      data.chat!.message.toString(),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getImgMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 95,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
                           ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                  curve: Curves.linear,
+                                  type: PageTransitionType.rightToLeft,
+                                  child: ImageView(
+                                    image: data.chat!.url!,
+                                    userimg: "",
+                                  )),
+                            );
+                          },
+                          child: Container(
+                              height: 120,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.network(
+                                  data.chat!.url!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
                         ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).paddingOnly(bottom: 10);
+  }
+
+  Widget getLocationMessageWidget(index, StarMessageList data) {
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 105,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
                     ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                    curve: Curves.linear,
-                                    type: PageTransitionType.rightToLeft,
-                                    child: ImageView(
-                                      image: data.chat!.url!,
-                                      userimg: "",
-                                    )),
-                              );
-                            },
-                            child: Container(
-                                height: 120,
-                                width: 120,
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            constraints: const BoxConstraints(
+                                minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
+                            child: InkWell(
+                              onTap: () {
+                                MapUtils.openMap(
+                                    double.parse(data.chat!.latitude!),
+                                    double.parse(data.chat!.longitude!));
+                              },
+                              child: Container(
+                                height: 130,
+                                width: 250,
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10)),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    data.chat!.url!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
-  }
-
-  Widget getLocationMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                constraints: const BoxConstraints(
-                                    minHeight: 10.0,
-                                    minWidth: 10.0,
-                                    maxWidth: 250),
-                                child: Container(
-                                  height: 120,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ClipRRect(
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10)),
-                                    child: data.chat!.latitude.toString() ==
-                                                "" ||
-                                            data.chat!.longitude.toString() ==
-                                                ""
-                                        ? Container(
-                                            decoration: const BoxDecoration(
-                                                image: DecorationImage(
-                                                    image: AssetImage(
-                                                        "assets/images/map_Blurr.png"),
-                                                    fit: BoxFit.cover)),
-                                            child: Icon(
-                                              Icons.error_outline,
-                                              color:
-                                                  chatownColor.withOpacity(0.6),
-                                              size: 50,
-                                            ),
-                                          )
-                                        : GoogleMap(
-                                            zoomControlsEnabled: false,
-                                            zoomGesturesEnabled: false,
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                                    target: LatLng(
-                                                        double.parse(data
-                                                            .chat!.latitude!),
-                                                        double.parse(data
-                                                            .chat!.longitude!)),
-                                                    zoom: 15),
-                                            mapType: MapType.normal,
-                                            onMapCreated: (GoogleMapController
-                                                controller111) {
-                                              // controller.complete();
-                                            },
+                                  child: data.chat!.latitude.toString() == "" ||
+                                          data.chat!.longitude.toString() == ""
+                                      ? Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight:
+                                                      Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      "assets/images/map_Blurr.png"),
+                                                  fit: BoxFit.cover)),
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            color:
+                                                chatownColor.withOpacity(0.6),
+                                            size: 50,
                                           ),
-                                  ),
+                                        )
+                                      : GoogleMap(
+                                          zoomControlsEnabled: false,
+                                          zoomGesturesEnabled: false,
+                                          initialCameraPosition: CameraPosition(
+                                              target: LatLng(
+                                                  double.parse(
+                                                      data.chat!.latitude!),
+                                                  double.parse(
+                                                      data.chat!.longitude!)),
+                                              zoom: 15),
+                                          mapType: MapType.normal,
+                                          onMapCreated: (GoogleMapController
+                                              controller111) {
+                                            // controller.complete();
+                                          },
+                                        ),
                                 ),
                               ),
-                              InkWell(
-                                onTap: () {
-                                  MapUtils.openMap(
-                                      double.parse(data.chat!.latitude!),
-                                      double.parse(data.chat!.longitude!));
-                                },
-                                child: Container(
-                                  height: 30,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: const BorderRadius.only(
-                                          bottomLeft: Radius.circular(10),
-                                          bottomRight: Radius.circular(10)),
-                                      color: Colors.grey.shade200),
-                                  child: const Center(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text("View Location",
-                                            style: TextStyle(
-                                              color: chatColor,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                            )),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
+                            )),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getVideoMessageWidget(index, StarMessageList data) {
@@ -1297,155 +1114,250 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           ],
         ),
       ),
-    );
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getDocMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 65,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
                           ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                PageTransition(
+                                  curve: Curves.linear,
+                                  type: PageTransitionType.rightToLeft,
+                                  child: FileView(file: "${data.chat!.url}"),
+                                ));
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: yellow1Color,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 5, bottom: 5, left: 5, right: 5),
+                              child: Container(
+                                width: Get.width * 0.50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
                                 ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                  context,
-                                  PageTransition(
-                                    curve: Curves.linear,
-                                    type: PageTransitionType.rightToLeft,
-                                    child: FileView(file: "${data.chat!.url}"),
-                                  ));
-                            },
-                            child: Container(
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.grey.shade200,
-                              ),
-                              child: Center(
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 10,
-                                  ),
+                                      horizontal: 10, vertical: 5),
                                   child: Row(
                                     children: [
-                                      Container(
-                                          height: 30,
-                                          width: 30,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.rectangle,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            color: const Color(0xffCCCCCC),
-                                          ),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(3.0),
-                                            child: Image(
-                                              image: AssetImage(
-                                                  'assets/images/doc.png'),
-                                            ),
-                                          )),
-                                      const SizedBox(width: 7),
-                                      SizedBox(
-                                        width: 140,
-                                        child: Text(
-                                          data.chat!.url
-                                              .toString()
-                                              .split('/')
-                                              .last,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black,
-                                          ),
-                                        ),
+                                      const Image(
+                                        height: 30,
+                                        image:
+                                            AssetImage('assets/images/pdf.png'),
+                                      ),
+                                      FutureBuilder<Map<String, dynamic>>(
+                                        future: getPdfInfo(data.chat!.url!),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  extractFilename(
+                                                          data.chat!.url!)
+                                                      .toString()
+                                                      .split("-")
+                                                      .last,
+                                                  style: const TextStyle(
+                                                    color: chatColor,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                const Text(
+                                                  '0 Page - 0 KB',
+                                                  style: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                )
+                                              ],
+                                            ).paddingOnly(left: 12);
+                                          } else if (snapshot.hasError) {
+                                            return const Text('');
+                                          } else if (snapshot.hasData) {
+                                            final int pageCount =
+                                                snapshot.data!['pageCount'];
+                                            final String fileSize =
+                                                snapshot.data!['fileSize'];
+                                            return Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 11),
+                                                  child: Text(
+                                                    extractFilename(
+                                                            data.chat!.url!)
+                                                        .toString()
+                                                        .split("-")
+                                                        .last,
+                                                    style: const TextStyle(
+                                                      color: chatColor,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '$pageCount Page - $fileSize',
+                                                  style: const TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                ).paddingOnly(left: 12),
+                                              ],
+                                            );
+                                          } else {
+                                            return const Text(
+                                                'No PDF info available');
+                                          }
+                                        },
                                       ),
                                     ],
                                   ),
@@ -1454,1121 +1366,933 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getVoiceMessageWidget(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 70,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
                           ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            _audio(
-                                message: data.chat!.url!,
-                                index: index,
-                                duration: data.chat!.audioTime!),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
                                   style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 11,
-                                    fontWeight: FontWeight.w400,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          _audio(
+                              message: data.chat!.url!,
+                              index: index,
+                              duration: data.chat!.audioTime!),
+                        ],
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getGifMessage(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                PageTransition(
-                                    curve: Curves.linear,
-                                    type: PageTransitionType.rightToLeft,
-                                    child: ImageView(
-                                      image: data.chat!.url!,
-                                      userimg: "",
-                                    )),
-                              );
-                            },
-                            child: Container(
-                                height: 120,
-                                width: 120,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    data.chat!.url!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 95,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
                                   style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
                                     fontSize: 11,
-                                    fontWeight: FontWeight.w400,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ],
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                  curve: Curves.linear,
+                                  type: PageTransitionType.rightToLeft,
+                                  child: ImageView(
+                                    image: data.chat!.url!,
+                                    userimg: "",
+                                  )),
+                            );
+                          },
+                          child: Container(
+                              height: 120,
+                              width: 120,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(15)),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image.network(
+                                  data.chat!.url!,
+                                  fit: BoxFit.cover,
+                                ),
+                              )),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getHttpLinkMessage(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey.shade200),
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 80,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
                             ),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  topRight: Radius.circular(10)),
-                              child: FlutterLinkPreview(
-                                url: data.chat!.message!,
-                                builder: (info) {
-                                  if (info is WebInfo) {
-                                    return info.title == null &&
-                                            info.description == null
-                                        ? Text(
-                                            data.chat!.message!,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.black,
-                                            ),
-                                          )
-                                        : Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              if (info.image != null)
-                                                Image.network(info.image!,
-                                                    fit: BoxFit.cover),
-                                              if (info.title != null)
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.black12,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              7)),
-                                                  child: Text(
-                                                    info.title!,
-                                                    style: const TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Container(
+                          constraints: BoxConstraints(
+                              maxHeight:
+                                  MediaQuery.of(context).size.height / 8.3,
+                              maxWidth: MediaQuery.of(context).size.width * .7),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade200),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              launchURL(data.chat!.message!);
+                            },
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 5, right: 5, top: 5, bottom: 5),
+                                  decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: FlutterLinkPreview(
+                                    url: data.chat!.message!,
+                                    builder: (info) {
+                                      if (info is WebInfo) {
+                                        return info.title == null &&
+                                                info.description == null
+                                            ? Text(
+                                                data.chat!.message!,
+                                                style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Colors.white),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  if (info.image != null)
+                                                    Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10)),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        child: Image.network(
+                                                            info.image!,
+                                                            fit: BoxFit.cover),
+                                                      ),
                                                     ),
-                                                  ).paddingAll(2),
-                                                ).paddingOnly(top: 5),
-                                              if (info.description != null)
-                                                Text(
-                                                  info.description!,
-                                                  maxLines: 4,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    color: Colors.black,
+                                                  const SizedBox(width: 5),
+                                                  Expanded(
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        if (info.title != null)
+                                                          Text(
+                                                            info.title!,
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
+                                                          ).paddingAll(2),
+                                                        info.image == null
+                                                            ? const SizedBox(
+                                                                height: 5)
+                                                            : const SizedBox
+                                                                .shrink(),
+                                                        if (info.description !=
+                                                            null)
+                                                          Text(
+                                                            info.description!,
+                                                            maxLines: 2,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: const TextStyle(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        68,
+                                                                        68,
+                                                                        68,
+                                                                        1),
+                                                                fontSize: 9,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                          ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                            ],
-                                          );
-                                  }
-                                  return const CircularProgressIndicator();
-                                },
-                                titleStyle: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
+                                                ],
+                                              );
+                                      }
+                                      return const CircularProgressIndicator();
+                                    },
+                                    titleStyle: const TextStyle(
                                       color: Colors.black,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
                                 ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
+                                const SizedBox(height: 3),
                                 Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
+                                  data.chat!.message!,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      color: linkColor,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w400),
+                                ).paddingOnly(left: 10)
                               ],
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
                           ),
                         ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getContactMessage(index, StarMessageList data) {
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
-                          ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(10.0),
-                                  bottomRight: Radius.circular(10.0),
-                                  topLeft: Radius.circular(10.0),
-                                  bottomLeft: Radius.circular(10.0),
-                                ),
-                                color: Colors.grey.shade200,
-                              ),
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 15,
-                                    vertical: 10,
-                                  ),
-                                  child: Container(
-                                    constraints: const BoxConstraints(
-                                      minHeight: 20.0,
-                                      minWidth: 10.0,
-                                      maxWidth: 230,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          data.chat!.sharedContactName
-                                              .toString(),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Text(
-                                          data.chat!.sharedContactNumber
-                                              .toString(),
-                                          maxLines: 3,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: 80,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
+                          ),
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * .6),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: grey1Color),
+                        padding: const EdgeInsets.all(3),
+                        child: Column(
                           children: [
                             Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
+                              height: 50,
+                              width: 200,
+                              decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      topRight: Radius.circular(10)),
+                                  color: Colors.white),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
+                                  Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(35)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(35),
+                                      child: CustomCachedNetworkImage(
+                                          imageUrl: data
+                                              .chat!.sharedContactProfileImage!,
+                                          placeholderColor: chatownColor,
+                                          errorWidgeticon: const Icon(
+                                            Icons.groups,
+                                            size: 30,
+                                          )),
                                     ),
                                   ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
+                                  const SizedBox(width: 5),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        capitalizeFirstLetter(
+                                            data.chat!.sharedContactName!),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: chatColor),
+                                      ),
+                                      Text(
+                                        capitalizeFirstLetter(
+                                            data.chat!.sharedContactNumber!),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: chatColor),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
+                            const SizedBox(height: 3),
+                            Container(
+                              height: 30,
+                              width: 200,
+                              decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                      bottomLeft: Radius.circular(10),
+                                      bottomRight: Radius.circular(10)),
+                                  color: Colors.white),
+                              child: const Column(
+                                children: [
+                                  SizedBox(height: 3),
+                                  Text(
+                                    "Message",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: chatColor),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget getReplyMessage(index, StarMessageList data) {
@@ -2638,261 +2362,434 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       return "message removed";
     }
 
-    return Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 28),
-          child: InkWell(
-            onTap: () {
-              data.chat!.conversation!.isGroup == false
-                  ? Get.to(() => SingleChatMsg(
-                      conversationID: data.chat!.conversationId.toString(),
-                      username: isIdMatch(data.chat!.conversationId.toString()),
-                      userPic: isPicMatch(data.chat!.conversationId.toString()),
-                      index: 0,
-                      searchText: "",
-                      searchTime: "",
-                      mobileNum: "",
-                      isBlock:
-                          isBlockMatch(data.chat!.conversationId.toString()),
-                      messageId: data.chat!.messageId.toString(),
-                      isMsgHighLight: true,
-                      userID: data.otherUserId.toString()))
-                  : Get.to(() => GroupChatMsg(
-                        conversationID:
-                            data.chat!.conversation!.conversationId.toString(),
-                        gPusername: data.chat!.conversation!.groupName,
-                        gPPic: data.chat!.conversation!.groupProfileImage,
-                        index: 0,
-                        searchText: "",
-                        searchTime: "",
-                        messageid: data.chat!.messageId.toString(),
-                        isMsgHighLight: true,
-                      ));
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: const Color(0xffFFFFFF),
-                border: Border.all(width: 1, color: Colors.grey.shade300),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(10.0),
-                  bottomRight: Radius.circular(10.0),
-                  topLeft: Radius.circular(10.0),
-                  bottomLeft: Radius.circular(10.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? "You"
-                              : data.chat!.user!.firstName! +
-                                  data.chat!.user!.lastName!,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 11,
+    return InkWell(
+      onTap: () {
+        if (isSelectedmessage == "1") {
+          setState(() {
+            starId.contains(data.chat!.messageId.toString())
+                ? starId.remove(data.chat!.messageId.toString())
+                : starId.add(data.chat!.messageId.toString());
+          });
+        } else {
+          data.chat!.conversation!.isGroup == false
+              ? Get.to(() => SingleChatMsg(
+                  conversationID: data.chat!.conversationId.toString(),
+                  username: isIdMatch(data.chat!.conversationId.toString()),
+                  userPic: isPicMatch(data.chat!.conversationId.toString()),
+                  index: 0,
+                  searchText: "",
+                  searchTime: "",
+                  mobileNum: "",
+                  isBlock: isBlockMatch(data.chat!.conversationId.toString()),
+                  messageId: data.chat!.messageId.toString(),
+                  isMsgHighLight: true,
+                  userID: data.otherUserId.toString()))
+              : Get.to(() => GroupChatMsg(
+                    conversationID:
+                        data.chat!.conversation!.conversationId.toString(),
+                    gPusername: data.chat!.conversation!.groupName,
+                    gPPic: data.chat!.conversation!.groupProfileImage,
+                    index: 0,
+                    searchText: "",
+                    searchTime: "",
+                    messageid: data.chat!.messageId.toString(),
+                    isMsgHighLight: true,
+                  ));
+        }
+      },
+      child: Container(
+        color: const Color(0xffFFFFFF),
+        child: Stack(
+          children: [
+            isSelectedmessage == "1"
+                ? Positioned(
+                    left: 10,
+                    top: data.chat!.messageType == "text"
+                        ? 85
+                        : data.chat!.messageType == "document"
+                            ? 90
+                            : data.chat!.messageType == "image"
+                                ? 130
+                                : data.chat!.messageType == "video"
+                                    ? 130
+                                    : data.chat!.messageType == "location"
+                                        ? 140
+                                        : data.chat!.messageType == "audio"
+                                            ? 90
+                                            : data.chat!.messageType == "link"
+                                                ? 120
+                                                : data.chat!.messageType ==
+                                                        "gif"
+                                                    ? 120
+                                                    : data.chat!.messageType ==
+                                                            "contact"
+                                                        ? 120
+                                                        : 85,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          starId.contains(data.chat!.messageId.toString())
+                              ? starId.remove(data.chat!.messageId.toString())
+                              : starId.add(data.chat!.messageId.toString());
+                        });
+                        print("STARID:$starId");
+                      },
+                      child: starId.length == 0
+                          ? const SizedBox()
+                          : Transform.scale(
+                              scale: 1.1,
+                              child: starId
+                                      .contains(data.chat!.messageId.toString())
+                                  ? checkContainer()
+                                  : removeCheckContainer(),
+                            ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 5,
+                  bottom: 5,
+                  left: starId.isNotEmpty ? 34 : 28,
+                  right: 28),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? "You"
+                                : data.chat!.user!.firstName! +
+                                    data.chat!.user!.lastName!,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 11,
+                            ),
                           ),
-                        ),
-                        const Icon(Icons.arrow_right_rounded, size: 30),
-                        data.chat!.conversation!.isGroup == false
-                            ? Text(
-                                data.otherUserDetails![0].userId ==
-                                        data.chat!.user!.userId
-                                    ? "You"
-                                    : data.otherUserDetails![0].firstName! +
-                                        data.otherUserDetails![0].lastName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
+                          const Icon(Icons.arrow_right_rounded, size: 30),
+                          data.chat!.conversation!.isGroup == false
+                              ? Text(
+                                  data.otherUserDetails![0].userId ==
+                                          data.chat!.user!.userId
+                                      ? "You"
+                                      : data.otherUserDetails![0].firstName! +
+                                          data.otherUserDetails![0].lastName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
+                                )
+                              : Text(
+                                  data.chat!.conversation!.groupName!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 11,
+                                  ),
                                 ),
-                              )
-                            : Text(
-                                data.chat!.conversation!.groupName!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 11,
-                                ),
-                              ),
-                      ],
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            children: [
-                              Container(
-                                constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width * .6),
-                                padding: const EdgeInsets.only(
-                                    left: 12, right: 12, top: 0, bottom: 0),
-                                decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(10))),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          bottom: 5, top: 10),
-                                      child: Container(
-                                        width: double.infinity,
-                                        decoration: const BoxDecoration(
-                                            color: Colors.black12,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(8))),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 15,
-                                              top: 8,
-                                              bottom: 8,
-                                              right: 15),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              RichText(
-                                                  textAlign: TextAlign.start,
-                                                  text: TextSpan(children: [
-                                                    TextSpan(
-                                                      text:
-                                                          "${data.resData!.senderData!.firstName} ${data.resData!.senderData!.lastName!}",
-                                                      style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Colors.black),
-                                                    )
-                                                  ])),
-                                              const SizedBox(height: 5),
-                                              Text(
-                                                isMatching(data
-                                                    .resData!.messageId
-                                                    .toString()),
-                                                maxLines: 1,
-                                                style: TextStyle(
-                                                    color: Colors.grey[700],
-                                                    fontSize: 12),
-                                              ),
-                                            ],
-                                          ),
+                        ],
+                      ),
+                      Text(
+                        date(convertToLocalDate(data.updatedAt!)),
+                        style: TextStyle(
+                            fontSize: 8.5,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey.shade500),
+                      )
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              constraints: BoxConstraints(
+                                  maxWidth: data.chat!.messageType == "link"
+                                      ? MediaQuery.of(context).size.width * .7
+                                      : data.chat!.messageType == "audio"
+                                          ? MediaQuery.of(context).size.width *
+                                              0.7
+                                          : data.chat!.messageType == "location"
+                                              ? 250
+                                              : MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  .6),
+                              padding: const EdgeInsets.only(
+                                  left: 12, right: 12, top: 0, bottom: 0),
+                              decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(10))),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        bottom: 5, top: 10),
+                                    child: Container(
+                                      width: double.infinity,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8))),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 15,
+                                            top: 8,
+                                            bottom: 8,
+                                            right: 15),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "${data.resData!.senderData!.firstName} ${data.resData!.senderData!.lastName!}",
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black),
+                                            ),
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              isMatching(data.resData!.messageId
+                                                  .toString()),
+                                              maxLines: 1,
+                                              style: TextStyle(
+                                                  color: Colors.grey[700],
+                                                  fontSize: 12),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: data.chat!.messageType == "text"
-                                          ? Text(data.chat!.message!)
-                                          : data.chat!.messageType == "document"
-                                              ? InkWell(
-                                                  onTap: () {
-                                                    Navigator.push(
-                                                        context,
-                                                        PageTransition(
-                                                          curve: Curves.linear,
-                                                          type:
-                                                              PageTransitionType
-                                                                  .rightToLeft,
-                                                          child: FileView(
-                                                              file: data
-                                                                  .chat!.url!),
-                                                        ));
-                                                  },
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 10),
+                                    child: data.chat!.messageType == "text"
+                                        ? Text(data.chat!.message!)
+                                        : data.chat!.messageType == "document"
+                                            ? InkWell(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      PageTransition(
+                                                        curve: Curves.linear,
+                                                        type: PageTransitionType
+                                                            .rightToLeft,
+                                                        child: FileView(
+                                                            file:
+                                                                "${data.chat!.url}"),
+                                                      ));
+                                                },
+                                                child: SizedBox(
+                                                  width: Get.width * 0.50,
                                                   child: Row(
                                                     children: [
-                                                      Container(
-                                                          height: 35,
-                                                          width: 35,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            shape: BoxShape
-                                                                .rectangle,
+                                                      const Image(
+                                                        height: 30,
+                                                        image: AssetImage(
+                                                            'assets/images/pdf.png'),
+                                                      ),
+                                                      FutureBuilder<
+                                                          Map<String, dynamic>>(
+                                                        future: getPdfInfo(
+                                                            data.chat!.url!),
+                                                        builder: (context,
+                                                            snapshot) {
+                                                          if (snapshot
+                                                                  .connectionState ==
+                                                              ConnectionState
+                                                                  .waiting) {
+                                                            return Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  extractFilename(data
+                                                                          .chat!
+                                                                          .url!)
+                                                                      .toString()
+                                                                      .split(
+                                                                          "-")
+                                                                      .last,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color:
+                                                                        chatColor,
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                ),
+                                                                const Text(
+                                                                  '0 Page - 0 KB',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ).paddingOnly(
+                                                                left: 12);
+                                                          } else if (snapshot
+                                                              .hasError) {
+                                                            return const Text(
+                                                                '');
+                                                          } else if (snapshot
+                                                              .hasData) {
+                                                            final int
+                                                                pageCount =
+                                                                snapshot.data![
+                                                                    'pageCount'];
+                                                            final String
+                                                                fileSize =
+                                                                snapshot.data![
+                                                                    'fileSize'];
+                                                            return Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Container(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          left:
+                                                                              11),
+                                                                  child: Text(
+                                                                    extractFilename(data
+                                                                            .chat!
+                                                                            .url!)
+                                                                        .toString()
+                                                                        .split(
+                                                                            "-")
+                                                                        .last,
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      color:
+                                                                          chatColor,
+                                                                      fontSize:
+                                                                          14,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                Text(
+                                                                  '$pageCount Page - $fileSize',
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize:
+                                                                        10,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                  ),
+                                                                ).paddingOnly(
+                                                                    left: 12),
+                                                              ],
+                                                            );
+                                                          } else {
+                                                            return const Text(
+                                                                'No PDF info available');
+                                                          }
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              )
+                                            : data.chat!.messageType == "image"
+                                                ? InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        PageTransition(
+                                                            curve:
+                                                                Curves.linear,
+                                                            type:
+                                                                PageTransitionType
+                                                                    .rightToLeft,
+                                                            child: ImageView(
+                                                              image: data
+                                                                  .chat!.url!,
+                                                              userimg: "",
+                                                            )),
+                                                      );
+                                                    },
+                                                    child: Container(
+                                                        height: 120,
+                                                        width: double.maxFinite,
+                                                        decoration: BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        10),
-                                                            color: const Color(
-                                                                0xffCCCCCC),
-                                                          ),
-                                                          child: const Padding(
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    3.0),
-                                                            child: Image(
-                                                              image: AssetImage(
-                                                                  'assets/images/doc.png'),
-                                                            ),
-                                                          )),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(left: 11),
-                                                        child: Text(
-                                                          extractFilename(data
-                                                                  .chat!.url!)
-                                                              .toString()
-                                                              .split("-")
-                                                              .last,
-                                                          style:
-                                                              const TextStyle(
-                                                            color: chatColor,
-                                                            fontSize: 15,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      const SizedBox(height: 15)
-                                                    ],
-                                                  ),
-                                                )
-                                              : data.chat!.messageType ==
-                                                      "image"
-                                                  ? InkWell(
-                                                      onTap: () {
-                                                        Navigator.push(
-                                                          context,
-                                                          PageTransition(
-                                                              curve:
-                                                                  Curves.linear,
-                                                              type: PageTransitionType
-                                                                  .rightToLeft,
-                                                              child: ImageView(
-                                                                image: data
-                                                                    .chat!.url!,
-                                                                userimg: '',
-                                                              )),
-                                                        );
-                                                      },
-                                                      child: SizedBox(
-                                                        height: 200,
+                                                                        15)),
                                                         child: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(15),
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            imageUrl:
-                                                                data.chat!.url!,
-                                                            imageBuilder: (context,
-                                                                    imageProvider) =>
-                                                                Stack(
-                                                              children: [
-                                                                Container(
+                                                          child: Image.network(
+                                                            data.chat!.url!,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        )),
+                                                  )
+                                                : data.chat!.messageType ==
+                                                        "video"
+                                                    ? Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          SizedBox(
+                                                            height: 120,
+                                                            child: ClipRRect(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                              child:
+                                                                  CachedNetworkImage(
+                                                                imageUrl: data
+                                                                    .chat!
+                                                                    .thumbnail!,
+                                                                imageBuilder:
+                                                                    (context,
+                                                                            imageProvider) =>
+                                                                        Container(
                                                                   decoration:
                                                                       BoxDecoration(
                                                                     image:
@@ -2904,452 +2801,392 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                                     ),
                                                                   ),
                                                                 ),
-                                                              ],
-                                                            ),
-                                                            placeholder:
-                                                                (context,
+                                                                placeholder: (context,
                                                                         url) =>
                                                                     const Center(
-                                                              child:
-                                                                  CupertinoActivityIndicator(),
-                                                            ),
-                                                            errorWidget: (context,
-                                                                    url,
-                                                                    error) =>
-                                                                const Icon(Icons
-                                                                    .error),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : data.chat!.messageType ==
-                                                          "video"
-                                                      ? Stack(
-                                                          children: [
-                                                            SizedBox(
-                                                              height: 200,
-                                                              child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15),
-                                                                child:
-                                                                    CachedNetworkImage(
-                                                                  imageUrl: data
-                                                                      .chat!
-                                                                      .thumbnail!,
-                                                                  imageBuilder:
-                                                                      (context,
-                                                                              imageProvider) =>
-                                                                          Container(
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      image:
-                                                                          DecorationImage(
-                                                                        image:
-                                                                            imageProvider,
-                                                                        fit: BoxFit
-                                                                            .cover,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                  placeholder: (context,
-                                                                          url) =>
-                                                                      const Center(
-                                                                    child:
-                                                                        CupertinoActivityIndicator(),
-                                                                  ),
-                                                                  errorWidget: (context,
-                                                                          url,
-                                                                          error) =>
-                                                                      const Center(
-                                                                    child: Icon(
-                                                                        Icons
-                                                                            .error),
-                                                                  ),
-                                                                  fit: BoxFit
-                                                                      .cover,
+                                                                  child:
+                                                                      CupertinoActivityIndicator(),
                                                                 ),
+                                                                errorWidget: (context,
+                                                                        url,
+                                                                        error) =>
+                                                                    const Center(
+                                                                  child: Icon(
+                                                                      Icons
+                                                                          .error),
+                                                                ),
+                                                                fit: BoxFit
+                                                                    .cover,
                                                               ),
                                                             ),
-                                                            Positioned(
-                                                                top: 80,
-                                                                left: 74,
-                                                                child: InkWell(
-                                                                  onTap: () {
-                                                                    Navigator.push(
-                                                                        context,
-                                                                        MaterialPageRoute(
-                                                                          builder: (context) => VideoViewFix(
-                                                                              username: "",
-                                                                              //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
-                                                                              url: data.chat!.url!,
-                                                                              play: true,
-                                                                              mute: false,
-                                                                              date: ""
-                                                                              // convertUTCTimeTo12HourFormat(
-                                                                              //     data.createdAt!),
-                                                                              ),
-                                                                        ));
-                                                                  },
-                                                                  child: CircleAvatar(
-                                                                      radius:
-                                                                          20,
-                                                                      backgroundColor: Colors
-                                                                          .grey
-                                                                          .shade300,
-                                                                      foregroundColor:
-                                                                          chatownColor,
-                                                                      child: Image.asset(
-                                                                          "assets/images/play1.png",
-                                                                          color:
-                                                                              chatColor,
-                                                                          height:
-                                                                              18)),
-                                                                ))
-                                                          ],
-                                                        )
-                                                      : data.chat!.messageType ==
-                                                              "location"
-                                                          ? Column(
-                                                              children: [
-                                                                Container(
-                                                                  decoration:
-                                                                      BoxDecoration(
+                                                          ),
+                                                          InkWell(
+                                                            onTap: () {
+                                                              Navigator.push(
+                                                                  context,
+                                                                  MaterialPageRoute(
+                                                                    builder: (context) => VideoViewFix(
+                                                                        username: "",
+                                                                        //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
+                                                                        url: data.chat!.url!,
+                                                                        play: true,
+                                                                        mute: false,
+                                                                        date: ""
+                                                                        // convertUTCTimeTo12HourFormat(
+                                                                        //     data.createdAt!),
+                                                                        ),
+                                                                  ));
+                                                            },
+                                                            child: CircleAvatar(
+                                                                radius: 18,
+                                                                backgroundColor:
+                                                                    Colors.grey
+                                                                        .shade300,
+                                                                foregroundColor:
+                                                                    chatownColor,
+                                                                child: Image.asset(
+                                                                    "assets/images/play1.png",
+                                                                    color:
+                                                                        chatColor,
+                                                                    height:
+                                                                        15)),
+                                                          )
+                                                        ],
+                                                      )
+                                                    : data.chat!.messageType ==
+                                                            "location"
+                                                        ? Container(
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10),
+                                                            ),
+                                                            constraints:
+                                                                const BoxConstraints(
+                                                                    minHeight:
+                                                                        10.0,
+                                                                    minWidth:
+                                                                        10.0,
+                                                                    maxWidth:
+                                                                        250),
+                                                            child: InkWell(
+                                                              onTap: () {
+                                                                MapUtils.openMap(
+                                                                    double.parse(data
+                                                                        .chat!
+                                                                        .latitude!),
+                                                                    double.parse(data
+                                                                        .chat!
+                                                                        .longitude!));
+                                                              },
+                                                              child: Container(
+                                                                height: 130,
+                                                                width: 250,
+                                                                decoration: BoxDecoration(
                                                                     borderRadius:
                                                                         BorderRadius.circular(
-                                                                            15),
-                                                                  ),
-                                                                  constraints: const BoxConstraints(
-                                                                      minHeight:
-                                                                          10.0,
-                                                                      minWidth:
-                                                                          10.0,
-                                                                      maxWidth:
-                                                                          250),
-                                                                  child:
-                                                                      Container(
-                                                                    height: 180,
-                                                                    decoration: BoxDecoration(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10)),
-                                                                    child:
-                                                                        ClipRRect(
+                                                                            10)),
+                                                                child:
+                                                                    ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  child: data.chat!.latitude.toString() ==
+                                                                              "" ||
+                                                                          data.chat!.longitude.toString() ==
+                                                                              ""
+                                                                      ? Container(
+                                                                          decoration: const BoxDecoration(
+                                                                              borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+                                                                              image: DecorationImage(image: AssetImage("assets/images/map_Blurr.png"), fit: BoxFit.cover)),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.error_outline,
+                                                                            color:
+                                                                                chatownColor.withOpacity(0.6),
+                                                                            size:
+                                                                                50,
+                                                                          ),
+                                                                        )
+                                                                      : GoogleMap(
+                                                                          zoomControlsEnabled:
+                                                                              false,
+                                                                          zoomGesturesEnabled:
+                                                                              false,
+                                                                          initialCameraPosition: CameraPosition(
+                                                                              target: LatLng(double.parse(data.chat!.latitude!), double.parse(data.chat!.longitude!)),
+                                                                              zoom: 15),
+                                                                          mapType:
+                                                                              MapType.normal,
+                                                                          onMapCreated:
+                                                                              (GoogleMapController controller111) {
+                                                                            // controller.complete();
+                                                                          },
+                                                                        ),
+                                                                ),
+                                                              ),
+                                                            ))
+                                                        : data.chat!.messageType ==
+                                                                "audio"
+                                                            ? _audioReply(
+                                                                message: data
+                                                                    .chat!.url!,
+                                                                index: index,
+                                                                duration: data
+                                                                    .chat!
+                                                                    .audioTime!)
+                                                            : data.chat!.messageType ==
+                                                                    "link"
+                                                                ? Container(
+                                                                    constraints: BoxConstraints(
+                                                                        maxHeight:
+                                                                            MediaQuery.of(context).size.height /
+                                                                                9.3,
+                                                                        maxWidth:
+                                                                            MediaQuery.of(context).size.width *
+                                                                                .7),
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      border: Border.all(
+                                                                          color: Colors
+                                                                              .grey
+                                                                              .shade200),
                                                                       borderRadius:
                                                                           BorderRadius.circular(
                                                                               10),
-                                                                      child: data.chat!.latitude == "" ||
-                                                                              data.chat!.longitude == ""
-                                                                          ? Container(
-                                                                              decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/map_Blurr.png"), fit: BoxFit.cover)),
-                                                                              child: Icon(
-                                                                                Icons.error_outline,
-                                                                                color: chatownColor.withOpacity(0.6),
-                                                                                size: 50,
-                                                                              ),
-                                                                            )
-                                                                          : GoogleMap(
-                                                                              zoomControlsEnabled: false,
-                                                                              zoomGesturesEnabled: false,
-                                                                              initialCameraPosition: CameraPosition(target: LatLng(double.parse(data.chat!.latitude!), double.parse(data.chat!.longitude!)), zoom: 15),
-                                                                              mapType: MapType.normal,
-                                                                              onMapCreated: (GoogleMapController controller111) {
-                                                                                // controller.complete();
-                                                                              },
-                                                                            ),
                                                                     ),
-                                                                  ),
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 5),
-                                                                InkWell(
-                                                                  onTap: () {
-                                                                    MapUtils.openMap(
-                                                                        double.parse(data
+                                                                    child:
+                                                                        InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        launchURL(data
                                                                             .chat!
-                                                                            .latitude!),
-                                                                        double.parse(data
-                                                                            .chat!
-                                                                            .longitude!));
-                                                                  },
-                                                                  child: Stack(
-                                                                    children: [
-                                                                      Container(
-                                                                        height:
-                                                                            30,
-                                                                        decoration:
-                                                                            const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))),
-                                                                        child:
-                                                                            const Center(
-                                                                          child:
-                                                                              Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
-                                                                              Text("View Location",
-                                                                                  style: TextStyle(
-                                                                                    color: chatColor,
-                                                                                    fontSize: 15,
-                                                                                    fontWeight: FontWeight.w500,
-                                                                                  )),
-                                                                            ],
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            )
-                                                          : data.chat!.messageType ==
-                                                                  "audio"
-                                                              ? myVoiceWidget(
-                                                                  data.chat!
-                                                                      .url!,
-                                                                  index,
-                                                                  data.chat!
-                                                                      .audioTime!,
-                                                                  "1",
-                                                                  data
-                                                                      .createdAt,
-                                                                  true)
-                                                              : data.chat!.messageType ==
-                                                                      "link"
-                                                                  ? FlutterLinkPreview(
-                                                                      url: data
-                                                                          .chat!
-                                                                          .message!,
-                                                                      builder:
-                                                                          (info) {
-                                                                        if (info
-                                                                            is WebInfo) {
-                                                                          return info.title == null && info.description == null
-                                                                              ? Text(
-                                                                                  data.chat!.message!,
-                                                                                  style: const TextStyle(
-                                                                                    fontSize: 14,
-                                                                                    fontWeight: FontWeight.w400,
-                                                                                    color: Colors.black,
-                                                                                  ),
-                                                                                )
-                                                                              : Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                  children: [
-                                                                                    if (info.image != null) Image.network(info.image!, fit: BoxFit.cover),
-                                                                                    if (info.title != null)
-                                                                                      Container(
-                                                                                        decoration: BoxDecoration(color: Colors.black12, borderRadius: BorderRadius.circular(7)),
-                                                                                        child: Text(
-                                                                                          info.title!,
-                                                                                          style: const TextStyle(
-                                                                                            color: Colors.black,
-                                                                                            fontWeight: FontWeight.bold,
-                                                                                          ),
-                                                                                        ).paddingAll(2),
-                                                                                      ).paddingOnly(top: 5),
-                                                                                    if (info.description != null)
-                                                                                      Text(
-                                                                                        info.description!,
-                                                                                        maxLines: 3,
-                                                                                        overflow: TextOverflow.ellipsis,
-                                                                                        style: const TextStyle(
-                                                                                          color: Colors.black,
-                                                                                        ),
-                                                                                      ),
-                                                                                  ],
-                                                                                );
-                                                                        }
-                                                                        return const CircularProgressIndicator();
+                                                                            .message!);
                                                                       },
-                                                                      titleStyle:
-                                                                          const TextStyle(
-                                                                        color: Colors
-                                                                            .black,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                      ),
-                                                                    )
-                                                                  : data.chat!.messageType ==
-                                                                          "gif"
-                                                                      ? InkWell(
-                                                                          onTap:
-                                                                              () {
-                                                                            Navigator.push(
-                                                                              context,
-                                                                              PageTransition(
-                                                                                  curve: Curves.linear,
-                                                                                  type: PageTransitionType.rightToLeft,
-                                                                                  child: ImageView(
-                                                                                    image: data.chat!.url!,
-                                                                                    userimg: '',
-                                                                                  )),
-                                                                            );
-                                                                          },
-                                                                          child:
-                                                                              SizedBox(
-                                                                            height:
-                                                                                150,
+                                                                      child:
+                                                                          Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: [
+                                                                          Container(
+                                                                            padding: const EdgeInsets.only(
+                                                                                left: 5,
+                                                                                right: 5,
+                                                                                top: 5,
+                                                                                bottom: 5),
+                                                                            decoration:
+                                                                                BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                                                                             child:
-                                                                                ClipRRect(
+                                                                                FlutterLinkPreview(
+                                                                              url: data.chat!.message!,
+                                                                              builder: (info) {
+                                                                                if (info is WebInfo) {
+                                                                                  return info.title == null && info.description == null
+                                                                                      ? Text(
+                                                                                          data.chat!.message!,
+                                                                                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Colors.white),
+                                                                                        )
+                                                                                      : Row(
+                                                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                                                                          children: [
+                                                                                            if (info.image != null)
+                                                                                              Container(
+                                                                                                height: 50,
+                                                                                                width: 50,
+                                                                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                                                                                child: ClipRRect(
+                                                                                                  borderRadius: BorderRadius.circular(10),
+                                                                                                  child: Image.network(info.image!, fit: BoxFit.cover),
+                                                                                                ),
+                                                                                              ),
+                                                                                            const SizedBox(width: 5),
+                                                                                            Expanded(
+                                                                                              child: Column(
+                                                                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                children: [
+                                                                                                  if (info.title != null)
+                                                                                                    Text(
+                                                                                                      info.title!,
+                                                                                                      maxLines: 1,
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      style: const TextStyle(
+                                                                                                        fontSize: 14,
+                                                                                                        fontWeight: FontWeight.w600,
+                                                                                                      ),
+                                                                                                    ).paddingAll(2),
+                                                                                                  info.image == null ? const SizedBox(height: 5) : const SizedBox.shrink(),
+                                                                                                  if (info.description != null)
+                                                                                                    Text(
+                                                                                                      info.description!,
+                                                                                                      maxLines: 2,
+                                                                                                      overflow: TextOverflow.ellipsis,
+                                                                                                      style: const TextStyle(color: Color.fromRGBO(68, 68, 68, 1), fontSize: 9, fontWeight: FontWeight.w400),
+                                                                                                    ),
+                                                                                                ],
+                                                                                              ),
+                                                                                            ),
+                                                                                          ],
+                                                                                        );
+                                                                                }
+                                                                                return const CircularProgressIndicator();
+                                                                              },
+                                                                              titleStyle: const TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontWeight: FontWeight.bold,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                          const SizedBox(
+                                                                              height: 3),
+                                                                          Text(
+                                                                            data.chat!.message!,
+                                                                            maxLines:
+                                                                                1,
+                                                                            overflow:
+                                                                                TextOverflow.ellipsis,
+                                                                            style: TextStyle(
+                                                                                color: linkColor,
+                                                                                fontSize: 10,
+                                                                                fontWeight: FontWeight.w400),
+                                                                          ).paddingOnly(
+                                                                              left: 10)
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  )
+                                                                : data.chat!.messageType ==
+                                                                        "gif"
+                                                                    ? InkWell(
+                                                                        onTap:
+                                                                            () {
+                                                                          Navigator
+                                                                              .push(
+                                                                            context,
+                                                                            PageTransition(
+                                                                                curve: Curves.linear,
+                                                                                type: PageTransitionType.rightToLeft,
+                                                                                child: ImageView(
+                                                                                  image: data.chat!.url!,
+                                                                                  userimg: "",
+                                                                                )),
+                                                                          );
+                                                                        },
+                                                                        child: Container(
+                                                                            height: 120,
+                                                                            width: double.maxFinite,
+                                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                                                                            child: ClipRRect(
                                                                               borderRadius: BorderRadius.circular(15),
-                                                                              child: CachedNetworkImage(
-                                                                                imageUrl: data.chat!.url!,
-                                                                                imageBuilder: (context, imageProvider) => Stack(
+                                                                              child: Image.network(
+                                                                                data.chat!.url!,
+                                                                                fit: BoxFit.cover,
+                                                                              ),
+                                                                            )),
+                                                                      )
+                                                                    : data.chat!.messageType ==
+                                                                            "contact"
+                                                                        ? Column(
+                                                                            children: [
+                                                                              Container(
+                                                                                height: 50,
+                                                                                width: 200,
+                                                                                decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
+                                                                                child: Row(
                                                                                   children: [
+                                                                                    const SizedBox(width: 20),
                                                                                     Container(
-                                                                                      decoration: BoxDecoration(
-                                                                                        image: DecorationImage(
-                                                                                          image: imageProvider,
-                                                                                          fit: BoxFit.cover,
-                                                                                        ),
+                                                                                      height: 30,
+                                                                                      width: 30,
+                                                                                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(35)),
+                                                                                      child: ClipRRect(
+                                                                                        borderRadius: BorderRadius.circular(35),
+                                                                                        child: CustomCachedNetworkImage(
+                                                                                            imageUrl: data.chat!.sharedContactProfileImage!,
+                                                                                            placeholderColor: chatownColor,
+                                                                                            errorWidgeticon: const Icon(
+                                                                                              Icons.groups,
+                                                                                              size: 30,
+                                                                                            )),
                                                                                       ),
+                                                                                    ),
+                                                                                    const SizedBox(width: 10),
+                                                                                    Column(
+                                                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                      children: [
+                                                                                        Text(
+                                                                                          capitalizeFirstLetter(data.chat!.sharedContactName!),
+                                                                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: chatColor),
+                                                                                        ),
+                                                                                        Text(
+                                                                                          capitalizeFirstLetter(data.chat!.sharedContactNumber!),
+                                                                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: chatColor),
+                                                                                        ),
+                                                                                      ],
                                                                                     ),
                                                                                   ],
                                                                                 ),
-                                                                                placeholder: (context, url) => const Center(
-                                                                                  child: CupertinoActivityIndicator(),
-                                                                                ),
-                                                                                errorWidget: (context, url, error) => const Icon(Icons.error),
-                                                                                fit: BoxFit.cover,
                                                                               ),
-                                                                            ),
-                                                                          ),
-                                                                        )
-                                                                      : data.chat!.messageType ==
-                                                                              "contact"
-                                                                          ? Column(
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Text(data.chat!.sharedContactName!),
-                                                                                Text(data.chat!.sharedContactNumber!),
-                                                                              ],
-                                                                            )
-                                                                          : const SizedBox(),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 26,
-                              width: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: chatownColor,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    date(convertToLocalDate(data.updatedAt!)),
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w400,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.black,
-                                    size: 11,
-                                  ),
+                                                                              const SizedBox(height: 3),
+                                                                              Container(
+                                                                                height: 30,
+                                                                                width: 200,
+                                                                                decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
+                                                                                child: const Column(
+                                                                                  children: [
+                                                                                    SizedBox(height: 3),
+                                                                                    Text(
+                                                                                      "Message",
+                                                                                      textAlign: TextAlign.center,
+                                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                    ),
+                                                                                  ],
+                                                                                ),
+                                                                              )
+                                                                            ],
+                                                                          )
+                                                                        : const SizedBox(),
+                                  )
                                 ],
                               ),
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      localmsgid = "";
-                                      localmsgid =
-                                          data.chat!.messageId.toString();
-                                      print('<<<<<>>>>>');
-                                      removeStarApi(data.messageId, data);
-                                    });
-                                  },
-                                  child: Image.asset(
-                                          "assets/images/starfill.png",
-                                          color: chatownColor,
-                                          height: 14)
-                                      .paddingOnly(top: 5, right: 5, bottom: 5),
-                                ),
-                                const SizedBox(
-                                  width: 5,
-                                ),
-                                Text(
-                                  convertUTCTimeTo12HourFormat(data.createdAt!),
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 15,
+                        color: Colors.grey.shade500,
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        convertUTCTimeTo12HourFormat(data.createdAt!),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade500,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-          ),
+          ],
         ),
-        isSelectedmessage == "1"
-            ? Positioned(
-                left: 2,
-                bottom: 10,
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      starId.contains(data.chat!.messageId)
-                          ? starId.remove(data.chat!.messageId)
-                          : starId.add(data.chat!.messageId);
-                    });
-                    print("STARID:$starId");
-                  },
-                  child: allStaredMsgController.allStarred.isEmpty
-                      ? const SizedBox()
-                      : Transform.scale(
-                          scale: 1.1,
-                          child: GestureDetector(
-                            child: Container(
-                              width: 20.0,
-                              height: 20.0,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                border: Border.all(color: bg1),
-                                color: starId.contains(data.chat!.messageId)
-                                    ? bg1
-                                    : bg1,
-                              ),
-                              child: starId.contains(data.chat!.messageId)
-                                  ? const Icon(
-                                      Icons.check,
-                                      size: 15.0,
-                                      color: Colors.black,
-                                    )
-                                  : const SizedBox(
-                                      height: 10,
-                                    ),
-                            ),
-                          ),
-                        ),
-                ),
-              )
-            : const SizedBox.shrink()
-      ],
-    );
+      ),
+    ).paddingOnly(bottom: 10);
   }
 
   Widget myVoiceWidget(String audiourl, int index, String audioduration,
@@ -3386,74 +3223,146 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   }) {
     return Container(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.6,
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
       ),
       height: 65,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                audioController.onPressedPlayButton(index, message);
-              });
-            },
-            onSecondaryTap: () {
-              audioPlayer.stop();
-            },
-            child: Obx(
-              () => (audioController.isRecordPlaying &&
-                      audioController.currentId == index)
-                  ? const Icon(
-                      Icons.pause,
-                      color: chatColor,
-                    )
-                  : const Icon(
-                      Icons.play_arrow,
-                      color: chatColor,
-                    ),
+          borderRadius: BorderRadius.circular(10), color: grey1Color),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10), color: Colors.white),
+        child: Row(
+          children: [
+            const SizedBox(width: 5),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  audioController.onPressedPlayButton(index, message);
+                });
+              },
+              onSecondaryTap: () {
+                audioPlayer.stop();
+              },
+              child: Obx(
+                () => (audioController.isRecordPlaying &&
+                        audioController.currentId == index)
+                    ? Icon(
+                        CupertinoIcons.pause_circle_fill,
+                        color: grey1Color,
+                      )
+                    : Icon(
+                        CupertinoIcons.play_circle_fill,
+                        color: grey1Color,
+                      ),
+              ),
             ),
-          ),
-          const SizedBox(width: 5),
-          Obx(
-            () => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    LinearProgressIndicator(
-                      minHeight: 5,
-                      backgroundColor: Colors.grey,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.black),
-                      value: (audioController.isRecordPlaying &&
-                              audioController.currentId == index)
-                          ? (audioController.totalDuration.value > 0
-                              ? audioController.completedPercentage.value
-                              : 0.0)
-                          : 0.0,
-                    ),
-                  ],
+            const SizedBox(width: 5),
+            Obx(
+              () => Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      LinearProgressIndicator(
+                        minHeight: 5,
+                        backgroundColor: Colors.grey,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.black),
+                        value: (audioController.isRecordPlaying &&
+                                audioController.currentId == index)
+                            ? (audioController.totalDuration.value > 0
+                                ? audioController.completedPercentage.value
+                                : 0.0)
+                            : 0.0,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Text(
-            duration,
-            style: const TextStyle(fontSize: 12, color: chatColor),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Text(
+              duration,
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey),
+            ),
+            const SizedBox(width: 10)
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _audioReply({
+    required String message,
+    required int index,
+    required String duration,
+  }) {
+    return Row(
+      children: [
+        const SizedBox(width: 5),
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              audioController.onPressedPlayButton(index, message);
+            });
+          },
+          onSecondaryTap: () {
+            audioPlayer.stop();
+          },
+          child: Obx(
+            () => (audioController.isRecordPlaying &&
+                    audioController.currentId == index)
+                ? const Icon(
+                    CupertinoIcons.pause_circle_fill,
+                    color: appColorBlack,
+                  )
+                : const Icon(
+                    CupertinoIcons.play_circle_fill,
+                    color: appColorBlack,
+                  ),
+          ),
+        ),
+        const SizedBox(width: 5),
+        Obx(
+          () => Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 0),
+              child: Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  LinearProgressIndicator(
+                    minHeight: 5,
+                    backgroundColor: Colors.grey,
+                    valueColor:
+                        const AlwaysStoppedAnimation<Color>(Colors.black),
+                    value: (audioController.isRecordPlaying &&
+                            audioController.currentId == index)
+                        ? (audioController.totalDuration.value > 0
+                            ? audioController.completedPercentage.value
+                            : 0.0)
+                        : 0.0,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          duration,
+          style: const TextStyle(
+              fontSize: 10, fontWeight: FontWeight.w400, color: Colors.grey),
+        ),
+        const SizedBox(width: 10)
+      ],
+    ).paddingOnly(top: 5);
   }
 
   bool isStar = false;

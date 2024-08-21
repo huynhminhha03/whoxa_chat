@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names, unused_field, prefer_is_empty
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +23,7 @@ import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -37,6 +39,7 @@ import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/contact_send.dart';
 import 'package:meyaoo_new/src/screens/chat/imageView.dart';
 import 'package:meyaoo_new/src/screens/forward_message/forward_message_list.dart';
+import 'package:meyaoo_new/src/screens/save_contact.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -86,6 +89,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   RoomIdController getRoomController = Get.put(RoomIdController());
   ChatListController chatListController = Get.put(ChatListController());
   ValueNotifier<bool> isLast = ValueNotifier(false);
+  GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
 
   @override
   void initState() {
@@ -166,7 +170,23 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       //   }
       // }
     });
+    apis();
     super.initState();
+  }
+
+  Future<void> apis() async {
+    await getContactsFromGloble();
+    var contactJson = json.encode(mobileContacts);
+    getAllDeviceContact.getAllContactApi(contact: contactJson);
+  }
+
+  bool matchContact(String num) {
+    for (var i = 0; i < getAllDeviceContact.getList.length; i++) {
+      if (num == getAllDeviceContact.getList[i].phoneNumber) {
+        return true;
+      }
+    }
+    return false;
   }
 
   List? chatMsgList;
@@ -892,7 +912,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1061,7 +1081,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1252,7 +1272,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1457,7 +1477,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1683,7 +1703,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1954,7 +1974,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         }
       },
       onTap: () {
-        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
@@ -2054,7 +2074,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2241,7 +2261,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2542,7 +2562,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2667,15 +2687,18 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     Container(
                                       height: 50,
                                       width: 200,
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10)),
+                                      decoration: BoxDecoration(
+                                          borderRadius: matchContact(
+                                                  data.sharedContactNumber!)
+                                              ? BorderRadius.circular(10)
+                                              : const BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight:
+                                                      Radius.circular(10)),
                                           color: Colors.white),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
                                         children: [
+                                          const SizedBox(width: 20),
                                           Container(
                                             height: 30,
                                             width: 30,
@@ -2691,12 +2714,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                   placeholderColor:
                                                       chatownColor,
                                                   errorWidgeticon: const Icon(
-                                                    Icons.groups,
+                                                    Icons.person,
                                                     size: 30,
                                                   )),
                                             ),
                                           ),
-                                          const SizedBox(width: 5),
+                                          const SizedBox(width: 10),
                                           Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
@@ -2725,28 +2748,44 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                       ),
                                     ),
                                     const SizedBox(height: 3),
-                                    Container(
-                                      height: 30,
-                                      width: 200,
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10)),
-                                          color: Colors.white),
-                                      child: const Column(
-                                        children: [
-                                          SizedBox(height: 3),
-                                          Text(
-                                            "Message",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: chatColor),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                                    matchContact(data.sharedContactNumber!)
+                                        ? const SizedBox.shrink()
+                                        : InkWell(
+                                            onTap: () {
+                                              Get.to(() => SaveContact(
+                                                  name: data.sharedContactName!,
+                                                  number: data
+                                                      .sharedContactNumber!));
+                                            },
+                                            child: Container(
+                                              height: 30,
+                                              width: 200,
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  color: Colors.white),
+                                              child: const Column(
+                                                children: [
+                                                  SizedBox(height: 3),
+                                                  Text(
+                                                    "View contact",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: chatColor),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
                                   ],
                                 ),
                               ),
@@ -2780,7 +2819,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         }
       },
       onTap: () {
-        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
@@ -3036,6 +3075,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           controller.isTyping();
                           typingstart = "0";
                           chatContorller.isSendMsg.value = false;
+                          listScrollController!.jumpTo(
+                              listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
@@ -3062,6 +3103,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           controller.isTyping();
                           typingstart = "0";
                           chatContorller.isSendMsg.value = false;
+                          listScrollController!.jumpTo(
+                              listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
@@ -3256,13 +3299,21 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                 click = !click;
                               });
                               Get.to(
-                                  () => ContactSend(
-                                        conversationID: widget.conversationID!,
-                                        mobileNum: widget.mobileNum.toString(),
-                                        SelectedreplyText: SelectedreplyText,
-                                        replyID: reply_chatID,
-                                      ),
-                                  transition: Transition.leftToRight);
+                                      () => ContactSend(
+                                            conversationID:
+                                                widget.conversationID!,
+                                            mobileNum:
+                                                widget.mobileNum.toString(),
+                                            SelectedreplyText:
+                                                SelectedreplyText,
+                                            replyID: reply_chatID,
+                                          ),
+                                      transition: Transition.leftToRight)!
+                                  .then((_) {
+                                listScrollController!.jumpTo(
+                                    listScrollController!
+                                        .position.minScrollExtent);
+                              });
                             },
                             child: const Image(
                                 height: 82,
@@ -3344,6 +3395,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             '',
             reply_chatID);
         SelectedreplyText = false;
+        listScrollController!
+            .jumpTo(listScrollController!.position.minScrollExtent);
       } else {
         chatContorller.sendMessageVoice(
             widget.conversationID!,
@@ -3354,6 +3407,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             widget.mobileNum.toString(),
             '',
             '');
+        listScrollController!
+            .jumpTo(listScrollController!.position.minScrollExtent);
       }
     }
   }
@@ -3773,9 +3828,13 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 reply_chatID,
                 false);
             SelectedreplyText = false;
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
                 value!.path, widget.mobileNum.toString(), '', '', false);
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           }
         });
       } else {}
@@ -3983,9 +4042,13 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 reply_chatID,
                 false);
             SelectedreplyText = false;
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           } else {
             chatContorller.sendMessageVideo(widget.conversationID, "video",
                 compressedVideos, widget.mobileNum.toString(), '', '', false);
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           }
         }
       } else {
@@ -4042,9 +4105,13 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
               widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
+          listScrollController!
+              .jumpTo(listScrollController!.position.minScrollExtent);
         } else {
           chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
               widget.mobileNum.toString(), '', '');
+          listScrollController!
+              .jumpTo(listScrollController!.position.minScrollExtent);
         }
 
         print(bytes.toString());
@@ -4088,9 +4155,13 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           '',
           reply_chatID);
       SelectedreplyText = false;
+      listScrollController!
+          .jumpTo(listScrollController!.position.minScrollExtent);
     } else {
       chatContorller.sendMessageLocation(widget.conversationID!, "location",
           _placeLat!, _placeLong!, widget.mobileNum.toString(), '', '');
+      listScrollController!
+          .jumpTo(listScrollController!.position.minScrollExtent);
     }
 
     // Handle the result in your way
@@ -5238,7 +5309,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           padding: const EdgeInsets.only(top: 4.0),
                           child: SizedBox(
                             child: timestpa(data.messageRead.toString(),
-                                data.createdAt!, isStarred),
+                                data.createdAt!, data.isStarMessage!),
                           ))
                     ],
                   ),

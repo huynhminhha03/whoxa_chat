@@ -876,7 +876,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1045,7 +1045,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1236,7 +1236,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1441,7 +1441,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1667,7 +1667,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -1938,7 +1938,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         }
       },
       onTap: () {
-        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
@@ -2038,7 +2038,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2225,7 +2225,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2526,7 +2526,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           }
         },
         onTap: () {
-          if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+          if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
             setState(() {
               chatID.contains(data.messageId.toString())
                   ? chatID.remove(data.messageId.toString())
@@ -2764,7 +2764,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         }
       },
       onTap: () {
-        if (chatID.isNotEmpty || chatMessageList.isEmpty) {
+        if (chatID.isNotEmpty || chatMessageList.isNotEmpty) {
           setState(() {
             chatID.contains(data.messageId.toString())
                 ? chatID.remove(data.messageId.toString())
@@ -2928,6 +2928,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           controller.isTyping();
                           typingstart = "0";
                           chatContorller.isSendMsg.value = false;
+                          listScrollController!.jumpTo(
+                              listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
@@ -2954,6 +2956,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           controller.isTyping();
                           typingstart = "0";
                           chatContorller.isSendMsg.value = false;
+                          listScrollController!.jumpTo(
+                              listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
@@ -3148,13 +3152,21 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                 click = !click;
                               });
                               Get.to(
-                                  () => ContactSend(
-                                        conversationID: widget.conversationID!,
-                                        mobileNum: widget.mobileNum.toString(),
-                                        SelectedreplyText: SelectedreplyText,
-                                        replyID: reply_chatID,
-                                      ),
-                                  transition: Transition.leftToRight);
+                                      () => ContactSend(
+                                            conversationID:
+                                                widget.conversationID!,
+                                            mobileNum:
+                                                widget.mobileNum.toString(),
+                                            SelectedreplyText:
+                                                SelectedreplyText,
+                                            replyID: reply_chatID,
+                                          ),
+                                      transition: Transition.leftToRight)!
+                                  .then((_) {
+                                listScrollController!.jumpTo(
+                                    listScrollController!
+                                        .position.minScrollExtent);
+                              });
                             },
                             child: const Image(
                                 height: 82,
@@ -3596,6 +3608,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             '',
             reply_chatID);
         SelectedreplyText = false;
+        listScrollController!
+            .jumpTo(listScrollController!.position.minScrollExtent);
       } else {
         chatContorller.sendMessageVoice(
             widget.conversationID!,
@@ -3606,6 +3620,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             widget.mobileNum.toString(),
             '',
             '');
+        listScrollController!
+            .jumpTo(listScrollController!.position.minScrollExtent);
       }
     }
   }
@@ -4009,9 +4025,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 reply_chatID,
                 false);
             SelectedreplyText = false;
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           } else {
             chatContorller.sendMessageIMGDoc(widget.conversationID, 'image',
                 value!.path, widget.mobileNum.toString(), '', '', false);
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           }
         });
       } else {}
@@ -4217,9 +4237,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 reply_chatID,
                 false);
             SelectedreplyText = false;
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           } else {
             chatContorller.sendMessageVideo(widget.conversationID, "video",
                 compressedVideos, widget.mobileNum.toString(), '', '', false);
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
           }
         }
       } else {
@@ -4274,9 +4298,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
           chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
               widget.mobileNum.toString(), '', reply_chatID);
           SelectedreplyText = false;
+          listScrollController!
+              .jumpTo(listScrollController!.position.minScrollExtent);
         } else {
           chatContorller.sendMessageGIF(widget.conversationID, 'gif', bytes, '',
               widget.mobileNum.toString(), '', '');
+          listScrollController!
+              .jumpTo(listScrollController!.position.minScrollExtent);
         }
 
         print(bytes.toString());

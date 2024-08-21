@@ -113,6 +113,7 @@ class Chat {
   String? latitude;
   String? longitude;
   String? sharedContactName;
+  String? sharedContactProfileImage;
   String? sharedContactNumber;
   int? forwardId;
   int? replyId;
@@ -136,6 +137,7 @@ class Chat {
       this.latitude,
       this.longitude,
       this.sharedContactName,
+      this.sharedContactProfileImage,
       this.sharedContactNumber,
       this.forwardId,
       this.replyId,
@@ -159,6 +161,7 @@ class Chat {
     latitude = json['latitude'];
     longitude = json['longitude'];
     sharedContactName = json['shared_contact_name'];
+    sharedContactProfileImage = json['shared_contact_profile_image'];
     sharedContactNumber = json['shared_contact_number'];
     forwardId = json['forward_id'];
     replyId = json['reply_id'];
@@ -186,6 +189,7 @@ class Chat {
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     data['shared_contact_name'] = sharedContactName;
+    data['shared_contact_profile_image'] = sharedContactProfileImage;
     data['shared_contact_number'] = sharedContactNumber;
     data['forward_id'] = forwardId;
     data['reply_id'] = replyId;
