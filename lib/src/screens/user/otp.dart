@@ -18,6 +18,7 @@ import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:http/http.dart' as http;
 
@@ -399,6 +400,7 @@ class _otpState extends State<otp> {
       request.fields['phone_number'] = widget.phoneController;
       request.fields['otp'] = _code;
       request.fields['device_token'] = _fcmtoken;
+      request.fields['one_signal_player_id'] = OneSignal.User.pushSubscription.id!;
 
       var response = await request.send();
       print(response.statusCode);

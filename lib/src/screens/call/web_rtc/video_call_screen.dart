@@ -292,7 +292,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         ? forFour()
                         : remoteRenderers.length == 4
                             ? forFive()
-                            : remoteRenderers.length > 5 &&
+                            : remoteRenderers.length > 4 &&
                                     remoteRenderers.length < 12
                                 ? forSixToTwelve()
                                 : forTwo(),
@@ -461,7 +461,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           ? localRenderer
                           : remoteRenderers[
                               remoteRenderers.keys.elementAt(index)]!,
-                      mirror: true,
+                      mirror: false,
                       objectFit:
                           RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     ),
@@ -491,7 +491,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       child: RTCVideoView(
                         remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                        mirror: true,
+                        mirror: false,
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
@@ -508,7 +508,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       child: RTCVideoView(
                         remoteRenderers[remoteRenderers.keys.elementAt(1)]!,
-                        mirror: true,
+                        mirror: false,
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
@@ -531,7 +531,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       child: RTCVideoView(
                         remoteRenderers[remoteRenderers.keys.elementAt(2)]!,
-                        mirror: true,
+                        mirror: false,
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
@@ -548,7 +548,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       ),
                       child: RTCVideoView(
                         remoteRenderers[remoteRenderers.keys.elementAt(3)]!,
-                        mirror: true,
+                        mirror: false,
                         objectFit:
                             RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
@@ -572,7 +572,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
               width: 85,
               child: RTCVideoView(
                 localRenderer,
-                mirror: true,
+                mirror: false,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),
             ),
@@ -596,7 +596,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     localRenderer,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -612,7 +612,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -634,7 +634,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(1)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -650,7 +650,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(2)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -673,7 +673,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
             ),
             child: RTCVideoView(
               localRenderer,
-              mirror: true,
+              mirror: false,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
           ),
@@ -692,7 +692,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -708,7 +708,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(1)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -751,7 +751,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                   ),
                   child: RTCVideoView(
                     remoteRenderers[remoteRenderers.keys.elementAt(0)]!,
-                    mirror: true,
+                    mirror: false,
                     objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                   ),
                 ),
@@ -768,7 +768,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         //       String key = remoteRenderers.keys.elementAt(index);
         //       return SizedBox(
         //           height: 300,
-        //           child: RTCVideoView(remoteRenderers[key]!, mirror: true));
+        //           child: RTCVideoView(remoteRenderers[key]!, mirror: false));
         //     },
         //   ),
         // ),

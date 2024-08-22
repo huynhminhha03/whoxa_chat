@@ -17,6 +17,7 @@ import 'package:meyaoo_new/Models/username_check_model.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
@@ -215,6 +216,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     request.fields['last_name'] = lNameController.text;
     request.fields['gender'] = genderData.toString();
     request.fields['device_token'] = _fcmtoken.toString();
+    request.fields['one_signal_player_id'] = OneSignal.User.pushSubscription.id!;
     request.fields['country'] = nationController.text;
 
     if (image != null) {

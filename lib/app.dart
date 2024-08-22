@@ -22,6 +22,7 @@ import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
+import 'package:meyaoo_new/src/screens/user/profile.dart';
 import 'package:meyaoo_new/welcome.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -57,10 +58,46 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
     // asknotificationpermmision();
     requestPermissions();
-    // OneSignal.Notifications.addClickListener((event) {
-    //   final data = event.notification.additionalData;
-    //   print("OneSignal data ${data?['screen']}");
+
+    // OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    //   print("OneSignal foregroundWillDisplayListener $event");
+    //   var buttons = event.notification.buttons;
+    //   if (buttons != null) {
+    //     for (var button in buttons) {
+    //       if (button.id == 'accept') {
+    //         print('Button pressed: ${button.id}');
+    //         Get.to(VideoCallScreen(
+    //           conversation_id: "askfasdasd",
+    //         ));
+    //         // Perform action based on button ID
+    //       } else {
+    //         print('Button pressed: ${button.id}');
+    //       }
+    //     }
+    //   }
     // });
+
+    print(
+        "OneSignal pushSubscription optedIn ${OneSignal.User.pushSubscription.optedIn}");
+    print(
+        "OneSignal pushSubscription id ${OneSignal.User.pushSubscription.id}");
+    print(
+        "OneSignal pushSubscription token ${OneSignal.User.pushSubscription.token}");
+
+
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      print("event body ${event.notification.additionalData}");
+    });
+    OneSignal.Notifications.addClickListener((event) {
+      if (event.result.actionId == "accept") {
+        print("actionId accept");
+        Get.to(VideoCallScreen(
+          conversation_id: "askfasdasd",
+        ));
+      } else {
+        print("actionId decline");
+      }
+    });
     _checkPermissions();
     FirebaseMessagingService()
         .setUpFirebase(); // Initialize Firebase messaging service

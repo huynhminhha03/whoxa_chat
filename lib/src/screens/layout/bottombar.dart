@@ -25,6 +25,7 @@ import 'package:meyaoo_new/src/screens/layout/contact_new.dart';
 import 'package:meyaoo_new/src/screens/layout/story/stroy.dart';
 import 'package:meyaoo_new/src/screens/user/profile.dart';
 import 'package:meyaoo_new/src/screens/calllist/call_list.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:http/http.dart' as http;
 
@@ -122,6 +123,8 @@ class _TabbarScreenState extends State<TabbarScreen>
     };
     request.headers.addAll(headers);
     request.fields['device_token'] = _fcmtoken;
+    request.fields['one_signal_player_id'] =
+        OneSignal.User.pushSubscription.id!;
 
     print(request.fields);
 
