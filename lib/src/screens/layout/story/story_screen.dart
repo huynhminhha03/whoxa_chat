@@ -32,9 +32,12 @@ class StoryScreen6PM extends StatefulWidget {
 }
 
 class _StoryScreen6PMState extends State<StoryScreen6PM> {
+  String statusMediaID = '';
+  String stautsText = '';
   StroyGetxController storyGetxController = Get.find<StroyGetxController>();
   late ValueNotifier<IndicatorAnimationCommand> indicatorAnimationController;
-
+  TextEditingController messagecontroller = TextEditingController();
+  final FocusNode focusNode = FocusNode();
   // late CachedVideoPlayerController controller;
 
   VideoPlayerController? _controller;
@@ -117,6 +120,16 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
     // setState(() {
     //   _fetchContacts();
     // });
+    // Listen to focus changes
+    focusNode.addListener(() {
+      if (focusNode.hasFocus) {
+        // Pause the animation when the keyboard opens (TextField gets focus)
+        indicatorAnimationController.value = IndicatorAnimationCommand.pause;
+      } else {
+        // Resume the animation when the keyboard closes (TextField loses focus)
+        indicatorAnimationController.value = IndicatorAnimationCommand.resume;
+      }
+    });
     setState(() {});
     super.initState();
   }
@@ -142,7 +155,8 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
     // } else {
     //   _controller.dispose();
     // }
-
+    focusNode.dispose();
+    messagecontroller.dispose();
     super.dispose();
   }
 
@@ -407,6 +421,15 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                       // }
 
                       // storyGetxController.storyListData.value.post[pageIndex].
+                      stautsText = storyGetxController
+                          .storyListData
+                          .value
+                          .statusList![storyGetxController.pageIndexValue.value]
+                          .userData!
+                          .statuses![0]
+                          .statusMedia![
+                              storyGetxController.storyIndexValue.value]
+                          .statusText!;
                       return widget.isForMyStory
                           ? StoryImage(
                               /// key is required
@@ -710,7 +733,128 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                     gestureItemBuilder: (context, pageIndex, storyIndex) {
                       pageIndex = widget.pageIndex;
                       return widget.isForMyStory
+                          // my story Align show
                           ? Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 32),
+                                child: Obx(() {
+                                  statusMediaID = storyGetxController
+                                      .storyListData
+                                      .value
+                                      .myStatus!
+                                      .statuses![0]
+                                      .statusMedia![storyIndex]
+                                      .statusMediaId
+                                      .toString();
+                                  return storyGetxController
+                                              .isMyStorySeenLoading.value ||
+                                          storyGetxController
+                                              .isAllUserStoryLoad.value
+                                      ? const SizedBox.shrink()
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(storyGetxController
+                                                .storyListData
+                                                .value
+                                                .myStatus!
+                                                .statuses![0]
+                                                .statusMedia![storyIndex]
+                                                .statusText!),
+                                            storyGetxController
+                                                        .myStorySeenData
+                                                        .value
+                                                        .statusViewsList ==
+                                                    null
+                                                ? const SizedBox.shrink()
+                                                : InkWell(
+                                                    onTap: () {
+                                                      indicatorAnimationController
+                                                              .value =
+                                                          IndicatorAnimationCommand
+                                                              .pause;
+                                                      showModalForSeenUsersList();
+                                                      //seendUserList();
+                                                    },
+                                                    child: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Image.asset(
+                                                            'assets/images/eye.png',
+                                                            height: 20,
+                                                            color:
+                                                                Colors.white),
+                                                        const SizedBox(
+                                                            width: 3),
+                                                        storyGetxController
+                                                                    .isMyStorySeenLoading
+                                                                    .value ||
+                                                                storyGetxController
+                                                                        .isAllUserStoryLoad
+                                                                        .value &&
+                                                                    storyGetxController
+                                                                            .myStorySeenData
+                                                                            .value
+                                                                            .statusViewsList ==
+                                                                        null
+                                                            ? const SizedBox
+                                                                .shrink()
+                                                            : Text(
+                                                                storyGetxController
+                                                                            .myStorySeenData
+                                                                            .value
+                                                                            .statusViewsList!
+                                                                            .isEmpty ||
+                                                                        storyGetxController.myStorySeenData.value.statusViewsList!.length ==
+                                                                            0
+                                                                    ? "0"
+                                                                    : storyGetxController
+                                                                        .myStorySeenData
+                                                                        .value
+                                                                        .statusViewsList!
+                                                                        .length
+                                                                        .toString(),
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        12,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
+                                                              ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                            IconButton(
+                                              padding: EdgeInsets.zero,
+                                              color: const Color.fromARGB(
+                                                  255, 46, 46, 46),
+                                              icon: const Icon(
+                                                  Icons.keyboard_arrow_up),
+                                              iconSize: 30,
+                                              onPressed: () {
+                                                indicatorAnimationController
+                                                        .value =
+                                                    IndicatorAnimationCommand
+                                                        .pause;
+                                                showModalForSeenUsersList();
+                                                // Navigator.pop(context);
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                }),
+                              ),
+                            )
+                          // To user alignment show
+                          : Align(
                               alignment: Alignment.bottomCenter,
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 32),
@@ -720,100 +864,127 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                           storyGetxController
                                               .isAllUserStoryLoad.value
                                       ? const SizedBox.shrink()
-                                      : storyGetxController.myStorySeenData
-                                                  .value.statusViewsList ==
-                                              null
-                                          ? const SizedBox.shrink()
-                                          : Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
+                                      : Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Text(stautsText),
+                                            const SizedBox(height: 10),
+                                            Row(
                                               children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    indicatorAnimationController
-                                                            .value =
-                                                        IndicatorAnimationCommand
-                                                            .pause;
-                                                    showModalForSeenUsersList();
-                                                    //seendUserList();
-                                                  },
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Image.asset(
-                                                          'assets/images/eye.png',
-                                                          height: 20,
+                                                Expanded(
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        border: Border.all(
+                                                            color: const Color
+                                                                .fromRGBO(108,
+                                                                108, 108, 1))),
+                                                    child: TextFormField(
+                                                      focusNode: focusNode,
+                                                      maxLines: 4,
+                                                      minLines:
+                                                          1, // Minimum lines to show initially
+                                                      cursorColor:
+                                                          const Color.fromRGBO(
+                                                              108, 108, 108, 1),
+                                                      textCapitalization:
+                                                          TextCapitalization
+                                                              .sentences,
+                                                      style: const TextStyle(
                                                           color: Colors.white),
-                                                      const SizedBox(width: 3),
-                                                      storyGetxController
-                                                                  .isMyStorySeenLoading
-                                                                  .value ||
-                                                              storyGetxController
-                                                                      .isAllUserStoryLoad
-                                                                      .value &&
-                                                                  storyGetxController
-                                                                          .myStorySeenData
-                                                                          .value
-                                                                          .statusViewsList ==
-                                                                      null
-                                                          ? const SizedBox
-                                                              .shrink()
-                                                          : Text(
-                                                              storyGetxController
-                                                                          .myStorySeenData
-                                                                          .value
-                                                                          .statusViewsList!
-                                                                          .isEmpty ||
-                                                                      storyGetxController
-                                                                              .myStorySeenData
-                                                                              .value
-                                                                              .statusViewsList!
-                                                                              .length ==
-                                                                          0
-                                                                  ? "0"
-                                                                  : storyGetxController
-                                                                      .myStorySeenData
-                                                                      .value
-                                                                      .statusViewsList!
-                                                                      .length
-                                                                      .toString(),
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                    ],
+                                                      controller:
+                                                          messagecontroller,
+                                                      decoration: const InputDecoration(
+                                                          fillColor:
+                                                              Colors.white,
+                                                          alignLabelWithHint:
+                                                              true,
+                                                          contentPadding:
+                                                              EdgeInsets.symmetric(
+                                                                  horizontal:
+                                                                      10,
+                                                                  vertical: 10),
+                                                          border:
+                                                              InputBorder.none,
+                                                          hintText:
+                                                              "Type reply...",
+                                                          hintStyle: TextStyle(
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      108,
+                                                                      108,
+                                                                      108,
+                                                                      1),
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400),
+                                                          isDense: true),
+                                                    ),
                                                   ),
                                                 ),
-                                                IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  color: const Color.fromARGB(
-                                                      255, 46, 46, 46),
-                                                  icon: const Icon(
-                                                      Icons.keyboard_arrow_up),
-                                                  iconSize: 30,
-                                                  onPressed: () {
-                                                    indicatorAnimationController
-                                                            .value =
-                                                        IndicatorAnimationCommand
-                                                            .pause;
-                                                    showModalForSeenUsersList();
-                                                    // Navigator.pop(context);
-                                                  },
+                                                const SizedBox(width: 10),
+                                                SizedBox(
+                                                  height: 42,
+                                                  width: 42,
+                                                  child: InkWell(
+                                                    onTap: () {},
+                                                    child: Container(
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            gradient: LinearGradient(
+                                                                colors: [
+                                                                  yellow1Color,
+                                                                  yellow2Color
+                                                                ],
+                                                                begin: Alignment
+                                                                    .topCenter,
+                                                                end: Alignment
+                                                                    .bottomCenter)),
+                                                        child:
+                                                            // storyController
+                                                            //         .isUploadStoryLoad
+                                                            //         .value
+                                                            //     ? const SizedBox(
+                                                            //         height: 15,
+                                                            //         width: 15,
+                                                            //         child: Center(
+                                                            //           child: CircularProgressIndicator(
+                                                            //               strokeWidth:
+                                                            //                   3,
+                                                            //               color: Colors
+                                                            //                   .black),
+                                                            //         ),
+                                                            //       )
+                                                            //     :
+                                                            Image.asset(
+                                                                    "assets/images/send1.png",
+                                                                    color:
+                                                                        chatColor)
+                                                                .paddingAll(
+                                                                    13)),
+                                                  ),
                                                 ),
                                               ],
-                                            );
+                                            )
+                                                .paddingSymmetric(
+                                                    horizontal: 10,
+                                                    vertical: 15)
+                                                .paddingOnly(
+                                                    top: 15, bottom: 15)
+                                          ],
+                                        );
                                 }),
                               ),
-                            )
-                          : const SizedBox.shrink();
+                            );
                     },
                   );
                 }),
@@ -876,7 +1047,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                           onTap: () {
                             indicatorAnimationController.value =
                                 IndicatorAnimationCommand.pause;
-                            deleteDialog();
+                            deleteDialog(statusMediaID);
                           },
                           child: const Icon(
                             Icons.more_horiz,
@@ -885,13 +1056,13 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                           ),
                         )
                       : const SizedBox.shrink(),
-                )
+                ),
               ],
             ));
     // });
   }
 
-  Future deleteDialog() {
+  Future deleteDialog(String statusMediaID) {
     return showDialog(
         context: context,
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
@@ -914,7 +1085,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   indicatorAnimationController.value =
                       IndicatorAnimationCommand.pause;
                   Navigator.pop(context);
-                  deleteDialog1();
+                  deleteDialog1(statusMediaID);
                   //Navigator.pop(context);
                 },
                 child: Row(
@@ -936,7 +1107,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
     });
   }
 
-  Future deleteDialog1() {
+  Future deleteDialog1(String statusMediaID) {
     return showDialog(
         context: context,
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
@@ -993,20 +1164,26 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                         ),
                       ),
                       const SizedBox(width: 27),
-                      Container(
-                        height: 39,
-                        width: Get.width * 0.35,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            gradient: LinearGradient(
-                                colors: [yellow1Color, yellow2Color],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter)),
-                        child: const Center(
-                          child: Text(
-                            "Delete",
-                            style: TextStyle(
-                                fontSize: 13, fontWeight: FontWeight.w400),
+                      InkWell(
+                        onTap: () {
+                          storyGetxController.myStoryDelete(statusMediaID);
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          height: 39,
+                          width: Get.width * 0.35,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              gradient: LinearGradient(
+                                  colors: [yellow1Color, yellow2Color],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter)),
+                          child: const Center(
+                            child: Text(
+                              "Delete",
+                              style: TextStyle(
+                                  fontSize: 13, fontWeight: FontWeight.w400),
+                            ),
                           ),
                         ),
                       )

@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -164,40 +163,10 @@ class _FloginState extends State<Flogin> {
   }
   //-------------------------------------------------------------otpcheck-------------------------------------------------------------//
 
-  String _fcmtoken = "";
-  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
-
-  Future<void> initNotifications() async {
-    try {
-      await firebaseMessaging.requestPermission(provisional: true);
-      if (Platform.isIOS) {
-        // final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        final apnsToken = await firebaseMessaging.getToken();
-        if (apnsToken == null) {
-          // APNS token is not available
-          log('APNS token is null');
-          return;
-        }
-        _fcmtoken = apnsToken; // Store APNS token in _fcmtoken variable
-        log('APNS Token: $_fcmtoken');
-      } else {
-        // For Android or other platforms, retrieve the FCM token
-        final fcmToken = await firebaseMessaging.getToken();
-        if (fcmToken != null) {
-          _fcmtoken = fcmToken; // Store FCM token in _fcmtoken variable
-          log('FCM Token: $_fcmtoken');
-        }
-      }
-    } catch (e) {
-      log(e.toString());
-    }
-  }
-
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   @override
   initState() {
     //otpStatus();
-    initNotifications();
     _events = StreamController<int>();
     _events!.add(60);
     super.initState();

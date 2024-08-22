@@ -1,10 +1,11 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, deprecated_member_use
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SaveContact extends StatefulWidget {
   String name;
@@ -17,11 +18,16 @@ class SaveContact extends StatefulWidget {
 
 class _SaveContactState extends State<SaveContact> {
   Future<void> saveContactInBackground(Map<String, String> contactData) async {
-    final contact = Contact()
-      ..name.first = contactData['name']!
-      ..phones = [Phone(contactData['number']!)];
+    final String name = contactData['name']!;
+    final String number = contactData['number']!;
 
-    await contact.insert();
+    // Creating the Contact object within the isolate
+    final Contact newContact = Contact()
+      ..name.first = name
+      ..phones = [Phone(number)];
+
+    // Inserting the contact
+    await newContact.insert();
   }
 
   @override
@@ -71,16 +77,19 @@ class _SaveContactState extends State<SaveContact> {
                   onTap: () async {
                     print("@@@@@@@@@@@@@@@@@@@@@");
                     // Request permission to access contacts
-                    if (await FlutterContacts.requestPermission()) {
-                      final contactData = {
-                        'name': widget.name,
-                        'number': widget.number,
-                      };
+                    // if (await FlutterContacts.requestPermission()) {
+                    //   // Passing a simple map to the isolate
+                    //   final contactData = {
+                    //     'name': widget.name,
+                    //     'number': widget.number,
+                    //   };
 
-                      await compute(saveContactInBackground, contactData);
-                    }
+                    //   // Using the compute function to run saveContactInBackground in the background
+                    //   await compute(saveContactInBackground, contactData);
+                    // }
+                    inviteMe(widget.number);
                   },
-                  title: "Add")
+                  title: "Invite")
             ],
           ).paddingSymmetric(horizontal: 20),
           Row(
@@ -100,5 +109,23 @@ class _SaveContactState extends State<SaveContact> {
         ],
       ),
     );
+  }
+
+  inviteMe(phone) async {
+    // Android
+    String uri =
+        'sms:$phone?body=${"‎Hey there! Join me on our Whoxa app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      // iOS
+      String uri =
+          'sms:$phone?body=${"‎Hey there! Join me on our Whoxa app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
+      if (await canLaunch(uri)) {
+        await launch(uri);
+      } else {
+        throw 'Could not launch $uri';
+      }
+    }
   }
 }

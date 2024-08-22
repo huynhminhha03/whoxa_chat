@@ -106,8 +106,8 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(100),
                                     child: Container(
-                                      height: 60,
-                                      width: 60,
+                                      height: 50,
+                                      width: 50,
                                       decoration: BoxDecoration(
                                           color: Colors.grey.withOpacity(0.60),
                                           shape: BoxShape.circle),
@@ -160,23 +160,16 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                   fontSize: 14, color: Colors.grey),
                               trailing: Wrap(
                                 children: [
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Image.asset(
-                                        "assets/images/edit_pen.png",
-                                        height: 23),
-                                  ),
                                   const SizedBox(width: 10),
-                                  (storyController.isAllUserStoryLoad.value) &&
+                                  (storyController.isAllUserStoryLoad.value) ||
                                           (storyController
-                                              .isMyStorySeenLoading.value) &&
+                                              .isMyStorySeenLoading.value) ||
                                           (storyController
-                                              .isProfileLoading.value) &&
+                                              .isProfileLoading.value) ||
                                           storyController.storyListData.value
-                                              .myStatus!.statuses!.isEmpty &&
+                                              .myStatus!.statuses!.isEmpty ||
                                           storyController.storyListData.value
-                                                  .myStatus!.statuses ==
-                                              []
+                                              .myStatus!.statuses!.isEmpty
                                       ? const SizedBox.shrink()
                                       : InkWell(
                                           onTap: () {
@@ -191,13 +184,6 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                               ),
                             ),
                             const Divider(),
-                            const Text(
-                              "Recent",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Poppins"),
-                            ).paddingSymmetric(horizontal: 20),
                             storyController.isAllUserStoryLoad.value
                                 ? const SizedBox()
                                 : storyController
@@ -290,7 +276,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                   },
                                                   leading: Obx(() {
                                                     return StatusView(
-                                                      radius: 31,
+                                                      radius: 25,
                                                       spacing: 10,
                                                       strokeWidth: 2,
                                                       indexOfSeenStatus:
@@ -313,7 +299,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                               .statuses![0]
                                                               .statusMedia!
                                                               .length,
-                                                      padding: 0,
+                                                      padding: 3,
                                                       centerImageUrl:
                                                           storyController
                                                               .storyListData
@@ -351,13 +337,6 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                           //: const SizedBox();
                                         },
                                       ),
-                            // const Text(
-                            //   "Viewed",
-                            //   style: TextStyle(
-                            //       fontSize: 16,
-                            //       fontWeight: FontWeight.w600,
-                            //       fontFamily: "Poppins"),
-                            // ).paddingSymmetric(horizontal: 20),
                           ]),
                     ),
                   ),

@@ -13,13 +13,16 @@ import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/Models/Story%20Models/add_story_data.dart';
 import 'package:meyaoo_new/Models/Story%20Models/my_story_seen_list_data.dart';
+import 'package:meyaoo_new/Models/Story%20Models/status_delete_model.dart';
 import 'package:meyaoo_new/Models/Story%20Models/story_list_data.dart';
 import 'package:meyaoo_new/Models/Story%20Models/view_story_data.dart';
 import 'package:meyaoo_new/hive_service/hive_service.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
+import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/layout/story/final_story.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:http/http.dart' as http;
 
 final apiHelper = ApiHelper();
 
@@ -30,10 +33,13 @@ class StroyGetxController extends GetxController {
   var isAllUserStoryLoad = false.obs;
   var isProfileLoading = false.obs;
   var isMyStorySeenLoading = false.obs;
+  var isMyStoryDeleteLoading = false.obs;
 
   var isSeenUserOpen = false;
 
   final _picker = ImagePicker();
+
+  var deleteStatusModel = StatusDeleteModel().obs;
 
   var addStoryData = AddStoryDataModel().obs;
   var storyListData = StoryListData().obs;
@@ -156,6 +162,7 @@ class StroyGetxController extends GetxController {
     String imagePath,
     String text,
   ) async {
+    print(text);
     try {
       isUploadStoryLoad(true);
 
@@ -302,11 +309,25 @@ class StroyGetxController extends GetxController {
 
       storyListData = respo.obs;
       allStoryListData = respo.obs;
+
+      // seenList = respo.statusList!.where((status) {
+      //   if (status.userData != null && status.userData!.statuses != null) {
+      //     for (var statusItem in status.userData!.statuses!) {
+      //       if (statusItem.statusMedia!.length ==
+      //           statusItem.statusViews![0].statusCount) {
+      //         return true;
+      //       }
+      //     }
+      //   }
+      //   return false;
+      // }).toList();
+
       var storeJsonData = json.encode(result.data);
       //box.put(HiveKeyService.storyKey, storeJsonData);
       log("STORY-LIST:$respo");
       log("STORY-LIST:${storyListData.toString()}");
       log("STORY-LIST:${allStoryListData.toString()}");
+      //log("SEEN-LIST:$seenList");
       if (kDebugMode) {
         print("Status of get_story_by_user : ${result.statusCode}");
       }
@@ -445,6 +466,44 @@ class StroyGetxController extends GetxController {
       log(e.toString());
     } finally {
       isMyStorySeenLoading(false);
+    }
+  }
+
+  myStoryDelete(statusMediaID) async {
+    try {
+      isMyStoryDeleteLoading(true);
+
+      var uri = Uri.parse(apiHelper.statusDetele);
+      var request = http.MultipartRequest("POST", uri);
+      Map<String, String> headers = {
+        'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+        "Accept": "application/json",
+      };
+
+      //add headers
+      request.headers.addAll(headers);
+      request.fields['status_media_id'] = statusMediaID;
+
+      print(request.fields);
+      // send
+      var response = await request.send();
+
+      String responseData =
+          await response.stream.transform(utf8.decoder).join();
+      var useData = json.decode(responseData);
+
+      deleteStatusModel.value = StatusDeleteModel.fromJson(useData);
+
+      if (deleteStatusModel.value.success == true) {
+        isMyStoryDeleteLoading(false);
+        showCustomToast("You Story Removed");
+        storyListData.refresh();
+        Get.back();
+      }
+    } catch (e) {
+      log("Error occurred: ${e.toString()}");
+    } finally {
+      isMyStoryDeleteLoading(false);
     }
   }
 }

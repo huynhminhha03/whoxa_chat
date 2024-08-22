@@ -4653,14 +4653,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                         topRight: Radius.circular(10),
                                         topLeft: Radius.circular(10),
                                         bottomLeft: Radius.circular(10)),
-                                color:
-                                    data.myMessage == false ? grey1Color : null,
-                                gradient: data.myMessage == false
-                                    ? null
-                                    : LinearGradient(
-                                        colors: [yellow1Color, yellow2Color],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter)),
+                                color: data.myMessage == false
+                                    ? grey1Color
+                                    : yellow1Color),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -5243,10 +5238,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                             Container(
                                                                               height: 50,
                                                                               width: 210,
-                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
+                                                                              decoration: BoxDecoration(borderRadius: matchContact(data.sharedContactNumber!) ? BorderRadius.circular(10) : const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
                                                                               child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
                                                                                 children: [
+                                                                                  const SizedBox(width: 20),
                                                                                   Container(
                                                                                     height: 30,
                                                                                     width: 30,
@@ -5257,7 +5252,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                                           imageUrl: data.sharedContactProfileImage!,
                                                                                           placeholderColor: chatownColor,
                                                                                           errorWidgeticon: const Icon(
-                                                                                            Icons.groups,
+                                                                                            Icons.person,
                                                                                             size: 30,
                                                                                           )),
                                                                                     ),
@@ -5281,21 +5276,28 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                               ),
                                                                             ),
                                                                             const SizedBox(height: 3),
-                                                                            Container(
-                                                                              height: 30,
-                                                                              width: 210,
-                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
-                                                                              child: const Column(
-                                                                                children: [
-                                                                                  SizedBox(height: 3),
-                                                                                  Text(
-                                                                                    "Message",
-                                                                                    textAlign: TextAlign.center,
-                                                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            )
+                                                                            matchContact(data.sharedContactNumber!)
+                                                                                ? const SizedBox.shrink()
+                                                                                : InkWell(
+                                                                                    onTap: () {
+                                                                                      Get.to(() => SaveContact(name: data.sharedContactName!, number: data.sharedContactNumber!));
+                                                                                    },
+                                                                                    child: Container(
+                                                                                      height: 30,
+                                                                                      width: 210,
+                                                                                      decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
+                                                                                      child: const Column(
+                                                                                        children: [
+                                                                                          SizedBox(height: 3),
+                                                                                          Text(
+                                                                                            "View contact",
+                                                                                            textAlign: TextAlign.center,
+                                                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  )
                                                                           ],
                                                                         )
                                                                       : const SizedBox(),

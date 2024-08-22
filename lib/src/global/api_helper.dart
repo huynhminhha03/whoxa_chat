@@ -31,4 +31,5 @@ class ApiHelper {
   String addStatusUrl = '$baseUrl/add-status';
   String callCutByMe = '$baseUrl/call-cut-by-me';
   String callCutByReceiver = '$baseUrl/call-cut-by-receiver';
+  String statusDetele = '$baseUrl/delete-status-media-by-id';
 }

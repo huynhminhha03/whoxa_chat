@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable, avoid_print, depend_on_referenced_packages, deprecated_member_use, prefer_is_empty, non_constant_identifier_names, unused_field
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -22,6 +23,7 @@ import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -35,6 +37,7 @@ import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/contact_send.dart';
 import 'package:meyaoo_new/src/screens/chat/imageView.dart';
 import 'package:meyaoo_new/src/screens/forward_message/forward_message_list.dart';
+import 'package:meyaoo_new/src/screens/save_contact.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -77,6 +80,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   SingleChatContorller chatContorller = Get.put(SingleChatContorller());
   RoomIdController getRoomController = Get.put(RoomIdController());
   OnlineOfflineController controller = Get.find();
+  GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
 
   @override
   void initState() {
@@ -109,8 +113,23 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         }
       }
     });
-
+    apis();
     super.initState();
+  }
+
+  Future<void> apis() async {
+    await getContactsFromGloble();
+    var contactJson = json.encode(mobileContacts);
+    getAllDeviceContact.getAllContactApi(contact: contactJson);
+  }
+
+  bool matchContact(String num) {
+    for (var i = 0; i < getAllDeviceContact.getList.length; i++) {
+      if (num == getAllDeviceContact.getList[i].phoneNumber) {
+        return true;
+      }
+    }
+    return false;
   }
 
   List? chatMsgList;
@@ -2651,15 +2670,18 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                     Container(
                                       height: 50,
                                       width: 200,
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                              topRight: Radius.circular(10)),
+                                      decoration: BoxDecoration(
+                                          borderRadius: matchContact(
+                                                  data.sharedContactNumber!)
+                                              ? BorderRadius.circular(10)
+                                              : const BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight:
+                                                      Radius.circular(10)),
                                           color: Colors.white),
                                       child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
                                         children: [
+                                          const SizedBox(width: 20),
                                           Container(
                                             height: 30,
                                             width: 30,
@@ -2675,7 +2697,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                   placeholderColor:
                                                       chatownColor,
                                                   errorWidgeticon: const Icon(
-                                                    Icons.groups,
+                                                    Icons.person,
                                                     size: 30,
                                                   )),
                                             ),
@@ -2709,28 +2731,44 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                       ),
                                     ),
                                     const SizedBox(height: 3),
-                                    Container(
-                                      height: 30,
-                                      width: 200,
-                                      decoration: const BoxDecoration(
-                                          borderRadius: BorderRadius.only(
-                                              bottomLeft: Radius.circular(10),
-                                              bottomRight: Radius.circular(10)),
-                                          color: Colors.white),
-                                      child: const Column(
-                                        children: [
-                                          SizedBox(height: 3),
-                                          Text(
-                                            "Message",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: chatColor),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                                    matchContact(data.sharedContactNumber!)
+                                        ? const SizedBox.shrink()
+                                        : InkWell(
+                                            onTap: () {
+                                              Get.to(() => SaveContact(
+                                                  name: data.sharedContactName!,
+                                                  number: data
+                                                      .sharedContactNumber!));
+                                            },
+                                            child: Container(
+                                              height: 30,
+                                              width: 200,
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          bottomLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          bottomRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  color: Colors.white),
+                                              child: const Column(
+                                                children: [
+                                                  SizedBox(height: 3),
+                                                  Text(
+                                                    "View contact",
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: chatColor),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
                                   ],
                                 ),
                               ),
@@ -4842,14 +4880,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                         topRight: Radius.circular(10),
                                         topLeft: Radius.circular(10),
                                         bottomLeft: Radius.circular(10)),
-                                color:
-                                    data.myMessage == false ? grey1Color : null,
-                                gradient: data.myMessage == false
-                                    ? null
-                                    : LinearGradient(
-                                        colors: [yellow1Color, yellow2Color],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter)),
+                                color: data.myMessage == false
+                                    ? grey1Color
+                                    : yellow1Color),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -5432,10 +5465,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                             Container(
                                                                               height: 50,
                                                                               width: 210,
-                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
+                                                                              decoration: BoxDecoration(borderRadius: matchContact(data.sharedContactNumber!) ? BorderRadius.circular(10) : const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)), color: Colors.white),
                                                                               child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.center,
                                                                                 children: [
+                                                                                  const SizedBox(width: 20),
                                                                                   Container(
                                                                                     height: 30,
                                                                                     width: 30,
@@ -5446,7 +5479,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                                           imageUrl: data.sharedContactProfileImage!,
                                                                                           placeholderColor: chatownColor,
                                                                                           errorWidgeticon: const Icon(
-                                                                                            Icons.groups,
+                                                                                            Icons.person,
                                                                                             size: 30,
                                                                                           )),
                                                                                     ),
@@ -5470,21 +5503,28 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                               ),
                                                                             ),
                                                                             const SizedBox(height: 3),
-                                                                            Container(
-                                                                              height: 30,
-                                                                              width: 210,
-                                                                              decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
-                                                                              child: const Column(
-                                                                                children: [
-                                                                                  SizedBox(height: 3),
-                                                                                  Text(
-                                                                                    "Message",
-                                                                                    textAlign: TextAlign.center,
-                                                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            )
+                                                                            matchContact(data.sharedContactNumber!)
+                                                                                ? const SizedBox.shrink()
+                                                                                : InkWell(
+                                                                                    onTap: () {
+                                                                                      Get.to(() => SaveContact(name: data.sharedContactName!, number: data.sharedContactNumber!));
+                                                                                    },
+                                                                                    child: Container(
+                                                                                      height: 30,
+                                                                                      width: 200,
+                                                                                      decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
+                                                                                      child: const Column(
+                                                                                        children: [
+                                                                                          SizedBox(height: 3),
+                                                                                          Text(
+                                                                                            "View contact",
+                                                                                            textAlign: TextAlign.center,
+                                                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    ),
+                                                                                  )
                                                                           ],
                                                                         )
                                                                       : const SizedBox(),

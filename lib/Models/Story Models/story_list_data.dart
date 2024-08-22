@@ -1,200 +1,3 @@
-// class StoryListData {
-//   String? status;
-//   String? msg;
-//   List<Post>? post;
-//   List<MyPost>? myPost;
-
-//   StoryListData({this.status, this.msg, this.post, this.myPost});
-
-//   StoryListData.fromJson(Map<String, dynamic> json) {
-//     status = json["status"];
-//     msg = json["msg"];
-//     post = json["post"] == null
-//         ? null
-//         : (json["post"] as List).map((e) => Post.fromJson(e)).toList();
-//     myPost = json["my_post"] == null
-//         ? null
-//         : (json["my_post"] as List).map((e) => MyPost.fromJson(e)).toList();
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data["status"] = status;
-//     data["msg"] = msg;
-//     if (post != null) {
-//       data["post"] = post?.map((e) => e.toJson()).toList();
-//     }
-//     if (myPost != null) {
-//       data["my_post"] = myPost?.map((e) => e.toJson()).toList();
-//     }
-//     return data;
-//   }
-// }
-
-// class MyPost {
-//   String? storyId;
-//   String? userId;
-//   String? url;
-//   String? type;
-//   String? createDate;
-//   String? username;
-//   String? mobileNumber;
-//   String? profilePic;
-//   List<StoryImage1>? storyImage;
-
-//   MyPost(
-//       {this.storyId,
-//       this.userId,
-//       this.url,
-//       this.type,
-//       this.createDate,
-//       this.username,
-//       this.mobileNumber,
-//       this.profilePic,
-//       this.storyImage});
-
-//   MyPost.fromJson(Map<String, dynamic> json) {
-//     storyId = json["story_id"];
-//     userId = json["user_id"];
-//     url = json["url"];
-//     type = json["type"];
-//     createDate = json["create_date"];
-//     username = json["username"];
-//     profilePic = json["profile_pic"];
-//     mobileNumber = json['mobile_number'];
-//     storyImage = json["story_image"] == null
-//         ? null
-//         : (json["story_image"] as List)
-//             .map((e) => StoryImage1.fromJson(e))
-//             .toList();
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data["story_id"] = storyId;
-//     data["user_id"] = userId;
-//     data["url"] = url;
-//     data["type"] = type;
-//     data["create_date"] = createDate;
-//     data["username"] = username;
-//     data["profile_pic"] = profilePic;
-//     data['mobile_number'] = mobileNumber;
-//     if (storyImage != null) {
-//       data["story_image"] = storyImage?.map((e) => e.toJson()).toList();
-//     }
-//     return data;
-//   }
-// }
-
-// class StoryImage1 {
-//   int? storyId;
-//   String? url;
-//   String? type;
-
-//   StoryImage1({this.storyId, this.url, this.type});
-
-//   StoryImage1.fromJson(Map<String, dynamic> json) {
-//     storyId = json["story_id"];
-//     url = json["url"];
-//     type = json["type"];
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data["story_id"] = storyId;
-//     data["url"] = url;
-//     data["type"] = type;
-//     return data;
-//   }
-// }
-
-// class Post {
-//   String? storyId;
-//   String? userId;
-//   String? url;
-//   String? type;
-//   String? createDate;
-//   int? totalStories;
-//   int? userReadCount;
-//   String? username;
-//   String? mobileNumber;
-//   String? profilePic;
-//   List<StoryImage>? storyImage;
-
-//   Post(
-//       {this.storyId,
-//       this.userId,
-//       this.url,
-//       this.type,
-//       this.createDate,
-//       this.totalStories,
-//       this.userReadCount,
-//       this.username,
-//       this.mobileNumber,
-//       this.profilePic,
-//       this.storyImage});
-
-//   Post.fromJson(Map<String, dynamic> json) {
-//     storyId = json["story_id"];
-//     userId = json["user_id"];
-//     url = json["url"];
-//     type = json["type"];
-//     createDate = json["create_date"];
-//     totalStories = json["total_stories"];
-//     userReadCount = json["user_read_count"];
-//     username = json["username"];
-//     mobileNumber = json['mobile_number'];
-//     profilePic = json["profile_pic"];
-//     storyImage = json["story_image"] == null
-//         ? null
-//         : (json["story_image"] as List)
-//             .map((e) => StoryImage.fromJson(e))
-//             .toList();
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data["story_id"] = storyId;
-//     data["user_id"] = userId;
-//     data["url"] = url;
-//     data["type"] = type;
-//     data["create_date"] = createDate;
-//     data["total_stories"] = totalStories;
-//     data["user_read_count"] = userReadCount;
-//     data["username"] = username;
-//     data['mobile_number'] = mobileNumber;
-//     data["profile_pic"] = profilePic;
-//     if (storyImage != null) {
-//       data["story_image"] = storyImage?.map((e) => e.toJson()).toList();
-//     }
-//     return data;
-//   }
-// }
-
-// class StoryImage {
-//   int? storyId;
-//   String? url;
-//   String? type;
-//   int? isSeen;
-
-//   StoryImage({this.storyId, this.url, this.type, this.isSeen});
-
-//   StoryImage.fromJson(Map<String, dynamic> json) {
-//     storyId = json["story_id"];
-//     url = json["url"];
-//     type = json["type"];
-//     isSeen = json["is_seen"];
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = <String, dynamic>{};
-//     data["story_id"] = storyId;
-//     data["url"] = url;
-//     data["type"] = type;
-//     data["is_seen"] = isSeen;
-//     return data;
-//   }
-// }
 class StoryListData {
   bool? success;
   String? message;
@@ -332,18 +135,21 @@ class Statuses {
 }
 
 class StatusMedia {
+  String? statusText;
   String? url;
   int? statusMediaId;
 
-  StatusMedia({this.url, this.statusMediaId});
+  StatusMedia({this.statusText, this.url, this.statusMediaId});
 
   StatusMedia.fromJson(Map<String, dynamic> json) {
+    statusText = json['status_text'];
     url = json['url'];
     statusMediaId = json['status_media_id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_text'] = statusText;
     data['url'] = url;
     data['status_media_id'] = statusMediaId;
     return data;

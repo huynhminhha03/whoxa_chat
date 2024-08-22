@@ -21,16 +21,47 @@ class AddMembersinGroup1 extends StatefulWidget {
 class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
   GetAllDeviceContact getAllDeviceContact = Get.find();
   ChatListController chatListController = Get.find();
+  List<ChatList> filteredChatList = [];
+  List<NewContactList> filteredContactList = [];
+  String searchQuery = '';
+
   @override
   void initState() {
     var contactJson = json.encode(mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
-
+    filteredChatList = chatListController.userChatListModel.value!.chatList!;
+    filteredContactList = getAllDeviceContact.getList;
     super.initState();
   }
 
   List contactID = [];
   List<SelectedContact> contactData = [];
+
+  void filterSearchResults(String query) {
+    List<ChatList> chatSearchResults = [];
+    List<NewContactList> contactSearchResults = [];
+
+    if (query.isNotEmpty) {
+      chatSearchResults = chatListController.userChatListModel.value!.chatList!
+          .where((chat) =>
+              chat.userName!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+
+      contactSearchResults = getAllDeviceContact.getList
+          .where((contact) =>
+              contact.fullName!.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    } else {
+      chatSearchResults = chatListController.userChatListModel.value!.chatList!;
+      contactSearchResults = getAllDeviceContact.getList;
+    }
+
+    setState(() {
+      searchQuery = query;
+      filteredChatList = chatSearchResults;
+      filteredContactList = contactSearchResults;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -89,6 +120,7 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                   cursorColor: Colors.black,
                   // controller: aboutController,
                   readOnly: false,
+                  onChanged: filterSearchResults,
                   decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -129,15 +161,17 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 10, top: 20),
-                child: Text(
-                  "Frequently Contacted",
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              if (searchQuery.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(left: 10, top: 20),
+                  child: Text(
+                    "Frequently Contacted",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
                 ),
-              ),
               recentContactWidget(context),
-              if (hasMatchingContacts()) // Check if there are matching contacts
+              if (searchQuery.isEmpty &&
+                  hasMatchingContacts()) // Check if there are matching contacts
                 const Padding(
                   padding: EdgeInsets.only(
                       left: 10, top: 10), // Reduced top padding to 10
@@ -168,12 +202,9 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount:
-              chatListController.userChatListModel.value!.chatList!.length,
+          itemCount: filteredChatList.length,
           itemBuilder: (context, index) {
-            return recentchatcard(
-                chatListController.userChatListModel.value!.chatList![index],
-                index);
+            return recentchatcard(filteredChatList[index], index);
           },
         ),
       ),
@@ -339,9 +370,9 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
           physics: const NeverScrollableScrollPhysics(),
           primary: false,
           padding: EdgeInsets.zero,
-          itemCount: getAllDeviceContact.getList.length,
+          itemCount: filteredContactList.length,
           itemBuilder: (BuildContext context, int index) {
-            return chatcard(getAllDeviceContact.getList[index]).paddingZero;
+            return chatcard(filteredContactList[index]).paddingZero;
           },
         ),
       ),
@@ -409,7 +440,7 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                         children: [
                           const SizedBox(height: 17),
                           Text(
-                            capitalizeFirstLetter(data.userName!),
+                            capitalizeFirstLetter(data.fullName!),
                             textAlign: TextAlign.left,
                             style: const TextStyle(
                                 fontWeight: FontWeight.w500, fontSize: 15),

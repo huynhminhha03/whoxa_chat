@@ -147,7 +147,7 @@ class _FinalStoryConfirmationScreenState
                     minLines: 1, // Minimum lines to show initially
                     cursorColor: const Color.fromRGBO(108, 108, 108, 1),
                     textCapitalization: TextCapitalization.sentences,
-                    style: const TextStyle(),
+                    style: const TextStyle(color: Colors.white),
                     controller: messagecontroller,
                     decoration: const InputDecoration(
                         fillColor: Color.fromRGBO(26, 25, 25, 1),
@@ -173,6 +173,8 @@ class _FinalStoryConfirmationScreenState
                     if (storyController.result.files[0].path!.endsWith('jpg') ||
                         storyController.result.files[0].path!
                             .endsWith('jpeg') ||
+                        storyController.result.files[0].path!
+                            .endsWith('JPEG') ||
                         storyController.result.files[0].path!.endsWith('png')) {
                       storyController.addImageStory(
                           storyController.result.files[0].path!,
@@ -181,7 +183,8 @@ class _FinalStoryConfirmationScreenState
                         .endsWith('mp4')) {
                       log("Add Story Path ${storyController.result.files[0].path!}");
                       storyController.addVideoStory(
-                          storyController.result.files[0].path!, '');
+                          storyController.result.files[0].path!,
+                          messagecontroller.text);
                     }
                   },
                   child: Container(
