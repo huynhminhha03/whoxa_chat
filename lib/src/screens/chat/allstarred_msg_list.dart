@@ -5,7 +5,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
@@ -362,6 +361,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
+        decoration: BoxDecoration(),
         child: Stack(
           children: [
             isSelectedmessage == "1"
@@ -452,9 +452,18 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                         alignment: Alignment.topLeft,
                         child: Container(
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.grey.shade200,
-                          ),
+                              borderRadius: BorderRadius.circular(10),
+                              color: data.chat!.user!.userId ==
+                                      Hive.box(userdata).get(userId)
+                                  ? null
+                                  : Colors.grey.shade200,
+                              gradient: data.chat!.user!.userId ==
+                                      Hive.box(userdata).get(userId)
+                                  ? LinearGradient(
+                                      colors: [yellow1Color, yellow2Color],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter)
+                                  : null),
                           child: Center(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
@@ -655,17 +664,29 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                             );
                           },
                           child: Container(
-                              height: 120,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Image.network(
-                                  data.chat!.url!,
-                                  fit: BoxFit.cover,
-                                ),
-                              )),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: data.chat!.user!.userId ==
+                                      Hive.box(userdata).get(userId)
+                                  ? yellow1Color
+                                  : Colors.grey.shade200,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Container(
+                                  height: 120,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      data.chat!.url!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )),
+                            ),
+                          ),
                         ),
                       ),
                       Icon(
@@ -826,62 +847,85 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            constraints: const BoxConstraints(
-                                minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
-                            child: InkWell(
-                              onTap: () {
-                                MapUtils.openMap(
-                                    double.parse(data.chat!.latitude!),
-                                    double.parse(data.chat!.longitude!));
-                              },
-                              child: Container(
-                                height: 130,
-                                width: 250,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : Colors.grey.shade200,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Container(
                                 decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: data.chat!.latitude.toString() == "" ||
-                                          data.chat!.longitude.toString() == ""
-                                      ? Container(
-                                          decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  topRight:
-                                                      Radius.circular(10)),
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      "assets/images/map_Blurr.png"),
-                                                  fit: BoxFit.cover)),
-                                          child: Icon(
-                                            Icons.error_outline,
-                                            color:
-                                                chatownColor.withOpacity(0.6),
-                                            size: 50,
-                                          ),
-                                        )
-                                      : GoogleMap(
-                                          zoomControlsEnabled: false,
-                                          zoomGesturesEnabled: false,
-                                          initialCameraPosition: CameraPosition(
-                                              target: LatLng(
-                                                  double.parse(
-                                                      data.chat!.latitude!),
-                                                  double.parse(
-                                                      data.chat!.longitude!)),
-                                              zoom: 15),
-                                          mapType: MapType.normal,
-                                          onMapCreated: (GoogleMapController
-                                              controller111) {
-                                            // controller.complete();
-                                          },
-                                        ),
                                 ),
-                              ),
-                            )),
+                                constraints: const BoxConstraints(
+                                    minHeight: 10.0,
+                                    minWidth: 10.0,
+                                    maxWidth: 250),
+                                child: InkWell(
+                                  onTap: () {
+                                    MapUtils.openMap(
+                                        double.parse(data.chat!.latitude!),
+                                        double.parse(data.chat!.longitude!));
+                                  },
+                                  child: Container(
+                                    height: 130,
+                                    width: 250,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: data.chat!.latitude.toString() ==
+                                                  "" ||
+                                              data.chat!.longitude.toString() ==
+                                                  ""
+                                          ? Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          "assets/images/map_Blurr.png"),
+                                                      fit: BoxFit.cover)),
+                                              child: Icon(
+                                                Icons.error_outline,
+                                                color: chatownColor
+                                                    .withOpacity(0.6),
+                                                size: 50,
+                                              ),
+                                            )
+                                          : GoogleMap(
+                                              zoomControlsEnabled: false,
+                                              zoomGesturesEnabled: false,
+                                              initialCameraPosition:
+                                                  CameraPosition(
+                                                      target: LatLng(
+                                                          double.parse(data
+                                                              .chat!.latitude!),
+                                                          double.parse(data
+                                                              .chat!
+                                                              .longitude!)),
+                                                      zoom: 15),
+                                              mapType: MapType.normal,
+                                              onMapCreated: (GoogleMapController
+                                                  controller111) {
+                                                // controller.complete();
+                                              },
+                                            ),
+                                    ),
+                                  ),
+                                )),
+                          ),
+                        ),
                       ),
                       Icon(
                         Icons.arrow_forward_ios,
@@ -1046,19 +1090,30 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                           alignment: Alignment.center,
                           children: [
                             Container(
-                                height: 120,
-                                width: 120,
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey.shade200),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    data.chat!.thumbnail!,
-                                    fit: BoxFit.cover,
-                                  ),
-                                )),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: data.chat!.user!.userId ==
+                                        Hive.box(userdata).get(userId)
+                                    ? yellow1Color
+                                    : Colors.grey.shade200,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Container(
+                                    height: 120,
+                                    width: 120,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        data.chat!.thumbnail!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )),
+                              ),
+                            ),
                             InkWell(
                               onTap: () {
                                 Navigator.push(
@@ -1258,7 +1313,10 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              color: yellow1Color,
+                              color: data.chat!.user!.userId ==
+                                      Hive.box(userdata).get(userId)
+                                  ? yellow1Color
+                                  : Colors.grey.shade200,
                             ),
                             child: Padding(
                               padding: const EdgeInsets.only(
@@ -1530,7 +1588,8 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                           _audio(
                               message: data.chat!.url!,
                               index: index,
-                              duration: data.chat!.audioTime!),
+                              duration: data.chat!.audioTime!,
+                              data: data),
                         ],
                       ),
                       Icon(
@@ -1706,17 +1765,29 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                             );
                           },
                           child: Container(
-                              height: 120,
-                              width: 120,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(15)),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Image.network(
-                                  data.chat!.url!,
-                                  fit: BoxFit.cover,
-                                ),
-                              )),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: data.chat!.user!.userId ==
+                                      Hive.box(userdata).get(userId)
+                                  ? yellow1Color
+                                  : Colors.grey.shade200,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(3.0),
+                              child: Container(
+                                  height: 120,
+                                  width: 120,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.network(
+                                      data.chat!.url!,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  )),
+                            ),
+                          ),
                         ),
                       ),
                       Icon(
@@ -1879,139 +1950,160 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                       Align(
                         alignment: Alignment.topLeft,
                         child: Container(
-                          constraints: BoxConstraints(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height / 8.3,
-                              maxWidth: MediaQuery.of(context).size.width * .7),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade200),
                             borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : Colors.grey.shade200,
                           ),
-                          child: InkWell(
-                            onTap: () {
-                              launchURL(data.chat!.message!);
-                            },
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 5, right: 5, top: 5, bottom: 5),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: FlutterLinkPreview(
-                                    url: data.chat!.message!,
-                                    builder: (info) {
-                                      if (info is WebInfo) {
-                                        return info.title == null &&
-                                                info.description == null
-                                            ? Text(
-                                                data.chat!.message!,
-                                                style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Colors.white),
-                                              )
-                                            : Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  if (info.image != null)
-                                                    Container(
-                                                      height: 50,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10)),
-                                                      child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        child: Image.network(
-                                                            info.image!,
-                                                            fit: BoxFit.cover),
-                                                      ),
-                                                    ),
-                                                  const SizedBox(width: 5),
-                                                  Expanded(
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        if (info.title != null)
-                                                          Text(
-                                                            info.title!,
-                                                            maxLines: 1,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 14,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ).paddingAll(2),
-                                                        info.image == null
-                                                            ? const SizedBox(
-                                                                height: 5)
-                                                            : const SizedBox
-                                                                .shrink(),
-                                                        if (info.description !=
-                                                            null)
-                                                          Text(
-                                                            info.description!,
-                                                            maxLines: 2,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: const TextStyle(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        68,
-                                                                        68,
-                                                                        68,
-                                                                        1),
-                                                                fontSize: 9,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400),
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 3, left: 3, right: 3),
+                            child: Container(
+                              constraints: BoxConstraints(
+                                  maxHeight:
+                                      MediaQuery.of(context).size.height / 8.3,
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * .7),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade200),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: InkWell(
+                                onTap: () {
+                                  launchURL(data.chat!.message!);
+                                },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.only(
+                                          left: 5, right: 5, top: 5, bottom: 5),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: FlutterLinkPreview(
+                                        url: data.chat!.message!,
+                                        builder: (info) {
+                                          if (info is WebInfo) {
+                                            return info.title == null &&
+                                                    info.description == null
+                                                ? Text(
+                                                    data.chat!.message!,
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                        color: Colors.white),
+                                                  )
+                                                : Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      if (info.image != null)
+                                                        Container(
+                                                          height: 50,
+                                                          width: 50,
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          10)),
+                                                          child: ClipRRect(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10),
+                                                            child:
+                                                                Image.network(
+                                                                    info.image!,
+                                                                    fit: BoxFit
+                                                                        .cover),
                                                           ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              );
-                                      }
-                                      return const CircularProgressIndicator();
-                                    },
-                                    titleStyle: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
+                                                        ),
+                                                      const SizedBox(width: 5),
+                                                      Expanded(
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .start,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            if (info.title !=
+                                                                null)
+                                                              Text(
+                                                                info.title!,
+                                                                maxLines: 1,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                ),
+                                                              ).paddingAll(2),
+                                                            info.image == null
+                                                                ? const SizedBox(
+                                                                    height: 5)
+                                                                : const SizedBox
+                                                                    .shrink(),
+                                                            if (info.description !=
+                                                                null)
+                                                              Text(
+                                                                info.description!,
+                                                                maxLines: 2,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                style: const TextStyle(
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            68,
+                                                                            68,
+                                                                            68,
+                                                                            1),
+                                                                    fontSize: 9,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
+                                                              ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                          }
+                                          return const CircularProgressIndicator();
+                                        },
+                                        titleStyle: const TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      data.chat!.message!,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          color: linkColor,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400),
+                                    ).paddingOnly(left: 10)
+                                  ],
                                 ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  data.chat!.message!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      color: linkColor,
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w400),
-                                ).paddingOnly(left: 10)
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -2177,8 +2269,12 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                         constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width * .6),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: grey1Color),
+                          borderRadius: BorderRadius.circular(10),
+                          color: data.chat!.user!.userId ==
+                                  Hive.box(userdata).get(userId)
+                              ? yellow1Color
+                              : Colors.grey.shade200,
+                        ),
                         padding: const EdgeInsets.all(3),
                         child: Column(
                           children: [
@@ -2526,9 +2622,12 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                       .width *
                                                   .6),
                               padding: const EdgeInsets.only(
-                                  left: 12, right: 12, top: 0, bottom: 0),
+                                  left: 7, right: 7, top: 0, bottom: 0),
                               decoration: BoxDecoration(
-                                  color: Colors.grey.shade200,
+                                  color: data.chat!.user!.userId ==
+                                          Hive.box(userdata).get(userId)
+                                      ? yellow1Color
+                                      : Colors.grey.shade200,
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(10))),
                               child: Column(
@@ -2757,11 +2856,11 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        15)),
+                                                                        10)),
                                                         child: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
-                                                                  .circular(15),
+                                                                  .circular(10),
                                                           child: Image.network(
                                                             data.chat!.url!,
                                                             fit: BoxFit.cover,
@@ -3079,9 +3178,9 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                                         child: Container(
                                                                             height: 120,
                                                                             width: double.maxFinite,
-                                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15)),
+                                                                            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                                                                             child: ClipRRect(
-                                                                              borderRadius: BorderRadius.circular(15),
+                                                                              borderRadius: BorderRadius.circular(10),
                                                                               child: Image.network(
                                                                                 data.chat!.url!,
                                                                                 fit: BoxFit.cover,
@@ -3190,7 +3289,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   }
 
   Widget myVoiceWidget(String audiourl, int index, String audioduration,
-      messageSeen, timestamp, isStarted) {
+      messageSeen, timestamp, isStarted, StarMessageList data) {
     return Container(
       padding: const EdgeInsets.only(right: 12, top: 0, bottom: 0),
       child: Column(
@@ -3200,7 +3299,8 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
               _audio(
                   message: audiourl,
                   index: index,
-                  duration: audioduration.toString()),
+                  duration: audioduration.toString(),
+                  data: data),
               Padding(
                   padding: const EdgeInsets.only(top: 4.0),
                   child: SizedBox(
@@ -3216,11 +3316,11 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
     );
   }
 
-  Widget _audio({
-    required String message,
-    required int index,
-    required String duration,
-  }) {
+  Widget _audio(
+      {required String message,
+      required int index,
+      required String duration,
+      required StarMessageList data}) {
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.7,
@@ -3228,7 +3328,11 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       height: 65,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10), color: grey1Color),
+        borderRadius: BorderRadius.circular(10),
+        color: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+            ? yellow1Color
+            : Colors.grey.shade200,
+      ),
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10), color: Colors.white),
@@ -3249,11 +3353,17 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                         audioController.currentId == index)
                     ? Icon(
                         CupertinoIcons.pause_circle_fill,
-                        color: grey1Color,
+                        color: data.chat!.user!.userId ==
+                                Hive.box(userdata).get(userId)
+                            ? yellow1Color
+                            : grey1Color,
                       )
                     : Icon(
                         CupertinoIcons.play_circle_fill,
-                        color: grey1Color,
+                        color: data.chat!.user!.userId ==
+                                Hive.box(userdata).get(userId)
+                            ? yellow1Color
+                            : grey1Color,
                       ),
               ),
             ),

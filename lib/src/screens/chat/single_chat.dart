@@ -343,7 +343,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         child: Container(
                       decoration: const BoxDecoration(
                           image: DecorationImage(
-                              opacity: 0.03,
+                              opacity: 0.05,
                               image:
                                   AssetImage("assets/images/chat_back_img.png"),
                               fit: BoxFit.cover)),
@@ -5461,6 +5461,35 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                   onTap: () async {
                     await getRoomController.getRoomModelApi(
                         conversationID: widget.conversationID,
+                        callType: "audio_call");
+                    print(
+                        "ROOMID 2 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
+                    Get.to(() => AudioCallScreen(
+                          roomID: Get.find<RoomIdController>()
+                              .roomModel
+                              .value!
+                              .roomId,
+                          conversation_id: widget.conversationID ?? "",
+                          isCaller: true,
+                          receiverImage: widget.userPic!,
+                          receiverUserName: widget.username!,
+                        ));
+                  },
+                  child: Image.asset(
+                    "assets/images/call_1.png",
+                    color: chatColor,
+                    height: MediaQuery.of(context).size.height * 0.027,
+                  ),
+                );
+        }),
+        const SizedBox(width: 12),
+        Obx(() {
+          return chatListController.blockModel.value!.isBlock == true
+              ? const SizedBox.shrink()
+              : InkWell(
+                  onTap: () async {
+                    await getRoomController.getRoomModelApi(
+                        conversationID: widget.conversationID,
                         callType: "video_call");
                     print(
                         "ROOMID 1 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
@@ -5475,41 +5504,6 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                   },
                   child: Image.asset(
                     "assets/images/video_1.png",
-                    color: chatColor,
-                    height: MediaQuery.of(context).size.height * 0.027,
-                  ),
-                );
-        }),
-        const SizedBox(width: 12),
-        Obx(() {
-          return chatListController.blockModel.value!.isBlock == true
-              ? const SizedBox.shrink()
-              : InkWell(
-                  onTap: () async {
-                    await getRoomController.getRoomModelApi(
-                        conversationID: widget.conversationID,
-                        callType: "audio_call");
-                    print(
-                        "ROOMID 2 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
-                    Get.to(() => AudioCallScreen(
-                          roomID: Get.find<RoomIdController>()
-                              .roomModel
-                              .value!
-                              .roomId,
-                          conversation_id: widget.conversationID ?? "",
-                          isCaller: true,
-                          receiverImage: widget.userPic!,
-                          receiverUserName: widget.username!,
-                        ));
-                    // Get.to(
-                    //   () =>  AudioCallScreen(),
-                    // );
-                    // getRoomController.getRoomModelApi(
-                    //     conversationID: widget.conversationID,
-                    //     callType: "voice_call");
-                  },
-                  child: Image.asset(
-                    "assets/images/call_1.png",
                     color: chatColor,
                     height: MediaQuery.of(context).size.height * 0.027,
                   ),

@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:readmore/readmore.dart';
 import 'package:story/story.dart';
 import 'package:video_player/video_player.dart';
 
@@ -877,6 +878,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                                 Expanded(
                                                   child: Container(
                                                     decoration: BoxDecoration(
+                                                        color: Colors.white,
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(10),

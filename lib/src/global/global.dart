@@ -613,10 +613,12 @@ Widget loader(BuildContext context) {
     child: Container(
       height: 40,
       width: 40,
-      decoration: const BoxDecoration(
-        color: chatownColor,
-        shape: BoxShape.circle,
-      ),
+      decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+              colors: [yellow1Color, yellow2Color],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter)),
       child: const Padding(
         padding: EdgeInsets.all(7.0),
         child: CircularProgressIndicator(
