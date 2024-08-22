@@ -13,6 +13,7 @@ import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 // import 'package:meyaoo_new/controller/call_history_controller.dart';
 import 'package:meyaoo_new/controller/get_delete_story.dart';
 import 'package:meyaoo_new/main.dart';
@@ -20,6 +21,8 @@ import 'package:meyaoo_new/src/Notification/notifiactions_handler.dart';
 import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/incoming_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
 import 'package:meyaoo_new/src/screens/user/profile.dart';
@@ -51,6 +54,8 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
           "Notification permission is required, Please allow notification permission from setting."
     });
   }
+
+  final RoomIdController roomIdController = Get.put(RoomIdController());
 
   @override
   void initState() {
@@ -84,18 +89,90 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     print(
         "OneSignal pushSubscription token ${OneSignal.User.pushSubscription.token}");
 
-
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print("event body ${event.notification.additionalData}");
+      if (event.notification.additionalData!['call_type'].toString() ==
+          'video_call') {
+        print("FirebaseMessaging.onMessage video call");
+        if (event.notification.additionalData!['missed_call'].toString() ==
+            'true') {
+          Get.back();
+        } else {
+          Get.to(IncomingCallScrenn(
+            roomID: event.notification.additionalData!['room_id'].toString(),
+            callerImage: event
+                .notification.additionalData!['sender_profile_image']
+                .toString(),
+            senderName:
+                event.notification.additionalData!['senderName'].toString(),
+            conversation_id: event
+                .notification.additionalData!['conversation_id']
+                .toString(),
+            message_id:
+                event.notification.additionalData!['message_id'].toString(),
+            caller_id:
+                event.notification.additionalData!['senderId'].toString(),
+            isGroupCall:
+                event.notification.additionalData!['is_group'].toString(),
+          ));
+        }
+      }
     });
+
     OneSignal.Notifications.addClickListener((event) {
       if (event.result.actionId == "accept") {
         print("actionId accept");
-        Get.to(VideoCallScreen(
-          conversation_id: "askfasdasd",
-        ));
-      } else {
+        if (event.notification.additionalData!['call_type'].toString() ==
+            'video_call') {
+          print("FirebaseMessaging.service 2 video call");
+          Get.off(VideoCallScreen(
+            roomID: event.notification.additionalData!['room_id'].toString(),
+            conversation_id: event
+                .notification.additionalData!['conversation_id']
+                .toString(),
+          ));
+        }
+      } else if (event.result.actionId == "decline") {
         print("actionId decline");
+        print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
+        if (event.notification.additionalData!['call_type'].toString() ==
+            'video_call') {
+          if (event.notification.additionalData!['is_group'].toString() ==
+              "true") {
+            Get.back();
+          } else {
+            roomIdController.callCutByReceiver(
+              conversationID: event
+                  .notification.additionalData!['conversation_id']
+                  .toString(),
+              message_id:
+                  event.notification.additionalData!['message_id'].toString(),
+              caller_id:
+                  event.notification.additionalData!['senderId'].toString(),
+            );
+          }
+        }
+      } else {
+        if (event.notification.additionalData!['call_type'].toString() ==
+            'video_call') {
+          Get.to(IncomingCallScrenn(
+            roomID: event.notification.additionalData!['room_id'].toString(),
+            callerImage: event
+                .notification.additionalData!['sender_profile_image']
+                .toString(),
+            senderName:
+                event.notification.additionalData!['senderName'].toString(),
+            conversation_id: event
+                .notification.additionalData!['conversation_id']
+                .toString(),
+            message_id:
+                event.notification.additionalData!['message_id'].toString(),
+            caller_id:
+                event.notification.additionalData!['senderId'].toString(),
+            isGroupCall:
+                event.notification.additionalData!['is_group'].toString(),
+          ));
+        }
       }
     });
     _checkPermissions();
