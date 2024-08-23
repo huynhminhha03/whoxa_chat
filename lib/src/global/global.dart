@@ -98,7 +98,7 @@ Color chatLogoColor = const Color.fromRGBO(252, 198, 4, 1);
 Color chatYColor = const Color.fromRGBO(252, 198, 4, 0.43);
 Color yellow1Color = const Color.fromRGBO(255, 237, 171, 1);
 Color yellow2Color = const Color.fromRGBO(252, 198, 4, 1);
-Color grey1Color = const Color.fromRGBO(221, 221, 221, 1);
+Color grey1Color = Colors.grey.shade200;
 Color blurColor = const Color.fromRGBO(0, 0, 0, 0.56);
 Color darkGreyColor = const Color.fromRGBO(58, 51, 51, 1);
 Color linkColor = const Color.fromRGBO(2, 126, 181, 1);
@@ -2078,4 +2078,44 @@ Widget removeCheckContainer() {
         border: Border.all(color: black1Color),
         color: bg1),
   );
+}
+
+RichText richText(
+    {required String imageFile, required String fName, required String lName}) {
+  return RichText(
+      text: TextSpan(children: [
+    WidgetSpan(
+        alignment: PlaceholderAlignment.middle,
+        child: Container(
+          height: 28,
+          width: 28,
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(28)),
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: CachedNetworkImage(
+                imageUrl: imageFile,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(
+                  color: chatownColor,
+                )),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.person,
+                  color: Color(0xffBFBFBF),
+                ),
+              )),
+        )),
+    TextSpan(
+        text: capitalizeFirstLetter(" $fName " "$lName"),
+        style: const TextStyle(
+            fontSize: 12, fontWeight: FontWeight.w500, color: Colors.black))
+  ]));
 }

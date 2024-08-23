@@ -236,7 +236,8 @@ class _ForwardMessageState extends State<ForwardMessage> {
                   widget.forwardMsgList[j].audioTime!,
                   '',
                   widget.forwardMsgList[j].messageId.toString(),
-                  '');
+                  '',
+                  true);
               //=============  GIF MESSAGE FORWARD ======================
             } else if (widget.forwardMsgList[j].messageType == 'gif') {
               chatContorller.sendMessageGIF(

@@ -992,6 +992,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
+                          data.myMessage == false
+                              ? richText(
+                                  imageFile: data.senderData!.profileImage!,
+                                  fName: data.senderData!.firstName!,
+                                  lName: data.senderData!.lastName!)
+                              : const SizedBox.shrink(),
+                          data.myMessage == false
+                              ? const SizedBox(height: 5)
+                              : const SizedBox.shrink(),
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -1157,6 +1166,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       ? CrossAxisAlignment.start
                       : CrossAxisAlignment.end,
                   children: [
+                    data.myMessage == false
+                        ? richText(
+                            imageFile: data.senderData!.profileImage!,
+                            fName: data.senderData!.firstName!,
+                            lName: data.senderData!.lastName!)
+                        : const SizedBox.shrink(),
+                    data.myMessage == false
+                        ? const SizedBox(height: 5)
+                        : const SizedBox.shrink(),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -1344,100 +1362,100 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       right: 12,
                       top: 0,
                       bottom: 0),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Stack(
-                      alignment: data.myMessage == false
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      children: [
-                        Column(
-                          crossAxisAlignment: data.myMessage == false
-                              ? CrossAxisAlignment.start
-                              : CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: data.myMessage == false
-                                      ? const BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15),
-                                          bottomRight: Radius.circular(15))
-                                      : const BorderRadius.only(
-                                          topRight: Radius.circular(15),
-                                          topLeft: Radius.circular(15),
-                                          bottomLeft: Radius.circular(15)),
-                                  color: data.myMessage == false
-                                      ? grey1Color
-                                      : yellow1Color),
-                              constraints: const BoxConstraints(
-                                  minHeight: 10.0,
-                                  minWidth: 10.0,
-                                  maxWidth: 250),
-                              child: InkWell(
-                                onTap: () {
-                                  MapUtils.openMap(double.parse(data.latitude!),
-                                      double.parse(data.longitude!));
-                                },
-                                child: Container(
-                                  height: 130,
-                                  width: 250,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: data.latitude.toString() == "" ||
-                                            data.longitude.toString() == ""
-                                        ? Container(
-                                            decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(10),
-                                                    topRight:
-                                                        Radius.circular(10)),
-                                                image: DecorationImage(
-                                                    image: AssetImage(
-                                                        "assets/images/map_Blurr.png"),
-                                                    fit: BoxFit.cover)),
-                                            child: Icon(
-                                              Icons.error_outline,
-                                              color:
-                                                  chatownColor.withOpacity(0.6),
-                                              size: 50,
-                                            ),
-                                          )
-                                        : GoogleMap(
-                                            zoomControlsEnabled: false,
-                                            zoomGesturesEnabled: false,
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                                    target: LatLng(
-                                                        double.parse(
-                                                            data.latitude!),
-                                                        double.parse(
-                                                            data.longitude!)),
-                                                    zoom: 15),
-                                            mapType: MapType.normal,
-                                            onMapCreated: (GoogleMapController
-                                                controller111) {
-                                              // controller.complete();
-                                            },
+                  child: Stack(
+                    alignment: data.myMessage == false
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    children: [
+                      Column(
+                        crossAxisAlignment: data.myMessage == false
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.end,
+                        children: [
+                          data.myMessage == false
+                              ? richText(
+                                  imageFile: data.senderData!.profileImage!,
+                                  fName: data.senderData!.firstName!,
+                                  lName: data.senderData!.lastName!)
+                              : const SizedBox.shrink(),
+                          data.myMessage == false
+                              ? const SizedBox(height: 5)
+                              : const SizedBox.shrink(),
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: data.myMessage == false
+                                    ? const BorderRadius.only(
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15),
+                                        bottomRight: Radius.circular(15))
+                                    : const BorderRadius.only(
+                                        topRight: Radius.circular(15),
+                                        topLeft: Radius.circular(15),
+                                        bottomLeft: Radius.circular(15)),
+                                color: data.myMessage == false
+                                    ? grey1Color
+                                    : yellow1Color),
+                            constraints: const BoxConstraints(
+                                minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
+                            child: InkWell(
+                              onTap: () {
+                                MapUtils.openMap(double.parse(data.latitude!),
+                                    double.parse(data.longitude!));
+                              },
+                              child: Container(
+                                height: 130,
+                                width: 250,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: data.latitude.toString() == "" ||
+                                          data.longitude.toString() == ""
+                                      ? Container(
+                                          decoration: const BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                  topRight:
+                                                      Radius.circular(10)),
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      "assets/images/map_Blurr.png"),
+                                                  fit: BoxFit.cover)),
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            color:
+                                                chatownColor.withOpacity(0.6),
+                                            size: 50,
                                           ),
-                                  ),
+                                        )
+                                      : GoogleMap(
+                                          zoomControlsEnabled: false,
+                                          zoomGesturesEnabled: false,
+                                          initialCameraPosition: CameraPosition(
+                                              target: LatLng(
+                                                  double.parse(data.latitude!),
+                                                  double.parse(
+                                                      data.longitude!)),
+                                              zoom: 15),
+                                          mapType: MapType.normal,
+                                          onMapCreated: (GoogleMapController
+                                              controller111) {
+                                            // controller.complete();
+                                          },
+                                        ),
                                 ),
-                              ).paddingOnly(
-                                  left: 4, top: 4, right: 4, bottom: 4),
-                            ),
-                            Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: SizedBox(
-                                  child: timestpa(data.messageRead.toString(),
-                                      data.createdAt!, data.isStarMessage!),
-                                ))
-                          ],
-                        ),
-                      ],
-                    ),
+                              ),
+                            ).paddingOnly(left: 4, top: 4, right: 4, bottom: 4),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: SizedBox(
+                                child: timestpa(data.messageRead.toString(),
+                                    data.createdAt!, data.isStarMessage!),
+                              ))
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -1571,6 +1589,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
+                          data.myMessage == false
+                              ? richText(
+                                  imageFile: data.senderData!.profileImage!,
+                                  fName: data.senderData!.firstName!,
+                                  lName: data.senderData!.lastName!)
+                              : const SizedBox.shrink(),
+                          data.myMessage == false
+                              ? const SizedBox(height: 5)
+                              : const SizedBox.shrink(),
                           Stack(
                             children: [
                               Container(
@@ -1770,6 +1797,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         ? CrossAxisAlignment.start
                         : CrossAxisAlignment.end,
                     children: [
+                      data.myMessage == false
+                          ? richText(
+                              imageFile: data.senderData!.profileImage!,
+                              fName: data.senderData!.firstName!,
+                              lName: data.senderData!.lastName!)
+                          : const SizedBox.shrink(),
+                      data.myMessage == false
+                          ? const SizedBox(height: 5)
+                          : const SizedBox.shrink(),
                       Container(
                         height: 70,
                         width: 250,
@@ -2150,6 +2186,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       ? CrossAxisAlignment.start
                       : CrossAxisAlignment.end,
                   children: [
+                    data.myMessage == false
+                        ? richText(
+                            imageFile: data.senderData!.profileImage!,
+                            fName: data.senderData!.firstName!,
+                            lName: data.senderData!.lastName!)
+                        : const SizedBox.shrink(),
+                    data.myMessage == false
+                        ? const SizedBox(height: 5)
+                        : const SizedBox.shrink(),
                     InkWell(
                       onTap: () {
                         Navigator.push(
@@ -2339,6 +2384,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
+                          data.myMessage == false
+                              ? richText(
+                                  imageFile: data.senderData!.profileImage!,
+                                  fName: data.senderData!.firstName!,
+                                  lName: data.senderData!.lastName!)
+                              : const SizedBox.shrink(),
+                          data.myMessage == false
+                              ? const SizedBox(height: 5)
+                              : const SizedBox.shrink(),
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -2642,6 +2696,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             ? CrossAxisAlignment.start
                             : CrossAxisAlignment.end,
                         children: [
+                          data.myMessage == false
+                              ? richText(
+                                  imageFile: data.senderData!.profileImage!,
+                                  fName: data.senderData!.firstName!,
+                                  lName: data.senderData!.lastName!)
+                              : const SizedBox.shrink(),
+                          data.myMessage == false
+                              ? const SizedBox(height: 5)
+                              : const SizedBox.shrink(),
                           Stack(
                             clipBehavior: Clip.none,
                             children: [
@@ -3642,7 +3705,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             audioController.total,
             widget.mobileNum.toString(),
             '',
-            reply_chatID);
+            reply_chatID,
+            false);
         SelectedreplyText = false;
         listScrollController!
             .jumpTo(listScrollController!.position.minScrollExtent);
@@ -3655,7 +3719,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             audioController.total,
             widget.mobileNum.toString(),
             '',
-            '');
+            '',
+            false);
         listScrollController!
             .jumpTo(listScrollController!.position.minScrollExtent);
       }
@@ -3800,7 +3865,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       height: 40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          color: chatownColor),
+                          gradient: LinearGradient(
+                              colors: [yellow1Color, yellow2Color],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
                       child: Center(
                         child: Text(
                           record ? "Send" : "Start",
@@ -3825,7 +3893,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                       height: 40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          color: chatownColor),
+                          gradient: LinearGradient(
+                              colors: [yellow1Color, yellow2Color],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
                       child: const Center(
                         child: Text(
                           "Cancel",
@@ -3858,6 +3929,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                   ? CrossAxisAlignment.start
                   : CrossAxisAlignment.end,
               children: [
+                data.myMessage == false
+                    ? richText(
+                        imageFile: data.senderData!.profileImage!,
+                        fName: data.senderData!.firstName!,
+                        lName: data.senderData!.lastName!)
+                    : const SizedBox.shrink(),
+                data.myMessage == false
+                    ? const SizedBox(height: 5)
+                    : const SizedBox.shrink(),
                 data.replyId == 0
                     ? _audio(
                         message: data.url!,
@@ -3896,72 +3976,86 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
   }) {
     return Container(
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.6,
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
       ),
       height: 65,
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: isCurrentUser ? Colors.grey.shade200 : chatownColor,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                audioController.onPressedPlayButton(index, message);
-              });
-            },
-            onSecondaryTap: () {
-              audioPlayer.stop();
-            },
-            child: Obx(
-              () => (audioController.isRecordPlaying &&
-                      audioController.currentId == index)
-                  ? const Icon(
-                      Icons.pause,
-                      color: chatColor,
-                    )
-                  : const Icon(
-                      Icons.play_arrow,
-                      color: chatColor,
-                    ),
+          borderRadius: isCurrentUser
+              ? const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(10))
+              : const BorderRadius.only(
+                  topRight: Radius.circular(10),
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10)),
+          color: isCurrentUser ? grey1Color : yellow1Color),
+      child: Container(
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10), color: Colors.white),
+        child: Row(
+          children: [
+            const SizedBox(width: 5),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  audioController.onPressedPlayButton(index, message);
+                });
+              },
+              onSecondaryTap: () {
+                audioPlayer.stop();
+              },
+              child: Obx(
+                () => (audioController.isRecordPlaying &&
+                        audioController.currentId == index)
+                    ? Icon(
+                        CupertinoIcons.pause_circle_fill,
+                        color: isCurrentUser ? grey1Color : yellow1Color,
+                      )
+                    : Icon(
+                        CupertinoIcons.play_circle_fill,
+                        color: isCurrentUser ? grey1Color : yellow1Color,
+                      ),
+              ),
             ),
-          ),
-          const SizedBox(width: 5),
-          Obx(
-            () => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 0),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    LinearProgressIndicator(
-                      minHeight: 5,
-                      backgroundColor: Colors.grey,
-                      valueColor:
-                          const AlwaysStoppedAnimation<Color>(Colors.black),
-                      value: (audioController.isRecordPlaying &&
-                              audioController.currentId == index)
-                          ? (audioController.totalDuration.value > 0
-                              ? audioController.completedPercentage.value
-                              : 0.0)
-                          : 0.0,
-                    ),
-                  ],
+            const SizedBox(width: 5),
+            Obx(
+              () => Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+                      LinearProgressIndicator(
+                        minHeight: 5,
+                        backgroundColor: Colors.grey,
+                        valueColor:
+                            const AlwaysStoppedAnimation<Color>(Colors.black),
+                        value: (audioController.isRecordPlaying &&
+                                audioController.currentId == index)
+                            ? (audioController.totalDuration.value > 0
+                                ? audioController.completedPercentage.value
+                                : 0.0)
+                            : 0.0,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          Text(
-            duration,
-            style: const TextStyle(fontSize: 12, color: chatColor),
-          ),
-        ],
+            const SizedBox(width: 10),
+            Text(
+              duration,
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey),
+            ),
+            const SizedBox(width: 10)
+          ],
+        ),
       ),
     );
   }
@@ -5536,7 +5630,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           padding: const EdgeInsets.only(top: 4.0),
                           child: SizedBox(
                             child: timestpa(data.messageRead.toString(),
-                                data.createdAt!, isStarred),
+                                data.createdAt!, data.isStarMessage!),
                           ))
                     ],
                   ),

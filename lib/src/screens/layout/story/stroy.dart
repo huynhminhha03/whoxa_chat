@@ -195,7 +195,24 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                       .userId ==
                                                   Hive.box(userdata).get(userId)
                                               ? const SizedBox.shrink()
-                                              : ListTile(
+                                              :
+                                              // storyController
+                                              //             .notViewedStatusList[
+                                              //                 index]
+                                              //             .userData!
+                                              //             .statuses![0]
+                                              //             .statusViews![0]
+                                              //             .statusCount ==
+                                              //         storyController
+                                              //             .notViewedStatusList[
+                                              //                 index]
+                                              //             .userData!
+                                              //             .statuses![0]
+                                              //             .statusMedia!
+                                              //             .length
+                                              //     ? const SizedBox()
+                                              //     :
+                                              ListTile(
                                                   onTap: () {
                                                     storyController
                                                         .pageIndexValue
@@ -248,6 +265,10 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                                     .fullName))!
                                                         .then((_) {
                                                       print("REFRESH");
+                                                      print(
+                                                          "COUNT:${storyController.notViewedStatusList[index].userData!.statuses![0].statusViews![0].statusCount}");
+                                                      print(
+                                                          "COUNT:${storyController.notViewedStatusList[index].userData!.statuses![0].statusMedia!.length}");
                                                       storyController
                                                           .storyListData
                                                           .refresh();
@@ -257,6 +278,15 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                       storyController
                                                           .viewedStatusList
                                                           .refresh();
+                                                      if (index ==
+                                                          storyController
+                                                                  .notViewedStatusList
+                                                                  .length -
+                                                              1) {
+                                                        // If it's the last index, call getAllUsersStoryUpdate()
+                                                        storyController
+                                                            .getAllUsersStoryUpdate();
+                                                      }
                                                     });
                                                   },
                                                   leading: Obx(() {

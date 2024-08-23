@@ -424,7 +424,8 @@ class SingleChatContorller extends GetxController {
       String duration,
       String mobileNum,
       String forwardid,
-      String replyid) async {
+      String replyid,
+      bool isforwardUrl) async {
     isSendMsg(true);
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
@@ -445,11 +446,11 @@ class SingleChatContorller extends GetxController {
     request.fields['forward_id'] = forwardid;
     request.fields['reply_id'] = replyid;
 
-    if (filePath == File) {
+    if (isforwardUrl == true) {
+      request.fields['url'] = forwardurl;
+    } else {
       request.files
           .add(await http.MultipartFile.fromPath('files', filePath.path));
-    } else {
-      request.fields['url'] = forwardurl;
     }
 
     // send
@@ -460,7 +461,8 @@ class SingleChatContorller extends GetxController {
 
     sendMsgModel.value = SendMsgModel.fromJson(useData);
     isSendMsg(false);
-    print("object: ${request.fields}");
+    print("AUDIO_URL:${request.fields}");
+    print("AUDIO_URL:${request.files}");
     print(responseData);
 
     // final respo = MessageList.fromJson(useData);
@@ -588,6 +590,68 @@ class SingleChatContorller extends GetxController {
     userdetailschattModel.refresh();
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+  }
+
+  sendMessageStatusMessage(
+      String message,
+      String conversationID,
+      String msgtype,
+      String mobileNum,
+      String forwardid,
+      String replyid,
+      String statusID) async {
+    print(message);
+    print(conversationID);
+    print(msgtype);
+    print(mobileNum);
+    isSendMsg(true);
+    var uri = Uri.parse(apiHelper.sendChatMsg);
+    var request = http.MultipartRequest("POST", uri);
+    Map<String, String> headers = {
+      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+      "Accept": "application/json",
+    };
+
+    //add headers
+    request.headers.addAll(headers);
+
+    //adding params
+    request.fields['message'] = message;
+    request.fields['message_type'] = msgtype;
+    request.fields['conversation_id'] = conversationID;
+    request.fields['phone_number'] = mobileNum;
+    request.fields['forward_id'] = forwardid;
+    request.fields['reply_id'] = replyid;
+    request.fields['status_id'] = statusID;
+
+    print(request.fields);
+    // send
+    var response = await request.send();
+
+    String responseData = await response.stream.transform(utf8.decoder).join();
+    var useData = json.decode(responseData);
+
+    sendMsgModel.value = SendMsgModel.fromJson(useData);
+    isSendMsg(false);
+    print("object: ${request.fields}");
+    print(responseData);
+    final newMessage = MessageList.fromJson(useData);
+
+    if (userdetailschattModel.value?.messageList == null) {
+      userdetailschattModel.value =
+          SingleChatListModel(messageList: [newMessage]);
+    } else {
+      print("check.......");
+      userdetailschattModel.value!.messageList!.insert(0, newMessage);
+    }
+    userdetailschattModel.refresh();
+    // final respo = MessageList.fromJson(useData);
+    // userdetailschattModel.value!.messageList!.add(respo);
+    Get.back();
+    Get.find<ChatListController>().forChatList();
+    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+
+    // getdetailschat(conversationID);
   }
 
   deleteChatApi(chatID, bool deleteFrom, String mobileNum) async {
@@ -803,6 +867,68 @@ class SingleChatContorller extends GetxController {
         {"conversation_id": cID.toString(), "is_typing": istyping.toString()});
     userdetailschattModel.refresh();
     print("isTyping Emitted");
+  }
+
+  removeStarApiMultiple(chatID) async {
+    print(chatID);
+    isStar(true);
+    try {
+      var uri = Uri.parse(apiHelper.addStar);
+      var request = http.MultipartRequest("POST", uri);
+      Map<String, String> headers = {
+        'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+        "Accept": "application/json",
+      };
+
+      //add headers
+      request.headers.addAll(headers);
+      request.fields['message_id'] = chatID
+          .toString()
+          .replaceAll('[', '')
+          .replaceAll(']', '')
+          .removeAllWhitespace;
+
+      request.fields['remove_from_star'] = true.toString();
+      var response = await request.send();
+
+      String responseData =
+          await response.stream.transform(utf8.decoder).join();
+      var useData = json.decode(responseData);
+
+      starModel.value = AddStarMsgModel.fromJson(useData);
+
+      if (starModel.value!.success == true) {
+        for (var i = 0;
+            i < userdetailschattModel.value!.messageList!.length;
+            i++) {
+          debugPrint(
+              "chatList[i].messageId ${userdetailschattModel.value!.messageList![i].messageId}");
+          debugPrint("chatList[i].chatID $chatID");
+          if (userdetailschattModel.value!.messageList![i].messageId
+                  .toString() ==
+              chatID.toString()) {
+            debugPrint(
+                "chatList[i].messageId 1 ${userdetailschattModel.value!.messageList![i].messageId}");
+            debugPrint("chatList[i].chatID 1 $chatID");
+            userdetailschattModel.value!.messageList![i].isStarMessage =
+                false; // Update message's star status
+            userdetailschattModel.refresh();
+            // chatList.refresh();
+          }
+        }
+        isStar(false);
+        userdetailschattModel.refresh();
+        showCustomToast(starModel.value!.message!);
+      } else {
+        isStar(false);
+      }
+    } catch (e) {
+      print(e.toString());
+      showCustomToast(e.toString());
+      isStar(false);
+    } finally {
+      isStar(false);
+    }
   }
 
   @override

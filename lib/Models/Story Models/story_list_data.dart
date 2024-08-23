@@ -204,21 +204,21 @@ class StoryListData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["success"] = success;
-    _data["message"] = message;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["success"] = success;
+    data["message"] = message;
     if (viewedStatusList != null) {
-      _data["viewedStatusList"] =
+      data["viewedStatusList"] =
           viewedStatusList?.map((e) => e.toJson()).toList();
     }
     if (notViewedStatusList != null) {
-      _data["notViewedStatusList"] =
+      data["notViewedStatusList"] =
           notViewedStatusList?.map((e) => e.toJson()).toList();
     }
     if (myStatus != null) {
-      _data["myStatus"] = myStatus?.toJson();
+      data["myStatus"] = myStatus?.toJson();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -238,26 +238,26 @@ class MyStatus {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["profile_image"] = profileImage;
-    _data["user_id"] = userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["profile_image"] = profileImage;
+    data["user_id"] = userId;
     if (statuses != null) {
-      _data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
+      data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
 class Statuses2 {
   int? statusId;
-  String? createdAt;
+  String? updatedAt;
   List<StatusMedia2>? statusMedia;
 
-  Statuses2({this.statusId, this.createdAt, this.statusMedia});
+  Statuses2({this.statusId, this.updatedAt, this.statusMedia});
 
   Statuses2.fromJson(Map<String, dynamic> json) {
     statusId = json["status_id"];
-    createdAt = json["createdAt"];
+    updatedAt = json["updatedAt"];
     statusMedia = json["StatusMedia"] == null
         ? null
         : (json["StatusMedia"] as List)
@@ -266,13 +266,13 @@ class Statuses2 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_id"] = statusId;
-    _data["createdAt"] = createdAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_id"] = statusId;
+    data["updatedAt"] = updatedAt;
     if (statusMedia != null) {
-      _data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
+      data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -280,21 +280,24 @@ class StatusMedia2 {
   String? statusText;
   String? url;
   int? statusMediaId;
+  String? updatedAt;
 
-  StatusMedia2({this.statusText, this.url, this.statusMediaId});
+  StatusMedia2({this.statusText, this.url, this.statusMediaId, this.updatedAt});
 
   StatusMedia2.fromJson(Map<String, dynamic> json) {
     statusText = json["status_text"];
     url = json["url"];
     statusMediaId = json["status_media_id"];
+    updatedAt = json["updatedAt"];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_text"] = statusText;
-    _data["url"] = url;
-    _data["status_media_id"] = statusMediaId;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_text"] = statusText;
+    data["url"] = url;
+    data["status_media_id"] = statusMediaId;
+    data["updatedAt"] = updatedAt;
+    return data;
   }
 }
 
@@ -313,13 +316,13 @@ class NotViewedStatusList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["full_name"] = fullName;
-    _data["phone_number"] = phoneNumber;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["full_name"] = fullName;
+    data["phone_number"] = phoneNumber;
     if (userData != null) {
-      _data["userData"] = userData?.toJson();
+      data["userData"] = userData?.toJson();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -339,13 +342,13 @@ class UserData1 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["profile_image"] = profileImage;
-    _data["user_id"] = userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["profile_image"] = profileImage;
+    data["user_id"] = userId;
     if (statuses != null) {
-      _data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
+      data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -374,16 +377,16 @@ class Statuses1 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_id"] = statusId;
-    _data["updatedAt"] = updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_id"] = statusId;
+    data["updatedAt"] = updatedAt;
     if (statusMedia != null) {
-      _data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
+      data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
     }
     if (statusViews != null) {
-      _data["StatusViews"] = statusViews?.map((e) => e.toJson()).toList();
+      data["StatusViews"] = statusViews?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -397,9 +400,9 @@ class StatusViews1 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_count"] = statusCount;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_count"] = statusCount;
+    return data;
   }
 }
 
@@ -419,12 +422,12 @@ class StatusMedia1 {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_text"] = statusText;
-    _data["url"] = url;
-    _data["status_media_id"] = statusMediaId;
-    _data["updatedAt"] = updatedAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_text"] = statusText;
+    data["url"] = url;
+    data["status_media_id"] = statusMediaId;
+    data["updatedAt"] = updatedAt;
+    return data;
   }
 }
 
@@ -443,13 +446,13 @@ class ViewedStatusList {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["full_name"] = fullName;
-    _data["phone_number"] = phoneNumber;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["full_name"] = fullName;
+    data["phone_number"] = phoneNumber;
     if (userData != null) {
-      _data["userData"] = userData?.toJson();
+      data["userData"] = userData?.toJson();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -469,13 +472,13 @@ class UserData {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["profile_image"] = profileImage;
-    _data["user_id"] = userId;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["profile_image"] = profileImage;
+    data["user_id"] = userId;
     if (statuses != null) {
-      _data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
+      data["Statuses"] = statuses?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -503,16 +506,16 @@ class Statuses {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_id"] = statusId;
-    _data["updatedAt"] = updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_id"] = statusId;
+    data["updatedAt"] = updatedAt;
     if (statusMedia != null) {
-      _data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
+      data["StatusMedia"] = statusMedia?.map((e) => e.toJson()).toList();
     }
     if (statusViews != null) {
-      _data["StatusViews"] = statusViews?.map((e) => e.toJson()).toList();
+      data["StatusViews"] = statusViews?.map((e) => e.toJson()).toList();
     }
-    return _data;
+    return data;
   }
 }
 
@@ -526,9 +529,9 @@ class StatusViews {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_count"] = statusCount;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_count"] = statusCount;
+    return data;
   }
 }
 
@@ -548,11 +551,11 @@ class StatusMedia {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["status_text"] = statusText;
-    _data["url"] = url;
-    _data["status_media_id"] = statusMediaId;
-    _data["updatedAt"] = updatedAt;
-    return _data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data["status_text"] = statusText;
+    data["url"] = url;
+    data["status_media_id"] = statusMediaId;
+    data["updatedAt"] = updatedAt;
+    return data;
   }
 }

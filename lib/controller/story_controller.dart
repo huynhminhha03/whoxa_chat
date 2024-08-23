@@ -361,7 +361,10 @@ class StroyGetxController extends GetxController {
               .statusViews![0]
               .statusCount! +
           1;
+
       storyListData.refresh();
+      viewedStatusList.refresh();
+      notViewedStatusList.refresh();
       print("Requested Data of add_story$respo");
       // if (respo.responseCode == 1) {
       //   for (int i = 0; i < storyListData.value.post!.length; i++) {
@@ -496,6 +499,27 @@ class StroyGetxController extends GetxController {
       log("Error occurred: ${e.toString()}");
     } finally {
       isMyStoryDeleteLoading(false);
+    }
+  }
+
+  getAllUsersStoryUpdate() async {
+    final result = await dio.post(apiHelper.statusListUrl, options: options);
+
+    final respo = StoryListData.fromJson(result.data);
+
+    storyListData = respo.obs;
+    viewedStatusList.value = storyListData.value.viewedStatusList!;
+    notViewedStatusList.value = storyListData.value.notViewedStatusList!;
+    allStoryListData = respo.obs;
+
+    var storeJsonData = json.encode(result.data);
+    //box.put(HiveKeyService.storyKey, storeJsonData);
+    log("STORY-LIST:$respo");
+    log("STORY-LIST:${storyListData.toString()}");
+    log("STORY-LIST:${allStoryListData.toString()}");
+    //log("SEEN-LIST:$seenList");
+    if (kDebugMode) {
+      print("Status of get_story_by_user : ${result.statusCode}");
     }
   }
 }

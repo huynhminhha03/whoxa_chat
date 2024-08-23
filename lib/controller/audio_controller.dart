@@ -126,37 +126,16 @@ class AudioPlayerAdapter implements AudioPlayerService {
   @override
   Future<void> play(String url) async {
     try {
-      if (url.startsWith('http://') || url.startsWith('https://')) {
-        await _audioPlayer
-            .play(UrlSource(url))
-            .timeout(const Duration(seconds: 30), onTimeout: () {
-          throw TimeoutException("Audio playback timed out");
-        });
-      } else {
-        await _audioPlayer
-            .play(DeviceFileSource(url))
-            .timeout(const Duration(seconds: 30), onTimeout: () {
-          throw TimeoutException("Audio playback timed out");
-        });
-      }
+      await _audioPlayer
+          .play(UrlSource(url))
+          .timeout(const Duration(seconds: 30), onTimeout: () {
+        throw TimeoutException("Audio playback timed out");
+      });
     } catch (e) {
       print('Error during audio play: $e');
       rethrow;
     }
   }
-
-  // Future<void> play(String url) async {
-  //   try {
-  //     await _audioPlayer
-  //         .play(UrlSource(url))
-  //         .timeout(const Duration(seconds: 30), onTimeout: () {
-  //       throw TimeoutException("Audio playback timed out");
-  //     });
-  //   } catch (e) {
-  //     print('Error during audio play: $e');
-  //     rethrow;
-  //   }
-  // }
 
   @override
   Future<void> release() async {

@@ -143,6 +143,7 @@ class _FinalStoryConfirmationScreenState
                       border: Border.all(
                           color: const Color.fromRGBO(108, 108, 108, 1))),
                   child: TextFormField(
+                    maxLength: 150,
                     maxLines: 4,
                     minLines: 1, // Minimum lines to show initially
                     cursorColor: const Color.fromRGBO(108, 108, 108, 1),
@@ -152,6 +153,7 @@ class _FinalStoryConfirmationScreenState
                     decoration: const InputDecoration(
                         fillColor: Color.fromRGBO(26, 25, 25, 1),
                         alignLabelWithHint: true,
+                        counterText: "",
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                         border: InputBorder.none,

@@ -14,6 +14,7 @@ import 'package:meyaoo_new/Models/all_starred_msg_list.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/reply_msg_controller.dart';
+import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -48,6 +49,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   AudioController audioController = Get.put(AudioController());
   ChatListController chatListController = Get.find();
   ReplyMsgController replyMsgController = Get.put(ReplyMsgController());
+  SingleChatContorller singleChatContorller = Get.put(SingleChatContorller());
 
   @override
   void initState() {
@@ -167,6 +169,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                       setState(() {
                         isSelectedmessage = "1";
                         starId.add(0);
+                        print("STARID:$starId");
                       });
                     },
                     title: "Edit")
@@ -183,10 +186,21 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                   children: [
                     InkWell(
                         onTap: () {
-                          setState(() {
-                            isSelectedmessage = "0";
-                            starId = [];
-                          });
+                          if (starId.length == 1 && starId.contains(0)) {
+                            showCustomToast("Please starred message");
+                          } else {
+                            setState(() {
+                              singleChatContorller
+                                  .removeStarApiMultiple(starId);
+                              // Iterate over starId and remove corresponding items from allStarred
+                              allStaredMsgController.allStarred.removeWhere(
+                                  (allChat) =>
+                                      starId.contains(allChat.messageId));
+
+                              isSelectedmessage = "0";
+                              starId = [];
+                            });
+                          }
                         },
                         child: Image.asset("assets/images/star-slash.png",
                             height: 25))
@@ -361,7 +375,6 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        decoration: BoxDecoration(),
         child: Stack(
           children: [
             isSelectedmessage == "1"

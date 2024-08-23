@@ -3393,7 +3393,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             audioController.total,
             widget.mobileNum.toString(),
             '',
-            reply_chatID);
+            reply_chatID,
+            false);
         SelectedreplyText = false;
         listScrollController!
             .jumpTo(listScrollController!.position.minScrollExtent);
@@ -3406,7 +3407,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             audioController.total,
             widget.mobileNum.toString(),
             '',
-            '');
+            '',
+            false);
         listScrollController!
             .jumpTo(listScrollController!.position.minScrollExtent);
       }
@@ -3531,6 +3533,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         Navigator.pop(context);
                         print("44444");
                       } else {
+                        setState1(() {
+                          record = true;
+                        });
                         var audioPlayer = AudioPlayer();
                         await audioPlayer
                             .play(AssetSource("audio/notification.mp3"));
@@ -3551,7 +3556,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       height: 40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          color: chatownColor),
+                          gradient: LinearGradient(colors: [
+                            yellow1Color,
+                            yellow2Color
+                          ],begin: Alignment.topCenter,end: Alignment.bottomCenter)),
                       child: Center(
                         child: Text(
                           record ? "Send" : "Start",
@@ -3576,7 +3584,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       height: 40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          color: chatownColor),
+                          gradient: LinearGradient(
+                              colors: [yellow1Color, yellow2Color],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
                       child: const Center(
                         child: Text(
                           "Cancel",

@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -35,9 +36,13 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
   String statusMediaID = '';
   String stautsText = '';
   String myStautsText = '';
+  String statusID = '';
+  String statisMediaID = '';
+  String phoneNum = '';
   StroyGetxController storyGetxController = Get.find<StroyGetxController>();
   late ValueNotifier<IndicatorAnimationCommand> indicatorAnimationController;
   TextEditingController messagecontroller = TextEditingController();
+  SingleChatContorller singleChatContorller = Get.put(SingleChatContorller());
   final FocusNode focusNode = FocusNode();
   // late CachedVideoPlayerController controller;
 
@@ -146,533 +151,595 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
   @override
   Widget build(BuildContext context) {
     /// Minimum example to explain the usage.
-    return Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Obx(() {
-              return StoryPageView(
-                indicatorHeight: 4,
-                backgroundColor: Colors.black,
-                onPageChanged: ((p0) {
-                  log("THIS IS P0 $p0");
+    return SafeArea(
+      child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Stack(
+            children: [
+              Obx(() {
+                return StoryPageView(
+                  indicatorHeight: 4,
+                  backgroundColor: Colors.black,
+                  onPageChanged: ((p0) {
+                    log("THIS IS P0 $p0");
 
-                  storyGetxController.pageIndexValue.value = p0;
-                  storyGetxController.pageIndexValue.refresh();
+                    storyGetxController.pageIndexValue.value = p0;
+                    storyGetxController.pageIndexValue.refresh();
 
-                  storyGetxController.storyIndexValue.value =
-                      storyGetxController
-                          .notViewedStatusList[
-                              storyGetxController.pageIndexValue.value]
-                          .userData!
-                          .statuses!
-                          .length;
-
-                  log("STORY LENGTH ${storyGetxController.notViewedStatusList[storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
-
-                  setState(() {});
-                }),
-                initialPage: widget.pageIndex,
-                initialStoryIndex: (pageIndex) {
-                  return 0;
-                },
-                storyLength: (pageIndex) {
-                  log("STORY LENGTH PAGEINDEX : $pageIndex");
-                  log("STORY LENGTH PAGEEEEEEEE ${storyGetxController.pageIndexValue.value}");
-                  return widget.isForMyStory
-                      ? storyGetxController.storyListData.value.myStatus!
-                          .statuses![0].statusMedia!.length
-                      : storyGetxController.notViewedStatusList[pageIndex]
-                          .userData!.statuses![0].statusMedia!.length;
-                },
-                pageLength: widget.isForMyStory
-                    ? storyGetxController
-                        .storyListData.value.myStatus!.statuses!.length
-                    : storyGetxController.notViewedStatusList.length,
-                onPageLimitReached: () {
-                  Get.back();
-                },
-                indicatorPadding:
-                    const EdgeInsets.only(top: 50, left: 10, right: 10),
-                indicatorDuration: Duration(
-                    seconds: videoLengthInSeconds == null
-                        ? 15
-                        : _controller!.value.duration.inSeconds),
-                indicatorAnimationController: indicatorAnimationController,
-                indicatorVisitedColor: chatownColor,
-                indicatorUnvisitedColor: const Color.fromRGBO(158, 158, 158, 1),
-                itemBuilder: (context, pageIndex, storyIndex) {
-                  log("ITEM BUILDER PAGE INDEX $pageIndex");
-                  log("ITEM BUILDER STORY INDEX $storyIndex");
-
-                  log('STORY PAGE INDEX VALUE !!! ${storyGetxController.pageIndexValue.value}');
-
-                  if (widget.isForMyStory) {
-                    log("YES FOR MY STORY");
-                    log("ID IS : ${storyGetxController.storyListData.value.myStatus!.statuses![pageIndex].statusMedia![storyIndex].statusMediaId!.toString()}");
-                    storyGetxController.myStorySeenListAPI(storyGetxController
-                        .storyListData
-                        .value
-                        .myStatus!
-                        .statuses![pageIndex]
-                        .statusId!
-                        .toString());
-                  } else {
-                    if (storyGetxController
-                            .notViewedStatusList[pageIndex]
+                    storyGetxController.storyIndexValue.value =
+                        storyGetxController
+                            .notViewedStatusList[
+                                storyGetxController.pageIndexValue.value]
                             .userData!
-                            .statuses![0]
-                            .statusViews![0]
-                            .statusCount! <
-                        storyIndex + 1) {
-                      storyGetxController.viewStoryAPI(
-                          storyGetxController.notViewedStatusList[pageIndex]
-                              .userData!.statuses![0].statusId!
-                              .toString(),
-                          storyIndex + 1,
-                          pageIndex);
-                    }
-                  }
+                            .statuses!
+                            .length;
 
-                  log("Inside Page Index : $pageIndex");
-                  log("Inside Story Index : $storyIndex");
+                    log("STORY LENGTH ${storyGetxController.notViewedStatusList[storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
 
-                  if (!widget.isForMyStory) {
-                    storyGetxController.pageIndexValue.value = pageIndex;
-                    storyGetxController.storyIndexValue.value = storyIndex;
-                  }
+                    setState(() {});
+                  }),
+                  initialPage: widget.pageIndex,
+                  initialStoryIndex: (pageIndex) {
+                    return 0;
+                  },
+                  storyLength: (pageIndex) {
+                    log("STORY LENGTH PAGEINDEX : $pageIndex");
+                    log("STORY LENGTH PAGEEEEEEEE ${storyGetxController.pageIndexValue.value}");
+                    return widget.isForMyStory
+                        ? storyGetxController.storyListData.value.myStatus!
+                            .statuses![0].statusMedia!.length
+                        : storyGetxController.notViewedStatusList[pageIndex]
+                            .userData!.statuses![0].statusMedia!.length;
+                  },
+                  pageLength: widget.isForMyStory
+                      ? storyGetxController
+                          .storyListData.value.myStatus!.statuses!.length
+                      : storyGetxController.notViewedStatusList.length,
+                  onPageLimitReached: () {
+                    Get.back();
+                  },
+                  indicatorPadding:
+                      const EdgeInsets.only(top: 50, left: 10, right: 10),
+                  indicatorDuration: Duration(
+                      seconds: videoLengthInSeconds == null
+                          ? 15
+                          : _controller!.value.duration.inSeconds),
+                  indicatorAnimationController: indicatorAnimationController,
+                  indicatorVisitedColor: chatownColor,
+                  indicatorUnvisitedColor:
+                      const Color.fromRGBO(158, 158, 158, 1),
+                  itemBuilder: (context, pageIndex, storyIndex) {
+                    log("ITEM BUILDER PAGE INDEX $pageIndex");
+                    log("ITEM BUILDER STORY INDEX $storyIndex");
 
-                  stautsText = storyGetxController
-                      .notViewedStatusList[
-                          storyGetxController.pageIndexValue.value]
-                      .userData!
-                      .statuses![0]
-                      .statusMedia![storyGetxController.storyIndexValue.value]
-                      .statusText!;
-                  myStautsText = storyGetxController
-                      .storyListData
-                      .value
-                      .myStatus!
-                      .statuses![0]
-                      .statusMedia![storyIndex]
-                      .statusText!;
-                  return widget.isForMyStory
-                      ? Container(
-                          color: Colors.black,
-                          child: StoryImage(
-                            /// key is required
-                            key: ValueKey(
-                              storyGetxController.storyListData.value.myStatus!
-                                  .statuses![0].statusMedia![storyIndex].url!,
-                            ),
-                            imageProvider: CachedNetworkImageProvider(
-                              storyGetxController.storyListData.value.myStatus!
-                                  .statuses![0].statusMedia![storyIndex].url!,
-                            ),
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: chatownColor,
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.network_check, size: 40),
-                          ),
-                        )
-                      : Container(
-                          color: Colors.black,
-                          child: StoryImage(
-                            /// key is required
-                            key: ValueKey(
-                              storyGetxController
-                                  .notViewedStatusList[
-                                      storyGetxController.pageIndexValue.value]
-                                  .userData!
-                                  .statuses![0]
-                                  .statusMedia![
-                                      storyGetxController.storyIndexValue.value]
-                                  .url,
-                            ),
-                            imageProvider: CachedNetworkImageProvider(
-                              storyGetxController
-                                  .notViewedStatusList[
-                                      storyGetxController.pageIndexValue.value]
-                                  .userData!
-                                  .statuses![0]
-                                  .statusMedia![
-                                      storyGetxController.storyIndexValue.value]
-                                  .url!,
-                            ),
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                    color: chatownColor),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Icon(Icons.network_check, size: 40),
-                            // fit: BoxFit.contain,
-                          ),
-                        );
-                },
-                gestureItemBuilder: (context, pageIndex, storyIndex) {
-                  pageIndex = widget.pageIndex;
-                  return widget.isForMyStory
-                      // my story Align show
-                      ? Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 32),
-                            child: Obx(() {
-                              statusMediaID = storyGetxController
-                                  .storyListData
-                                  .value
-                                  .myStatus!
-                                  .statuses![0]
-                                  .statusMedia![storyIndex]
-                                  .statusMediaId
-                                  .toString();
-                              return storyGetxController
-                                          .isMyStorySeenLoading.value ||
-                                      storyGetxController
-                                          .isAllUserStoryLoad.value
-                                  ? const SizedBox.shrink()
-                                  : Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        ReadMoreText(
-                                          trimLines: 3,
-                                          trimMode: TrimMode.Line,
-                                          trimCollapsedText: 'Read more'.tr,
-                                          trimExpandedText: 'Read less'.tr,
-                                          colorClickableText: yellow2Color,
-                                          myStautsText,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  255, 255, 255, 1)),
-                                        ).paddingSymmetric(horizontal: 10),
-                                        storyGetxController.myStorySeenData
-                                                    .value.statusViewsList ==
-                                                null
-                                            ? const SizedBox.shrink()
-                                            : InkWell(
-                                                onTap: () {
-                                                  indicatorAnimationController
-                                                          .value =
-                                                      IndicatorAnimationCommand
-                                                          .pause;
-                                                  showModalForSeenUsersList();
-                                                  //seendUserList();
-                                                },
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Image.asset(
-                                                        'assets/images/eye.png',
-                                                        height: 20,
-                                                        color: Colors.white),
-                                                    const SizedBox(width: 3),
-                                                    storyGetxController
-                                                                .isMyStorySeenLoading
-                                                                .value ||
-                                                            storyGetxController
-                                                                    .isAllUserStoryLoad
-                                                                    .value &&
-                                                                storyGetxController
-                                                                        .myStorySeenData
-                                                                        .value
-                                                                        .statusViewsList ==
-                                                                    null
-                                                        ? const SizedBox
-                                                            .shrink()
-                                                        : Text(
-                                                            storyGetxController
-                                                                        .myStorySeenData
-                                                                        .value
-                                                                        .statusViewsList!
-                                                                        .isEmpty ||
-                                                                    storyGetxController
-                                                                            .myStorySeenData
-                                                                            .value
-                                                                            .statusViewsList!
-                                                                            .length ==
-                                                                        0
-                                                                ? "0"
-                                                                : storyGetxController
-                                                                    .myStorySeenData
-                                                                    .value
-                                                                    .statusViewsList!
-                                                                    .length
-                                                                    .toString(),
-                                                            style: const TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize: 12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                          ),
-                                                  ],
-                                                ),
-                                              ),
-                                        IconButton(
-                                          padding: EdgeInsets.zero,
-                                          color: const Color.fromARGB(
-                                              255, 46, 46, 46),
-                                          icon: const Icon(
-                                              Icons.keyboard_arrow_up),
-                                          iconSize: 30,
-                                          onPressed: () {
-                                            indicatorAnimationController.value =
-                                                IndicatorAnimationCommand.pause;
-                                            showModalForSeenUsersList();
-                                            // Navigator.pop(context);
-                                          },
-                                        ),
-                                      ],
-                                    );
-                            }),
-                          ),
-                        )
-                      // To user alignment show
-                      : Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 32),
-                            child: Obx(() {
-                              return storyGetxController
-                                          .isMyStorySeenLoading.value ||
-                                      storyGetxController
-                                          .isAllUserStoryLoad.value
-                                  ? const SizedBox.shrink()
-                                  : Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        ReadMoreText(
-                                          trimLines: 3,
-                                          trimMode: TrimMode.Line,
-                                          trimCollapsedText: 'Read more'.tr,
-                                          trimExpandedText: 'Read less'.tr,
-                                          colorClickableText: chatownColor,
-                                          stautsText,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: Color.fromRGBO(
-                                                  255, 255, 255, 1)),
-                                        ).paddingSymmetric(horizontal: 10),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    color: const Color.fromRGBO(
-                                                        26, 25, 25, 1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                        color: const Color
-                                                            .fromRGBO(
-                                                            108, 108, 108, 1))),
-                                                child: TextFormField(
-                                                  focusNode: focusNode,
-                                                  maxLines: 4,
-                                                  minLines:
-                                                      1, // Minimum lines to show initially
-                                                  cursorColor:
-                                                      const Color.fromRGBO(
-                                                          108, 108, 108, 1),
-                                                  textCapitalization:
-                                                      TextCapitalization
-                                                          .sentences,
-                                                  style: const TextStyle(
-                                                      color: Colors.white),
-                                                  controller: messagecontroller,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                          fillColor: Colors
-                                                              .white,
-                                                          alignLabelWithHint:
-                                                              true,
-                                                          contentPadding:
-                                                              EdgeInsets.symmetric(
-                                                                  horizontal:
-                                                                      10,
-                                                                  vertical: 10),
-                                                          border:
-                                                              InputBorder.none,
-                                                          hintText:
-                                                              "Type reply...",
-                                                          hintStyle: TextStyle(
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      108,
-                                                                      108,
-                                                                      108,
-                                                                      1),
-                                                              fontSize: 13,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
-                                                          isDense: true),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            SizedBox(
-                                              height: 42,
-                                              width: 42,
-                                              child: InkWell(
-                                                onTap: () {},
-                                                child: Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        gradient: LinearGradient(
-                                                            colors: [
-                                                              yellow1Color,
-                                                              yellow2Color
-                                                            ],
-                                                            begin: Alignment
-                                                                .topCenter,
-                                                            end: Alignment
-                                                                .bottomCenter)),
-                                                    child:
-                                                        // storyController
-                                                        //         .isUploadStoryLoad
-                                                        //         .value
-                                                        //     ? const SizedBox(
-                                                        //         height: 15,
-                                                        //         width: 15,
-                                                        //         child: Center(
-                                                        //           child: CircularProgressIndicator(
-                                                        //               strokeWidth:
-                                                        //                   3,
-                                                        //               color: Colors
-                                                        //                   .black),
-                                                        //         ),
-                                                        //       )
-                                                        //     :
-                                                        Image.asset(
-                                                                "assets/images/send1.png",
-                                                                color:
-                                                                    chatColor)
-                                                            .paddingAll(13)),
-                                              ),
-                                            ),
-                                          ],
-                                        )
-                                            .paddingSymmetric(
-                                                horizontal: 10, vertical: 15)
-                                            .paddingOnly(top: 15, bottom: 15)
-                                      ],
-                                    );
-                            }),
-                          ),
-                        );
-                },
-              );
-            }),
-            //====================================== TOP OF USER NAME ==============================
-            Positioned(
-              top: 66,
-              left: 16,
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(100),
-                    child: SizedBox(
-                      height: 25,
-                      width: 25,
-                      // decoration: const BoxDecoration(
-                      //     shape: BoxShape.circle, color: Colors.black),
-                      child: CachedNetworkImage(
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.person_2),
-                          fit: BoxFit.cover,
-                          imageUrl: widget.isForMyStory
-                              ? storyGetxController
-                                  .storyListData.value.myStatus!.profileImage!
-                              : storyGetxController
-                                  .notViewedStatusList[
-                                      storyGetxController.pageIndexValue.value]
-                                  .userData!
-                                  .profileImage!),
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 6,
-                  ),
-                  Material(
-                    color: Colors.transparent,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.isForMyStory
-                              ? "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}"
-                              : capitalizeFirstLetter(storyGetxController
-                                  .notViewedStatusList[
-                                      storyGetxController.pageIndexValue.value]
-                                  .fullName!),
-                          // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 15),
-                        ),
-                        Text(
-                          formatCreateDate(storyGetxController
-                              .notViewedStatusList[
-                                  storyGetxController.pageIndexValue.value]
+                    log('STORY PAGE INDEX VALUE !!! ${storyGetxController.pageIndexValue.value}');
+
+                    if (widget.isForMyStory) {
+                      log("YES FOR MY STORY");
+                      log("ID IS : ${storyGetxController.storyListData.value.myStatus!.statuses![pageIndex].statusMedia![storyIndex].statusMediaId!.toString()}");
+                      storyGetxController.myStorySeenListAPI(storyGetxController
+                          .storyListData
+                          .value
+                          .myStatus!
+                          .statuses![pageIndex]
+                          .statusId!
+                          .toString());
+                    } else {
+                      if (storyGetxController
+                              .notViewedStatusList[pageIndex]
                               .userData!
                               .statuses![0]
-                              .updatedAt!),
-                          // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w300,
-                              color: Color.fromRGBO(255, 255, 255, 1),
-                              fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 66,
-              right: 16,
-              child: widget.isForMyStory
-                  ? InkWell(
-                      onTap: () {
-                        indicatorAnimationController.value =
-                            IndicatorAnimationCommand.pause;
-                        deleteDialog(statusMediaID);
-                      },
-                      child: const Icon(
-                        Icons.more_horiz,
-                        size: 20,
-                        color: Colors.black,
+                              .statusViews![0]
+                              .statusCount! <
+                          storyIndex + 1) {
+                        storyGetxController.viewStoryAPI(
+                            storyGetxController.notViewedStatusList[pageIndex]
+                                .userData!.statuses![0].statusId!
+                                .toString(),
+                            storyIndex + 1,
+                            pageIndex);
+                      }
+                    }
+
+                    log("Inside Page Index : $pageIndex");
+                    log("Inside Story Index : $storyIndex");
+
+                    if (!widget.isForMyStory) {
+                      storyGetxController.pageIndexValue.value = pageIndex;
+                      storyGetxController.storyIndexValue.value = storyIndex;
+                    }
+
+                    stautsText = storyGetxController.notViewedStatusList.isEmpty
+                        ? ""
+                        : storyGetxController
+                            .notViewedStatusList[
+                                storyGetxController.pageIndexValue.value]
+                            .userData!
+                            .statuses![0]
+                            .statusMedia![
+                                storyGetxController.storyIndexValue.value]
+                            .statusText!;
+                    myStautsText = widget.isForMyStory
+                        ? storyGetxController.storyListData.value.myStatus!
+                            .statuses![0].statusMedia![storyIndex].statusText!
+                        : "";
+
+                    statusID = storyGetxController
+                        .notViewedStatusList[
+                            storyGetxController.pageIndexValue.value]
+                        .userData!
+                        .statuses![0]
+                        .statusId
+                        .toString();
+
+                    statusMediaID = storyGetxController
+                        .notViewedStatusList[
+                            storyGetxController.pageIndexValue.value]
+                        .userData!
+                        .statuses![0]
+                        .statusMedia![storyGetxController.storyIndexValue.value]
+                        .statusMediaId
+                        .toString();
+
+                    phoneNum = storyGetxController
+                        .notViewedStatusList[
+                            storyGetxController.pageIndexValue.value]
+                        .phoneNumber
+                        .toString();
+                    return widget.isForMyStory
+                        ? Container(
+                            color: Colors.black,
+                            child: StoryImage(
+                              /// key is required
+                              key: ValueKey(
+                                storyGetxController
+                                    .storyListData
+                                    .value
+                                    .myStatus!
+                                    .statuses![0]
+                                    .statusMedia![storyIndex]
+                                    .url!,
+                              ),
+                              imageProvider: CachedNetworkImageProvider(
+                                storyGetxController
+                                    .storyListData
+                                    .value
+                                    .myStatus!
+                                    .statuses![0]
+                                    .statusMedia![storyIndex]
+                                    .url!,
+                              ),
+                              loadingBuilder: (BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                    color: chatownColor,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.network_check, size: 40),
+                            ),
+                          )
+                        : Container(
+                            color: Colors.black,
+                            child: StoryImage(
+                              /// key is required
+                              key: ValueKey(
+                                storyGetxController
+                                    .notViewedStatusList[storyGetxController
+                                        .pageIndexValue.value]
+                                    .userData!
+                                    .statuses![0]
+                                    .statusMedia![storyGetxController
+                                        .storyIndexValue.value]
+                                    .url,
+                              ),
+                              imageProvider: CachedNetworkImageProvider(
+                                storyGetxController
+                                    .notViewedStatusList[storyGetxController
+                                        .pageIndexValue.value]
+                                    .userData!
+                                    .statuses![0]
+                                    .statusMedia![storyGetxController
+                                        .storyIndexValue.value]
+                                    .url!,
+                              ),
+                              loadingBuilder: (BuildContext context,
+                                  Widget child,
+                                  ImageChunkEvent? loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: chatownColor),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(Icons.network_check, size: 40),
+                              // fit: BoxFit.contain,
+                            ),
+                          );
+                  },
+                  gestureItemBuilder: (context, pageIndex, storyIndex) {
+                    pageIndex = widget.pageIndex;
+                    return widget.isForMyStory
+                        // my story Align show
+                        ? Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Obx(() {
+                                statusMediaID = storyGetxController
+                                    .storyListData
+                                    .value
+                                    .myStatus!
+                                    .statuses![0]
+                                    .statusMedia![storyIndex]
+                                    .statusMediaId
+                                    .toString();
+                                return storyGetxController
+                                            .isMyStorySeenLoading.value ||
+                                        storyGetxController
+                                            .isAllUserStoryLoad.value
+                                    ? const SizedBox.shrink()
+                                    : Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          ReadMoreText(
+                                            trimLines: 3,
+                                            trimMode: TrimMode.Line,
+                                            trimCollapsedText: 'Read more'.tr,
+                                            trimExpandedText: 'Read less'.tr,
+                                            colorClickableText: yellow2Color,
+                                            myStautsText,
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color.fromRGBO(
+                                                    255, 255, 255, 1)),
+                                          ).paddingSymmetric(horizontal: 10),
+                                          storyGetxController.myStorySeenData
+                                                      .value.statusViewsList ==
+                                                  null
+                                              ? const SizedBox.shrink()
+                                              : InkWell(
+                                                  onTap: () {
+                                                    indicatorAnimationController
+                                                            .value =
+                                                        IndicatorAnimationCommand
+                                                            .pause;
+                                                    showModalForSeenUsersList();
+                                                    //seendUserList();
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Image.asset(
+                                                          'assets/images/eye.png',
+                                                          height: 20,
+                                                          color: Colors.white),
+                                                      const SizedBox(width: 3),
+                                                      storyGetxController
+                                                                  .isMyStorySeenLoading
+                                                                  .value ||
+                                                              storyGetxController
+                                                                      .isAllUserStoryLoad
+                                                                      .value &&
+                                                                  storyGetxController
+                                                                          .myStorySeenData
+                                                                          .value
+                                                                          .statusViewsList ==
+                                                                      null
+                                                          ? const SizedBox
+                                                              .shrink()
+                                                          : Text(
+                                                              storyGetxController
+                                                                          .myStorySeenData
+                                                                          .value
+                                                                          .statusViewsList!
+                                                                          .isEmpty ||
+                                                                      storyGetxController
+                                                                              .myStorySeenData
+                                                                              .value
+                                                                              .statusViewsList!
+                                                                              .length ==
+                                                                          0
+                                                                  ? "0"
+                                                                  : storyGetxController
+                                                                      .myStorySeenData
+                                                                      .value
+                                                                      .statusViewsList!
+                                                                      .length
+                                                                      .toString(),
+                                                              style: const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 12,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                    ],
+                                                  ),
+                                                ),
+                                          IconButton(
+                                            padding: EdgeInsets.zero,
+                                            color: const Color.fromARGB(
+                                                255, 46, 46, 46),
+                                            icon: const Icon(
+                                                Icons.keyboard_arrow_up),
+                                            iconSize: 30,
+                                            onPressed: () {
+                                              indicatorAnimationController
+                                                      .value =
+                                                  IndicatorAnimationCommand
+                                                      .pause;
+                                              showModalForSeenUsersList();
+                                              // Navigator.pop(context);
+                                            },
+                                          ),
+                                        ],
+                                      );
+                              }),
+                            ),
+                          )
+                        // To user alignment show
+                        : Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 32),
+                              child: Obx(() {
+                                return storyGetxController
+                                            .isMyStorySeenLoading.value ||
+                                        storyGetxController
+                                            .isAllUserStoryLoad.value
+                                    ? const SizedBox.shrink()
+                                    : Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          ReadMoreText(
+                                            trimLines: 3,
+                                            trimMode: TrimMode.Line,
+                                            trimCollapsedText: 'Read more'.tr,
+                                            trimExpandedText: 'Read less'.tr,
+                                            colorClickableText: chatownColor,
+                                            stautsText,
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color.fromRGBO(
+                                                    255, 255, 255, 1)),
+                                          ).paddingSymmetric(horizontal: 10),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromRGBO(
+                                                              26, 25, 25, 1),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      border: Border.all(
+                                                          color: const Color
+                                                              .fromRGBO(108,
+                                                              108, 108, 1))),
+                                                  child: TextFormField(
+                                                    focusNode: focusNode,
+                                                    maxLines: 4,
+                                                    minLines:
+                                                        1, // Minimum lines to show initially
+                                                    cursorColor:
+                                                        const Color.fromRGBO(
+                                                            108, 108, 108, 1),
+                                                    textCapitalization:
+                                                        TextCapitalization
+                                                            .sentences,
+                                                    style: const TextStyle(
+                                                        color: Colors.white),
+                                                    controller:
+                                                        messagecontroller,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                            fillColor: Colors
+                                                                .white,
+                                                            alignLabelWithHint:
+                                                                true,
+                                                            contentPadding:
+                                                                EdgeInsets
+                                                                    .symmetric(
+                                                                        horizontal:
+                                                                            10,
+                                                                        vertical:
+                                                                            10),
+                                                            border: InputBorder
+                                                                .none,
+                                                            hintText:
+                                                                "Type reply...",
+                                                            hintStyle: TextStyle(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        108,
+                                                                        108,
+                                                                        108,
+                                                                        1),
+                                                                fontSize: 13,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400),
+                                                            isDense: true),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              SizedBox(
+                                                height: 42,
+                                                width: 42,
+                                                child: InkWell(
+                                                  onTap: () {
+                                                    singleChatContorller
+                                                        .sendMessageStatusMessage(
+                                                            messagecontroller
+                                                                .text,
+                                                            "conversationID",
+                                                            "status",
+                                                            phoneNum,
+                                                            '',
+                                                            '',
+                                                            statusID);
+                                                  },
+                                                  child: Container(
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          gradient: LinearGradient(
+                                                              colors: [
+                                                                yellow1Color,
+                                                                yellow2Color
+                                                              ],
+                                                              begin: Alignment
+                                                                  .topCenter,
+                                                              end: Alignment
+                                                                  .bottomCenter)),
+                                                      child: singleChatContorller
+                                                              .isSendMsg.value
+                                                          ? const SizedBox(
+                                                              height: 15,
+                                                              width: 15,
+                                                              child: Center(
+                                                                child: CircularProgressIndicator(
+                                                                    strokeWidth:
+                                                                        3,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            )
+                                                          : Image.asset(
+                                                                  "assets/images/send1.png",
+                                                                  color:
+                                                                      chatColor)
+                                                              .paddingAll(13)),
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                              .paddingSymmetric(
+                                                  horizontal: 10, vertical: 15)
+                                              .paddingOnly(top: 15, bottom: 15)
+                                        ],
+                                      );
+                              }),
+                            ),
+                          );
+                  },
+                );
+              }),
+              //====================================== TOP OF USER NAME ==============================
+              Positioned(
+                top: 66,
+                left: 16,
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: SizedBox(
+                        height: 25,
+                        width: 25,
+                        // decoration: const BoxDecoration(
+                        //     shape: BoxShape.circle, color: Colors.black),
+                        child: CachedNetworkImage(
+                            errorWidget: (context, url, error) =>
+                                const Icon(Icons.person_2),
+                            fit: BoxFit.cover,
+                            imageUrl: widget.isForMyStory
+                                ? storyGetxController
+                                    .storyListData.value.myStatus!.profileImage!
+                                : storyGetxController
+                                    .notViewedStatusList[storyGetxController
+                                        .pageIndexValue.value]
+                                    .userData!
+                                    .profileImage!),
                       ),
-                    )
-                  : const SizedBox.shrink(),
-            ),
-          ],
-        ));
+                    ),
+                    const SizedBox(
+                      width: 6,
+                    ),
+                    Material(
+                      color: Colors.transparent,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.isForMyStory
+                                ? "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}"
+                                : capitalizeFirstLetter(storyGetxController
+                                    .notViewedStatusList[storyGetxController
+                                        .pageIndexValue.value]
+                                    .fullName!),
+                            // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 15),
+                          ),
+                          Text(
+                            widget.isForMyStory
+                                ? formatCreateDate(storyGetxController
+                                    .storyListData
+                                    .value
+                                    .myStatus!
+                                    .statuses![0]
+                                    .updatedAt!)
+                                : formatCreateDate(storyGetxController
+                                    .notViewedStatusList[storyGetxController
+                                        .pageIndexValue.value]
+                                    .userData!
+                                    .statuses![0]
+                                    .updatedAt!),
+                            // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w300,
+                                color: Color.fromRGBO(255, 255, 255, 1),
+                                fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: 66,
+                right: 16,
+                child: widget.isForMyStory
+                    ? InkWell(
+                        onTap: () {
+                          indicatorAnimationController.value =
+                              IndicatorAnimationCommand.pause;
+                          deleteDialog(statusMediaID);
+                        },
+                        child: const Icon(
+                          Icons.more_horiz,
+                          size: 20,
+                          color: Colors.black,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          )),
+    );
     // });
   }
 
