@@ -43,6 +43,8 @@ class StroyGetxController extends GetxController {
 
   var addStoryData = AddStoryDataModel().obs;
   var storyListData = StoryListData().obs;
+  RxList<ViewedStatusList> viewedStatusList = <ViewedStatusList>[].obs;
+  RxList<NotViewedStatusList> notViewedStatusList = <NotViewedStatusList>[].obs;
   ////
   var allStoryListData = StoryListData().obs;
   var viewStoryData = ViewStoryData().obs;
@@ -308,19 +310,9 @@ class StroyGetxController extends GetxController {
       final respo = StoryListData.fromJson(result.data);
 
       storyListData = respo.obs;
+      viewedStatusList.value = storyListData.value.viewedStatusList!;
+      notViewedStatusList.value = storyListData.value.notViewedStatusList!;
       allStoryListData = respo.obs;
-
-      // seenList = respo.statusList!.where((status) {
-      //   if (status.userData != null && status.userData!.statuses != null) {
-      //     for (var statusItem in status.userData!.statuses!) {
-      //       if (statusItem.statusMedia!.length ==
-      //           statusItem.statusViews![0].statusCount) {
-      //         return true;
-      //       }
-      //     }
-      //   }
-      //   return false;
-      // }).toList();
 
       var storeJsonData = json.encode(result.data);
       //box.put(HiveKeyService.storyKey, storeJsonData);
@@ -360,10 +352,10 @@ class StroyGetxController extends GetxController {
       print("Staus of view_story ${result.statusCode}");
 
       final respo = ViewStoryData.fromJson(result.data);
-      storyListData.value.statusList![pageIndex].userData!.statuses![0]
+      storyListData.value.notViewedStatusList![pageIndex].userData!.statuses![0]
           .statusViews![0].statusCount = storyListData
               .value
-              .statusList![pageIndex]
+              .notViewedStatusList![pageIndex]
               .userData!
               .statuses![0]
               .statusViews![0]

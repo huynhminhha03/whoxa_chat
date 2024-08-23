@@ -216,7 +216,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     request.fields['last_name'] = lNameController.text;
     request.fields['gender'] = genderData.toString();
     request.fields['device_token'] = _fcmtoken.toString();
-    request.fields['one_signal_player_id'] = OneSignal.User.pushSubscription.id!;
+    request.fields['one_signal_player_id'] =
+        OneSignal.User.pushSubscription.id!;
     request.fields['country'] = nationController.text;
 
     if (image != null) {
@@ -263,7 +264,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             PageTransition(
               curve: Curves.linear,
               type: PageTransitionType.rightToLeft,
-              child: TabbarScreen(),
+              child: TabbarScreen(currentTab: 0),
             ),
             (route) => false);
       }

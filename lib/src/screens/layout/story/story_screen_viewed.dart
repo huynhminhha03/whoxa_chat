@@ -13,13 +13,13 @@ import 'package:readmore/readmore.dart';
 import 'package:story/story.dart';
 import 'package:video_player/video_player.dart';
 
-class StoryScreen6PM extends StatefulWidget {
+class StoryScreen6PMViewed extends StatefulWidget {
   final bool isForMyStory;
   final int pageIndex;
   final int storyIndex;
   final int i;
   final String? username;
-  const StoryScreen6PM(
+  const StoryScreen6PMViewed(
       {super.key,
       this.isForMyStory = false,
       this.pageIndex = 0,
@@ -28,10 +28,10 @@ class StoryScreen6PM extends StatefulWidget {
       this.username});
 
   @override
-  State<StoryScreen6PM> createState() => _StoryScreen6PMState();
+  State<StoryScreen6PMViewed> createState() => _StoryScreen6PMViewedState();
 }
 
-class _StoryScreen6PMState extends State<StoryScreen6PM> {
+class _StoryScreen6PMViewedState extends State<StoryScreen6PMViewed> {
   String statusMediaID = '';
   String stautsText = '';
   String myStautsText = '';
@@ -92,7 +92,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
     log("INDEX PAGE : ${widget.pageIndex}");
     if (!widget.isForMyStory) {
       length = storyGetxController.pageIndexValue.value == 0
-          ? storyGetxController.notViewedStatusList.length
+          ? storyGetxController.viewedStatusList.length
           : storyGetxController.pageIndexValue.value;
       storyGetxController.pageIndexValue.value = widget.pageIndex;
       storyGetxController.storyIndexValue.value = widget.storyIndex;
@@ -162,13 +162,13 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
 
                   storyGetxController.storyIndexValue.value =
                       storyGetxController
-                          .notViewedStatusList[
+                          .viewedStatusList[
                               storyGetxController.pageIndexValue.value]
                           .userData!
                           .statuses!
                           .length;
 
-                  log("STORY LENGTH ${storyGetxController.notViewedStatusList[storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
+                  log("STORY LENGTH ${storyGetxController.viewedStatusList[storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
 
                   setState(() {});
                 }),
@@ -182,13 +182,13 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   return widget.isForMyStory
                       ? storyGetxController.storyListData.value.myStatus!
                           .statuses![0].statusMedia!.length
-                      : storyGetxController.notViewedStatusList[pageIndex]
+                      : storyGetxController.viewedStatusList[pageIndex]
                           .userData!.statuses![0].statusMedia!.length;
                 },
                 pageLength: widget.isForMyStory
                     ? storyGetxController
                         .storyListData.value.myStatus!.statuses!.length
-                    : storyGetxController.notViewedStatusList.length,
+                    : storyGetxController.viewedStatusList.length,
                 onPageLimitReached: () {
                   Get.back();
                 },
@@ -219,14 +219,14 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                         .toString());
                   } else {
                     if (storyGetxController
-                            .notViewedStatusList[pageIndex]
+                            .viewedStatusList[pageIndex]
                             .userData!
                             .statuses![0]
                             .statusViews![0]
                             .statusCount! <
                         storyIndex + 1) {
                       storyGetxController.viewStoryAPI(
-                          storyGetxController.notViewedStatusList[pageIndex]
+                          storyGetxController.viewedStatusList[pageIndex]
                               .userData!.statuses![0].statusId!
                               .toString(),
                           storyIndex + 1,
@@ -243,7 +243,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   }
 
                   stautsText = storyGetxController
-                      .notViewedStatusList[
+                      .viewedStatusList[
                           storyGetxController.pageIndexValue.value]
                       .userData!
                       .statuses![0]
@@ -288,7 +288,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                             /// key is required
                             key: ValueKey(
                               storyGetxController
-                                  .notViewedStatusList[
+                                  .viewedStatusList[
                                       storyGetxController.pageIndexValue.value]
                                   .userData!
                                   .statuses![0]
@@ -298,7 +298,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                             ),
                             imageProvider: CachedNetworkImageProvider(
                               storyGetxController
-                                  .notViewedStatusList[
+                                  .viewedStatusList[
                                       storyGetxController.pageIndexValue.value]
                                   .userData!
                                   .statuses![0]
@@ -597,8 +597,8 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(100),
                     child: SizedBox(
-                      height: 25,
-                      width: 25,
+                      height: 35,
+                      width: 35,
                       // decoration: const BoxDecoration(
                       //     shape: BoxShape.circle, color: Colors.black),
                       child: CachedNetworkImage(
@@ -609,7 +609,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                               ? storyGetxController
                                   .storyListData.value.myStatus!.profileImage!
                               : storyGetxController
-                                  .notViewedStatusList[
+                                  .viewedStatusList[
                                       storyGetxController.pageIndexValue.value]
                                   .userData!
                                   .profileImage!),
@@ -627,7 +627,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                           widget.isForMyStory
                               ? "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}"
                               : capitalizeFirstLetter(storyGetxController
-                                  .notViewedStatusList[
+                                  .viewedStatusList[
                                       storyGetxController.pageIndexValue.value]
                                   .fullName!),
                           // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
@@ -636,7 +636,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                         ),
                         Text(
                           formatCreateDate(storyGetxController
-                              .notViewedStatusList[
+                              .viewedStatusList[
                                   storyGetxController.pageIndexValue.value]
                               .userData!
                               .statuses![0]

@@ -907,6 +907,25 @@ class CustomCachedNetworkImage extends StatelessWidget {
   }
 }
 
+String formatCreateDate(String dateString) {
+  // Parse the date string
+  DateTime date = DateTime.parse(dateString).toLocal();
+
+  final now = DateTime.now();
+  final difference = now.difference(date);
+
+  // Use DateFormat to format the time part
+  String formattedTime = DateFormat("h:mm a").format(date);
+
+  if (difference.inDays == 1) {
+    return 'Yesterday at $formattedTime';
+  } else if (difference.inDays == 0) {
+    return 'Today at $formattedTime';
+  } else {
+    return DateFormat("d MMMM y").format(date);
+  }
+}
+
 String formatDate(String dateString) {
   DateTime date = parseDate(dateString);
   DateTime now = DateTime.now();

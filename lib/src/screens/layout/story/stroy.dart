@@ -5,11 +5,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:intl/intl.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/layout/story/story_screen.dart';
+import 'package:meyaoo_new/src/screens/layout/story/story_screen_viewed.dart';
 import 'package:status_view/status_view.dart';
 
 class StorySectionScreen extends StatefulWidget {
@@ -21,25 +21,6 @@ class StorySectionScreen extends StatefulWidget {
 
 class _StorySectionScreenState extends State<StorySectionScreen> {
   StroyGetxController storyController = Get.put(StroyGetxController());
-
-  String formatCreateDate(String dateString) {
-    // Parse the date string
-    DateTime date = DateTime.parse(dateString).toLocal();
-
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    // Use DateFormat to format the time part
-    String formattedTime = DateFormat("h:mm a").format(date);
-
-    if (difference.inDays == 1) {
-      return 'yesterday at $formattedTime';
-    } else if (difference.inDays == 0) {
-      return 'today at $formattedTime';
-    } else {
-      return DateFormat("d MMMM y").format(date);
-    }
-  }
 
   @override
   void initState() {
@@ -186,12 +167,21 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                             const Divider(),
                             storyController.isAllUserStoryLoad.value
                                 ? const SizedBox()
-                                : storyController
-                                        .storyListData.value.statusList!.isEmpty
+                                : storyController.notViewedStatusList.isEmpty
+                                    ? const SizedBox()
+                                    : const Text(
+                                        "Recent",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ).paddingOnly(left: 20),
+                            storyController.isAllUserStoryLoad.value
+                                ? const SizedBox()
+                                : storyController.notViewedStatusList.isEmpty
                                     ? const SizedBox()
                                     : ListView.builder(
-                                        itemCount: storyController.storyListData
-                                            .value.statusList!.length,
+                                        itemCount: storyController
+                                            .notViewedStatusList.length,
                                         shrinkWrap: true,
                                         physics:
                                             const NeverScrollableScrollPhysics(),
@@ -199,9 +189,8 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                         itemBuilder:
                                             (BuildContext context, int index) {
                                           return storyController
-                                                      .storyListData
-                                                      .value
-                                                      .statusList![index]
+                                                      .notViewedStatusList[
+                                                          index]
                                                       .userData!
                                                       .userId ==
                                                   Hive.box(userdata).get(userId)
@@ -214,9 +203,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                     storyController
                                                         .storyIndexValue
                                                         .value = storyController
-                                                                .storyListData
-                                                                .value
-                                                                .statusList![
+                                                                .notViewedStatusList[
                                                                     index]
                                                                 .userData!
                                                                 .statuses![0]
@@ -225,9 +212,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                             0
                                                         ? 0
                                                         : storyController
-                                                                    .storyListData
-                                                                    .value
-                                                                    .statusList![
+                                                                    .notViewedStatusList[
                                                                         index]
                                                                     .userData!
                                                                     .statuses![
@@ -236,15 +221,11 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                                         0]
                                                                     .statusCount! ==
                                                                 storyController
-                                                                    .storyListData
-                                                                    .value
-                                                                    .statusList!
+                                                                    .notViewedStatusList
                                                                     .length
                                                             ? 0
                                                             : storyController
-                                                                    .storyListData
-                                                                    .value
-                                                                    .statusList![
+                                                                    .notViewedStatusList[
                                                                         index]
                                                                     .userData!
                                                                     .statuses![
@@ -262,15 +243,19 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                             i: index,
                                                             username:
                                                                 storyController
-                                                                    .storyListData
-                                                                    .value
-                                                                    .statusList![
+                                                                    .notViewedStatusList[
                                                                         index]
                                                                     .fullName))!
                                                         .then((_) {
                                                       print("REFRESH");
                                                       storyController
                                                           .storyListData
+                                                          .refresh();
+                                                      storyController
+                                                          .notViewedStatusList
+                                                          .refresh();
+                                                      storyController
+                                                          .viewedStatusList
                                                           .refresh();
                                                     });
                                                   },
@@ -281,9 +266,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                       strokeWidth: 2,
                                                       indexOfSeenStatus:
                                                           storyController
-                                                              .storyListData
-                                                              .value
-                                                              .statusList![
+                                                              .notViewedStatusList[
                                                                   index]
                                                               .userData!
                                                               .statuses![0]
@@ -291,9 +274,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                               .statusCount!,
                                                       numberOfStatus:
                                                           storyController
-                                                              .storyListData
-                                                              .value
-                                                              .statusList![
+                                                              .notViewedStatusList[
                                                                   index]
                                                               .userData!
                                                               .statuses![0]
@@ -302,9 +283,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                       padding: 3,
                                                       centerImageUrl:
                                                           storyController
-                                                              .storyListData
-                                                              .value
-                                                              .statusList![
+                                                              .notViewedStatusList[
                                                                   index]
                                                               .userData!
                                                               .profileImage!,
@@ -314,17 +293,162 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                     );
                                                   }),
                                                   title: Text(
-                                                      "${storyController.storyListData.value.statusList![index].fullName}"),
-                                                  subtitle: Text(
-                                                      formatCreateDate(
+                                                      "${storyController.notViewedStatusList[index].fullName}"),
+                                                  subtitle: Text(formatCreateDate(
+                                                      storyController
+                                                          .notViewedStatusList[
+                                                              index]
+                                                          .userData!
+                                                          .statuses![0]
+                                                          .updatedAt!)),
+                                                  titleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 16,
+                                                          color: blackcolor),
+                                                  subtitleTextStyle:
+                                                      const TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.grey),
+                                                ).paddingOnly(bottom: 5);
+                                          //: const SizedBox();
+                                        },
+                                      ),
+                            storyController.isAllUserStoryLoad.value
+                                ? const SizedBox()
+                                : storyController.viewedStatusList.isEmpty
+                                    ? const SizedBox()
+                                    : const Text(
+                                        "Viewed",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ).paddingOnly(left: 20),
+                            storyController.isAllUserStoryLoad.value
+                                ? const SizedBox()
+                                : storyController.viewedStatusList.isEmpty
+                                    ? const SizedBox()
+                                    : ListView.builder(
+                                        itemCount: storyController
+                                            .viewedStatusList.length,
+                                        shrinkWrap: true,
+                                        physics:
+                                            const NeverScrollableScrollPhysics(),
+                                        scrollDirection: Axis.vertical,
+                                        itemBuilder:
+                                            (BuildContext context, int index) {
+                                          return storyController
+                                                      .viewedStatusList[index]
+                                                      .userData!
+                                                      .userId ==
+                                                  Hive.box(userdata).get(userId)
+                                              ? const SizedBox.shrink()
+                                              : ListTile(
+                                                  onTap: () {
+                                                    storyController
+                                                        .pageIndexValue
+                                                        .value = index;
+                                                    storyController
+                                                        .storyIndexValue
+                                                        .value = storyController
+                                                                .viewedStatusList[
+                                                                    index]
+                                                                .userData!
+                                                                .statuses![0]
+                                                                .statusViews![0]
+                                                                .statusCount! ==
+                                                            0
+                                                        ? 0
+                                                        : storyController
+                                                                    .viewedStatusList[
+                                                                        index]
+                                                                    .userData!
+                                                                    .statuses![
+                                                                        0]
+                                                                    .statusViews![
+                                                                        0]
+                                                                    .statusCount! ==
+                                                                storyController
+                                                                    .viewedStatusList
+                                                                    .length
+                                                            ? 0
+                                                            : storyController
+                                                                    .viewedStatusList[
+                                                                        index]
+                                                                    .userData!
+                                                                    .statuses![
+                                                                        0]
+                                                                    .statusViews![
+                                                                        0]
+                                                                    .statusCount! -
+                                                                1;
+                                                    log("Page Index Value : ${storyController.pageIndexValue.value}");
+                                                    log("Story Index Value : ${storyController.storyIndexValue.value}");
+                                                    setState(() {});
+                                                    Get.to(() => StoryScreen6PMViewed(
+                                                            pageIndex: index,
+                                                            storyIndex: 0,
+                                                            i: index,
+                                                            username:
+                                                                storyController
+                                                                    .viewedStatusList[
+                                                                        index]
+                                                                    .fullName))!
+                                                        .then((_) {
+                                                      print("REFRESH");
+                                                      storyController
+                                                          .storyListData
+                                                          .refresh();
+                                                      storyController
+                                                          .notViewedStatusList
+                                                          .refresh();
+                                                      storyController
+                                                          .viewedStatusList
+                                                          .refresh();
+                                                    });
+                                                  },
+                                                  leading: Obx(() {
+                                                    return StatusView(
+                                                      radius: 25,
+                                                      spacing: 10,
+                                                      strokeWidth: 2,
+                                                      indexOfSeenStatus:
                                                           storyController
-                                                              .storyListData
-                                                              .value
-                                                              .statusList![
+                                                              .viewedStatusList[
                                                                   index]
                                                               .userData!
                                                               .statuses![0]
-                                                              .createdAt!)),
+                                                              .statusViews![0]
+                                                              .statusCount!,
+                                                      numberOfStatus:
+                                                          storyController
+                                                              .viewedStatusList[
+                                                                  index]
+                                                              .userData!
+                                                              .statuses![0]
+                                                              .statusMedia!
+                                                              .length,
+                                                      padding: 3,
+                                                      centerImageUrl:
+                                                          storyController
+                                                              .viewedStatusList[
+                                                                  index]
+                                                              .userData!
+                                                              .profileImage!,
+                                                      seenColor:
+                                                          Colors.grey.shade400,
+                                                      unSeenColor: chatownColor,
+                                                    );
+                                                  }),
+                                                  title: Text(
+                                                      "${storyController.viewedStatusList[index].fullName}"),
+                                                  subtitle: Text(
+                                                      formatCreateDate(
+                                                          storyController
+                                                              .viewedStatusList[
+                                                                  index]
+                                                              .userData!
+                                                              .statuses![0]
+                                                              .updatedAt!)),
                                                   titleTextStyle:
                                                       const TextStyle(
                                                           fontSize: 16,
