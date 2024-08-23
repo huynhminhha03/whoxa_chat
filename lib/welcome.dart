@@ -61,7 +61,7 @@ class _WelcomeState extends State<Welcome> {
               width: double.infinity,
               color: chatownColor,
               child: const Text(
-                "Whoxa",
+                "Chatapp",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
               )),

@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 import 'dart:developer';
-//import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
@@ -288,6 +287,10 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                     trailing:
                         Image.asset("assets/images/Chat1.png", height: 10),
                   ),
+                  if (index != getAllDeviceContact.getList.length - 1)
+                    Divider(
+                      color: Colors.grey.shade300,
+                    )
                 ],
               );
             },
@@ -410,13 +413,17 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                               color: Color.fromRGBO(73, 73, 73, 1)),
                         )),
                     trailing: const Text(
-                      "Invite  ",
+                      "Invite",
                       style: TextStyle(
                           fontSize: 14,
                           color: chatownColor,
                           fontWeight: FontWeight.w500),
                     ),
                   ),
+            if (index != filteredContacts.length - 1)
+              Divider(
+                color: Colors.grey.shade300,
+              )
           ],
         );
       },

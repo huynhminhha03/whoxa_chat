@@ -35,6 +35,7 @@ class StoryScreen6PM extends StatefulWidget {
 class _StoryScreen6PMState extends State<StoryScreen6PM> {
   String statusMediaID = '';
   String stautsText = '';
+  String myStautsText = '';
   StroyGetxController storyGetxController = Get.find<StroyGetxController>();
   late ValueNotifier<IndicatorAnimationCommand> indicatorAnimationController;
   TextEditingController messagecontroller = TextEditingController();
@@ -164,746 +165,385 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
   @override
   Widget build(BuildContext context) {
     /// Minimum example to explain the usage.
-    return
-        // Obx(() {
-        //   return
+    return Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          children: [
+            Obx(() {
+              return StoryPageView(
+                indicatorHeight: 4,
+                backgroundColor: Colors.black,
+                onPageChanged: ((p0) {
+                  log("THIS IS P0 $p0");
 
-        Scaffold(
-            backgroundColor: Colors.black,
-            body: Stack(
-              children: [
-                // for (int i = 0;
-                //     i < storyGetxController.storyListData.value.post!.length;
-                //     i++)
-                Obx(() {
-                  return StoryPageView(
-                    indicatorHeight: 4,
-                    backgroundColor: Colors.black,
+                  storyGetxController.pageIndexValue.value = p0;
+                  storyGetxController.pageIndexValue.refresh();
 
-                    onPageChanged: ((p0) {
-                      log("THIS IS P0 $p0");
+                  storyGetxController.storyIndexValue.value =
+                      storyGetxController
+                          .storyListData
+                          .value
+                          .statusList![storyGetxController.pageIndexValue.value]
+                          .userData!
+                          .statuses!
+                          .length;
 
-                      storyGetxController.pageIndexValue.value = p0;
-                      storyGetxController.pageIndexValue.refresh();
+                  log("STORY LENGTH ${storyGetxController.storyListData.value.statusList![storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
 
-                      storyGetxController.storyIndexValue.value =
+                  setState(() {});
+                }),
+                initialPage: widget.pageIndex,
+                initialStoryIndex: (pageIndex) {
+                  return 0;
+                },
+                storyLength: (pageIndex) {
+                  log("STORY LENGTH PAGEINDEX : $pageIndex");
+                  log("STORY LENGTH PAGEEEEEEEE ${storyGetxController.pageIndexValue.value}");
+                  return widget.isForMyStory
+                      ? storyGetxController.storyListData.value.myStatus!
+                          .statuses![0].statusMedia!.length
+                      : storyGetxController
+                          .storyListData
+                          .value
+                          .statusList![pageIndex]
+                          .userData!
+                          .statuses![0]
+                          .statusMedia!
+                          .length;
+                },
+                pageLength: widget.isForMyStory
+                    ? storyGetxController
+                        .storyListData.value.myStatus!.statuses!.length
+                    : storyGetxController
+                        .storyListData.value.statusList!.length,
+                onPageLimitReached: () {
+                  Get.back();
+                },
+                indicatorPadding:
+                    const EdgeInsets.only(top: 50, left: 10, right: 10),
+                indicatorDuration: Duration(
+                    seconds: videoLengthInSeconds == null
+                        ? 15
+                        : _controller!.value.duration.inSeconds),
+                indicatorAnimationController: indicatorAnimationController,
+                indicatorVisitedColor: chatownColor,
+                indicatorUnvisitedColor: const Color.fromRGBO(158, 158, 158, 1),
+                itemBuilder: (context, pageIndex, storyIndex) {
+                  log("ITEM BUILDER PAGE INDEX $pageIndex");
+                  log("ITEM BUILDER STORY INDEX $storyIndex");
+
+                  log('STORY PAGE INDEX VALUE !!! ${storyGetxController.pageIndexValue.value}');
+
+                  if (widget.isForMyStory) {
+                    log("YES FOR MY STORY");
+                    log("ID IS : ${storyGetxController.storyListData.value.myStatus!.statuses![pageIndex].statusMedia![storyIndex].statusMediaId!.toString()}");
+                    storyGetxController.myStorySeenListAPI(storyGetxController
+                        .storyListData
+                        .value
+                        .myStatus!
+                        .statuses![pageIndex]
+                        .statusId!
+                        .toString());
+                  } else {
+                    if (storyGetxController
+                            .storyListData
+                            .value
+                            .statusList![pageIndex]
+                            .userData!
+                            .statuses![0]
+                            .statusViews![0]
+                            .statusCount! <
+                        storyIndex + 1) {
+                      storyGetxController.viewStoryAPI(
                           storyGetxController
-                              .storyListData
-                              .value
-                              .statusList![
-                                  storyGetxController.pageIndexValue.value]
-                              .userData!
-                              .statuses!
-                              .length;
-
-                      log("STORY LENGTH ${storyGetxController.storyListData.value.statusList![storyGetxController.pageIndexValue.value].userData!.statuses!.length} ---");
-
-                      setState(() {});
-                      // storyGetxController.pageIndexValue.value++;
-                      // storyGetxController.storyListData.refresh();
-                    }),
-                    initialPage: widget.pageIndex,
-                    initialStoryIndex: (pageIndex) {
-                      return 0;
-                      // storyGetxController.storyIndexValue.value;
-                    },
-                    storyLength: (pageIndex) {
-                      log("STORY LENGTH PAGEINDEX : $pageIndex");
-                      log("STORY LENGTH PAGEEEEEEEE ${storyGetxController.pageIndexValue.value}");
-                      return widget.isForMyStory
-                          ? storyGetxController.storyListData.value.myStatus!
-                              .statuses![0].statusMedia!.length
-                          : storyGetxController
                               .storyListData
                               .value
                               .statusList![pageIndex]
                               .userData!
                               .statuses![0]
-                              .statusMedia!
-                              .length;
-                    },
-                    // pageLength: 1,
-                    pageLength: widget.isForMyStory
-                        ? storyGetxController
-                            .storyListData.value.myStatus!.statuses!.length
-                        : storyGetxController
-                            .storyListData.value.statusList!.length,
-                    // widget.pageIndex == 0
-                    //     ? storyGetxController.storyListData.value.post!.length
-                    //     : storyGetxController.storyListData.value.post!.length -
-                    //         widget.pageIndex,
-                    //  storyGetxController.storyListData.value.post!.length -
-                    //     storyGetxController.pageIndexValue.value,
-                    onPageLimitReached: () {
-                      Get.back();
-                    },
+                              .statusId!
+                              .toString(),
+                          storyIndex + 1,
+                          pageIndex);
+                    }
+                  }
 
-                    // initialPage: 1,
-                    // initialStoryIndex: (pageIndex) {
-                    //   return
-                    // },
-                    indicatorPadding:
-                        const EdgeInsets.only(top: 50, left: 10, right: 10),
-                    indicatorDuration: Duration(
-                        seconds: videoLengthInSeconds == null
-                            ? 15
-                            : _controller!.value.duration.inSeconds),
-                    indicatorAnimationController: indicatorAnimationController,
-                    indicatorVisitedColor: chatownColor,
-                    indicatorUnvisitedColor:
-                        const Color.fromRGBO(158, 158, 158, 1),
+                  log("Inside Page Index : $pageIndex");
+                  log("Inside Story Index : $storyIndex");
 
-                    itemBuilder: (context, pageIndex, storyIndex) {
-                      log("ITEM BUILDER PAGE INDEX $pageIndex");
-                      log("ITEM BUILDER STORY INDEX $storyIndex");
+                  if (!widget.isForMyStory) {
+                    storyGetxController.pageIndexValue.value = pageIndex;
+                    storyGetxController.storyIndexValue.value = storyIndex;
+                  }
 
-                      log('STORY PAGE INDEX VALUE !!! ${storyGetxController.pageIndexValue.value}');
-
-                      if (widget.isForMyStory) {
-                        // print(
-                        //     "STORY TYPE ${storyGetxController.storyListData.value.myPost![pageIndex].storyImage![storyIndex].type}");
-                        //ttttttttttttttteeeeeeeeeeeeeeemmmmmmmmmmmmmmppppppppppppp
-                        // if (storyGetxController.storyListData.value.myStatus!.statuses![pageIndex]
-                        //         .statusMedia![storyIndex].type ==
-                        //     "video") {
-                        //   if (_controller != null) {
-                        //     _controller!.pause(); // Pause the video before disposing
-                        //     _controller!.dispose();
-                        //   }
-
-                        //   log("TYPE IS VIDEO");
-                        //   loadVideoPlayer(storyGetxController.storyListData.value
-                        //       .myPost![pageIndex].storyImage![storyIndex].url!);
-                        //   // _videoControllers = List.generate(
-                        //   //   storyGetxController.storyListData.value.post!.length,
-                        //   //   (index) => VideoPlayerController.network(
-                        //   //       "https://videos.pexels.com/video-files/18724815/18724815-sd_540_960_20fps.mp4"
-                        //   //       // storyGetxController.storyListData.value.post![pageIndex]
-                        //   //       //     .storyImage![storyIndex].url!,
-                        //   //       ),
-                        //   // );
-                        // }
-
-                        log("YES FOR MY STORY");
-                        log("ID IS : ${storyGetxController.storyListData.value.myStatus!.statuses![pageIndex].statusMedia![storyIndex].statusMediaId!.toString()}");
-                        storyGetxController.myStorySeenListAPI(
-                            storyGetxController.storyListData.value.myStatus!
-                                .statuses![pageIndex].statusId!
-                                .toString());
-                      } else {
-                        if (storyGetxController
-                                .storyListData
-                                .value
-                                .statusList![pageIndex]
-                                .userData!
-                                .statuses![0]
-                                .statusViews![0]
-                                .statusCount! <
-                            storyIndex + 1) {
-                          storyGetxController.viewStoryAPI(
+                  stautsText = storyGetxController
+                      .storyListData
+                      .value
+                      .statusList![storyGetxController.pageIndexValue.value]
+                      .userData!
+                      .statuses![0]
+                      .statusMedia![storyGetxController.storyIndexValue.value]
+                      .statusText!;
+                  myStautsText = storyGetxController
+                      .storyListData
+                      .value
+                      .myStatus!
+                      .statuses![0]
+                      .statusMedia![storyIndex]
+                      .statusText!;
+                  return widget.isForMyStory
+                      ? Container(
+                          color: Colors.black,
+                          child: StoryImage(
+                            /// key is required
+                            key: ValueKey(
+                              storyGetxController.storyListData.value.myStatus!
+                                  .statuses![0].statusMedia![storyIndex].url!,
+                            ),
+                            imageProvider: CachedNetworkImageProvider(
+                              storyGetxController.storyListData.value.myStatus!
+                                  .statuses![0].statusMedia![storyIndex].url!,
+                            ),
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: chatownColor,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.network_check, size: 40),
+                          ),
+                        )
+                      : Container(
+                          color: Colors.black,
+                          child: StoryImage(
+                            /// key is required
+                            key: ValueKey(
                               storyGetxController
                                   .storyListData
                                   .value
-                                  .statusList![pageIndex]
+                                  .statusList![
+                                      storyGetxController.pageIndexValue.value]
                                   .userData!
                                   .statuses![0]
-                                  .statusId!
-                                  .toString(),
-                              storyIndex + 1,
-                              pageIndex);
-
-                          // storyGetxController.storyListData.refresh();
-                        }
-                        // if (storyGetxController.storyListData.value.statusList![pageIndex]
-                        //         .userData!.statuses![storyIndex].type ==
-                        //     "video") {
-                        //   if (_controller != null) {
-                        //     _controller!.pause(); // Pause the video before disposing
-                        //     _controller!.dispose();
-                        //   }
-                        //   log("THIS IS USER VIDEOS");
-                        //   loadVideoPlayer(storyGetxController.storyListData.value
-                        //       .post![pageIndex].storyImage![storyIndex].url!);
-                        //   indicatorAnimationController.value =
-                        //       IndicatorAnimationCommand.pause;
-                        //   log("Value of indicator ${indicatorAnimationController.value}");
-
-                        //   // _controller = VideoPlayerController.networkUrl(
-                        //   //   Uri.parse(
-                        //   // storyGetxController
-                        //   //     .storyListData
-                        //   //     .value
-                        //   //     .post![storyGetxController.pageIndexValue.value]
-                        //   //     .storyImage![storyGetxController.storyIndexValue.value]
-                        //   //     .url!,
-                        //   //   ),
-                        //   // )..initialize().then((value) {
-                        //   //     setState(() {});
-                        //   //   });
-                        //   // controller = VideoPlayerController.networkUrl(Uri.parse(
-                        //   //     storyGetxController
-                        //   //         .storyListData
-                        //   //         .value
-                        //   //         .post![storyGetxController.pageIndexValue.value]
-                        //   //         .storyImage![
-                        //   //             storyGetxController.storyIndexValue.value]
-                        //   //         .url!));
-                        //   // controller.initialize().then((value) {
-                        //   //   // controller.play();
-                        //   //   log("VIDEO INITIALIZED");
-                        //   //   setState(() {});
-                        //   //   indicatorAnimationController.value =
-                        //   //       IndicatorAnimationCommand.resume;
-                        //   // });
-
-                        //   // _initializeVideoPlayerFuture = _controller.initialize();
-                        //   // controller = VideoPlayerController.networkUrl(Uri.parse(
-                        //   //     storyGetxController.storyListData.value.post![pageIndex]
-                        //   //         .storyImage![storyIndex].url!));
-                        // }
-                      }
-
-                      // pageIndex = storyGetxController.pageIndexValue.value == 0
-                      //     ? 0
-                      //     : storyGetxController.storyListData.value.post!.length -
-                      //         storyGetxController.pageIndexValue.value;
-                      // widget.pageIndex;
-
-                      // pageIndex = storyGetxController.pageIndexValue.value;
-                      // storyIndex = storyGetxController.storyIndexValue.value;
-                      log("Inside Page Index : $pageIndex");
-                      log("Inside Story Index : $storyIndex");
-
-                      // setState(() {
-
-                      // if (!widget.isForMyStory) {
-                      //   storyGetxController.viewStoryAPI(storyGetxController
-                      //       .storyListData
-                      //       .value
-                      //       .post![pageIndex]
-                      //       .storyImage![storyIndex]
-                      //       .storyId!
-                      //       .toString());
-                      // }
-
-                      if (!widget.isForMyStory) {
-                        storyGetxController.pageIndexValue.value = pageIndex;
-                        storyGetxController.storyIndexValue.value = storyIndex;
-                      }
-
-                      // });
-
-                      // if (!widget.isForMyStory) {
-                      // storyGetxController.myStorySeenListAPI(storyGetxController
-                      //     .storyListData
-                      //     .value
-                      //     .post![pageIndex]
-                      //     .storyImage![storyIndex]
-                      //     .storyId!
-                      //     .toString());
-                      // }
-
-                      // if (widget.isForMyStory) {
-                      //   if (storyGetxController.storyListData.value.myPost![0]
-                      //           .storyImage![storyIndex].type ==
-                      //       "video") {
-                      //     // controller1 = _videoControllers[pageIndex];
-                      //   }
-                      // } else {
-                      //   if (storyGetxController
-                      //           .storyListData
-                      //           .value
-                      //           .post![storyGetxController.pageIndexValue.value]
-                      //           .storyImage![storyGetxController.storyIndexValue.value]
-                      //           .type ==
-                      //       "video") {
-                      //     controller1 = _videoControllers[pageIndex];
-                      //   }
-                      // }
-
-                      // storyGetxController.storyListData.value.post[pageIndex].
-                      stautsText = storyGetxController
-                          .storyListData
-                          .value
-                          .statusList![storyGetxController.pageIndexValue.value]
-                          .userData!
-                          .statuses![0]
-                          .statusMedia![
-                              storyGetxController.storyIndexValue.value]
-                          .statusText!;
-                      return widget.isForMyStory
-                          ? StoryImage(
-                              /// key is required
-                              key: ValueKey(
-                                storyGetxController
-                                    .storyListData
-                                    .value
-                                    .myStatus!
-                                    .statuses![0]
-                                    .statusMedia![storyIndex]
-                                    .url!,
-                              ),
-                              imageProvider: CachedNetworkImageProvider(
-                                storyGetxController
-                                    .storyListData
-                                    .value
-                                    .myStatus!
-                                    .statuses![0]
-                                    .statusMedia![storyIndex]
-                                    .url!,
-                              ),
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                    color: chatownColor,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.network_check, size: 40),
-                              // fit: BoxFit.contain,
-                            )
-                          // CachedNetworkImage(
-                          // imageUrl: storyGetxController.storyListData.value
-                          //     .myPost![0].storyImage![storyIndex].url!,
-                          //     progressIndicatorBuilder: (context, url, progress) {
-                          //       log("Progress $progress");
-                          //       if (100 == progress.downloaded) {
-                          //         log("downloaded");
-                          //       }
-                          //       log("Progress 1 ${progress.progress}");
-
-                          //       if (progress.downloaded == 1) {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.resume;
-                          //       } else if (progress.downloaded == 1) {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.pause;
-                          //       }
-
-                          //       // return showModalForPause();
-                          //       return const CupertinoActivityIndicator();
-                          //     },
-                          //   )
-                          // :
-                          // //  Text(
-                          // //     "It's a Video",
-                          // //     style: TextStyle(fontSize: 14, color: Colors.black),
-                          // //   )
-                          // FutureBuilder(
-                          //     future: _initializeVideoPlayerFuture1,
-                          //     builder: (context, snapshot) {
-                          //       if (snapshot.connectionState ==
-                          //           ConnectionState.waiting) {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.pause;
-                          //         return const CupertinoActivityIndicator();
-                          //       } else if (snapshot.connectionState ==
-                          //           ConnectionState.done) {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.resume;
-                          //         // If the VideoPlayerController has finished initialization, use
-                          //         // the data it provides to limit the aspect ratio of the video.
-                          //         return AspectRatio(
-                          //           aspectRatio: _controller!.value.aspectRatio,
-                          //           // Use the VideoPlayer widget to display the video.
-                          //           child: VideoPlayer(
-                          //             _controller!,
-                          //           ),
-                          //         );
-                          //       } else {
-                          //         // If the VideoPlayerController is still initializing, show a
-                          //         // loading spinner.
-                          //         return const Center(
-                          //           child: CircularProgressIndicator(
-                          //               color: chatownColor),
-                          //         );
-                          //       }
-                          //     },
-                          //   )
-                          //  VideoPlayer(controller1)
-
-                          // controller.value.isInitialized
-                          //     ? AspectRatio(
-                          //         aspectRatio: controller.value.aspectRatio,
-                          //         child: VideoPlayer(controller))
-                          //     : SizedBox(
-                          //         height: Get.height,
-                          //         child: const Center(
-                          //             child: CircularProgressIndicator()),
-                          //       )
-                          // FutureBuilder(
-                          //     future: _initializeVideoPlayerFuture,
-                          //     builder: (context, snapshot) {
-                          //       if (snapshot.connectionState ==
-                          //           ConnectionState.done) {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.resume;
-
-                          //         // If the VideoPlayerController has finished initialization, use
-                          //         // the data it provides to limit the aspect ratio of the video.
-                          //         return AspectRatio(
-                          //           aspectRatio: _controller.value.aspectRatio,
-                          //           // Use the VideoPlayer widget to display the video.
-                          //           child: VideoPlayer(_controller),
-                          //         );
-                          //       } else {
-                          //         indicatorAnimationController.value =
-                          //             IndicatorAnimationCommand.pause;
-
-                          //         // If the VideoPlayerController is still initializing, show a
-                          //         // loading spinner.
-                          //         return const Center(
-                          //           child: CircularProgressIndicator(),
-                          //         );
-                          //       }
-                          //     },
-                          //   )
-                          // VideoProgressIndicator(
-                          //     controller, //video player controller
-                          //     allowScrubbing: true,
-                          //     colors: const VideoProgressColors(
-                          //       //video player progress bar
-                          //       backgroundColor: Colors.redAccent,
-                          //       playedColor: Colors.green,
-                          //       bufferedColor: Colors.purple,
-                          //     ))
-                          : StoryImage(
-                              /// key is required
-                              key: ValueKey(
-                                storyGetxController
-                                    .storyListData
-                                    .value
-                                    .statusList![storyGetxController
-                                        .pageIndexValue.value]
-                                    .userData!
-                                    .statuses![0]
-                                    .statusMedia![storyGetxController
-                                        .storyIndexValue.value]
-                                    .url,
-                              ),
-                              imageProvider: CachedNetworkImageProvider(
-                                storyGetxController
-                                    .storyListData
-                                    .value
-                                    .statusList![storyGetxController
-                                        .pageIndexValue.value]
-                                    .userData!
-                                    .statuses![0]
-                                    .statusMedia![storyGetxController
-                                        .storyIndexValue.value]
-                                    .url!,
-                              ),
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                  child: CircularProgressIndicator(
-                                      color: chatownColor),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.network_check, size: 40),
-                              // fit: BoxFit.contain,
-                            );
-                      // CachedNetworkImage(
-                      // imageUrl: storyGetxController
-                      //     .storyListData
-                      //     .value
-                      //     .post![storyGetxController.pageIndexValue.value]
-                      //     .storyImage![
-                      //         storyGetxController.storyIndexValue.value]
-                      //     .url!,
-                      //     progressIndicatorBuilder: (context, url, progress) {
-                      //       log("Progress $progress");
-
-                      //       if (100 == progress.downloaded) {
-                      //         log("downloaded");
-                      //       }
-                      //       log("Progress 1 ${progress.progress}");
-
-                      //       if (progress.downloaded == 1) {
-                      //         indicatorAnimationController.value =
-                      //             IndicatorAnimationCommand.resume;
-                      //       } else if (progress.downloaded == 1) {
-                      // indicatorAnimationController.value =
-                      //     IndicatorAnimationCommand.pause;
-                      //       }
-                      //       // showModalForPause();
-                      //       // return showModalForPause();
-                      //       return const CupertinoActivityIndicator();
-                      //     },
-                      //   )
-                      // :
-                      // //  Text(
-                      // //     "It's user video story",
-                      // //     style: TextStyle(fontSize: 14, color: Colors.black),
-                      // //   );
-                      // FutureBuilder(
-                      //     future: _initializeVideoPlayerFuture1,
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.waiting) {
-                      //         indicatorAnimationController.value =
-                      //             IndicatorAnimationCommand.pause;
-                      //         return const CupertinoActivityIndicator();
-                      //       } else if (snapshot.connectionState ==
-                      //           ConnectionState.done) {
-                      //         // setState(() {
-                      //         indicatorAnimationController.value =
-                      //             IndicatorAnimationCommand.resume;
-                      //         // });
-                      //         // If the VideoPlayerController has finished initialization, use
-                      //         // the data it provides to limit the aspect ratio of the video.
-                      //         return AspectRatio(
-                      //           aspectRatio: _controller!.value.aspectRatio,
-                      //           // Use the VideoPlayer widget to display the video.
-                      //           child: VideoPlayer(
-                      //             _controller!,
-                      //           ),
-                      //         );
-                      //       } else {
-                      //         // setState(() {
-
-                      //         // });
-                      //         // If the VideoPlayerController is still initializing, show a
-                      //         // loading spinner.
-                      //         return const Center(
-                      //           child: CircularProgressIndicator(
-                      //               color: chatownColor),
-                      //         );
-                      //       }
-                      //     },
-                      //   );
-                      // VideoPlayer(controller1);
-                      //  controller.value.isInitialized
-                      //     ? AspectRatio(
-                      //         aspectRatio: controller.value.aspectRatio,
-                      //         child: VideoPlayer(controller))
-                      //     : SizedBox(
-                      //         height: Get.height,
-                      //         child: const Center(
-                      //             child: CircularProgressIndicator()),
-                      //       );
-                      //  FutureBuilder(
-                      //     future: _initializeVideoPlayerFuture,
-                      //     builder: (context, snapshot) {
-                      //       if (snapshot.connectionState ==
-                      //           ConnectionState.done) {
-                      //         indicatorAnimationController.value =
-                      //             IndicatorAnimationCommand.pause;
-                      //         // If the VideoPlayerController has finished initialization, use
-                      //         // the data it provides to limit the aspect ratio of the video.
-                      //         return AspectRatio(
-                      //           aspectRatio: _controller.value.aspectRatio,
-                      //           // Use the VideoPlayer widget to display the video.
-                      //           child: VideoPlayer(_controller),
-                      //         );
-                      //       } else {
-                      //         // If the VideoPlayerController is still initializing, show a
-                      //         // loading spinner.
-                      //         indicatorAnimationController.value =
-                      //             IndicatorAnimationCommand.resume;
-
-                      //         return const Center(
-                      //           child: CircularProgressIndicator(),
-                      //         );
-                      //       }
-                      //     },
-                      //   );
-                      // VideoProgressIndicator(
-                      //     controller, //video player controller
-                      //     allowScrubbing: true,
-                      //     colors: const VideoProgressColors(
-                      //       //video player progress bar
-                      //       backgroundColor: Colors.redAccent,
-                      //       playedColor: Colors.green,
-                      //       bufferedColor: Colors.purple,
-                      //     ));
-
-                      // Center(
-                      //     child: Text(
-                      //         "${storyGetxController.storyListData.value.post![pageIndex].storyImage![storyIndex].type} ${storyGetxController.storyListData.value.post![pageIndex].storyImage![storyIndex].storyId}"),
-                      //   );
-                    },
-
-                    gestureItemBuilder: (context, pageIndex, storyIndex) {
-                      pageIndex = widget.pageIndex;
-                      return widget.isForMyStory
-                          // my story Align show
-                          ? Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 32),
-                                child: Obx(() {
-                                  statusMediaID = storyGetxController
-                                      .storyListData
-                                      .value
-                                      .myStatus!
-                                      .statuses![0]
-                                      .statusMedia![storyIndex]
-                                      .statusMediaId
-                                      .toString();
-                                  return storyGetxController
-                                              .isMyStorySeenLoading.value ||
-                                          storyGetxController
-                                              .isAllUserStoryLoad.value
-                                      ? const SizedBox.shrink()
-                                      : Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Text(storyGetxController
-                                                .storyListData
-                                                .value
-                                                .myStatus!
-                                                .statuses![0]
-                                                .statusMedia![storyIndex]
-                                                .statusText!),
-                                            storyGetxController
-                                                        .myStorySeenData
-                                                        .value
-                                                        .statusViewsList ==
-                                                    null
-                                                ? const SizedBox.shrink()
-                                                : InkWell(
-                                                    onTap: () {
-                                                      indicatorAnimationController
-                                                              .value =
-                                                          IndicatorAnimationCommand
-                                                              .pause;
-                                                      showModalForSeenUsersList();
-                                                      //seendUserList();
-                                                    },
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Image.asset(
-                                                            'assets/images/eye.png',
-                                                            height: 20,
-                                                            color:
-                                                                Colors.white),
-                                                        const SizedBox(
-                                                            width: 3),
-                                                        storyGetxController
-                                                                    .isMyStorySeenLoading
-                                                                    .value ||
+                                  .statusMedia![
+                                      storyGetxController.storyIndexValue.value]
+                                  .url,
+                            ),
+                            imageProvider: CachedNetworkImageProvider(
+                              storyGetxController
+                                  .storyListData
+                                  .value
+                                  .statusList![
+                                      storyGetxController.pageIndexValue.value]
+                                  .userData!
+                                  .statuses![0]
+                                  .statusMedia![
+                                      storyGetxController.storyIndexValue.value]
+                                  .url!,
+                            ),
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                    color: chatownColor),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.network_check, size: 40),
+                            // fit: BoxFit.contain,
+                          ),
+                        );
+                },
+                gestureItemBuilder: (context, pageIndex, storyIndex) {
+                  pageIndex = widget.pageIndex;
+                  return widget.isForMyStory
+                      // my story Align show
+                      ? Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 32),
+                            child: Obx(() {
+                              statusMediaID = storyGetxController
+                                  .storyListData
+                                  .value
+                                  .myStatus!
+                                  .statuses![0]
+                                  .statusMedia![storyIndex]
+                                  .statusMediaId
+                                  .toString();
+                              return storyGetxController
+                                          .isMyStorySeenLoading.value ||
+                                      storyGetxController
+                                          .isAllUserStoryLoad.value
+                                  ? const SizedBox.shrink()
+                                  : Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        ReadMoreText(
+                                          trimLines: 3,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'Read more'.tr,
+                                          trimExpandedText: 'Read less'.tr,
+                                          colorClickableText: yellow2Color,
+                                          myStautsText,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color.fromRGBO(
+                                                  255, 255, 255, 1)),
+                                        ),
+                                        storyGetxController.myStorySeenData
+                                                    .value.statusViewsList ==
+                                                null
+                                            ? const SizedBox.shrink()
+                                            : InkWell(
+                                                onTap: () {
+                                                  indicatorAnimationController
+                                                          .value =
+                                                      IndicatorAnimationCommand
+                                                          .pause;
+                                                  showModalForSeenUsersList();
+                                                  //seendUserList();
+                                                },
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Image.asset(
+                                                        'assets/images/eye.png',
+                                                        height: 20,
+                                                        color: Colors.white),
+                                                    const SizedBox(width: 3),
+                                                    storyGetxController
+                                                                .isMyStorySeenLoading
+                                                                .value ||
+                                                            storyGetxController
+                                                                    .isAllUserStoryLoad
+                                                                    .value &&
                                                                 storyGetxController
-                                                                        .isAllUserStoryLoad
-                                                                        .value &&
-                                                                    storyGetxController
-                                                                            .myStorySeenData
-                                                                            .value
-                                                                            .statusViewsList ==
-                                                                        null
-                                                            ? const SizedBox
-                                                                .shrink()
-                                                            : Text(
-                                                                storyGetxController
-                                                                            .myStorySeenData
-                                                                            .value
-                                                                            .statusViewsList!
-                                                                            .isEmpty ||
-                                                                        storyGetxController.myStorySeenData.value.statusViewsList!.length ==
-                                                                            0
-                                                                    ? "0"
-                                                                    : storyGetxController
+                                                                        .myStorySeenData
+                                                                        .value
+                                                                        .statusViewsList ==
+                                                                    null
+                                                        ? const SizedBox
+                                                            .shrink()
+                                                        : Text(
+                                                            storyGetxController
                                                                         .myStorySeenData
                                                                         .value
                                                                         .statusViewsList!
-                                                                        .length
-                                                                        .toString(),
-                                                                style: const TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontSize:
-                                                                        12,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600),
-                                                              ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                            IconButton(
-                                              padding: EdgeInsets.zero,
-                                              color: const Color.fromARGB(
-                                                  255, 46, 46, 46),
-                                              icon: const Icon(
-                                                  Icons.keyboard_arrow_up),
-                                              iconSize: 30,
-                                              onPressed: () {
-                                                indicatorAnimationController
-                                                        .value =
-                                                    IndicatorAnimationCommand
-                                                        .pause;
-                                                showModalForSeenUsersList();
-                                                // Navigator.pop(context);
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                }),
-                              ),
-                            )
-                          // To user alignment show
-                          : Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 32),
-                                child: Obx(() {
-                                  return storyGetxController
-                                              .isMyStorySeenLoading.value ||
-                                          storyGetxController
-                                              .isAllUserStoryLoad.value
-                                      ? const SizedBox.shrink()
-                                      : Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                                                        .isEmpty ||
+                                                                    storyGetxController
+                                                                            .myStorySeenData
+                                                                            .value
+                                                                            .statusViewsList!
+                                                                            .length ==
+                                                                        0
+                                                                ? "0"
+                                                                : storyGetxController
+                                                                    .myStorySeenData
+                                                                    .value
+                                                                    .statusViewsList!
+                                                                    .length
+                                                                    .toString(),
+                                                            style: const TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600),
+                                                          ),
+                                                  ],
+                                                ),
+                                              ),
+                                        IconButton(
+                                          padding: EdgeInsets.zero,
+                                          color: const Color.fromARGB(
+                                              255, 46, 46, 46),
+                                          icon: const Icon(
+                                              Icons.keyboard_arrow_up),
+                                          iconSize: 30,
+                                          onPressed: () {
+                                            indicatorAnimationController.value =
+                                                IndicatorAnimationCommand.pause;
+                                            showModalForSeenUsersList();
+                                            // Navigator.pop(context);
+                                          },
+                                        ),
+                                      ],
+                                    );
+                            }),
+                          ),
+                        )
+                      // To user alignment show
+                      : Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 32),
+                            child: Obx(() {
+                              return storyGetxController
+                                          .isMyStorySeenLoading.value ||
+                                      storyGetxController
+                                          .isAllUserStoryLoad.value
+                                  ? const SizedBox.shrink()
+                                  : Column(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        ReadMoreText(
+                                          trimLines: 3,
+                                          trimMode: TrimMode.Line,
+                                          trimCollapsedText: 'Read more'.tr,
+                                          trimExpandedText: 'Read less'.tr,
+                                          colorClickableText: chatownColor,
+                                          stautsText,
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color.fromRGBO(
+                                                  255, 255, 255, 1)),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
                                           children: [
-                                            Text(stautsText),
-                                            const SizedBox(height: 10),
-                                            Row(
-                                              children: [
-                                                Expanded(
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        border: Border.all(
-                                                            color: const Color
-                                                                .fromRGBO(108,
-                                                                108, 108, 1))),
-                                                    child: TextFormField(
-                                                      focusNode: focusNode,
-                                                      maxLines: 4,
-                                                      minLines:
-                                                          1, // Minimum lines to show initially
-                                                      cursorColor:
-                                                          const Color.fromRGBO(
-                                                              108, 108, 108, 1),
-                                                      textCapitalization:
-                                                          TextCapitalization
-                                                              .sentences,
-                                                      style: const TextStyle(
-                                                          color: Colors.white),
-                                                      controller:
-                                                          messagecontroller,
-                                                      decoration: const InputDecoration(
-                                                          fillColor:
-                                                              Colors.white,
+                                            Expanded(
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    border: Border.all(
+                                                        color: const Color
+                                                            .fromRGBO(
+                                                            108, 108, 108, 1))),
+                                                child: TextFormField(
+                                                  focusNode: focusNode,
+                                                  maxLines: 4,
+                                                  minLines:
+                                                      1, // Minimum lines to show initially
+                                                  cursorColor:
+                                                      const Color.fromRGBO(
+                                                          108, 108, 108, 1),
+                                                  textCapitalization:
+                                                      TextCapitalization
+                                                          .sentences,
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                  controller: messagecontroller,
+                                                  decoration:
+                                                      const InputDecoration(
+                                                          fillColor: Colors
+                                                              .white,
                                                           alignLabelWithHint:
                                                               true,
                                                           contentPadding:
@@ -927,140 +567,135 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                                                   FontWeight
                                                                       .w400),
                                                           isDense: true),
-                                                    ),
-                                                  ),
                                                 ),
-                                                const SizedBox(width: 10),
-                                                SizedBox(
-                                                  height: 42,
-                                                  width: 42,
-                                                  child: InkWell(
-                                                    onTap: () {},
-                                                    child: Container(
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            gradient: LinearGradient(
-                                                                colors: [
-                                                                  yellow1Color,
-                                                                  yellow2Color
-                                                                ],
-                                                                begin: Alignment
-                                                                    .topCenter,
-                                                                end: Alignment
-                                                                    .bottomCenter)),
-                                                        child:
-                                                            // storyController
-                                                            //         .isUploadStoryLoad
-                                                            //         .value
-                                                            //     ? const SizedBox(
-                                                            //         height: 15,
-                                                            //         width: 15,
-                                                            //         child: Center(
-                                                            //           child: CircularProgressIndicator(
-                                                            //               strokeWidth:
-                                                            //                   3,
-                                                            //               color: Colors
-                                                            //                   .black),
-                                                            //         ),
-                                                            //       )
-                                                            //     :
-                                                            Image.asset(
-                                                                    "assets/images/send1.png",
-                                                                    color:
-                                                                        chatColor)
-                                                                .paddingAll(
-                                                                    13)),
-                                                  ),
-                                                ),
-                                              ],
-                                            )
-                                                .paddingSymmetric(
-                                                    horizontal: 10,
-                                                    vertical: 15)
-                                                .paddingOnly(
-                                                    top: 15, bottom: 15)
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            SizedBox(
+                                              height: 42,
+                                              width: 42,
+                                              child: InkWell(
+                                                onTap: () {},
+                                                child: Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        gradient: LinearGradient(
+                                                            colors: [
+                                                              yellow1Color,
+                                                              yellow2Color
+                                                            ],
+                                                            begin: Alignment
+                                                                .topCenter,
+                                                            end: Alignment
+                                                                .bottomCenter)),
+                                                    child:
+                                                        // storyController
+                                                        //         .isUploadStoryLoad
+                                                        //         .value
+                                                        //     ? const SizedBox(
+                                                        //         height: 15,
+                                                        //         width: 15,
+                                                        //         child: Center(
+                                                        //           child: CircularProgressIndicator(
+                                                        //               strokeWidth:
+                                                        //                   3,
+                                                        //               color: Colors
+                                                        //                   .black),
+                                                        //         ),
+                                                        //       )
+                                                        //     :
+                                                        Image.asset(
+                                                                "assets/images/send1.png",
+                                                                color:
+                                                                    chatColor)
+                                                            .paddingAll(13)),
+                                              ),
+                                            ),
                                           ],
-                                        );
-                                }),
-                              ),
-                            );
-                    },
-                  );
-                }),
-                //====================================== TOP OF USER NAME ==============================
-                Positioned(
-                  top: 66,
-                  left: 16,
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          // decoration: const BoxDecoration(
-                          //     shape: BoxShape.circle, color: Colors.black),
-                          child: CachedNetworkImage(
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.person_2),
-                              fit: BoxFit.cover,
-                              imageUrl: widget.isForMyStory
-                                  ? storyGetxController.storyListData.value
-                                      .myStatus!.profileImage!
-                                  : storyGetxController
-                                      .storyListData
-                                      .value
-                                      .statusList![storyGetxController
-                                          .pageIndexValue.value]
-                                      .userData!
-                                      .profileImage!),
-                        ),
-                      ),
-                      const SizedBox(
-                        width: 6,
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        child: Text(
-                          widget.isForMyStory
-                              ? "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}"
-                              : capitalizeFirstLetter(storyGetxController
+                                        )
+                                            .paddingSymmetric(
+                                                horizontal: 10, vertical: 15)
+                                            .paddingOnly(top: 15, bottom: 15)
+                                      ],
+                                    );
+                            }),
+                          ),
+                        );
+                },
+              );
+            }),
+            //====================================== TOP OF USER NAME ==============================
+            Positioned(
+              top: 66,
+              left: 16,
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      // decoration: const BoxDecoration(
+                      //     shape: BoxShape.circle, color: Colors.black),
+                      child: CachedNetworkImage(
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.person_2),
+                          fit: BoxFit.cover,
+                          imageUrl: widget.isForMyStory
+                              ? storyGetxController
+                                  .storyListData.value.myStatus!.profileImage!
+                              : storyGetxController
                                   .storyListData
                                   .value
                                   .statusList![
                                       storyGetxController.pageIndexValue.value]
-                                  .fullName!),
-                          // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
-                          style: const TextStyle(
-                              color: Colors.black, fontSize: 15),
-                        ),
-                      ),
-                    ],
+                                  .userData!
+                                  .profileImage!),
+                    ),
                   ),
-                ),
-                Positioned(
-                  top: 66,
-                  right: 16,
-                  child: widget.isForMyStory
-                      ? InkWell(
-                          onTap: () {
-                            indicatorAnimationController.value =
-                                IndicatorAnimationCommand.pause;
-                            deleteDialog(statusMediaID);
-                          },
-                          child: const Icon(
-                            Icons.more_horiz,
-                            size: 20,
-                            color: Colors.black,
-                          ),
-                        )
-                      : const SizedBox.shrink(),
-                ),
-              ],
-            ));
+                  const SizedBox(
+                    width: 6,
+                  ),
+                  Material(
+                    color: Colors.transparent,
+                    child: Text(
+                      widget.isForMyStory
+                          ? "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}"
+                          : capitalizeFirstLetter(storyGetxController
+                              .storyListData
+                              .value
+                              .statusList![
+                                  storyGetxController.pageIndexValue.value]
+                              .fullName!),
+                      // "${storyGetxController.storyListData.value.post![storyGetxController.pageIndexValue.value].username}",
+                      style: const TextStyle(color: Colors.black, fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 66,
+              right: 16,
+              child: widget.isForMyStory
+                  ? InkWell(
+                      onTap: () {
+                        indicatorAnimationController.value =
+                            IndicatorAnimationCommand.pause;
+                        deleteDialog(statusMediaID);
+                      },
+                      child: const Icon(
+                        Icons.more_horiz,
+                        size: 20,
+                        color: Colors.black,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ));
     // });
   }
 
