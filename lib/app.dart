@@ -118,6 +118,12 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
         }
       }
     });
+    // OneSignal.shared.setNotificationWillShowInForegroundHandler(
+    //   (OSNotificationReceivedEvent event) {
+    //     // Display notification
+    //     event.complete(event.notification);
+    //   },
+    // );
 
     OneSignal.Notifications.addClickListener((event) {
       if (event.result.actionId == "accept") {
