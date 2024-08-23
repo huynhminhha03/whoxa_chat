@@ -7,10 +7,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meyaoo_new/app.dart';
+import 'package:meyaoo_new/src/Notification/one_signal_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/socket_initiallize.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -30,9 +30,9 @@ void main() async {
   await Firebase.initializeApp();
   // dynamicLinkIsPending();
   FirebaseMessaging.onBackgroundMessage(_firebasebackgroundmessagehendler);
-  OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-  OneSignal.initialize("fa0d2111-1ab5-49d7-ad5d-976b8d9d66a4");
-  OneSignal.Notifications.requestPermission(true);
+
+  OnesignalService().initialize();
+
   Directory directory = await getApplicationDocumentsDirectory();
   await Permission.location.request();
   // Initialize the time zone data

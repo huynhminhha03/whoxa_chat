@@ -19,6 +19,7 @@ import 'package:meyaoo_new/controller/get_delete_story.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/Notification/notifiactions_handler.dart';
 import 'package:meyaoo_new/src/Notification/notification_service.dart';
+import 'package:meyaoo_new/src/Notification/one_signal_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
@@ -55,32 +56,12 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     });
   }
 
-  final RoomIdController roomIdController = Get.put(RoomIdController());
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // asknotificationpermmision();
     requestPermissions();
-
-    // OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    //   print("OneSignal foregroundWillDisplayListener $event");
-    //   var buttons = event.notification.buttons;
-    //   if (buttons != null) {
-    //     for (var button in buttons) {
-    //       if (button.id == 'accept') {
-    //         print('Button pressed: ${button.id}');
-    //         Get.to(VideoCallScreen(
-    //           conversation_id: "askfasdasd",
-    //         ));
-    //         // Perform action based on button ID
-    //       } else {
-    //         print('Button pressed: ${button.id}');
-    //       }
-    //     }
-    //   }
-    // });
 
     print(
         "OneSignal pushSubscription optedIn ${OneSignal.User.pushSubscription.optedIn}");
@@ -89,98 +70,9 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
     print(
         "OneSignal pushSubscription token ${OneSignal.User.pushSubscription.token}");
 
-    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print("event body ${event.notification.additionalData}");
-      if (event.notification.additionalData!['call_type'].toString() ==
-          'video_call') {
-        print("FirebaseMessaging.onMessage video call");
-        if (event.notification.additionalData!['missed_call'].toString() ==
-            'true') {
-          Get.back();
-        } else {
-          Get.to(IncomingCallScrenn(
-            roomID: event.notification.additionalData!['room_id'].toString(),
-            callerImage: event
-                .notification.additionalData!['sender_profile_image']
-                .toString(),
-            senderName:
-                event.notification.additionalData!['senderName'].toString(),
-            conversation_id: event
-                .notification.additionalData!['conversation_id']
-                .toString(),
-            message_id:
-                event.notification.additionalData!['message_id'].toString(),
-            caller_id:
-                event.notification.additionalData!['senderId'].toString(),
-            isGroupCall:
-                event.notification.additionalData!['is_group'].toString(),
-          ));
-        }
-      }
-    });
-    // OneSignal.shared.setNotificationWillShowInForegroundHandler(
-    //   (OSNotificationReceivedEvent event) {
-    //     // Display notification
-    //     event.complete(event.notification);
-    //   },
-    // );
+    OnesignalService().onNotifiacation();
+    OnesignalService().onNotificationClick();
 
-    OneSignal.Notifications.addClickListener((event) {
-      if (event.result.actionId == "accept") {
-        print("actionId accept");
-        if (event.notification.additionalData!['call_type'].toString() ==
-            'video_call') {
-          print("FirebaseMessaging.service 2 video call");
-          Get.off(VideoCallScreen(
-            roomID: event.notification.additionalData!['room_id'].toString(),
-            conversation_id: event
-                .notification.additionalData!['conversation_id']
-                .toString(),
-          ));
-        }
-      } else if (event.result.actionId == "decline") {
-        print("actionId decline");
-        print("☺☺☺☺☺☺☺☺☺☺☺☺☺☺decline_insideapp");
-        if (event.notification.additionalData!['call_type'].toString() ==
-            'video_call') {
-          if (event.notification.additionalData!['is_group'].toString() ==
-              "true") {
-            Get.back();
-          } else {
-            roomIdController.callCutByReceiver(
-              conversationID: event
-                  .notification.additionalData!['conversation_id']
-                  .toString(),
-              message_id:
-                  event.notification.additionalData!['message_id'].toString(),
-              caller_id:
-                  event.notification.additionalData!['senderId'].toString(),
-            );
-          }
-        }
-      } else {
-        if (event.notification.additionalData!['call_type'].toString() ==
-            'video_call') {
-          Get.to(IncomingCallScrenn(
-            roomID: event.notification.additionalData!['room_id'].toString(),
-            callerImage: event
-                .notification.additionalData!['sender_profile_image']
-                .toString(),
-            senderName:
-                event.notification.additionalData!['senderName'].toString(),
-            conversation_id: event
-                .notification.additionalData!['conversation_id']
-                .toString(),
-            message_id:
-                event.notification.additionalData!['message_id'].toString(),
-            caller_id:
-                event.notification.additionalData!['senderId'].toString(),
-            isGroupCall:
-                event.notification.additionalData!['is_group'].toString(),
-          ));
-        }
-      }
-    });
     _checkPermissions();
     FirebaseMessagingService()
         .setUpFirebase(); // Initialize Firebase messaging service
