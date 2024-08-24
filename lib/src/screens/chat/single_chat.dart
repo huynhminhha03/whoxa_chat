@@ -3029,7 +3029,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                             },
                             child: Image.asset("assets/images/pin.png",
                                 height: 20, color: darkGreyColor),
-                          ),
+                          ).paddingOnly(left: 10),
                           const SizedBox(width: 10),
                           InkWell(
                             onTap: () {
@@ -3556,10 +3556,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       height: 40,
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(6),
-                          gradient: LinearGradient(colors: [
-                            yellow1Color,
-                            yellow2Color
-                          ],begin: Alignment.topCenter,end: Alignment.bottomCenter)),
+                          gradient: LinearGradient(
+                              colors: [yellow1Color, yellow2Color],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
                       child: Center(
                         child: Text(
                           record ? "Send" : "Start",

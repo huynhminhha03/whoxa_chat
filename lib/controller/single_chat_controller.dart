@@ -58,15 +58,14 @@ class SingleChatContorller extends GetxController {
           // If this is the initial fetch, set the message list
           if (userdetailschattModel.value == null ||
               userdetailschattModel.value!.messageList == null) {
+            print("MESSAGE_RECEIVED-1");
             userdetailschattModel.value = SingleChatListModel.fromJson(data);
             // Reverse the initial message list
             userdetailschattModel.value!.messageList =
                 userdetailschattModel.value!.messageList!.reversed.toList();
-
-            // print(
-            //     "DATA 1:::::${userdetailschattModel.value!.messageList![0].message}");
           } else {
             // Reverse the new messages before adding them to the existing list
+            print("MESSAGE_RECEIVED-2");
             List<MessageList> reversedNewMessages = data['MessageList']
                 .map<MessageList>(
                     (newMessage) => MessageList.fromJson(newMessage))
@@ -78,6 +77,7 @@ class SingleChatContorller extends GetxController {
             userdetailschattModel.value!.messageList!
                 .addAll(reversedNewMessages);
           }
+          print("MESSAGE_RECEIVED-3");
           userdetailschattModel.value!.messageList!.insert(
               userdetailschattModel.value!.messageList!.length,
               MessageList.fromJson(data));
@@ -94,15 +94,45 @@ class SingleChatContorller extends GetxController {
             userdetailschattModel.value!.messageList = [];
           }
 
-          // userdetailschattModel.value!.messageList!
-          //     .add(MessageList.fromJson(data));
-          // if (userdetailschattModel.value!.messageList!.first.message == null) {
-          userdetailschattModel.value!.messageList!
-              .insert(0, MessageList.fromJson(data));
-          // }
+          print("MESSAGE_RECEIVED-4");
 
-          // print(
-          // "@@@@@@@@@:${userdetailschattModel.value!.messageList!.last.message}");
+          final localData = MessageList.fromJson(data);
+          if (localData.conversationId.toString() == conversationID) {
+            final lastMessages = userdetailschattModel.value!.messageList!
+                .toList()
+                .reversed
+                .toList();
+            bool todayDateFound = false;
+            final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+            for (var i = 0; i < lastMessages.length; i++) {
+              if (lastMessages[i].messageType == "date") {
+                final lastMessageDate = DateTime.parse(lastMessages[i]
+                    .message!); // Assuming UTC date is stored in message field
+
+                if (lastMessageDate.year == today.year &&
+                    lastMessageDate.month == today.month &&
+                    lastMessageDate.day == today.day) {
+                  todayDateFound = true;
+                  break;
+                }
+              }
+            }
+
+// If no date message with today's date exists, add it
+            if (!todayDateFound) {
+              final todayDateMessage = MessageList(
+                message: today.toIso8601String(),
+                messageType: "date",
+                // Add any other necessary fields here
+              );
+              userdetailschattModel.value!.messageList!
+                  .insert(0, todayDateMessage);
+            }
+            userdetailschattModel.value!.messageList!
+                .insert(0, MessageList.fromJson(data));
+          }
         }
 
         isLoading(false);
@@ -114,93 +144,6 @@ class SingleChatContorller extends GetxController {
       print("Finally Called");
     }
   }
-
-  // getdetailschat(conversationID) async {
-  //   try {
-  //     isLoading(true);
-  //     // chat emit
-  //     socketIntilized.socket!.emit("messageReceived", {
-  //       "conversation_id": conversationID,
-  //       "user_timezone": Hive.box(userdata).get(utcLocaName)
-  //     });
-  //     print("SingleChat Emitted");
-
-  //     // Listen single Chat
-  //     socketIntilized.socket!.on("messageReceived", (data) {
-  //       if (data['MessageList'] != null && data['MessageList'].isNotEmpty) {
-  //         print("DATA1:::::$data");
-  //         userdetailschattModel.value = SingleChatListModel.fromJson(data);
-  //         print("MESSAGE LIST : ${userdetailschattModel.value!.messageList}");
-  //       } else {
-  //         print("List Emitted 222");
-  //         print("Data2: $data");
-
-  //         if (userdetailschattModel.value == null) {
-  //           userdetailschattModel.value = SingleChatListModel(messageList: []);
-  //         }
-
-  //         if (userdetailschattModel.value!.messageList == null) {
-  //           userdetailschattModel.value!.messageList = [];
-  //         }
-
-  //         userdetailschattModel.value!.messageList!
-  //             .add(MessageList.fromJson(data));
-
-  //         print(
-  //             "@@@@@@@@@:${userdetailschattModel.value!.messageList!.last.message}");
-  //       }
-  //       isLoading(false);
-  //       userdetailschattModel.refresh();
-  //     });
-  //   } catch (e) {
-  //     log("Error ${e.toString()}");
-  //   } finally {
-  //     print("Finally Called");
-  //   }
-  // }
-
-  // getdetailschat(conversationID) async {
-  //   try {
-  //     isLoading(true);
-  //     // chat emit
-  //     socketIntilized.socket!.emit("messageReceived", {
-  //       "conversation_id": conversationID,
-  //       "user_timezone": Hive.box(userdata).get(utcLocaName)
-  //     });
-  //     print("SingleChat Emitted");
-
-  //     // Listen single Chat
-  //     socketIntilized.socket!.on("messageReceived", (data) {
-  //       final newMessage = MessageList.fromJson(data);
-  //       //print("Received Data: $data");
-  //       if (data['MessageList'] != null && data['MessageList'] != null) {
-  //         print("DATA1:::::$data");
-  //         print("Both data and message list are null, adding default message");
-  //         // Add a default message
-  //         userdetailschattModel.value = SingleChatListModel.fromJson(data);
-  //         // chatList.value = userdetailschattModel.value!.messageList!;
-  //         print("MESSAGE LIST : ${userdetailschattModel.value!.messageList}");
-  //       } else {
-  //         print("List Emitted 222");
-  //         print("Data2: $data");
-  //         //userdetailschattModel.value = SingleChatListModel.fromJson(data);
-  //         //final repos = MessageList.fromJson(data);
-  //         userdetailschattModel.value = SingleChatListModel(messageList: data['MessageList']);
-  //         // userdetailschattModel.value = SingleChatListModel.fromJson(data);
-  //         // chatList.value = userdetailschattModel.value!.messageList!;
-  //         print(
-  //             "@@@@@@@@@:${userdetailschattModel.value!.messageList!.last.message}");
-  //       }
-  //       isLoading(false);
-  //       userdetailschattModel.refresh();
-  //       // chatList.refresh();
-  //     });
-  //   } catch (e) {
-  //     log("Error ${e.toString()}");
-  //   } finally {
-  //     print("Finally Called");
-  //   }
-  // }
 
   //================== send DOC message api ==================================
   sendMessageIMGDoc(conversationID, msgtype, filePath, String mobileNum,
@@ -249,6 +192,36 @@ class SingleChatContorller extends GetxController {
           SingleChatListModel(messageList: [newMessage]);
     } else {
       print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
@@ -294,19 +267,46 @@ class SingleChatContorller extends GetxController {
     final newMessage = MessageList.fromJson(useData);
 
     if (userdetailschattModel.value?.messageList == null) {
+      print("check.......1");
       userdetailschattModel.value =
           SingleChatListModel(messageList: [newMessage]);
     } else {
-      print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
+
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
     Get.find<ChatListController>().forChatList();
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
-
-    // getdetailschat(conversationID);
   }
 
   //======================= Send Location message Api ==========================
@@ -353,6 +353,36 @@ class SingleChatContorller extends GetxController {
           SingleChatListModel(messageList: [newMessage]);
     } else {
       print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
@@ -408,6 +438,36 @@ class SingleChatContorller extends GetxController {
           SingleChatListModel(messageList: [newMessage]);
     } else {
       print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
@@ -475,6 +535,38 @@ class SingleChatContorller extends GetxController {
             SingleChatListModel(messageList: [newMessage]);
       } else {
         print("check.......");
+        print("check.......2");
+        final lastMessages = userdetailschattModel.value!.messageList!
+            .toList()
+            .reversed
+            .toList();
+        bool todayDateFound = false;
+        final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+        for (var i = 0; i < lastMessages.length; i++) {
+          if (lastMessages[i].messageType == "date") {
+            final lastMessageDate = DateTime.parse(lastMessages[i]
+                .message!); // Assuming UTC date is stored in message field
+
+            if (lastMessageDate.year == today.year &&
+                lastMessageDate.month == today.month &&
+                lastMessageDate.day == today.day) {
+              todayDateFound = true;
+              break;
+            }
+          }
+        }
+
+// If no date message with today's date exists, add it
+        if (!todayDateFound) {
+          final todayDateMessage = MessageList(
+            message: today.toIso8601String(),
+            messageType: "date",
+            // Add any other necessary fields here
+          );
+          userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+        }
         userdetailschattModel.value!.messageList!.insert(0, newMessage);
       }
     }
@@ -534,6 +626,36 @@ class SingleChatContorller extends GetxController {
           SingleChatListModel(messageList: [newMessage]);
     } else {
       print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
@@ -585,6 +707,36 @@ class SingleChatContorller extends GetxController {
           SingleChatListModel(messageList: [newMessage]);
     } else {
       print("check.......");
+      print("check.......2");
+      final lastMessages =
+          userdetailschattModel.value!.messageList!.toList().reversed.toList();
+      bool todayDateFound = false;
+      final today = DateTime.now().toUtc();
+
+// Check if today's date message already exists
+      for (var i = 0; i < lastMessages.length; i++) {
+        if (lastMessages[i].messageType == "date") {
+          final lastMessageDate = DateTime.parse(lastMessages[i]
+              .message!); // Assuming UTC date is stored in message field
+
+          if (lastMessageDate.year == today.year &&
+              lastMessageDate.month == today.month &&
+              lastMessageDate.day == today.day) {
+            todayDateFound = true;
+            break;
+          }
+        }
+      }
+
+// If no date message with today's date exists, add it
+      if (!todayDateFound) {
+        final todayDateMessage = MessageList(
+          message: today.toIso8601String(),
+          messageType: "date",
+          // Add any other necessary fields here
+        );
+        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+      }
       userdetailschattModel.value!.messageList!.insert(0, newMessage);
     }
     userdetailschattModel.refresh();
@@ -592,16 +744,9 @@ class SingleChatContorller extends GetxController {
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
 
-  sendMessageStatusMessage(
-      String message,
-      String conversationID,
-      String msgtype,
-      String mobileNum,
-      String forwardid,
-      String replyid,
-      String statusID) async {
+  sendMessageStatusMessage(String message, String msgtype, String mobileNum,
+      String forwardid, String replyid, String statusID) async {
     print(message);
-    print(conversationID);
     print(msgtype);
     print(mobileNum);
     isSendMsg(true);
@@ -618,7 +763,6 @@ class SingleChatContorller extends GetxController {
     //adding params
     request.fields['message'] = message;
     request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
     request.fields['phone_number'] = mobileNum;
     request.fields['forward_id'] = forwardid;
     request.fields['reply_id'] = replyid;

@@ -27,8 +27,6 @@ String socketBaseUrl() {
 String isOnline = 'Online';
 bool isForward = false;
 bool isStarred = false;
-String agoraBaseUrl =
-    "https://agora-token-service-production-4ef9.up.railway.app/";
 
 /// Description: This file is used for declaring all global objects used in the Application.
 ///

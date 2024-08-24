@@ -238,7 +238,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       },
       child: Scaffold(
           backgroundColor: Colors.white,
-          appBar: isSelectedmessage == "0"
+          appBar: isSelectedmessage == "0" ||
+                  chatID.isEmpty ||
+                  chatMessageList.isEmpty
               ? (isSearchSelect == "0"
                   ? _appbar(context)
                   : _appbarSearch(context))
@@ -303,7 +305,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                           child: Column(
                                             children: [
                                               SizedBox(
-                                                  height: isKeyboard
+                                                  height: isKeyboard ||
+                                                          click == true
                                                       ? MediaQuery.sizeOf(
                                                                   context)
                                                               .height *
@@ -314,35 +317,28 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                           0.2),
                                               InkWell(
                                                 onTap: () {
-                                                  try {
-                                                    chatContorller
-                                                        .isSendMsg.value = true;
-                                                    chatContorller
-                                                        .sendMessageText(
-                                                            "Hi",
-                                                            widget
-                                                                .conversationID
-                                                                .toString(),
-                                                            "text",
-                                                            widget.mobileNum
-                                                                .toString(),
-                                                            '',
-                                                            '');
-                                                    chatContorller.isSendMsg
-                                                        .value = false;
-                                                    chatContorller.isTypingApi(
-                                                        widget.conversationID!,
-                                                        "0");
-                                                    typingstart = "0";
-                                                    controller.isTyping();
-                                                  } catch (e) {
-                                                    chatContorller.isSendMsg
-                                                        .value = false;
-                                                    print(e);
-                                                    showCustomToast(
-                                                        "Something Error1");
-                                                  }
                                                   //sendApiBydefult();
+                                                  widget.mobileNum == null &&
+                                                          widget.mobileNum == ""
+                                                      ? chatContorller
+                                                          .sendMessageText(
+                                                              "Hi",
+                                                              widget
+                                                                  .conversationID!,
+                                                              "text",
+                                                              widget.mobileNum
+                                                                  .toString(),
+                                                              '',
+                                                              '')
+                                                      : chatContorller
+                                                          .sendMessageText(
+                                                              "Hi",
+                                                              widget
+                                                                  .conversationID!,
+                                                              "text",
+                                                              "",
+                                                              '',
+                                                              '');
                                                 },
                                                 child: Container(
                                                   width: MediaQuery.of(context)
