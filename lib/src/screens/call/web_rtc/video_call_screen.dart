@@ -811,10 +811,16 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
   @override
   void dispose() {
+    localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+    localRenderer.srcObject = null;
     localRenderer.dispose();
     // remoteRenderer.dispose();
 
     remoteRenderers.forEach((key, renderer) {
+      renderer.srcObject!.getTracks().forEach((track) => track.stop());
+      renderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+      renderer.srcObject = null;
       renderer.dispose();
     });
     myPeer!.dispose();

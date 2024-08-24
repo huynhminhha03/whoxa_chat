@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
@@ -17,14 +18,19 @@ class OnesignalService {
   }
 
   onNotifiacation() {
+    OneSignal.Notifications.removeClickListener((event) {
+      FlutterRingtonePlayer().playRingtone();
+    });
+
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      OneSignal.Notifications.clearAll();
       print("event body ${event.notification.additionalData}");
       if (event.notification.additionalData!['call_type'].toString() ==
           'video_call') {
         print("video call");
         if (event.notification.additionalData!['missed_call'].toString() ==
             'true') {
+          OneSignal.Notifications.clearAll();
+          FlutterRingtonePlayer().stop();
           Get.back();
         } else {
           Get.to(IncomingCallScrenn(
@@ -44,6 +50,7 @@ class OnesignalService {
             isGroupCall:
                 event.notification.additionalData!['is_group'].toString(),
           ));
+          FlutterRingtonePlayer().playRingtone();
         }
       } else if (event.notification.additionalData!['call_type'].toString() ==
           'audio_call') {
@@ -85,6 +92,8 @@ class OnesignalService {
         if (event.notification.additionalData!['call_type'].toString() ==
             'video_call') {
           print("video call");
+          OneSignal.Notifications.clearAll();
+          FlutterRingtonePlayer().stop();
           Get.off(VideoCallScreen(
             roomID: event.notification.additionalData!['room_id'].toString(),
             conversation_id: event
@@ -111,6 +120,8 @@ class OnesignalService {
         print("actionId decline");
         if (event.notification.additionalData!['call_type'].toString() ==
             'video_call') {
+          OneSignal.Notifications.clearAll();
+          FlutterRingtonePlayer().stop();
           if (event.notification.additionalData!['is_group'].toString() ==
               "true") {
             Get.back();
@@ -145,6 +156,8 @@ class OnesignalService {
       } else {
         if (event.notification.additionalData!['call_type'].toString() ==
             'video_call') {
+          OneSignal.Notifications.clearAll();
+          FlutterRingtonePlayer().stop();
           Get.to(IncomingCallScrenn(
             roomID: event.notification.additionalData!['room_id'].toString(),
             callerImage: event

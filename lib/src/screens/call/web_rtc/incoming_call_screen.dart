@@ -3,6 +3,7 @@
 import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:lottie/lottie.dart';
@@ -11,6 +12,7 @@ import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class IncomingCallScrenn extends StatefulWidget {
   String roomID;
@@ -229,6 +231,9 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        OneSignal.Notifications.clearAll();
+                        FlutterRingtonePlayer().stop();
+
                         if (widget.isGroupCall == "true") {
                           getx.Get.back();
                         } else {
@@ -284,6 +289,9 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                       onTap: () {
                         LocalNotificationService.notificationsPlugin
                             .cancelAll();
+                        OneSignal.Notifications.clearAll();
+                        FlutterRingtonePlayer().stop();
+
                         if (widget.forVideoCall == true) {
                           getx.Get.off(
                             VideoCallScreen(
@@ -355,9 +363,9 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
 
   @override
   void dispose() {
-    localRenderer.srcObject?.getTracks().forEach((track) {
-      track.stop();
-    });
+    localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+    localRenderer.srcObject = null;
     localRenderer.dispose();
     super.dispose();
   }
