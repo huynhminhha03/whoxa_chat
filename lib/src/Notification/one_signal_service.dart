@@ -6,6 +6,8 @@ import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/incoming_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
+import 'package:meyaoo_new/src/screens/chat/group_chat_temp.dart';
+import 'package:meyaoo_new/src/screens/chat/single_chat.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class OnesignalService {
@@ -18,10 +20,6 @@ class OnesignalService {
   }
 
   onNotifiacation() {
-    OneSignal.Notifications.removeClickListener((event) {
-      FlutterRingtonePlayer().playRingtone();
-    });
-
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print("event body ${event.notification.additionalData}");
       if (event.notification.additionalData!['call_type'].toString() ==
@@ -29,7 +27,7 @@ class OnesignalService {
         print("video call");
         if (event.notification.additionalData!['missed_call'].toString() ==
             'true') {
-          OneSignal.Notifications.clearAll();
+          // OneSignal.Notifications.clearAll();
           FlutterRingtonePlayer().stop();
           Get.back();
         } else {
@@ -50,7 +48,7 @@ class OnesignalService {
             isGroupCall:
                 event.notification.additionalData!['is_group'].toString(),
           ));
-          FlutterRingtonePlayer().playRingtone();
+          // FlutterRingtonePlayer().playRingtone();
         }
       } else if (event.notification.additionalData!['call_type'].toString() ==
           'audio_call') {
@@ -92,7 +90,7 @@ class OnesignalService {
         if (event.notification.additionalData!['call_type'].toString() ==
             'video_call') {
           print("video call");
-          OneSignal.Notifications.clearAll();
+          // OneSignal.Notifications.clearAll();
           FlutterRingtonePlayer().stop();
           Get.off(VideoCallScreen(
             roomID: event.notification.additionalData!['room_id'].toString(),
@@ -120,7 +118,7 @@ class OnesignalService {
         print("actionId decline");
         if (event.notification.additionalData!['call_type'].toString() ==
             'video_call') {
-          OneSignal.Notifications.clearAll();
+          // OneSignal.Notifications.clearAll();
           FlutterRingtonePlayer().stop();
           if (event.notification.additionalData!['is_group'].toString() ==
               "true") {
@@ -155,8 +153,10 @@ class OnesignalService {
         }
       } else {
         if (event.notification.additionalData!['call_type'].toString() ==
-            'video_call') {
-          OneSignal.Notifications.clearAll();
+                'video_call' &&
+            event.notification.additionalData!['missed_call'].toString() ==
+                'false') {
+          // OneSignal.Notifications.clearAll();
           FlutterRingtonePlayer().stop();
           Get.to(IncomingCallScrenn(
             roomID: event.notification.additionalData!['room_id'].toString(),
@@ -176,7 +176,9 @@ class OnesignalService {
                 event.notification.additionalData!['is_group'].toString(),
           ));
         } else if (event.notification.additionalData!['call_type'].toString() ==
-            'audio_call') {
+                'audio_call' &&
+            event.notification.additionalData!['missed_call'].toString() ==
+                'false') {
           Get.to(IncomingCallScrenn(
             roomID: event.notification.additionalData!['room_id'].toString(),
             callerImage: event
@@ -197,6 +199,40 @@ class OnesignalService {
                 .toString(),
             isGroupCall:
                 event.notification.additionalData!['is_group'].toString(),
+          ));
+        } else if (event.notification.additionalData!['notification_type']
+                    .toString() ==
+                'message' &&
+            event.notification.additionalData!['is_group'].toString() ==
+                'false') {
+          Get.to(SingleChatMsg(
+            conversationID: event
+                .notification.additionalData!['conversation_id']
+                .toString(),
+            username:
+                event.notification.additionalData!['senderName'].toString(),
+            userPic:
+                event.notification.additionalData!['profile_image'].toString(),
+            index: 0,
+            isMsgHighLight: false,
+            isBlock: bool.parse(event.notification.additionalData!['is_block']),
+            userID: event.notification.additionalData!['senderId'].toString(),
+          ));
+        } else if (event.notification.additionalData!['notification_type']
+                    .toString() ==
+                'message' &&
+            event.notification.additionalData!['is_group'].toString() ==
+                'true') {
+          Get.to(GroupChatMsg(
+            conversationID: event
+                .notification.additionalData!['conversation_id']
+                .toString(),
+            gPusername:
+                event.notification.additionalData!['senderName'].toString(),
+            gPPic:
+                event.notification.additionalData!['profile_image'].toString(),
+            index: 0,
+            isMsgHighLight: false,
           ));
         }
       }
