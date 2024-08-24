@@ -4953,6 +4953,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         ? CrossAxisAlignment.start
                         : CrossAxisAlignment.end,
                     children: [
+                      data.myMessage == false
+                          ? richText(
+                              imageFile: data.senderData!.profileImage!,
+                              fName: data.senderData!.firstName!,
+                              lName: data.senderData!.lastName!)
+                          : const SizedBox.shrink(),
+                      data.myMessage == false
+                          ? const SizedBox(height: 5)
+                          : const SizedBox.shrink(),
                       Stack(
                         clipBehavior: Clip.none,
                         children: [
