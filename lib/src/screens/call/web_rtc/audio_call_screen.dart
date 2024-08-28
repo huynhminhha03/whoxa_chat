@@ -15,6 +15,7 @@ import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 import 'package:peerdart/peerdart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -113,6 +114,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
       print('new connected userid $userId');
       print('new connected stream $mediaStream');
 
+      if (widget.isCaller == true && _seconds == 0) {
+        startTimer();
+      }
       final call = myPeer!.call(userId, mediaStream);
       print('new connected user... ${call.connectionId}');
 
@@ -126,7 +130,6 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
           });
         }
         remoteRenderers[userId]!.srcObject = stream;
-        startTimer();
         print("remoteStream $stream");
         print("remoteRenderers length ${remoteRenderers.length}");
       });
@@ -169,11 +172,14 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
           });
           print("remoteRenderers length ${remoteRenderers.length}");
           print("remoteStream $remoteStream");
-          startTimer();
         });
         print("call peer ${call.peer}");
         peers[call.peer] = call;
       });
+
+      if (widget.isCaller == false) {
+        startTimer();
+      }
       socketIntilized.socket!.on(
         "user-connected-to-call",
         (userId) {
@@ -200,7 +206,18 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                       remoteRenderers.remove(userId),
                       if (remoteRenderers.isEmpty)
                         {
-                          getx.Get.back(),
+                          if (widget.isCaller == true)
+                            {
+                              getx.Get.back(),
+                            }
+                          else
+                            {
+                              getx.Get.to(
+                                TabbarScreen(
+                                  currentTab: 0,
+                                ),
+                              ),
+                            }
                         }
                     },
                   setState(() {}),
@@ -217,11 +234,157 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
       print("call_decline data : $data");
       getx.Get.back();
       setState(() {
+        localRenderer.srcObject?.getTracks().forEach((track) {
+          track.stop();
+        });
+        remoteRenderers.forEach((key, renderer) {
+          renderer.dispose();
+        });
         localRenderer.dispose();
         myPeer!.dispose();
       });
     });
   }
+
+  // Future<void> _initPeer() async {
+  //   try {
+  //     myPeer = Peer(
+  //       id: "${const Uuid().v4()}/${Hive.box(userdata).get(userId).toString()}",
+  //       options: PeerOptions(
+  //         port: CLOUD_PORT,
+  //         host: CLOUD_HOST,
+  //         secure: false,
+  //         path: '/',
+  //         // config: defaultConfig,
+  //         // pingInterval: 50,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     print('Unhandled exception in _initPeer: $e');
+  //   }
+
+  //   myPeer!.on("open").listen((event) {
+  //     setState(() {
+  //       peerid = event.toString();
+  //     });
+  //     print("PEERID☺☺☺☺☺☺☺:$event");
+  //     socketIntilized.socket!
+  //         .emit("join-call", {"room_id": widget.roomID, "user_id": event});
+  //   });
+
+  //   connectNewUser(userId, MediaStream mediaStream) async {
+  //     print('new connected userid $userId');
+  //     print('new connected stream $mediaStream');
+
+  //     final call = myPeer!.call(userId, mediaStream);
+  //     print('new connected user... ${call.connectionId}');
+
+  //     call.on<MediaStream>("stream").listen((stream) async {
+  //       print("call.peer ${call.peer}");
+  //       if (!remoteRenderers.containsKey(call.peer)) {
+  //         RTCVideoRenderer renderer = RTCVideoRenderer();
+  //         await renderer.initialize();
+  //         setState(() {
+  //           remoteRenderers[call.peer] = renderer;
+  //         });
+  //       }
+  //       remoteRenderers[userId]!.srcObject = stream;
+  //       startTimer();
+  //       print("remoteStream $stream");
+  //       print("remoteRenderers length ${remoteRenderers.length}");
+  //     });
+
+  //     call.on("close").listen((onData) {
+  //       print("call closed");
+  //       if (remoteRenderers[userId] != null) {
+  //         remoteRenderers[userId]!.dispose();
+  //         remoteRenderers.remove(userId);
+  //         print("remoteRenderers length ${remoteRenderers.length}");
+  //       }
+  //     });
+
+  //     peers[userId] = call;
+  //     print("peers $peers");
+  //   }
+
+  //   navigator.mediaDevices
+  //       .getUserMedia({"video": false, "audio": true}).then((mediaStream) {
+  //     localRenderer.srcObject = mediaStream;
+  //     print('my stream $mediaStream');
+
+  //     myPeer!.on<MediaConnection>("call").listen((call) {
+  //       print("call from ${call.peer} to $peerid");
+  //       print('my stream $mediaStream');
+  //       call.answer(mediaStream);
+
+  //       call.on<MediaStream>("stream").listen((remoteStream) async {
+  //         // remoteRenderer.srcObject = remoteStream;
+  //         if (!remoteRenderers.containsKey(call.peer)) {
+  //           RTCVideoRenderer renderer = RTCVideoRenderer();
+
+  //           await renderer.initialize();
+  //           setState(() {
+  //             remoteRenderers[call.peer] = renderer;
+  //           });
+  //         }
+  //         setState(() {
+  //           remoteRenderers[call.peer]!.srcObject = remoteStream;
+  //         });
+  //         print("remoteRenderers length ${remoteRenderers.length}");
+  //         print("remoteStream $remoteStream");
+  //         startTimer();
+  //       });
+  //       print("call peer ${call.peer}");
+  //       peers[call.peer] = call;
+  //     });
+  //     socketIntilized.socket!.on(
+  //       "user-connected-to-call",
+  //       (userId) {
+  //         print("PEERID☺☺☺☺☺☺☺ remote: $userId");
+  //         connectNewUser(userId, mediaStream);
+  //         isReciverConnect = true;
+  //         // setState(() {});
+  //       },
+  //     );
+  //   });
+
+  //   socketIntilized.socket!.on(
+  //       "user-disconnected-from-call",
+  //       (userId) => {
+  //             print("disconnected  $userId"),
+  //             print("peers $peers"),
+  //             if (peers[userId] != null)
+  //               {
+  //                 print("disconnected userid $userId"),
+  //                 peers[userId]!.close(),
+  //                 if (remoteRenderers[userId] != null)
+  //                   {
+  //                     remoteRenderers[userId]!.dispose(),
+  //                     remoteRenderers.remove(userId),
+  //                     if (remoteRenderers.isEmpty)
+  //                       {
+  //                         getx.Get.back(),
+  //                       }
+  //                   },
+  //                 setState(() {}),
+  //                 print("disconnected peers[userId] ${peers[userId]}"),
+  //                 print("remoteRenderers length ${remoteRenderers.length}"),
+  //               }
+  //             else
+  //               {
+  //                 print("peers else $peers"),
+  //               }
+  //           });
+
+  //   socketIntilized.socket!.on("call_decline", (data) {
+  //     print("call_decline data : $data");
+  //     getx.Get.back();
+  //     setState(() {
+  //       localRenderer.dispose();
+  //       myPeer!.dispose();
+  //     });
+  //   });
+  // }
 
   void _endCall() {
     if (isReciverConnect == false && widget.isCaller == true) {
@@ -241,7 +404,15 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     setState(() {
       inCall = false;
     });
-    getx.Get.back();
+    if (widget.isCaller == true) {
+      getx.Get.back();
+    } else {
+      getx.Get.to(
+        TabbarScreen(
+          currentTab: 0,
+        ),
+      );
+    }
   }
 
   bool microphone = false;
@@ -523,10 +694,18 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
 
   @override
   void dispose() {
+    localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
+    localRenderer.srcObject = null;
     localRenderer.dispose();
     // remoteRenderer.dispose();
 
     remoteRenderers.forEach((key, renderer) {
+      renderer.srcObject!.getTracks().forEach((track) => track.stop());
+      renderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+      renderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
+      renderer.srcObject = null;
       renderer.dispose();
     });
     myPeer!.dispose();

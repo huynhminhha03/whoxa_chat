@@ -12,6 +12,7 @@ import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class IncomingCallScrenn extends StatefulWidget {
   String roomID;
@@ -230,7 +231,7 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // OneSignal.Notifications.clearAll();
+                        OneSignal.Notifications.clearAll();
                         FlutterRingtonePlayer().stop();
 
                         if (widget.isGroupCall == "true") {
@@ -288,7 +289,7 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                       onTap: () {
                         LocalNotificationService.notificationsPlugin
                             .cancelAll();
-                        // OneSignal.Notifications.clearAll();
+                        OneSignal.Notifications.clearAll();
                         FlutterRingtonePlayer().stop();
 
                         if (widget.forVideoCall == true) {
@@ -364,6 +365,7 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
   void dispose() {
     localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
     localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
     localRenderer.srcObject = null;
     localRenderer.dispose();
     super.dispose();

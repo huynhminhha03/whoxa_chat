@@ -30,6 +30,7 @@ import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/pdf.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Onlichat/ChatOnline.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/video_call_screen.dart';
 import 'package:meyaoo_new/src/screens/chat/FileView.dart';
 import 'package:meyaoo_new/src/screens/chat/GroupProfile.dart';
@@ -5734,10 +5735,22 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         Row(
           children: [
             InkWell(
-                onTap: () {
-                  getRoomController.getRoomModelApi(
+                onTap: () async {
+                  await getRoomController.getRoomModelApi(
                       conversationID: widget.conversationID,
                       callType: "audio_call");
+                  print(
+                      "ROOMID 2 ${Get.find<RoomIdController>().roomModel.value!.roomId}");
+                  Get.to(() => AudioCallScreen(
+                        roomID: Get.find<RoomIdController>()
+                            .roomModel
+                            .value!
+                            .roomId,
+                        conversation_id: widget.conversationID ?? "",
+                        isCaller: true,
+                        receiverImage: widget.gPPic!,
+                        receiverUserName: widget.gPusername!,
+                      ));
                 },
                 child: Image.asset(
                   "assets/images/call_1.png",

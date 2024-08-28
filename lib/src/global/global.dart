@@ -941,6 +941,21 @@ String formatDate(String dateString) {
   }
 }
 
+String formatDateCallHistorry(String dateString) {
+  DateTime date = parseDate(dateString);
+  DateTime now = DateTime.now();
+  DateTime yesterday = DateTime(now.year, now.month, now.day - 1);
+  if (date.year == now.year && date.month == now.month && date.day == now.day) {
+    return 'Today';
+  } else if (date.year == yesterday.year &&
+      date.month == yesterday.month &&
+      date.day == yesterday.day) {
+    return 'Yesterday';
+  } else {
+    return DateFormat('dd/MM/yy').format(date);
+  }
+}
+
 DateTime parseDate(String dateString) {
   List<String> parts = dateString.split(' ');
   int day = int.parse(parts[0]);

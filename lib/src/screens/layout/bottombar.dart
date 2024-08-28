@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
+import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
@@ -51,6 +52,7 @@ class _TabbarScreenState extends State<TabbarScreen>
   OnlineOfflineController controller = Get.put(OnlineOfflineController());
   ChatListController chatListController = Get.put(ChatListController());
   GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
+  RoomIdController getRoomController = Get.put(RoomIdController());
   AllBlockListController allBlockListController =
       Get.put(AllBlockListController());
   AllStaredMsgController allStaredMsgController =
@@ -237,6 +239,7 @@ class _TabbarScreenState extends State<TabbarScreen>
     editApiCall();
     _fetchTimeZone();
     permissionAcessPhone();
+    getRoomController.callHistory();
     super.initState();
   }
 

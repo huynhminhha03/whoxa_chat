@@ -1,3 +1,7 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'package:http/http.dart' as http;
+
 class ApiHelper {
   static const String baseUrl = 'http://62.72.36.245:3000/api';
 
@@ -32,4 +36,44 @@ class ApiHelper {
   String callCutByMe = '$baseUrl/call-cut-by-me';
   String callCutByReceiver = '$baseUrl/call-cut-by-receiver';
   String statusDetele = '$baseUrl/delete-status-media-by-id';
+  String callHistory = '$baseUrl/call-list';
+
+  Future<Map<String, dynamic>> postMethod(
+      {required String url,
+      Map<String, String>? headers,
+      required Map<String, dynamic> requestBody}) async {
+    try {
+      final body = jsonEncode(requestBody);
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers ??
+            <String, String>{
+              'Content-Type': 'application/json',
+            },
+        body: body,
+      );
+
+      log('POST URL: $url');
+      log('Body: $body');
+
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        log('jsonResponse--->$jsonResponse');
+        return jsonResponse;
+      } else if (response.statusCode == 404) {
+        final jsonResponse = jsonDecode(response.body);
+        log('jsonResponse--->$jsonResponse');
+        return jsonResponse;
+      } else if (response.statusCode == 422) {
+        final jsonResponse = jsonDecode(response.body);
+        log('jsonResponse--->$jsonResponse');
+        return jsonResponse;
+      } else {
+        throw Exception('Failed to perform the POST request');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
 }

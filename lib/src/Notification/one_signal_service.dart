@@ -48,13 +48,14 @@ class OnesignalService {
             isGroupCall:
                 event.notification.additionalData!['is_group'].toString(),
           ));
-          // FlutterRingtonePlayer().playRingtone();
+          FlutterRingtonePlayer().playRingtone();
         }
       } else if (event.notification.additionalData!['call_type'].toString() ==
           'audio_call') {
         print("audio call");
         if (event.notification.additionalData!['missed_call'].toString() ==
             "true") {
+          FlutterRingtonePlayer().stop();
           Get.back();
         } else {
           Get.to(IncomingCallScrenn(
@@ -78,6 +79,7 @@ class OnesignalService {
             isGroupCall:
                 event.notification.additionalData!['is_group'].toString(),
           ));
+          FlutterRingtonePlayer().playRingtone();
         }
       }
     });
@@ -102,6 +104,7 @@ class OnesignalService {
             'audio_call') {
           print("audio call");
           // Navigate to the desired screen based on the payload'
+          FlutterRingtonePlayer().stop();
           Get.off(AudioCallScreen(
             roomID: event.notification.additionalData!['room_id'].toString(),
             conversation_id: event
@@ -136,6 +139,7 @@ class OnesignalService {
           }
         } else if (event.notification.additionalData!['call_type'].toString() ==
             'audio_call') {
+          FlutterRingtonePlayer().stop();
           if (event.notification.additionalData!['is_group'].toString() ==
               "true") {
             Get.back();
@@ -179,6 +183,7 @@ class OnesignalService {
                 'audio_call' &&
             event.notification.additionalData!['missed_call'].toString() ==
                 'false') {
+          FlutterRingtonePlayer().stop();
           Get.to(IncomingCallScrenn(
             roomID: event.notification.additionalData!['room_id'].toString(),
             callerImage: event

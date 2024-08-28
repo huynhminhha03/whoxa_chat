@@ -46,7 +46,6 @@ void main() async {
     await Hive.initFlutter();
   }
   await openHiveBox(userdata);
-
   await openHiveBox(catchData);
   // await openHiveBox(contactBox);
   await openHiveBox(allMsgCache);

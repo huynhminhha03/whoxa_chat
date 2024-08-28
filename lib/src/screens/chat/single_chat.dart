@@ -4230,9 +4230,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                             ? capitalizeFirstLetter(
                                                 data.message!)
                                             : data.messageType == "gif"
-                                                ? "GIF"
+                                                ? "😈 GIF"
                                                 : data.messageType == "contact"
-                                                    ? "Contact"
+                                                    ? "📞 Contact"
                                                     : capitalizeFirstLetter(
                                                         data.message!),
                     maxLines: 2,
@@ -5427,8 +5427,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: MediaQuery.of(context).size.width *
-                          0.4, // Adjust width based on screen size
+                      width: MediaQuery.of(context).size.width * 0.38,
                       child: Text(
                         capitalizeFirstLetter(widget.username!),
                         maxLines: 1,
@@ -5486,14 +5485,16 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           receiverUserName: widget.username!,
                         ));
                   },
-                  child: Image.asset(
-                    "assets/images/call_1.png",
-                    color: chatColor,
-                    height: MediaQuery.of(context).size.height * 0.027,
+                  child: Container(
+                    child: Image.asset(
+                      "assets/images/call_1.png",
+                      color: chatColor,
+                      height: MediaQuery.of(context).size.height * 0.027,
+                    ).paddingAll(6),
                   ),
                 );
         }),
-        const SizedBox(width: 12),
+        const SizedBox(width: 4),
         Obx(() {
           return chatListController.blockModel.value!.isBlock == true
               ? const SizedBox.shrink()
@@ -5513,10 +5514,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           isCaller: true,
                         ));
                   },
-                  child: Image.asset(
-                    "assets/images/video_1.png",
-                    color: chatColor,
-                    height: MediaQuery.of(context).size.height * 0.027,
+                  child: Container(
+                    child: Image.asset(
+                      "assets/images/video_1.png",
+                      color: chatColor,
+                      height: MediaQuery.of(context).size.height * 0.027,
+                    ).paddingAll(6),
                   ),
                 );
         }),

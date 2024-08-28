@@ -3,7 +3,6 @@
 // // ignore_for_file: avoid_print, use_build_context_synchronously
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';  
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
@@ -13,6 +12,7 @@ import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
+import 'package:meyaoo_new/src/screens/call/web_rtc/joiend_users.dart';
 import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 import 'package:peerdart/peerdart.dart';
 import 'package:uuid/uuid.dart';
@@ -56,6 +56,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
   void initState() {
     super.initState();
     _initializeRenderers();
+    roomIdController.joinUsers();
   }
 
   Future<void> _initializeRenderers() async {
@@ -193,18 +194,20 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       remoteRenderers.remove(userId),
                       if (remoteRenderers.isEmpty)
                         {
-                          if (widget.isCaller == true)
-                            {
-                              getx.Get.back(),
-                            }
-                          else
-                            {
-                              getx.Get.to(
-                                TabbarScreen(
-                                  currentTab: 0,
-                                ),
-                              ),
-                            }
+                          // if (widget.isCaller == true)
+                          //   {
+                          //     getx.Get.back(),
+                          //   }
+                          // else
+                          //   {
+                          disposeLocalRender(),
+                          disposeRemoteRender(),
+                          getx.Get.to(
+                            TabbarScreen(
+                              currentTab: 0,
+                            ),
+                          ),
+                          // }
                         }
                     },
                   setState(() {}),
@@ -219,15 +222,15 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
 
     socketIntilized.socket!.on("call_decline", (data) {
       print("call_decline data : $data");
-      getx.Get.back();
+      // getx.Get.back();
+      disposeLocalRender();
+      disposeRemoteRender();
+      getx.Get.to(
+        TabbarScreen(
+          currentTab: 0,
+        ),
+      );
       setState(() {
-        localRenderer.srcObject?.getTracks().forEach((track) {
-          track.stop();
-        });
-        remoteRenderers.forEach((key, renderer) {
-          renderer.dispose();
-        });
-        localRenderer.dispose();
         myPeer!.dispose();
       });
     });
@@ -251,15 +254,17 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     setState(() {
       inCall = false;
     });
-    if (widget.isCaller == true) {
-      getx.Get.back();
-    } else {
-      getx.Get.to(
-        TabbarScreen(
-          currentTab: 0,
-        ),
-      );
-    }
+    // if (widget.isCaller == true) {
+    //   getx.Get.back();
+    // } else {
+    disposeLocalRender();
+    disposeRemoteRender();
+    getx.Get.to(
+      TabbarScreen(
+        currentTab: 0,
+      ),
+    );
+    // }
   }
 
   bool microphone = false;
@@ -312,8 +317,8 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                         : remoteRenderers.length == 4
                             ? forFive()
                             : remoteRenderers.length > 4 &&
-                                    remoteRenderers.length < 12
-                                ? forSixToTwelve()
+                                    remoteRenderers.length < 20
+                                ? forSixToTwenty()
                                 : forTwo(),
             Positioned(
               top: 40,
@@ -333,23 +338,29 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       fontFamily: "Poppins",
                     ),
                   ),
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(100)),
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: appColorBlack.withOpacity(0.07),
+                  GestureDetector(
+                    onTap: () {
+                      joinUsers();
+                    },
+                    child: ClipRRect(
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(100)),
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: appColorBlack.withOpacity(0.07),
+                            ),
+                            color: appColorBlack.withOpacity(0.10),
                           ),
-                          color: appColorBlack.withOpacity(0.10),
+                          child: Image.asset(
+                            "assets/icons/profile-add.png",
+                            height: 16,
+                            width: 16,
+                          ).paddingAll(9),
                         ),
-                        child: Image.asset(
-                          "assets/icons/profile-add.png",
-                          height: 16,
-                          width: 16,
-                        ).paddingAll(9),
                       ),
                     ),
                   )
@@ -417,10 +428,19 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
+  joinUsers() {
+    return showDialog(
+        context: context,
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+        builder: (BuildContext context) {
+          return const JoinedUsers();
+        });
+  }
+
   bool isSwap = false;
   int swapIndex = 0;
 
-  Widget forSixToTwelve() {
+  Widget forSixToTwenty() {
     return Stack(
       children: [
         Column(
@@ -795,33 +815,28 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     );
   }
 
-  // IconButton(
-  //   icon: const Icon(Icons.call_end),
-  //   onPressed: _endCall,
-  // ),
-  // IconButton(
-  //   icon: const Icon(Icons.mic),
-  //   onPressed: () {},
-  // ),
-  // IconButton(
-  //   icon: const Icon(Icons.videocam),
-  //   onPressed: () {},
-  // ),
-
-  @override
-  void dispose() {
+  disposeLocalRender() {
     localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
     localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+    localRenderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
     localRenderer.srcObject = null;
     localRenderer.dispose();
-    // remoteRenderer.dispose();
+  }
 
+  disposeRemoteRender() {
     remoteRenderers.forEach((key, renderer) {
       renderer.srcObject!.getTracks().forEach((track) => track.stop());
       renderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
+      renderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
       renderer.srcObject = null;
       renderer.dispose();
     });
+  }
+
+  @override
+  void dispose() {
+    disposeLocalRender();
+    disposeRemoteRender();
     myPeer!.dispose();
     super.dispose();
   }

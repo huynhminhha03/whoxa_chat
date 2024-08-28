@@ -3,11 +3,11 @@
 import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:meyaoo_new/Models/get_all_audiocall_list_model.dart';
-import 'package:meyaoo_new/Models/get_all_videocall_list_model.dart';
+import 'package:hive/hive.dart';
+import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/call_history_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
-import 'package:meyaoo_new/Models/calllistmodel.dart';
+import 'package:meyaoo_new/src/global/strings.dart';
 
 class call_history extends StatefulWidget {
   const call_history({super.key});
@@ -21,15 +21,13 @@ class _call_historyState extends State<call_history>
   TabController? _tabController;
   int selectedindex = 0;
   CallHistoryController callController = Get.put(CallHistoryController());
+  final RoomIdController roomIdController = Get.find();
 
   @override
   void initState() {
-    // callController.callHistoryApi();
-    // callController.callHistoryApiVideo();
-    // callController.callHistoryApiAudio();
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-
+    roomIdController.callHistory();
     // Add a listener to update the selected index when the tab is changed
     _tabController?.addListener(() {
       setState(() {
@@ -61,805 +59,520 @@ class _call_historyState extends State<call_history>
       body: Stack(
         children: [
           Container(
-              // height: MediaQuery.of(context).size.height * 0.9,
-              width: MediaQuery.of(context).size.width,
-              decoration: const BoxDecoration(color: Colors.white),
-              child: Container(
-                color: Colors.transparent,
-                height: MediaQuery.of(context).size.height,
-                child: Column(
-                  children: <Widget>[
-                    ButtonsTabBar(
-                      controller: _tabController,
-                      borderWidth: 1,
-                      unselectedBorderColor: Colors.transparent,
-                      borderColor: Colors.transparent,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [yellow1Color, yellow2Color],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        ),
+            // height: MediaQuery.of(context).size.height * 0.9,
+            width: MediaQuery.of(context).size.width,
+            decoration: const BoxDecoration(color: Colors.white),
+            child: Container(
+              color: Colors.transparent,
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                children: <Widget>[
+                  ButtonsTabBar(
+                    controller: _tabController,
+                    borderWidth: 1,
+                    unselectedBorderColor: Colors.transparent,
+                    borderColor: Colors.transparent,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [yellow1Color, yellow2Color],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                       ),
-                      unselectedBackgroundColor: Colors.transparent,
-                      unselectedLabelStyle: const TextStyle(
-                        color: appgrey2,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                      labelStyle: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
-                      ),
-                      onTap: (p0) {
-                        setState(() {
-                          selectedindex = p0;
-                        });
-                        print("INDEX:$selectedindex");
-                      },
-                      tabs: [
-                        Tab(
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 25,
-                              ),
-                              Image.asset(
-                                'assets/images/call_1.png',
-                                width: 16,
-                                height: 16,
+                    ),
+                    unselectedBackgroundColor: Colors.transparent,
+                    unselectedLabelStyle: const TextStyle(
+                      color: appgrey2,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    labelStyle: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
+                    onTap: (p0) {
+                      setState(() {
+                        selectedindex = p0;
+                      });
+                      print("INDEX:$selectedindex");
+                    },
+                    tabs: [
+                      Tab(
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 25,
+                            ),
+                            Image.asset(
+                              'assets/images/call_1.png',
+                              width: 16,
+                              height: 16,
+                              color:
+                                  selectedindex == 0 ? Colors.black : appgrey2,
+                            ),
+                            // Adjust the spacing between image and text
+                            Text(
+                              "  All Call         ",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                                 color: selectedindex == 0
                                     ? Colors.black
                                     : appgrey2,
                               ),
-                              // Adjust the spacing between image and text
-                              Text(
-                                "  All Call         ",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: selectedindex == 0
-                                      ? Colors.black
-                                      : appgrey2,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Tab(
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              Image.asset(
-                                'assets/images/call-remove.png',
-                                width: 16,
-                                height: 16,
+                      ),
+                      Tab(
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            Image.asset(
+                              'assets/images/call-remove.png',
+                              width: 16,
+                              height: 16,
+                              color:
+                                  selectedindex == 1 ? Colors.black : appgrey2,
+                            ),
+                            // Adjust the spacing between image and text
+                            Text(
+                              "   Missed Call     ",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
                                 color: selectedindex == 1
                                     ? Colors.black
                                     : appgrey2,
                               ),
-                              // Adjust the spacing between image and text
-                              Text(
-                                "   Missed Call     ",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: selectedindex == 1
-                                      ? Colors.black
-                                      : appgrey2,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
+                      ),
+                    ],
+                  ),
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: <Widget>[
+                        allCalls(),
+                        missedCalls(),
                       ],
                     ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: <Widget>[
-                          //_______________________________________________________________________________________
-                          //_____________________________ ALL CALL LIST____________________________________________
-                          //_______________________________________________________________________________________
-                          //AllCallList(),
-                          callController.callListModel.value!.messagesList ==
-                                  null
-                              ? const SizedBox()
-                              : callController.callListModel.value!
-                                      .messagesList!.isEmpty
-                                  ? Center(
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.2,
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
-                                                "assets/images/no_call_history.png",
-                                                height: 300),
-                                          ),
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.1,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10),
-                                      child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: callController
-                                              .callListModel
-                                              .value!
-                                              .messagesList!
-                                              .length,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
-                                          scrollDirection: Axis.vertical,
-                                          itemBuilder: (context, index) {
-                                            return allwidget(callController
-                                                .callListModel
-                                                .value!
-                                                .messagesList![index]);
-                                          }),
-                                    ),
-                          //______________________________________________________________________________________
-                          //__________________________MISSED CALL LIST TABBAR_____________________________________
-                          //______________________________________________________________________________________
-                          //AllAudioCallList()
-                          callController.audioCallListModel.value!
-                                      .missedCallList ==
-                                  null
-                              ? const SizedBox()
-                              : callController.audioCallListModel.value!
-                                      .missedCallList!.isEmpty
-                                  ? Center(
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.2,
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
-                                            child: Image.asset(
-                                                "assets/images/no_call_history.png",
-                                                height: 300),
-                                          ),
-                                          Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.1,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  : Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10),
-                                      child: ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: callController
-                                              .audioCallListModel
-                                              .value!
-                                              .missedCallList!
-                                              .length,
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
-                                          scrollDirection: Axis.vertical,
-                                          itemBuilder: (context, index) {
-                                            return missedwidget(callController
-                                                .audioCallListModel
-                                                .value!
-                                                .missedCallList![index]);
-                                          }),
-                                    )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              )),
-          // inController.isOnline.value
-          //     ? const SizedBox.shrink()
-          //     : Positioned(
-          //         bottom: 0.5,
-          //         child: Container(
-          //             width: Get.width,
-          //             decoration:
-          //                 const BoxDecoration(color: chatownColor),
-          //             child: Center(
-          //               child: const Text(
-          //                 "No Internet",
-          //                 style: TextStyle(
-          //                     fontSize: 15, color: chatColor),
-          //               ).paddingSymmetric(vertical: 8),
-          //             )),
-          //       ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     ));
   }
 
-//---------------------------------------------------- All Call List ----------------------------------------------------------
-  Widget allwidget(MessagesList allList) {
-    String getContact(mobile) {
-      if (mobile != null) {
-        var name = mobile;
-        bool found = false;
-        for (var i = 0; i < allcontacts.length; i++) {
-          if (allcontacts[i]
-              .phones
-              .map((e) => e.number)
-              .toString()
-              .replaceAll(RegExp(r"\s+\b|\b\s"), "")
-              .contains(mobile)) {
-            name = allcontacts[i].displayName;
-            found = true;
-            break; // Once found, no need to continue searching
-          }
-        }
-        if (!found) {
-          return allList.username!; // Return username if contact not found
-        }
-        return name;
-      } else {
-        return mobile;
-      }
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration:
-                const BoxDecoration(shape: BoxShape.circle, color: appgrey),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: CustomCachedNetworkImage(
-                    imageUrl: allList.profilePic!,
-                    errorWidgeticon: Icon(
-                      allList.groupname == "" ? Icons.person : Icons.groups_2,
-                      size: 30,
-                    ))),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                allList.groupname == ""
-                    ? Text(
-                        capitalizeFirstLetter(
-                            getContact(getMobile(allList.mobileNumber!))),
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black),
-                      )
-                    : Text(
-                        allList.groupname!,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.black),
-                      ),
-                const SizedBox(height: 5),
-                Text(
-                  formatDateTime(DateTime.parse(allList.timestamp!)),
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: appgrey2),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                //____________________ AUDIO CALL STATUS__________________
-                allList.callType == "audio_call" &&
-                        allList.message == "" &&
-                        allList.isComeing == "Outgoing"
-                    ? const Image(
-                        image: AssetImage('assets/images/call-outgoing.png'),
-                        height: 20,
-                      )
-                    : allList.callType == "audio_call" &&
-                            allList.message == "" &&
-                            allList.isComeing == "Incoming"
-                        ? const Image(
-                            image:
-                                AssetImage('assets/images/call-incoming.png'),
-                            height: 20,
-                          )
-                        : allList.callType == "audio_call" &&
-                                allList.message == "missed call"
-                            ? const Image(
-                                image:
-                                    AssetImage('assets/images/NotRecive.png'),
-                                height: 13,
-                              )
-                            //____________________ VIDEO CALL STATUS__________________
-                            : allList.callType == "video_call" &&
-                                    allList.message == "" &&
-                                    allList.isComeing == "Incoming"
-                                ? const Image(
-                                    image:
-                                        AssetImage('assets/images/videoo.png'),
-                                    height: 20,
-                                  )
-                                : allList.callType == "video_call" &&
-                                        allList.message == "" &&
-                                        allList.isComeing == "Outgoing"
-                                    ? const Image(
-                                        image: AssetImage(
-                                            'assets/images/videoo.png'),
-                                        height: 20,
-                                      )
-                                    : allList.callType == "video_call" &&
-                                            allList.message == "missed call"
-                                        ? const Image(
-                                            image: AssetImage(
-                                                'assets/images/videocall_missed.png'),
-                                            height: 20,
-                                          )
-                                        :
-                                        //_____________________GROUP AUDIO CALL STATUS_______________________________
-                                        allList.callType ==
-                                                    "group_audio_call" &&
-                                                allList.message == "" &&
-                                                allList.isComeing == "Outgoing"
-                                            ? const Image(
-                                                image: AssetImage(
-                                                    'assets/images/call-outgoing.png'),
-                                                height: 20,
-                                              )
-                                            : allList.callType ==
-                                                        "group_audio_call" &&
-                                                    allList.message == "" &&
-                                                    allList.isComeing ==
-                                                        "Incoming"
-                                                ? const Image(
-                                                    image: AssetImage(
-                                                        'assets/images/call-incoming.png'),
-                                                    height: 20,
-                                                  )
-                                                : allList.callType ==
-                                                            "group_audio_call" &&
-                                                        allList.message ==
-                                                            "missed call"
-                                                    ? const Image(
-                                                        image: AssetImage(
-                                                            'assets/images/NotRecive.png'),
-                                                        height: 20,
-                                                      )
-                                                    //____________________________GROUP VIDEO CALL STATUS______________________________________
-                                                    : allList.callType ==
-                                                                "group_video_call" &&
-                                                            allList.message ==
-                                                                "" &&
-                                                            allList.isComeing ==
-                                                                "Incoming"
-                                                        ? const Image(
-                                                            image: AssetImage(
-                                                                'assets/images/videoo.png'),
-                                                            height: 20,
-                                                          )
-                                                        : allList.callType ==
-                                                                    "group_video_call" &&
-                                                                allList.message ==
-                                                                    "" &&
-                                                                allList.isComeing ==
-                                                                    "Outgoing"
-                                                            ? const Image(
-                                                                image: AssetImage(
-                                                                    'assets/images/videoo.png'),
-                                                                height: 20,
-                                                              )
-                                                            : allList.callType ==
-                                                                        "group_video_call" &&
-                                                                    allList.message ==
-                                                                        "missed call"
-                                                                ? const Image(
-                                                                    image: AssetImage(
-                                                                        'assets/images/videocall_missed.png'),
-                                                                    height: 20,
-                                                                  )
-                                                                : const SizedBox()
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-//---------------------------------------------------- VIDEO MISSED CALL WIDGET ------------------------------------------------
-  Widget videocallwidget(VideoCallList videoCallList) {
-    String getContact(mobile) {
-      if (mobile != null) {
-        var name = mobile;
-        bool found = false;
-        for (var i = 0; i < allcontacts.length; i++) {
-          if (allcontacts[i]
-              .phones
-              .map((e) => e.number)
-              .toString()
-              .replaceAll(RegExp(r"\s+\b|\b\s"), "")
-              .contains(mobile)) {
-            name = allcontacts[i].displayName;
-            found = true;
-            break; // Once found, no need to continue searching
-          }
-        }
-        if (!found) {
-          return videoCallList
-              .username!; // Return username if contact not found
-        }
-        return name;
-      } else {
-        return mobile;
-      }
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: CustomCachedNetworkImage(
-                    imageUrl: videoCallList.profilePic!,
-                    errorWidgeticon: Icon(
-                      videoCallList.groupname == ""
-                          ? Icons.person
-                          : Icons.groups_2,
-                      size: 30,
-                    ))),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  videoCallList.groupname == ""
-                      ? capitalizeFirstLetter(
-                          getContact(getMobile(videoCallList.mobileNumber!)))
-                      : capitalizeFirstLetter(videoCallList.groupname!),
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
-                ),
-                Text(
-                  formatDateTime(DateTime.parse(videoCallList.timestamp!)),
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: appgrey2),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                videoCallList.callType == "video_call" &&
-                        videoCallList.message == ""
-                    ? const Image(
-                        image: AssetImage('assets/images/videoo.png'),
-                        height: 20,
-                      )
-                    : videoCallList.callType == "group_video_call"
-                        ? const Image(
-                            image: AssetImage('assets/images/videoo.png'),
-                            height: 20,
-                          )
-                        : videoCallList.callType == "group_video_call" &&
-                                videoCallList.message == "missed call"
-                            ? const Image(
-                                image: AssetImage(
-                                    'assets/images/videocall_missed.png'),
-                                height: 20,
-                              )
-                            : videoCallList.callType == "video_call" &&
-                                    videoCallList.message == "missed call"
-                                ? const Image(
-                                    image: AssetImage(
-                                        'assets/images/videocall_missed.png'),
-                                    height: 20,
-                                  )
-                                : videoCallList.callType == "video_call" &&
-                                        videoCallList.message ==
-                                            "missed call" &&
-                                        videoCallList.isComeing == "Outgoing"
-                                    ? const Image(
-                                        image: AssetImage(
-                                            'assets/images/videocall_missed.png'),
-                                        height: 20,
-                                      )
-                                    : const SizedBox()
-                //          Image(
-                //   image: AssetImage('assets/images/videoo.png'),
-                //   height: 15,
-                // )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-//---------------------------------------------------- AUDIO MISSED CALL WIDGET ------------------------------------------------
-  Widget missedwidget(MissedCallList missCallList) {
-    String getContact(mobile) {
-      if (mobile != null) {
-        var name = mobile;
-        bool found = false;
-        for (var i = 0; i < allcontacts.length; i++) {
-          if (allcontacts[i]
-              .phones
-              .map((e) => e.number)
-              .toString()
-              .replaceAll(RegExp(r"\s+\b|\b\s"), "")
-              .contains(mobile)) {
-            name = allcontacts[i].displayName;
-            found = true;
-            break; // Once found, no need to continue searching
-          }
-        }
-        if (!found) {
-          return missCallList.username!; // Return username if contact not found
-        }
-        return name;
-      } else {
-        return mobile;
-      }
-    }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: CustomCachedNetworkImage(
-                    imageUrl: missCallList.profilePic!,
-                    errorWidgeticon: Icon(
-                      missCallList.groupname == ""
-                          ? Icons.person
-                          : Icons.groups_2,
-                      size: 30,
-                    ))),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  capitalizeFirstLetter(
-                      getContact(getMobile(missCallList.mobileNumber!))),
-                  style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black),
-                ),
-                Text(
-                  formatDateTime(DateTime.parse(missCallList.timestamp!)),
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400,
-                      color: appgrey2),
-                ),
-              ],
-            ),
-          ),
-          const Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Image(
-                  image: AssetImage('assets/images/NotRecive.png'),
-                  height: 13,
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-//------------------------------------
-  Widget loaderWidget() {
-    return Stack(
+  allCalls() {
+    return Column(
       children: [
-        Container(
-            // height: MediaQuery.of(context).size.height * 0.9,
-            width: MediaQuery.of(context).size.width,
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    topRight: Radius.circular(30))),
-            child: Container(
-              color: Colors.transparent,
-              height: MediaQuery.of(context).size.height,
-              child: DefaultTabController(
-                length: 3,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: appgrey2),
-                          borderRadius: BorderRadius.circular(10)),
-                      child: ButtonsTabBar(
-                        borderWidth: 1,
-                        unselectedBorderColor: Colors.transparent,
-                        borderColor: Colors.transparent,
-                        backgroundColor: chatownColor,
-                        unselectedBackgroundColor: Colors.transparent,
-                        unselectedLabelStyle: const TextStyle(color: appgrey2),
-                        labelStyle: TextStyle(
-                            color: selectedindex == 0 ? Colors.black : appgrey2,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14),
-                        onTap: (p0) {
-                          setState(() {
-                            selectedindex = p0;
-                          });
-                        },
-                        tabs: [
-                          Tab(
-                            child: Row(
-                              children: [
-                                const SizedBox(
-                                  width: 25,
+        const SizedBox(
+          height: 20,
+        ),
+        Expanded(
+          child: roomIdController.callHistoryData.isEmpty &&
+                  roomIdController.isCallHistoryLoading.value == true
+              ? loader(context)
+              : Obx(
+                  () => ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: roomIdController.callHistoryData.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              CustomCachedNetworkImage(
+                                size: 50,
+                                imageUrl: roomIdController
+                                            .callHistoryData[index]
+                                            .conversation!
+                                            .isGroup ==
+                                        true
+                                    ? roomIdController.callHistoryData[index]
+                                        .conversation!.groupProfileImage!
+                                    : roomIdController.callHistoryData[index]
+                                        .user!.profileImage!,
+                                placeholderColor: chatownColor,
+                                errorWidgeticon: const Icon(
+                                  Icons.groups,
+                                  size: 30,
                                 ),
-                                Image.asset(
-                                  'assets/images/callVector.png',
-                                  width: 16,
-                                  height: 16,
-                                  color: selectedindex == 0
-                                      ? Colors.black
-                                      : appgrey2,
-                                ),
-                                // Adjust the spacing between image and text
-                                Text(
-                                  "  All         ",
-                                  style: TextStyle(
-                                      fontSize: 12,
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    roomIdController.callHistoryData[index]
+                                                .conversation!.isGroup ==
+                                            true
+                                        ? roomIdController
+                                            .callHistoryData[index]
+                                            .conversation!
+                                            .groupName!
+                                        : "${roomIdController.callHistoryData[index].user!.firstName!} ${roomIdController.callHistoryData[index].user!.lastName!}",
+                                    style: const TextStyle(
+                                      fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w500,
-                                      color: selectedindex == 1
-                                          ? appgrey2
-                                          : Colors.black),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            child: Row(
-                              children: [
-                                const SizedBox(
-                                  width: 18,
-                                ),
-                                Image.asset(
-                                  'assets/images/Video 3.png',
-                                  width: 16,
-                                  height: 16,
-                                  color: selectedindex == 1
-                                      ? Colors.black
-                                      : appgrey2,
-                                ),
-                                // Adjust the spacing between image and text
-                                Text(
-                                  "   Video Call   ",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: selectedindex == 1
-                                        ? Colors.black
-                                        : appgrey2,
+                                      fontSize: 15,
+                                      color: Color(0xff0B0B0B),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Tab(
-                            child: Row(
-                              children: [
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                Image.asset(
-                                  'assets/images/Call Missed.png',
-                                  width: 16,
-                                  height: 16,
-                                  color: selectedindex == 2
-                                      ? Colors.black
-                                      : appgrey2,
-                                ),
-                                // Adjust the spacing between image and text
-                                Text(
-                                  "   Missed     ",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                    color: selectedindex == 2
-                                        ? Colors.black
-                                        : appgrey2,
+                                  const SizedBox(
+                                    height: 2,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                  Row(
+                                    children: [
+                                      Image.asset(
+                                        roomIdController.callHistoryData[index]
+                                                    .callType ==
+                                                "video_call"
+                                            ? roomIdController
+                                                        .callHistoryData[index]
+                                                        .missedCall ==
+                                                    "1"
+                                                ? "assets/icons/missed_video_call.png"
+                                                : roomIdController
+                                                            .callHistoryData[
+                                                                index]
+                                                            .callDecline ==
+                                                        "1"
+                                                    ? "assets/icons/missed_video_call.png"
+                                                    : roomIdController
+                                                                .callHistoryData[
+                                                                    index]
+                                                                .userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "assets/icons/outgoing_video_call.png"
+                                                        : "assets/icons/incoming_video_call.png"
+                                            : roomIdController
+                                                        .callHistoryData[index]
+                                                        .missedCall ==
+                                                    "1"
+                                                ? "assets/icons/missed_audio_call.png"
+                                                : roomIdController
+                                                            .callHistoryData[
+                                                                index]
+                                                            .callDecline ==
+                                                        "1"
+                                                    ? "assets/icons/missed_audio_call.png"
+                                                    : roomIdController
+                                                                .callHistoryData[
+                                                                    index]
+                                                                .userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "assets/icons/outgoing_audio_call.png"
+                                                        : "assets/icons/incoming_audio_call.png",
+                                        scale: roomIdController
+                                                        .callHistoryData[index]
+                                                        .callType ==
+                                                    "video_call" &&
+                                                roomIdController
+                                                        .callHistoryData[index]
+                                                        .missedCall ==
+                                                    "1"
+                                            ? 2
+                                            : 3,
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      Text(
+                                        roomIdController.callHistoryData[index]
+                                                    .callType ==
+                                                "video_call"
+                                            ? roomIdController
+                                                        .callHistoryData[index]
+                                                        .missedCall ==
+                                                    "1"
+                                                ? "Missed Video Call"
+                                                : roomIdController
+                                                            .callHistoryData[
+                                                                index]
+                                                            .callDecline ==
+                                                        "1"
+                                                    ? "Video Call Declined"
+                                                    : roomIdController
+                                                                .callHistoryData[
+                                                                    index]
+                                                                .userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "Outgoing Video Call"
+                                                        : "Incoming Video Call"
+                                            : roomIdController
+                                                        .callHistoryData[index]
+                                                        .missedCall ==
+                                                    "1"
+                                                ? "Missed Audio Call"
+                                                : roomIdController
+                                                            .callHistoryData[
+                                                                index]
+                                                            .callDecline ==
+                                                        "1"
+                                                    ? "Audio Call Declined"
+                                                    : roomIdController
+                                                                .callHistoryData[
+                                                                    index]
+                                                                .userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "Outgoing Audio Call"
+                                                        : "Incoming Audio Call",
+                                        style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          color: Color(0xffA4A4A4),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const Spacer(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    formatDateCallHistorry(convertToLocalDate(
+                                        roomIdController
+                                            .callHistoryData[index].updatedAt)),
+                                    style: const TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 9,
+                                      color: Color(0xff606060),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 8,
+                                  ),
+                                  Text(
+                                    convertUTCTimeTo12HourFormat(
+                                      roomIdController
+                                          .callHistoryData[index].updatedAt!,
+                                    ),
+                                    style: const TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 8,
+                                      color: Color(0xff606060),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ).paddingSymmetric(horizontal: 20, vertical: 7),
+                          index == roomIdController.callHistoryData.length - 1
+                              ? const SizedBox(
+                                  height: 20,
+                                )
+                              : Divider(
+                                  color: Colors.grey.shade300,
+                                )
                         ],
-                      ),
-                    ),
-                    const SizedBox(height: 330),
-                    loader(context)
-                  ],
+                      );
+                    },
+                  ),
                 ),
-              ),
-            )),
-        // inController.isOnline.value
-        //     ? const SizedBox.shrink()
-        //     : Positioned(
-        //         bottom: 0.5,
-        //         child: Container(
-        //             width: Get.width,
-        //             decoration: const BoxDecoration(color: chatownColor),
-        //             child: Center(
-        //               child: const Text(
-        //                 "No Internet",
-        //                 style: TextStyle(fontSize: 15, color: chatColor),
-        //               ).paddingSymmetric(vertical: 8),
-        //             )),
-        //       ),
+        ),
+      ],
+    );
+  }
+
+  missedCalls() {
+    return Column(
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        Expanded(
+          child: roomIdController.callHistoryData.isEmpty &&
+                  roomIdController.isCallHistoryLoading.value == true
+              ? loader(context)
+              : Obx(
+                  () => ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: roomIdController.callHistoryData.length,
+                    itemBuilder: (context, index) {
+                      return roomIdController
+                                  .callHistoryData[index].missedCall ==
+                              "0"
+                          ? const SizedBox.shrink()
+                          : Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    CustomCachedNetworkImage(
+                                      size: 50,
+                                      imageUrl: roomIdController
+                                                  .callHistoryData[index]
+                                                  .conversation!
+                                                  .isGroup ==
+                                              true
+                                          ? roomIdController
+                                              .callHistoryData[index]
+                                              .conversation!
+                                              .groupProfileImage!
+                                          : roomIdController
+                                              .callHistoryData[index]
+                                              .user!
+                                              .profileImage!,
+                                      placeholderColor: chatownColor,
+                                      errorWidgeticon: const Icon(
+                                        Icons.groups,
+                                        size: 30,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          roomIdController
+                                                      .callHistoryData[index]
+                                                      .conversation!
+                                                      .isGroup ==
+                                                  true
+                                              ? roomIdController
+                                                  .callHistoryData[index]
+                                                  .conversation!
+                                                  .groupName!
+                                              : "${roomIdController.callHistoryData[index].user!.firstName!} ${roomIdController.callHistoryData[index].user!.lastName!}",
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15,
+                                            color: Color(0xff0B0B0B),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 2,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              roomIdController
+                                                          .callHistoryData[
+                                                              index]
+                                                          .callType ==
+                                                      "video_call"
+                                                  ? "assets/icons/missed_video_call.png"
+                                                  : "assets/icons/missed_audio_call.png",
+                                              scale: roomIdController
+                                                              .callHistoryData[
+                                                                  index]
+                                                              .callType ==
+                                                          "video_call" &&
+                                                      roomIdController
+                                                              .callHistoryData[
+                                                                  index]
+                                                              .missedCall ==
+                                                          "1"
+                                                  ? 2
+                                                  : 3,
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              roomIdController
+                                                          .callHistoryData[
+                                                              index]
+                                                          .callType ==
+                                                      "video_call"
+                                                  ? "Missed Video Call"
+                                                  : "Missed Audio Call",
+                                              style: const TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 12,
+                                                color: Color(0xffA4A4A4),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const Spacer(),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          formatDateCallHistorry(
+                                              convertToLocalDate(
+                                                  roomIdController
+                                                      .callHistoryData[index]
+                                                      .updatedAt)),
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 9,
+                                            color: Color(0xff606060),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 8,
+                                        ),
+                                        Text(
+                                          convertUTCTimeTo12HourFormat(
+                                            roomIdController
+                                                .callHistoryData[index]
+                                                .updatedAt!,
+                                          ),
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 8,
+                                            color: Color(0xff606060),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ).paddingSymmetric(horizontal: 20, vertical: 7),
+                                index ==
+                                        roomIdController
+                                                .callHistoryData.length -
+                                            1
+                                    ? const SizedBox(
+                                        height: 20,
+                                      )
+                                    : Divider(
+                                        color: Colors.grey.shade300,
+                                      )
+                              ],
+                            );
+                    },
+                  ),
+                ),
+        ),
       ],
     );
   }
