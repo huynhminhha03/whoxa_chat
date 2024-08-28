@@ -206,18 +206,25 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                       remoteRenderers.remove(userId),
                       if (remoteRenderers.isEmpty)
                         {
-                          if (widget.isCaller == true)
-                            {
-                              getx.Get.back(),
-                            }
-                          else
-                            {
-                              getx.Get.to(
-                                TabbarScreen(
-                                  currentTab: 0,
-                                ),
-                              ),
-                            }
+                          disposeLocalRender(),
+                          disposeRemoteRender(),
+                          getx.Get.to(
+                            TabbarScreen(
+                              currentTab: 0,
+                            ),
+                          ),
+                          // if (widget.isCaller == true)
+                          //   {
+                          //     getx.Get.back(),
+                          //   }
+                          // else
+                          //   {
+                          //     getx.Get.to(
+                          //       TabbarScreen(
+                          //         currentTab: 0,
+                          //       ),
+                          //     ),
+                          //   }
                         }
                     },
                   setState(() {}),
@@ -232,15 +239,15 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
 
     socketIntilized.socket!.on("call_decline", (data) {
       print("call_decline data : $data");
-      getx.Get.back();
+      // getx.Get.back();
+      disposeLocalRender();
+      disposeRemoteRender();
+      getx.Get.to(
+        TabbarScreen(
+          currentTab: 0,
+        ),
+      );
       setState(() {
-        localRenderer.srcObject?.getTracks().forEach((track) {
-          track.stop();
-        });
-        remoteRenderers.forEach((key, renderer) {
-          renderer.dispose();
-        });
-        localRenderer.dispose();
         myPeer!.dispose();
       });
     });
@@ -395,24 +402,20 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     socketIntilized.socket!
         .emit("leave-call", {"room_id": widget.roomID, "user_id": myPeer!.id});
 
-    localRenderer.dispose();
-    // remoteRenderer.dispose();
-    remoteRenderers.forEach((key, renderer) {
-      renderer.dispose();
-    });
-
     setState(() {
       inCall = false;
     });
-    if (widget.isCaller == true) {
-      getx.Get.back();
-    } else {
-      getx.Get.to(
-        TabbarScreen(
-          currentTab: 0,
-        ),
-      );
-    }
+    // if (widget.isCaller == true) {
+    //   getx.Get.back();
+    // } else {
+    disposeLocalRender();
+    disposeRemoteRender();
+    getx.Get.to(
+      TabbarScreen(
+        currentTab: 0,
+      ),
+    );
+    // }
   }
 
   bool microphone = false;
@@ -692,15 +695,15 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
   //   onPressed: () {},
   // ),
 
-  @override
-  void dispose() {
+  disposeLocalRender() {
     localRenderer.srcObject!.getTracks().forEach((track) => track.stop());
     localRenderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
     localRenderer.srcObject!.getVideoTracks().forEach((track) => track.stop());
     localRenderer.srcObject = null;
     localRenderer.dispose();
-    // remoteRenderer.dispose();
+  }
 
+  disposeRemoteRender() {
     remoteRenderers.forEach((key, renderer) {
       renderer.srcObject!.getTracks().forEach((track) => track.stop());
       renderer.srcObject!.getAudioTracks().forEach((track) => track.stop());
@@ -708,6 +711,12 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
       renderer.srcObject = null;
       renderer.dispose();
     });
+  }
+
+  @override
+  void dispose() {
+    disposeLocalRender();
+    disposeRemoteRender();
     myPeer!.dispose();
     _timer?.cancel();
     super.dispose();

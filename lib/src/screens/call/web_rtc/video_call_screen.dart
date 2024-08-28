@@ -245,12 +245,6 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     socketIntilized.socket!
         .emit("leave-call", {"room_id": widget.roomID, "user_id": myPeer!.id});
 
-    localRenderer.dispose();
-    // remoteRenderer.dispose();
-    remoteRenderers.forEach((key, renderer) {
-      renderer.dispose();
-    });
-
     setState(() {
       inCall = false;
     });

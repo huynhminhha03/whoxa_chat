@@ -62,7 +62,7 @@ class _ProfileState extends State<Profile> {
           ),
           Column(
             children: [
-              const SizedBox(height: 80),
+              SizedBox(height: Get.height * 0.13),
               profileWidget(),
               Expanded(child: SingleChildScrollView(child: aboutWidget())),
               const SizedBox(height: 10),
