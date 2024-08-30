@@ -5,12 +5,14 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/common_widget.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Group/add_gp_member.dart';
 import 'package:meyaoo_new/src/screens/chat/ArchivedChat.dart';
 import 'package:meyaoo_new/src/screens/chat/group_chat_temp.dart';
@@ -156,7 +158,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 150),
+                SizedBox(height: Get.height * 0.04),
                 Image.asset(
                   "assets/images/no_contact_found.png",
                   height: 250,
@@ -167,6 +169,12 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   }
 
   Widget chatsWidget(ChatList data, index) {
+    // Split the lastMessage string into a list
+    final messageList = data.lastMessage!.split(',');
+
+    // Check if the userId is in the messageList
+    final isUserInList = messageList.contains(Hive.box(userdata).get(userId));
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -451,8 +459,83 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                               style: TextStyle(color: Colors.grey, fontSize: 13))
                                                                         ],
                                                                       )
-                                                                    : const SizedBox
-                                                                        .shrink()
+                                                                    : data.lastMessageType ==
+                                                                            "video_call"
+                                                                        ? Row(
+                                                                            children: [
+                                                                              Image.asset(
+                                                                                data.lastMessage == "1,0,0"
+                                                                                    ? "assets/icons/missed_video_call.png"
+                                                                                    : data.lastMessage == "0,0,2"
+                                                                                        ? "assets/icons/missed_video_call.png"
+                                                                                        : data.userId == Hive.box(userdata).get(userId)
+                                                                                            ? isUserInList
+                                                                                                ? ""
+                                                                                                : "assets/icons/outgoing_video_call.png"
+                                                                                            : "assets/icons/incoming_video_call.png",
+                                                                                height: 14,
+                                                                              ),
+                                                                              const SizedBox(
+                                                                                width: 4,
+                                                                              ),
+                                                                              Text(
+                                                                                data.lastMessage == "1,0,0"
+                                                                                    ? "Missed Video Call"
+                                                                                    : data.lastMessage == "0,0,2"
+                                                                                        ? "Video Call Declined"
+                                                                                        : data.userId == Hive.box(userdata).get(userId)
+                                                                                            ? isUserInList
+                                                                                                ? ""
+                                                                                                : "Outgoing Video Call"
+                                                                                            : "Incoming Video Call",
+                                                                                style: const TextStyle(
+                                                                                  fontFamily: 'Poppins',
+                                                                                  fontWeight: FontWeight.w400,
+                                                                                  fontSize: 12,
+                                                                                  color: Color(0xffA4A4A4),
+                                                                                ),
+                                                                              )
+                                                                            ],
+                                                                          )
+                                                                        : data.lastMessageType ==
+                                                                                "audio_call"
+                                                                            ? Row(
+                                                                                children: [
+                                                                                  Image.asset(
+                                                                                    data.lastMessage == "1,0,0"
+                                                                                        ? "assets/icons/missed_audio_call.png"
+                                                                                        : data.lastMessage == "0,0,2"
+                                                                                            ? "assets/icons/missed_video_call.png"
+                                                                                            : data.userId == Hive.box(userdata).get(userId)
+                                                                                                ? isUserInList
+                                                                                                    ? ""
+                                                                                                    : "assets/icons/outgoing_audio_call.png"
+                                                                                                : "assets/icons/incoming_audio_call.png",
+                                                                                    height: 14,
+                                                                                  ),
+                                                                                  const SizedBox(
+                                                                                    width: 4,
+                                                                                  ),
+                                                                                  Text(
+                                                                                    data.lastMessage == "1,0,0"
+                                                                                        ? "Missed Audio Call"
+                                                                                        : data.lastMessage == "0,0,2"
+                                                                                            ? "Audio Call Declined"
+                                                                                            : data.userId == Hive.box(userdata).get(userId)
+                                                                                                ? isUserInList
+                                                                                                    ? ""
+                                                                                                    : "Outgoing Audio Call"
+                                                                                                : "Incoming Audio Call",
+                                                                                    style: const TextStyle(
+                                                                                      fontFamily: 'Poppins',
+                                                                                      fontWeight: FontWeight.w400,
+                                                                                      fontSize: 12,
+                                                                                      color: Color(0xffA4A4A4),
+                                                                                    ),
+                                                                                  )
+                                                                                ],
+                                                                              )
+                                                                            : const SizedBox.shrink()
                           ],
                         ),
                       ),

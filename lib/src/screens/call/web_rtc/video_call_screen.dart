@@ -202,7 +202,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                           //   {
                           disposeLocalRender(),
                           disposeRemoteRender(),
-                          getx.Get.to(
+                          getx.Get.offAll(
                             TabbarScreen(
                               currentTab: 0,
                             ),
@@ -223,13 +223,13 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     socketIntilized.socket!.on("call_decline", (data) {
       print("call_decline data : $data");
       // getx.Get.back();
-      disposeLocalRender();
-      disposeRemoteRender();
-      getx.Get.to(
+      getx.Get.offAll(
         TabbarScreen(
           currentTab: 0,
         ),
       );
+      disposeLocalRender();
+      disposeRemoteRender();
       setState(() {
         myPeer!.dispose();
       });
@@ -253,7 +253,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
     // } else {
     disposeLocalRender();
     disposeRemoteRender();
-    getx.Get.to(
+    getx.Get.offAll(
       TabbarScreen(
         currentTab: 0,
       ),

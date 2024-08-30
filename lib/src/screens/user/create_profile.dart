@@ -20,6 +20,7 @@ import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:meyaoo_new/src/global/global.dart';
+import 'package:path_provider/path_provider.dart';
 
 final ApiHelper apiHelper = ApiHelper();
 
@@ -55,10 +56,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
 
   @override
   void initState() {
-    log("TOKEN: ${Hive.box(userdata).get(authToken)}");
-    _getToken();
-    CheckUserConnection();
-    print("NATIONALITY: ${nationController.text}");
+    openHive();
+
     super.initState();
   }
 
@@ -368,8 +367,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(
-                        left: 25, right: 25, bottom: 20, top: 80),
+                    padding: EdgeInsets.only(
+                        left: 25,
+                        right: 25,
+                        bottom: 20,
+                        top: Get.height * 0.13),
                     child: Column(
                       children: [
                         const SizedBox(height: 10),
@@ -827,32 +829,36 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
           child: ClipRRect(
               borderRadius: BorderRadius.circular(110),
               child: image == null
-                  ? userProfileModel.resData!.profileImage != null
-                      ? CachedNetworkImage(
-                          imageUrl: userProfileModel.resData!.profileImage!,
-                          imageBuilder: (context, imageProvider) => Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: imageProvider,
-                                fit: BoxFit.cover,
+                  ? isLoading
+                      ? CircularProgressIndicator(color: yellow1Color)
+                      : userProfileModel.resData!.profileImage != null
+                          ? CachedNetworkImage(
+                              imageUrl: userProfileModel.resData!.profileImage!,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.person, color: chatColor),
-                        )
-                      : Container(
-                          height: 30,
-                          width: 30,
-                          decoration: const BoxDecoration(
-                              color: Color(0xffE7E8EC), shape: BoxShape.circle),
-                          child: const Icon(
-                            Icons.person,
-                            size: 15,
-                            color: Colors.black,
-                          ),
-                        )
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.person, color: chatColor),
+                            )
+                          : Container(
+                              height: 30,
+                              width: 30,
+                              decoration: const BoxDecoration(
+                                  color: Color(0xffE7E8EC),
+                                  shape: BoxShape.circle),
+                              child: const Icon(
+                                Icons.person,
+                                size: 15,
+                                color: Colors.black,
+                              ),
+                            )
                   : Image.file(image!, fit: BoxFit.cover)),
         ),
       ),
@@ -1248,5 +1254,41 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         print('No image selected.');
       }
     });
+  }
+
+  Future<void> openHive() async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    Hive.init(directory.path);
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      await Hive.initFlutter(appName);
+    } else {
+      await Hive.initFlutter();
+    }
+    await openHiveBox(userdata);
+    await _getToken();
+    await CheckUserConnection();
+    print("NATIONALITY: ${nationController.text}");
+  }
+
+  Future<void> openHiveBox(String boxName) async {
+    final box = await Hive.openBox(boxName).onError((error, stackTrace) async {
+      final Directory dir = await getApplicationDocumentsDirectory();
+      final String dirPath = dir.path;
+
+      File dbFile = File('$dirPath/$boxName.hive');
+      File lockFile = File('$dirPath/$boxName.lock');
+      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+        dbFile = File('$dirPath/$appName/$boxName.hive');
+        lockFile = File('$dirPath/$appName/$boxName.lock');
+      }
+      await dbFile.delete();
+      await lockFile.delete();
+      await Hive.openBox(boxName);
+      throw 'Failed to open $boxName Box\nError: $error';
+    });
+    // clear box if it grows large
+    if (box.length > 500) {
+      box.clear();
+    }
   }
 }

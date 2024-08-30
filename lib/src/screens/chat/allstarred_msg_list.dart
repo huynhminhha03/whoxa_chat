@@ -193,9 +193,13 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                               singleChatContorller
                                   .removeStarApiMultiple(starId);
                               // Iterate over starId and remove corresponding items from allStarred
-                              allStaredMsgController.allStarred.removeWhere(
-                                  (allChat) =>
-                                      starId.contains(allChat.messageId));
+                              for (var id in starId) {
+                                allStaredMsgController.allStarred.removeWhere(
+                                    (item) =>
+                                        item.messageId.toString() ==
+                                        id.toString());
+                              }
+                              allStaredMsgController.allStarred.refresh();
 
                               isSelectedmessage = "0";
                               starId = [];

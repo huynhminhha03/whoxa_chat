@@ -208,7 +208,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                         {
                           disposeLocalRender(),
                           disposeRemoteRender(),
-                          getx.Get.to(
+                          getx.Get.offAll(
                             TabbarScreen(
                               currentTab: 0,
                             ),
@@ -240,13 +240,13 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     socketIntilized.socket!.on("call_decline", (data) {
       print("call_decline data : $data");
       // getx.Get.back();
-      disposeLocalRender();
-      disposeRemoteRender();
-      getx.Get.to(
+      getx.Get.offAll(
         TabbarScreen(
           currentTab: 0,
         ),
       );
+      disposeLocalRender();
+      disposeRemoteRender();
       setState(() {
         myPeer!.dispose();
       });
@@ -410,7 +410,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     // } else {
     disposeLocalRender();
     disposeRemoteRender();
-    getx.Get.to(
+    getx.Get.offAll(
       TabbarScreen(
         currentTab: 0,
       ),

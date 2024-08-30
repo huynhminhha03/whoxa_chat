@@ -733,9 +733,287 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         return getMemeberAdded(data);
       case 'member_removed':
         return getMemeberRemoved(data);
+      case 'video_call':
+        return data.replyId == 0
+            ? getVideoCallWidget(index, data)
+            : getReplyMessage(index, data);
+      case 'audio_call':
+        return data.replyId == 0
+            ? getAudioCallWidget(index, data)
+            : getReplyMessage(index, data);
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  Widget getVideoCallWidget(index, MessageList data) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
+      child: Stack(
+        children: [
+          Container(
+            color: highlightedIndex == index &&
+                    (isMsgHighLight == false
+                        ? widget.isMsgHighLight!
+                        : isMsgHighLight)
+                ? chatStrokeColor // for when reply msg scoll then
+                : Colors.transparent,
+            child: Align(
+                alignment: data.myMessage == false
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                child: Column(
+                  crossAxisAlignment: data.myMessage == false
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
+                  children: [
+                    data.myMessage == false
+                        ? richText(
+                            imageFile: data.senderData!.profileImage!,
+                            fName: data.senderData!.firstName!,
+                            lName: data.senderData!.lastName!)
+                        : const SizedBox.shrink(),
+                    data.myMessage == false
+                        ? const SizedBox(height: 5)
+                        : const SizedBox.shrink(),
+                    Container(
+                      height: 40,
+                      padding: const EdgeInsets.only(
+                          left: 3, right: 3, top: 0, bottom: 0),
+                      margin: const EdgeInsets.only(bottom: 5),
+                      decoration: BoxDecoration(
+                          borderRadius: data.myMessage == false
+                              ? const BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))
+                              : const BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  topLeft: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10)),
+                          color: data.myMessage == false
+                              ? grey1Color
+                              : yellow1Color),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: Get.width * 0.50,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topRight: const Radius.circular(8.0),
+                                  bottomRight: data.myMessage == false
+                                      ? const Radius.circular(8)
+                                      : const Radius.circular(0.0),
+                                  topLeft: const Radius.circular(8.0),
+                                  bottomLeft: data.myMessage == false
+                                      ? const Radius.circular(0)
+                                      : const Radius.circular(8),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        data.messageType == "video_call"
+                                            ? data.message == "1,0,0"
+                                                ? "assets/icons/missed_video_call.png"
+                                                : data.message == "0,0,2"
+                                                    ? "assets/icons/missed_video_call.png"
+                                                    : data.senderData!.userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "assets/icons/outgoing_video_call.png"
+                                                        : "assets/icons/incoming_video_call.png"
+                                            : "",
+                                        height: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      Text(
+                                        data.messageType == "video_call"
+                                            ? data.message == "1,0,0"
+                                                ? "Missed Video Call"
+                                                : data.message == "0,0,2"
+                                                    ? "Video Call Declined"
+                                                    : data.senderData!.userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "Outgoing Video Call"
+                                                        : "Incoming Video Call"
+                                            : "",
+                                        style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          color: Color(0xffA4A4A4),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).paddingOnly(top: 3, bottom: 3),
+                    ),
+                    data.myMessage == false
+                        ? SizedBox(
+                            child: timestpa(data.messageRead.toString(),
+                                data.createdAt!, data.isStarMessage!),
+                          )
+                        : SizedBox(
+                            child: timestpa(data.messageRead.toString(),
+                                data.createdAt!, data.isStarMessage!),
+                          )
+                  ],
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget getAudioCallWidget(index, MessageList data) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
+      child: Stack(
+        children: [
+          Container(
+            color: highlightedIndex == index &&
+                    (isMsgHighLight == false
+                        ? widget.isMsgHighLight!
+                        : isMsgHighLight)
+                ? chatStrokeColor // for when reply msg scoll then
+                : Colors.transparent,
+            child: Align(
+                alignment: data.myMessage == false
+                    ? Alignment.centerLeft
+                    : Alignment.centerRight,
+                child: Column(
+                  crossAxisAlignment: data.myMessage == false
+                      ? CrossAxisAlignment.start
+                      : CrossAxisAlignment.end,
+                  children: [
+                    data.myMessage == false
+                        ? richText(
+                            imageFile: data.senderData!.profileImage!,
+                            fName: data.senderData!.firstName!,
+                            lName: data.senderData!.lastName!)
+                        : const SizedBox.shrink(),
+                    data.myMessage == false
+                        ? const SizedBox(height: 5)
+                        : const SizedBox.shrink(),
+                    Container(
+                      height: 40,
+                      padding: const EdgeInsets.only(
+                          left: 3, right: 3, top: 0, bottom: 0),
+                      margin: const EdgeInsets.only(bottom: 5),
+                      decoration: BoxDecoration(
+                          borderRadius: data.myMessage == false
+                              ? const BorderRadius.only(
+                                  topLeft: Radius.circular(10),
+                                  topRight: Radius.circular(10),
+                                  bottomRight: Radius.circular(10))
+                              : const BorderRadius.only(
+                                  topRight: Radius.circular(10),
+                                  topLeft: Radius.circular(10),
+                                  bottomLeft: Radius.circular(10)),
+                          color: data.myMessage == false
+                              ? grey1Color
+                              : yellow1Color),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: Get.width * 0.50,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.only(
+                                  topRight: const Radius.circular(8.0),
+                                  bottomRight: data.myMessage == false
+                                      ? const Radius.circular(8)
+                                      : const Radius.circular(0.0),
+                                  topLeft: const Radius.circular(8.0),
+                                  bottomLeft: data.myMessage == false
+                                      ? const Radius.circular(0)
+                                      : const Radius.circular(8),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    children: [
+                                      Image.asset(
+                                        data.messageType == "audio_call"
+                                            ? data.message == "1,0,0"
+                                                ? "assets/icons/missed_audio_call.png"
+                                                : data.message == "0,0,2"
+                                                    ? "assets/icons/missed_audio_call.png"
+                                                    : data.senderData!.userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "assets/icons/outgoing_audio_call.png"
+                                                        : "assets/icons/incoming_audio_call.png"
+                                            : "",
+                                        height: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 4,
+                                      ),
+                                      Text(
+                                        data.messageType == "audio_call"
+                                            ? data.message == "1,0,0"
+                                                ? "Missed Audio Call"
+                                                : data.message == "0,0,2"
+                                                    ? "Audio Call Declined"
+                                                    : data.senderData!.userId ==
+                                                            Hive.box(userdata)
+                                                                .get(userId)
+                                                        ? "Outgoing Audio Call"
+                                                        : "Incoming Audio Call"
+                                            : "",
+                                        style: const TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12,
+                                          color: Color(0xffA4A4A4),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ).paddingOnly(top: 3, bottom: 3),
+                    ),
+                    data.myMessage == false
+                        ? SizedBox(
+                            child: timestpa(data.messageRead.toString(),
+                                data.createdAt!, data.isStarMessage!),
+                          )
+                        : SizedBox(
+                            child: timestpa(data.messageRead.toString(),
+                                data.createdAt!, data.isStarMessage!),
+                          )
+                  ],
+                )),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget getMemeberAdded(MessageList data) {
@@ -5972,6 +6250,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 chatContorller.isSendMsg.value = true;
                 chatContorller.deleteChatApi(
                     chatID, false, widget.mobileNum.toString());
+
+                for (var id in chatID) {
+                  chatContorller.userdetailschattModel.value!.messageList!
+                      .removeWhere((element) =>
+                          element.messageId.toString() == id.toString());
+                }
+                chatContorller.userdetailschattModel.refresh();
 
                 setState(() {
                   isSelectedmessage = "0";

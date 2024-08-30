@@ -13,9 +13,6 @@ String serverError =
 
 //Hive Box
 String userdata = 'userdata';
-String catchData = 'cache';
-String allMsgCache = 'allMsgCache';
-String contactBox = "contactBox";
 
 // Hive User String
 const String nameBox = "nameBox";

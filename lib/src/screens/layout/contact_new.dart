@@ -37,6 +37,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   @override
   void initState() {
     apis();
+    log(Hive.box(userdata).get(userMobile), name: "USER-MOBILE");
     super.initState();
   }
 

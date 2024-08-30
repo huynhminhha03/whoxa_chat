@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/VerifyotpModel.dart';
 import 'package:meyaoo_new/Models/firebase_otp_model.dart';
@@ -148,26 +149,6 @@ class _otpState extends State<otp> {
             ),
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              onPressed: () {},
-              icon: Container(
-                height: 60,
-                width: 60,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey.shade300)),
-                child: const Icon(
-                  Icons.more_horiz,
-                  color: Colors.black,
-                  size: 15,
-                ),
-              ),
-            ),
-          ),
-        ],
       ),
       // bottomNavigationBar: BottomAppBar(
       //   color: Colors.white,
@@ -268,7 +249,7 @@ class _otpState extends State<otp> {
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Poppins'),
                       ),
-                    ),
+                    ).paddingOnly(left: 10),
                     const SizedBox(
                       height: 5,
                     ),
@@ -282,7 +263,7 @@ class _otpState extends State<otp> {
                             fontWeight: FontWeight.w700,
                             fontFamily: "Poppins"),
                       ),
-                    ),
+                    ).paddingOnly(left: 10),
                     const SizedBox(height: 20),
                     OtpTextField(
                       contentPadding: const EdgeInsets.only(bottom: 2),
@@ -333,7 +314,7 @@ class _otpState extends State<otp> {
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Poppins"),
                           )),
-                    ),
+                    ).paddingOnly(right: 10),
                     const SizedBox(
                       height: 20,
                     ),
@@ -400,7 +381,8 @@ class _otpState extends State<otp> {
       request.fields['phone_number'] = widget.phoneController;
       request.fields['otp'] = _code;
       request.fields['device_token'] = _fcmtoken;
-      request.fields['one_signal_player_id'] = OneSignal.User.pushSubscription.id!;
+      request.fields['one_signal_player_id'] =
+          OneSignal.User.pushSubscription.id!;
 
       var response = await request.send();
       print(response.statusCode);

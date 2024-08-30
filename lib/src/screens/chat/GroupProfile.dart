@@ -119,7 +119,7 @@ class _GroupProfileState extends State<GroupProfile> {
                     ),
                     Column(
                       children: [
-                        const SizedBox(height: 100),
+                        SizedBox(height: Get.height * 0.13),
                         profilePic(chatProfileController
                             .profileModel.value!.conversationDetails!),
                         const SizedBox(height: 10),

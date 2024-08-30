@@ -203,7 +203,10 @@ class _ProfileState extends State<Profile> {
               // internetController.isOnline.value
               //     ?
               Get.to(AllStarredMsgList(index: 0),
-                  transition: Transition.rightToLeft);
+                      transition: Transition.rightToLeft)!
+                  .then((_) {
+                allStaredMsgController.allStarred.refresh();
+              });
               // : Fluttertoast.showToast(
               //     msg: "Check your connectivity",
               //     gravity: ToastGravity.BOTTOM);
@@ -350,9 +353,16 @@ class _ProfileState extends State<Profile> {
           const SizedBox(height: 10),
           //________________________________ LOGOUT ___________________________________________________
           InkWell(
-            onTap: () {
+            onTap: () async {
               //when app logout then user offline
               //store all uerData clear
+              var box = Hive.box(userdata);
+
+              // Delete specific keys
+              await box.delete(userId);
+              await box.delete(authToken);
+              await box.delete(firstName);
+              await box.delete(lastName);
               Hive.box(userdata).clear();
               // then navigate to login page
               Navigator.pushAndRemoveUntil(

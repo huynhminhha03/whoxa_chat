@@ -108,19 +108,27 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
 
   Widget _handleCurrentScreen() {
     var box = Hive.box(userdata);
+    // log(box.get(userId), name: "#####DATA### USERID");
+    // log(box.get(authToken), name: "#####DATA### TOKEN");
+    // log(box.get(firstName), name: "#####DATA### FIRST");
+    // log(box.get(lastName), name: "#####DATA### LAST");
     if (box.get(userId) != null &&
         box.get(authToken) != null &&
         box.get(lastName) != null &&
         box.get(lastName)!.isNotEmpty &&
         box.get(firstName) != null &&
         box.get(firstName)!.isNotEmpty) {
+      print("☺☺☺☺GO TO HOME PAGE☺☺☺☺");
       return TabbarScreen();
     } else if (box.get(userId) == null &&
         box.get(authToken) == null &&
         box.get(lastName) == null &&
         box.get(firstName) == null) {
+      print("☺☺☺☺GO TO WELCOME SCREEN☺☺☺☺");
       return const Welcome();
     } else {
+      print("☺☺☺☺GO TO CREATE PROFILE☺☺☺☺");
+      print(Hive.box(userdata).get(userId));
       return AddPersonaDetails(isRought: false, isback: false);
     }
   }

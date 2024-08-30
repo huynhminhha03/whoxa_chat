@@ -78,7 +78,7 @@ class _ChatProfileState extends State<ChatProfile> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 100),
+                        SizedBox(height: Get.height * 0.13),
                         profilePicWidget(chatProfileController
                             .profileModel.value!.conversationDetails!),
                         Center(

@@ -46,9 +46,13 @@ void main() async {
     await Hive.initFlutter();
   }
   await openHiveBox(userdata);
-  await openHiveBox(catchData);
-  // await openHiveBox(contactBox);
-  await openHiveBox(allMsgCache);
+  // var box = Hive.box(userdata);
+  // await box.delete(userId);
+  // await box.delete(authToken);
+  // await box.delete(firstName);
+  // await box.delete(lastName);
+  // await box.clear();
+  // await box.deleteFromDisk();
 
   // await Hive.box(userdata)
   //     .put(utcLocaName, "${place.country}/${place.locality}");
@@ -71,8 +75,8 @@ void main() async {
       // ],
       GetMaterialApp(
     onInit: () {
-      if (Hive.box(userdata).get(userId) == null ||
-          Hive.box(userdata).get(userId) == "") {
+      if (Hive.box(userdata).get(userId) == "" ||
+          Hive.box(userdata).get(userId) == null) {
         if (kDebugMode) {
           print("NO USER ID AVAILABLE");
         }
