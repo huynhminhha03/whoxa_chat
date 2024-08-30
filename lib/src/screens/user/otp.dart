@@ -189,7 +189,7 @@ class _otpState extends State<otp> {
     );
   }
 
-  Widget button() {
+  Widget button({required String time}) {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: isLoading2
@@ -249,7 +249,7 @@ class _otpState extends State<otp> {
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Poppins'),
                       ),
-                    ).paddingOnly(left: 10),
+                    ).paddingOnly(left: 20),
                     const SizedBox(
                       height: 5,
                     ),
@@ -263,12 +263,14 @@ class _otpState extends State<otp> {
                             fontWeight: FontWeight.w700,
                             fontFamily: "Poppins"),
                       ),
-                    ).paddingOnly(left: 10),
+                    ).paddingOnly(left: 20),
                     const SizedBox(height: 20),
                     OtpTextField(
-                      contentPadding: const EdgeInsets.only(bottom: 2),
+                      // contentPadding:
+                      //     const EdgeInsets.only(bottom: 2, left: 20, right: 20),
                       showCursor: true,
                       cursorColor: Colors.black,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       fieldWidth: 50, fieldHeight: 60,
                       numberOfFields: 6,
                       clearText: true,
@@ -292,29 +294,39 @@ class _otpState extends State<otp> {
                           // otpcheck();
                         });
                       },
-                    ),
+                    ).paddingSymmetric(horizontal: 20),
+                    const SizedBox(height: 6),
                     Align(
                       alignment: Alignment.centerRight,
                       child: InkWell(
                           onTap: () {
-                            snapshot.data == 0
-                                ?
-                                // widget.otpStatus == "firebase"
-                                //     ? resendOtpFirebase()
-                                //     : resendoTP()
-                                resendoTP()
-                                : showCustomToast(
-                                    "Wait for a  00:${snapshot.data.toString()} ");
+                            if (_code.isNotEmpty) {
+                              showCustomToast(
+                                  "You can't send otp once it's enetered");
+                            } else {
+                              snapshot.data == 0
+                                  ?
+                                  // widget.otpStatus == "firebase"
+                                  //     ? resendOtpFirebase()
+                                  //     : resendoTP()
+                                  resendoTP()
+                                  : showCustomToast(
+                                      "Wait for a  00:${snapshot.data.toString()} ");
+                            }
                           },
-                          child: const Text(
+                          child: Text(
                             "Resend OTP",
                             style: TextStyle(
                                 fontSize: 14,
-                                color: Color.fromRGBO(252, 198, 4, 1),
+                                color:
+                                    snapshot.data.toString().padLeft(2, '0') ==
+                                            "00"
+                                        ? const Color.fromRGBO(252, 198, 4, 1)
+                                        : Colors.grey,
                                 fontWeight: FontWeight.w500,
                                 fontFamily: "Poppins"),
                           )),
-                    ).paddingOnly(right: 10),
+                    ).paddingOnly(right: 20),
                     const SizedBox(
                       height: 20,
                     ),
@@ -338,7 +350,7 @@ class _otpState extends State<otp> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    button(),
+                    button(time: snapshot.data.toString().padLeft(2, '0')),
                   ],
                 ),
               );

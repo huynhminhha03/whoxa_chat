@@ -321,7 +321,6 @@ class _FloginState extends State<Flogin> {
             children: [
               Container(
                 height: 47,
-                width: 60,
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(12),
@@ -338,13 +337,24 @@ class _FloginState extends State<Flogin> {
                         onTap: () {
                           _onPressedShowBottomSheet();
                         },
-                        child: Text(
-                          selectedCountrycode,
-                          style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.black,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w500),
+                        child: Row(
+                          children: [
+                            Text(
+                              selectedCountrycode,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            const SizedBox(
+                              width: 2,
+                            ),
+                            const Icon(
+                              Icons.arrow_drop_down,
+                              color: appColorYellow,
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -367,7 +377,6 @@ class _FloginState extends State<Flogin> {
                             color: Color.fromRGBO(176, 176, 176, 1))),
                   ),
                   child: SizedBox(
-                    width: 176,
                     height: 45,
                     child: TextField(
                         style: const TextStyle(

@@ -20,7 +20,6 @@ import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:meyaoo_new/src/global/global.dart';
-import 'package:path_provider/path_provider.dart';
 
 final ApiHelper apiHelper = ApiHelper();
 
@@ -56,9 +55,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
 
   @override
   void initState() {
-    openHive();
-
     super.initState();
+    _getToken();
+    CheckUserConnection();
   }
 
   bool ActiveConnection = false;
@@ -405,8 +404,41 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                                 ),
                                 Nationality(),
                                 const SizedBox(
-                                  height: 20,
+                                  height: 30,
                                 ),
+                                buttonClick
+                                    ? const Center(
+                                        child: SizedBox(
+                                        height: 30,
+                                        width: 30,
+                                        child: CircularProgressIndicator(
+                                            color: chatownColor),
+                                      ))
+                                    : CustomButtom(
+                                        onPressed: () {
+                                          closekeyboard();
+
+                                          if (userController.text.isNotEmpty &&
+                                              fNameController.text.isNotEmpty &&
+                                              lNameController.text.isNotEmpty) {
+                                            editApiCall();
+                                          } else {
+                                            if (userController.text.isEmpty) {
+                                              showCustomToast(
+                                                  "Please enter username");
+                                            } else if (fNameController
+                                                .text.isEmpty) {
+                                              showCustomToast(
+                                                  "Please enter first name");
+                                            } else if (lNameController
+                                                .text.isEmpty) {
+                                              showCustomToast(
+                                                  "Please enter last name");
+                                            }
+                                          }
+                                        },
+                                        title: "Continue",
+                                      )
                                 // _submitButton()
                               ],
                             ),
@@ -423,37 +455,37 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.w600),
                       )),
-                  Positioned(
-                      top: 45,
-                      right: 15,
-                      child: InkWell(
-                          onTap: () {
-                            closekeyboard();
+                  // Positioned(
+                  //     top: 45,
+                  //     right: 15,
+                  //     child: InkWell(
+                  //         onTap: () {
+                  //           closekeyboard();
 
-                            if (userController.text.isNotEmpty &&
-                                fNameController.text.isNotEmpty &&
-                                lNameController.text.isNotEmpty) {
-                              editApiCall();
-                            } else {
-                              if (userController.text.isEmpty) {
-                                showCustomToast("Please enter username");
-                              } else if (fNameController.text.isEmpty) {
-                                showCustomToast("Please enter first name");
-                              } else if (lNameController.text.isEmpty) {
-                                showCustomToast("Please enter last name");
-                              }
-                            }
-                          },
-                          child: buttonClick
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 3, color: Colors.black),
-                                  ),
-                                )
-                              : const Icon(Icons.check, size: 25)))
+                  //           if (userController.text.isNotEmpty &&
+                  //               fNameController.text.isNotEmpty &&
+                  //               lNameController.text.isNotEmpty) {
+                  //             editApiCall();
+                  //           } else {
+                  //             if (userController.text.isEmpty) {
+                  //               showCustomToast("Please enter username");
+                  //             } else if (fNameController.text.isEmpty) {
+                  //               showCustomToast("Please enter first name");
+                  //             } else if (lNameController.text.isEmpty) {
+                  //               showCustomToast("Please enter last name");
+                  //             }
+                  //           }
+                  //         },
+                  //         child: buttonClick
+                  //             ? const SizedBox(
+                  //                 height: 20,
+                  //                 width: 20,
+                  //                 child: Center(
+                  //                   child: CircularProgressIndicator(
+                  //                       strokeWidth: 3, color: Colors.black),
+                  //                 ),
+                  //               )
+                  //             : const Icon(Icons.check, size: 25)))
                 ],
               )),
     );
@@ -1254,41 +1286,5 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         print('No image selected.');
       }
     });
-  }
-
-  Future<void> openHive() async {
-    Directory directory = await getApplicationDocumentsDirectory();
-    Hive.init(directory.path);
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      await Hive.initFlutter(appName);
-    } else {
-      await Hive.initFlutter();
-    }
-    await openHiveBox(userdata);
-    await _getToken();
-    await CheckUserConnection();
-    print("NATIONALITY: ${nationController.text}");
-  }
-
-  Future<void> openHiveBox(String boxName) async {
-    final box = await Hive.openBox(boxName).onError((error, stackTrace) async {
-      final Directory dir = await getApplicationDocumentsDirectory();
-      final String dirPath = dir.path;
-
-      File dbFile = File('$dirPath/$boxName.hive');
-      File lockFile = File('$dirPath/$boxName.lock');
-      if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-        dbFile = File('$dirPath/$appName/$boxName.hive');
-        lockFile = File('$dirPath/$appName/$boxName.lock');
-      }
-      await dbFile.delete();
-      await lockFile.delete();
-      await Hive.openBox(boxName);
-      throw 'Failed to open $boxName Box\nError: $error';
-    });
-    // clear box if it grows large
-    if (box.length > 500) {
-      box.clear();
-    }
   }
 }
