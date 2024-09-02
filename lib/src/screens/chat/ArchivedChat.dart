@@ -1,5 +1,6 @@
 // ignore_for_file: curly_braces_in_flow_control_structures, avoid_print, prefer_if_null_operators, prefer_is_empty, unused_field, avoid_function_literals_in_foreach_calls, unused_local_variable, file_names
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -1012,84 +1013,230 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
 
 //_________________________________________________________________________________________________________________________________________________________
 
+  // dialogBox(String isblock, String cID, bool isGroup, String uname,
+  //     String gpname, ArchiveList data, int index) {
+  //   return showDialog(
+  //       context: context,
+  //       barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+  //       builder: (BuildContext context) {
+  //         return
+  //             //  AlertDialog(
+  //             //   insetPadding: const EdgeInsets.all(20),
+  //             //   alignment: Alignment.bottomCenter,
+  //             //   backgroundColor: Colors.white,
+  //             //   elevation: 0,
+  //             //   contentPadding: const EdgeInsets.symmetric(vertical: 20),
+
+  //             //   // contentPadding:
+  //             //   //     const EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
+  //             //   shape: RoundedRectangleBorder(
+  //             //     borderRadius: BorderRadius.circular(20.0),
+  //             //   ),
+  //             //   content: SizedBox(
+  //             //     width: double.maxFinite,
+  //             //     child: Column(
+  //             //       mainAxisSize: MainAxisSize.min,
+  //             //       children: [
+  //             //         GestureDetector(
+  //             //           behavior: HitTestBehavior.translucent,
+  //             //           onTap: () {
+  //             //             Navigator.pop(context);
+  //             //             isGroup == false
+  //             //                 ? chatListController.addArchveApi(cID, uname)
+  //             //                 : chatListController.addArchveApi(cID, gpname);
+  //             //             chatListController
+  //             //                 .userArchiveListModel.value!.archiveList!
+  //             //                 .remove(data);
+  //             //           },
+  //             //           child: Row(
+  //             //             children: [
+  //             //               Image.asset(
+  //             //                 "assets/images/unarchive.png",
+  //             //                 height: 18,
+  //             //                 width: 18,
+  //             //               ),
+  //             //               const SizedBox(
+  //             //                 width: 10,
+  //             //               ),
+  //             //               const Text(
+  //             //                 'Unarchive Chat',
+  //             //                 style: TextStyle(
+  //             //                   fontSize: 14,
+  //             //                   fontWeight: FontWeight.w400,
+  //             //                   fontFamily: "Poppins",
+  //             //                 ),
+  //             //               ),
+  //             //             ],
+  //             //           )
+  //             //               .paddingSymmetric(
+  //             //                 horizontal: 20,
+  //             //                 // vertical: 7,
+  //             //               )
+  //             //               .paddingOnly(bottom: isGroup == false ? 10 : 0),
+  //             //         ),
+  //             //         isGroup == false
+  //             //             ? const Divider(
+  //             //                 height: 1,
+  //             //                 color: Color(0xffF1F1F1),
+  //             //               )
+  //             //             : const SizedBox.shrink(),
+  //             //         isGroup == false
+  //             //             ? GestureDetector(
+  //             //                 behavior: HitTestBehavior.translucent,
+  //             //                 onTap: () {
+  //             //                   Navigator.pop(context);
+  //             //                   chatListController.blockUserApi(cID);
+  //             //                   chatListController.forArchiveChatList();
+  //             //                   // setState(() {});
+  //             //                 },
+  //             //                 child: Row(
+  //             //                   children: [
+  //             //                     Image.asset(
+  //             //                       "assets/images/block.png",
+  //             //                       height: 18,
+  //             //                       width: 18,
+  //             //                     ),
+  //             //                     const SizedBox(
+  //             //                       width: 10,
+  //             //                     ),
+  //             //                     Text(
+  //             //                       isblock == "false" ? 'Block' : "Unblock",
+  //             //                       style: const TextStyle(
+  //             //                         fontSize: 14,
+  //             //                         fontWeight: FontWeight.w400,
+  //             //                         fontFamily: "Poppins",
+  //             //                       ),
+  //             //                     ),
+  //             //                   ],
+  //             //                 )
+  //             //                     .paddingSymmetric(
+  //             //                       horizontal: 20,
+  //             //                       // vertical: 7,
+  //             //                     )
+  //             //                     .paddingOnly(top: 10),
+  //             //               )
+  //             //             : const SizedBox.shrink(),
+  //             //       ],
+  //             //     ),
+  //             //   ),
+  //             // );
+  //             UnarchiveAndBlock(
+  //           isblock: isblock,
+  //           cID: cID,
+  //           isGroup: isGroup,
+  //           uname: uname,
+  //           gpname: gpname,
+  //           data: data,
+  //         );
+  //       });
+  //   //     .then((value) {
+  //   //   debugPrint("value $value");
+  //   //   if (value["isblock"] == "true") {
+  //   //     debugPrint("value isblock ${value["isblock"]}");
+  //   //     chatListController
+  //   //         .userArchiveListModel.value!.archiveList![index].isBlock = false;
+  //   //     setState(() {});
+  //   //   } else {
+  //   //     debugPrint("value isblock ${value["isblock"]}");
+  //   //     chatListController
+  //   //         .userArchiveListModel.value!.archiveList![index].isGroup = true;
+  //   //     setState(() {});
+  //   //   }
+  //   // });
+  // }
+
   Future dialogBox(String isblock, String cID, bool isGroup, String uname,
       String gpname, ArchiveList data) {
     return showDialog(
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
         context: context,
+        barrierDismissible: false,
         builder: (BuildContext context) {
-          return AlertDialog(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25.0),
-            ),
-            content: SizedBox(
-              height: isGroup == false ? 87 : 50,
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 40,
-                    child: ListTile(
-                      leading: const Text(
-                        'Unarchive',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
+          return Stack(
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: Container(
+                  color: const Color.fromRGBO(30, 30, 30, 0.37),
+                ),
+              ),
+              AlertDialog(
+                insetPadding: const EdgeInsets.all(5),
+                alignment: Alignment.bottomCenter,
+                backgroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                content: SizedBox(
+                  height: isGroup == false ? 87 : 50,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40,
+                        child: ListTile(
+                          leading: const Text(
+                            'Unarchive',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          trailing: const Icon(
+                            Icons.archive_outlined,
+                            size: 19,
+                            color: Colors.black,
+                          ),
+                          onTap: () {
+                            Navigator.pop(context);
+                            isGroup == false
+                                ? chatListController.addArchveApi(cID, uname)
+                                : chatListController.addArchveApi(cID, gpname);
+                            chatListController
+                                .userArchiveListModel.value!.archiveList!
+                                .remove(data);
+                          },
                         ),
                       ),
-                      trailing: const Icon(
-                        Icons.archive_outlined,
-                        size: 19,
-                        color: Colors.black,
-                      ),
-                      onTap: () {
-                        Navigator.pop(context);
-                        isGroup == false
-                            ? chatListController.addArchveApi(cID, uname)
-                            : chatListController.addArchveApi(cID, gpname);
-                        chatListController
-                            .userArchiveListModel.value!.archiveList!
-                            .remove(data);
-                      },
-                    ),
-                  ),
-                  isGroup == false
-                      ? const SizedBox(height: 5)
-                      : const SizedBox.shrink(),
-                  isGroup == false
-                      ? Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey[200],
-                        )
-                      : const SizedBox.shrink(),
-                  isGroup == false
-                      ? SizedBox(
-                          height: 40,
-                          child: ListTile(
-                            leading: Text(
-                              isblock == "false" ? 'Block' : "Unblock",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
+                      isGroup == false
+                          ? const SizedBox(height: 5)
+                          : const SizedBox.shrink(),
+                      isGroup == false
+                          ? Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: Colors.grey[200],
+                            )
+                          : const SizedBox.shrink(),
+                      isGroup == false
+                          ? SizedBox(
+                              height: 40,
+                              child: ListTile(
+                                leading: Text(
+                                  isblock == "false" ? 'Block' : "Unblock",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                trailing: const Icon(
+                                  Icons.block,
+                                  size: 19,
+                                  color: Colors.black,
+                                ),
+                                onTap: () async {
+                                  Navigator.pop(context);
+                                  await chatListController.blockUserApi(cID);
+                                  await chatListController.forArchiveChatList();
+                                },
                               ),
-                            ),
-                            trailing: const Icon(
-                              Icons.block,
-                              size: 19,
-                              color: Colors.black,
-                            ),
-                            onTap: () {
-                              setState(() {});
-                              Navigator.pop(context);
-                              chatListController.blockUserApi(cID);
-                            },
-                          ),
-                        )
-                      : const SizedBox.shrink()
-                ],
+                            )
+                          : const SizedBox.shrink()
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           );
         });
   }

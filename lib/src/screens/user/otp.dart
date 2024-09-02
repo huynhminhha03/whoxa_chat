@@ -278,7 +278,7 @@ class _otpState extends State<otp> {
                       borderRadius: BorderRadius.circular(4),
                       showFieldAsBox: true,
                       focusedBorderColor: chatownColor,
-
+                      margin: EdgeInsets.zero,
                       onCodeChanged: (String code) {
                         setState(() {
                           _code = code;

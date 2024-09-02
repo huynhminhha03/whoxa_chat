@@ -155,6 +155,8 @@ class _WelcomeState extends State<Welcome> {
                                   style: const TextStyle(
                                     fontSize: 14.5,
                                     decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    decorationThickness: 1.5,
                                   ),
                                   // Add your onTap logic for Privacy Policy
                                   recognizer: TapGestureRecognizer()
@@ -168,10 +170,12 @@ class _WelcomeState extends State<Welcome> {
                                   text: ' and ',
                                 ),
                                 TextSpan(
-                                  text: 'Term Condition',
+                                  text: 'Terms & Conditions.',
                                   style: const TextStyle(
                                     fontSize: 14.5,
                                     decoration: TextDecoration.underline,
+                                    decorationColor: Colors.white,
+                                    decorationThickness: 1.5,
                                   ),
                                   // Add your onTap logic for Term Condition
                                   recognizer: TapGestureRecognizer()

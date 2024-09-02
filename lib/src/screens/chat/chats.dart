@@ -71,7 +71,12 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   Widget isUserOnline(String userID) {
     for (var i = 0; i < onlieController.allOffline.length; i++) {
       if (userID == onlieController.allOffline[i].userId.toString()) {
-        return const SizedBox.shrink();
+        return Container(
+          height: 10,
+          width: 10,
+          decoration:
+              const BoxDecoration(color: Colors.grey, shape: BoxShape.circle),
+        );
       }
     }
     return const SizedBox.shrink();
@@ -265,7 +270,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                             color: Colors.green,
                                             shape: BoxShape.circle),
                                       )
-                                    : isUserOnline(data.userId.toString());
+                                    : data.isGroup == true
+                                        ? const SizedBox.shrink()
+                                        : isUserOnline(data.userId.toString());
                               }))
                         ],
                       ),
@@ -280,20 +287,30 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 data.userName.toString().isEmpty
-                                    ? Text(
-                                        capitalizeFirstLetter(
-                                            '${data.groupName}'),
-                                        textAlign: TextAlign.left,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15),
+                                    ? SizedBox(
+                                        width: Get.width * 0.55,
+                                        child: Text(
+                                          capitalizeFirstLetter(
+                                              '${data.groupName}'),
+                                          textAlign: TextAlign.left,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 15),
+                                        ),
                                       )
-                                    : Text(
-                                        capitalizeFirstLetter(data.userName!),
-                                        textAlign: TextAlign.left,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15),
+                                    : SizedBox(
+                                        width: Get.width * 0.55,
+                                        child: Text(
+                                          capitalizeFirstLetter(data.userName!),
+                                          textAlign: TextAlign.left,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 15),
+                                        ),
                                       ),
                                 Text(
                                   data.updatedAt!.isEmpty
@@ -318,11 +335,16 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                     );
                                   })
                                 : data.lastMessageType == "text"
-                                    ? Text(
-                                        capitalizeFirstLetter(
-                                            data.lastMessage!),
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.grey),
+                                    ? SizedBox(
+                                        width: Get.width * 0.60,
+                                        child: Text(
+                                          capitalizeFirstLetter(
+                                              data.lastMessage!),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 12, color: Colors.grey),
+                                        ),
                                       )
                                     : data.lastMessageType == "image"
                                         ? Row(
@@ -665,7 +687,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                     borderSide: BorderSide(color: Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(15)),
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Search',
+                hintText: 'Search User',
                 hintStyle: const TextStyle(
                     fontSize: 13,
                     color: Colors.grey,

@@ -424,24 +424,39 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                   ""
                                                           ? chatContorller
                                                               .sendMessageText(
-                                                                  "Hi",
-                                                                  widget
-                                                                      .conversationID!,
-                                                                  "text",
-                                                                  widget
-                                                                      .mobileNum
-                                                                      .toString(),
-                                                                  '',
-                                                                  '')
+                                                              "Hi",
+                                                              widget
+                                                                  .conversationID
+                                                                  .toString(),
+                                                              'text',
+                                                              widget.mobileNum
+                                                                  .toString(),
+                                                              "",
+                                                              "",
+                                                            )
+                                                          // chatContorller
+                                                          //     .sendMessageText(
+                                                          //         "Hi",
+                                                          //         widget
+                                                          //             .conversationID!,
+                                                          //         "text",
+                                                          //         widget
+                                                          //             .mobileNum
+                                                          //             .toString(),
+                                                          //         '',
+                                                          //         '')
                                                           : chatContorller
                                                               .sendMessageText(
-                                                                  "Hi",
-                                                                  widget
-                                                                      .conversationID!,
-                                                                  "text",
-                                                                  "",
-                                                                  '',
-                                                                  '');
+                                                              "Hi",
+                                                              widget
+                                                                  .conversationID
+                                                                  .toString(),
+                                                              'text',
+                                                              widget.mobileNum
+                                                                  .toString(),
+                                                              "",
+                                                              "",
+                                                            );
                                                 },
                                                 child: Container(
                                                   width: MediaQuery.of(context)
@@ -456,17 +471,27 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                     padding:
                                                         const EdgeInsets.all(
                                                             15.0),
-                                                    child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
+                                                    child: Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      clipBehavior: Clip.none,
                                                       children: [
                                                         Image.asset(
-                                                            "assets/images/start_conversation.png",
-                                                            height: 200)
+                                                          "assets/images/start_conversation.png",
+                                                          height: 200,
+                                                        ),
+                                                        const Positioned(
+                                                          bottom: -8,
+                                                          child: Text(
+                                                            "Start Conversation",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 17,
+                                                            ),
+                                                          ),
+                                                        )
                                                       ],
                                                     ),
                                                   ),
