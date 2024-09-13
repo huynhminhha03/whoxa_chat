@@ -72,7 +72,7 @@ class _MyWidgetState extends State<MyWidget> {
         children: [
           const SizedBox(height: 20),
           Center(child: gpCreate()),
-          const SizedBox(height: 10),
+          const SizedBox(height: 32),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -80,7 +80,7 @@ class _MyWidgetState extends State<MyWidget> {
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ).paddingOnly(left: 20),
-          const SizedBox(height: 10),
+          const SizedBox(height: 15),
           widget.contactData.isEmpty
               ? const SizedBox.shrink()
               : selectedUsersList(),
@@ -91,12 +91,13 @@ class _MyWidgetState extends State<MyWidget> {
 
   Widget gpCreate() {
     return Container(
-      height: 64,
+      // height: 70,
       width: Get.width * 0.90,
       decoration: BoxDecoration(boxShadow: const [
         BoxShadow(blurRadius: 0.5, color: Colors.grey, offset: Offset(0, 0.4))
       ], borderRadius: BorderRadius.circular(10), color: Colors.white),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           InkWell(
             onTap: () {
@@ -115,25 +116,32 @@ class _MyWidgetState extends State<MyWidget> {
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(50),
                       child: Image.file(image!, fit: BoxFit.cover)),
-            ),
+            ).paddingOnly(bottom: 5),
           ),
           Expanded(
-              child: TextFormField(
-            controller: controller,
-            maxLines: 1,
-            textCapitalization: TextCapitalization.sentences,
-            readOnly: false,
-            cursorColor: Colors.black,
-            decoration: const InputDecoration(
-                hintText: 'Group Name',
-                hintStyle: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey),
-                border: OutlineInputBorder(borderSide: BorderSide.none)),
-          ))
+            child: TextFormField(
+              controller: controller,
+              maxLines: 1,
+              textCapitalization: TextCapitalization.sentences,
+              readOnly: false,
+              cursorColor: Colors.black,
+              maxLength: 60,
+              scrollPhysics: const BouncingScrollPhysics(),
+              textAlignVertical: TextAlignVertical.center,
+              decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.only(top: 0),
+                  fillColor: Colors.transparent,
+                  isDense: true,
+                  hintText: 'Group Name',
+                  hintStyle: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey),
+                  border: OutlineInputBorder(borderSide: BorderSide.none)),
+            ).paddingOnly(top: 25, left: 10),
+          )
         ],
-      ).paddingAll(7),
+      ).paddingSymmetric(horizontal: 7),
     );
   }
 

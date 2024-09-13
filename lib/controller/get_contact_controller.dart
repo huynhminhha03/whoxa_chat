@@ -11,6 +11,7 @@ import 'package:meyaoo_new/src/global/strings.dart';
 final ApiHelper apiHelper = ApiHelper();
 
 class GetAllDeviceContact extends GetxController {
+  RxBool isGetContectLoading = false.obs;
   @override
   void onInit() {
     getAllContactApi();
@@ -20,6 +21,7 @@ class GetAllDeviceContact extends GetxController {
   Rx<GetContactModel?> model = GetContactModel().obs;
   RxList<NewContactList> getList = <NewContactList>[].obs;
   Future<void> getAllContactApi({var contact}) async {
+    isGetContectLoading.value = true;
     var uri = Uri.parse(apiHelper.getAllContact);
     var request = http.MultipartRequest("POST", uri);
     Map<String, String> headers = {
@@ -43,9 +45,12 @@ class GetAllDeviceContact extends GetxController {
           getList.add(model.value!.newContactList![i]);
         }
       }
+      isGetContectLoading.value = false;
       log("API_CONTACT_RESPONSE: $userData");
     } else if (response.statusCode == 500) {
+      isGetContectLoading.value = false;
       log("API_CONTACT_RESPONSE: $userData");
     }
+    isGetContectLoading.value = false;
   }
 }

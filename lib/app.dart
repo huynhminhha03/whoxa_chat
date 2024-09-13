@@ -84,7 +84,7 @@ class _AppScreenState extends State<AppScreen> with WidgetsBindingObserver {
   Future<void> _checkPermissions() async {
     if (await Permission.contacts.request().isGranted) {
       // You can access the contacts
-      getContactsFromGloble();
+      addContactController.getContactsFromGloble();
     } else {
       // You can show a message to the user asking them to grant the permission
       ScaffoldMessenger.of(context).showSnackBar(

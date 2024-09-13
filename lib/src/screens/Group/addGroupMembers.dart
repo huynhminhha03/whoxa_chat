@@ -25,7 +25,7 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
   GroupCreateController gpCreateController = Get.find();
   @override
   void initState() {
-    var contactJson = json.encode(mobileContacts);
+    var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
 
     super.initState();

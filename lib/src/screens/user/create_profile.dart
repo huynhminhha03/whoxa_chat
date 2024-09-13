@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,11 +15,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/Models/username_check_model.dart';
+import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/layout/bottombar.dart';
+import 'package:meyaoo_new/src/screens/user/pick_image_popup.dart';
+import 'package:meyaoo_new/src/screens/user/profile_pic_screen.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:page_transition/page_transition.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
 final ApiHelper apiHelper = ApiHelper();
@@ -52,6 +54,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   final TextEditingController nationController = TextEditingController();
   UserNameCheckModel? userNameCheckModel;
   bool isUsername = false;
+
+  AvatarController avatarController = Get.put(AvatarController());
 
   @override
   void initState() {
@@ -214,15 +218,54 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     request.fields['last_name'] = lNameController.text;
     request.fields['gender'] = genderData.toString();
     request.fields['device_token'] = _fcmtoken.toString();
+    if (widget.isRought == false && Hive.box(userdata).get(userBio) == null) {
+      request.fields['bio'] = "At work";
+    }
     request.fields['one_signal_player_id'] =
         OneSignal.User.pushSubscription.id!;
     request.fields['country'] = nationController.text;
 
-    if (image != null) {
-      request.files
-          .add(await http.MultipartFile.fromPath('files', image!.path));
+    if (widget.isRought == true) {
+      if (image != null) {
+        request.files
+            .add(await http.MultipartFile.fromPath('files', image!.path));
+      } else if (avatarController.avatarIndex.value != -1) {
+        request.fields['avatar_id'] = avatarController
+            .avatarsData[avatarController.avatarIndex.value].avatarId
+            .toString();
+      } else if (profileImg!.isNotEmpty &&
+          profileImg !=
+              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+          avatarController.avatarsData
+              .where((avatar) => avatar.avtarMedia == profileImg)
+              .map((avatar) => avatar.avtarMedia!)
+              .isNotEmpty &&
+          // profileImg == avatarController.avatarsData[index].avtarMedia && 
+          avatarController.avatarIndex.value == -1 &&
+          image == null) {
+        request.fields['avatar_id'] = avatarController.avatarsData
+            .where((avatar) => avatar.avtarMedia == profileImg)
+            .map((avatar) => avatar.avatarId!.toString())
+            .first;
+      } else {
+        if (Hive.box(userdata).get(userGender) == "male") {
+          request.fields['avatar_id'] = avatarController.avatarsData
+              .where((avatar) =>
+                  avatar.avatarGender == "male" && avatar.defaultAvtar == true)
+              .map((avatar) => avatar.avatarId.toString())
+              .first;
+        } else {
+          request.fields['avatar_id'] = avatarController.avatarsData
+              .where((avatar) =>
+                  avatar.avatarGender == "female" &&
+                  avatar.defaultAvtar == true)
+              .map((avatar) => avatar.avatarId.toString())
+              .first;
+        }
+      }
+      // request.files
+      //     .add(await http.MultipartFile.fromPath('files', image!.path));
     }
-
     var response = await request.send();
 
     String responseData = await response.stream.transform(utf8.decoder).join();
@@ -257,14 +300,19 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       if (widget.isRought == true) {
         Get.back();
       } else {
-        Navigator.pushAndRemoveUntil(
-            context,
-            PageTransition(
-              curve: Curves.linear,
-              type: PageTransitionType.rightToLeft,
-              child: TabbarScreen(currentTab: 0),
-            ),
-            (route) => false);
+        avatarController.getAvatars();
+        Get.offAll(
+          const ProfilePicScreen(),
+          transition: Transition.rightToLeft,
+        );
+        // Navigator.pushAndRemoveUntil(
+        //     context,
+        //     PageTransition(
+        //       curve: Curves.linear,
+        //       type: PageTransitionType.rightToLeft,
+        //       child: TabbarScreen(currentTab: 0),
+        //     ),
+        //     (route) => false);
       }
       showCustomToast("Success");
     } else {
@@ -346,149 +394,304 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
-      body: isLoading
-          ? loader(context)
-          : Container(
-              width: MediaQuery.of(context).size.width,
-              color: const Color.fromRGBO(250, 250, 250, 1),
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height: Get.height * 0.27,
-                    width: double.infinity,
-                    child: Image.asset(
-                      cacheHeight: 140,
-                      "assets/images/back_img1.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                        left: 25,
-                        right: 25,
-                        bottom: 20,
-                        top: Get.height * 0.13),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                _imgWidget(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                UserNameWid(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Firstname(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Lastname(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                gender(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                MobileNumber(),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Nationality(),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                                buttonClick
-                                    ? const Center(
-                                        child: SizedBox(
-                                        height: 30,
-                                        width: 30,
-                                        child: CircularProgressIndicator(
-                                            color: chatownColor),
-                                      ))
-                                    : CustomButtom(
-                                        onPressed: () {
-                                          closekeyboard();
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: const Color(0xffFFEDAB).withOpacity(0.05),
+      ),
+      child: Scaffold(
+          backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+          body: isLoading
+              ? loader(context)
+              : widget.isRought == false
+                  ? createProfile()
+                  : profile()),
+    );
+  }
 
-                                          if (userController.text.isNotEmpty &&
-                                              fNameController.text.isNotEmpty &&
-                                              lNameController.text.isNotEmpty) {
-                                            editApiCall();
-                                          } else {
-                                            if (userController.text.isEmpty) {
-                                              showCustomToast(
-                                                  "Please enter username");
-                                            } else if (fNameController
-                                                .text.isEmpty) {
-                                              showCustomToast(
-                                                  "Please enter first name");
-                                            } else if (lNameController
-                                                .text.isEmpty) {
-                                              showCustomToast(
-                                                  "Please enter last name");
-                                            }
-                                          }
-                                        },
-                                        title: "Continue",
-                                      )
-                                // _submitButton()
-                              ],
-                            ),
-                          ),
+  Widget createProfile() {
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        color: const Color.fromRGBO(250, 250, 250, 1),
+        child: Column(
+          children: [
+            Container(
+              height: 130,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xffFFEDAB).withOpacity(0.04),
+                    const Color(0xffFCC604).withOpacity(0.04),
+                  ],
+                ),
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: const Text(
+                  "Add Info",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Poppins",
+                  ),
+                ).paddingOnly(top: 20).paddingSymmetric(
+                      horizontal: 28,
+                    ),
+              ),
+            ),
+            const Divider(
+              color: Color(0xffE9E9E9),
+              height: 1,
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    UserNameWid(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Firstname(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Lastname(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    gender(),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Divider(
+                      color: const Color(0xFF000000).withOpacity(0.06),
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const Text(
+                          'Contact Details',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              fontFamily: "Poppins",
+                              color: Color(0xff3A3333)),
                         ),
+                        const Text(
+                          '(Non Changeable)',
+                          style: TextStyle(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 8,
+                              fontFamily: "Poppins",
+                              color: Color(0xff959595)),
+                        ).paddingOnly(top: 2, left: 2),
                       ],
                     ),
-                  ),
-                  const Positioned(
-                      top: 45,
-                      left: 15,
-                      child: Text(
-                        "Profile",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
-                      )),
-                  // Positioned(
-                  //     top: 45,
-                  //     right: 15,
-                  //     child: InkWell(
-                  //         onTap: () {
-                  //           closekeyboard();
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    MobileNumber(),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Nationality(),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    buttonClick
+                        ? const Center(
+                            child: SizedBox(
+                            height: 30,
+                            width: 30,
+                            child:
+                                CircularProgressIndicator(color: chatownColor),
+                          ))
+                        : CustomButtom(
+                            onPressed: () {
+                              closekeyboard();
 
-                  //           if (userController.text.isNotEmpty &&
-                  //               fNameController.text.isNotEmpty &&
-                  //               lNameController.text.isNotEmpty) {
-                  //             editApiCall();
-                  //           } else {
-                  //             if (userController.text.isEmpty) {
-                  //               showCustomToast("Please enter username");
-                  //             } else if (fNameController.text.isEmpty) {
-                  //               showCustomToast("Please enter first name");
-                  //             } else if (lNameController.text.isEmpty) {
-                  //               showCustomToast("Please enter last name");
-                  //             }
-                  //           }
-                  //         },
-                  //         child: buttonClick
-                  //             ? const SizedBox(
-                  //                 height: 20,
-                  //                 width: 20,
-                  //                 child: Center(
-                  //                   child: CircularProgressIndicator(
-                  //                       strokeWidth: 3, color: Colors.black),
-                  //                 ),
-                  //               )
-                  //             : const Icon(Icons.check, size: 25)))
+                              if (userController.text.isNotEmpty &&
+                                  fNameController.text.isNotEmpty &&
+                                  lNameController.text.isNotEmpty) {
+                                editApiCall();
+                              } else {
+                                if (userController.text.isEmpty) {
+                                  showCustomToast("Please enter username");
+                                } else if (fNameController.text.isEmpty) {
+                                  showCustomToast("Please enter first name");
+                                } else if (lNameController.text.isEmpty) {
+                                  showCustomToast("Please enter last name");
+                                }
+                              }
+                            },
+                            title: "Continue",
+                          ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+
+                    // _submitButton()
+                  ],
+                ).paddingSymmetric(horizontal: 20),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  Widget profile() {
+    return Container(
+        width: MediaQuery.of(context).size.width,
+        color: const Color.fromRGBO(250, 250, 250, 1),
+        child: Stack(
+          children: [
+            SizedBox(
+              height: Get.height * 0.27,
+              width: double.infinity,
+              child: Image.asset(
+                cacheHeight: 140,
+                "assets/images/back_img1.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  left: 25, right: 25, bottom: 20, top: Get.height * 0.13),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          _imgWidget(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          UserNameWid(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Firstname(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Lastname(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          gender(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          MobileNumber(),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          Nationality(),
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          buttonClick
+                              ? const Center(
+                                  child: SizedBox(
+                                  height: 30,
+                                  width: 30,
+                                  child: CircularProgressIndicator(
+                                      color: chatownColor),
+                                ))
+                              : CustomButtom(
+                                  onPressed: () {
+                                    closekeyboard();
+
+                                    if (userController.text.isNotEmpty &&
+                                        fNameController.text.isNotEmpty &&
+                                        lNameController.text.isNotEmpty) {
+                                      editApiCall();
+                                    } else {
+                                      if (userController.text.isEmpty) {
+                                        showCustomToast(
+                                            "Please enter username");
+                                      } else if (fNameController.text.isEmpty) {
+                                        showCustomToast(
+                                            "Please enter first name");
+                                      } else if (lNameController.text.isEmpty) {
+                                        showCustomToast(
+                                            "Please enter last name");
+                                      }
+                                    }
+                                  },
+                                  title: "Continue",
+                                )
+                          // _submitButton()
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
-              )),
-    );
+              ),
+            ),
+            Positioned(
+                top: 45,
+                left: 15,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Image.asset(
+                        "assets/images/arrow-left.png",
+                        color: appColorBlack,
+                        scale: 1.5,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 5,
+                    ),
+                    const Text(
+                      "Profile",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                )),
+            // Positioned(
+            //     top: 45,
+            //     right: 15,
+            //     child: InkWell(
+            //         onTap: () {
+            //           closekeyboard();
+
+            //           if (userController.text.isNotEmpty &&
+            //               fNameController.text.isNotEmpty &&
+            //               lNameController.text.isNotEmpty) {
+            //             editApiCall();
+            //           } else {
+            //             if (userController.text.isEmpty) {
+            //               showCustomToast("Please enter username");
+            //             } else if (fNameController.text.isEmpty) {
+            //               showCustomToast("Please enter first name");
+            //             } else if (lNameController.text.isEmpty) {
+            //               showCustomToast("Please enter last name");
+            //             }
+            //           }
+            //         },
+            //         child: buttonClick
+            //             ? const SizedBox(
+            //                 height: 20,
+            //                 width: 20,
+            //                 child: Center(
+            //                   child: CircularProgressIndicator(
+            //                       strokeWidth: 3, color: Colors.black),
+            //                 ),
+            //               )
+            //             : const Icon(Icons.check, size: 25)))
+          ],
+        ));
   }
 
   bool buttonClick = false;
@@ -557,7 +760,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                   userImg(),
                   InkWell(
                     onTap: () {
-                      selectImageSource();
+                      // selectImageSource();
+                      piceImagePopup();
                     },
                     child: Container(
                       height: 30,
@@ -586,6 +790,22 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     );
   }
 
+  piceImagePopup() {
+    return showDialog(
+        context: context,
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+        builder: (BuildContext context) {
+          return const PickImagePopup();
+        }).then((value) {
+      setState(() {
+        image = value["image"];
+        if (image != null) {
+          avatarController.avatarIndex.value = -1;
+        }
+      });
+    });
+  }
+
   Widget gender() {
     return Container(
       decoration: const BoxDecoration(),
@@ -597,8 +817,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 'Gender',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.black),
+                    fontSize: 11,
+                    fontFamily: "Poppins",
+                    color: Color(0xff3A3333)),
               ),
             ],
           ),
@@ -621,29 +842,42 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 child: Row(
                   children: [
                     Container(
-                      height: 14,
-                      width: 14,
+                      height: 16,
+                      width: 16,
                       decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(width: 1, color: Colors.black)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: isselected == true
-                                  ? LinearGradient(
-                                      colors: [blackcolor, black1Color],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    )
-                                  : const LinearGradient(
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.transparent,
-                                      ],
-                                    )),
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isselected == true
+                              ? [
+                                  const Color(0xff9E9E9E),
+                                  const Color(0xff1B1B1B),
+                                ]
+                              : [
+                                  const Color(0xff9E9E9E).withOpacity(0.5),
+                                  const Color(0xff1B1B1B).withOpacity(0.5),
+                                ],
                         ),
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        decoration: isselected == false
+                            ? const BoxDecoration(
+                                shape: BoxShape.circle, color: appColorWhite)
+                            : BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: appColorWhite, width: 2),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xff9E9E9E),
+                                    Color(0xff1B1B1B),
+                                  ],
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(
@@ -675,33 +909,42 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 child: Row(
                   children: [
                     Container(
-                      height: 14,
-                      width: 14,
+                      height: 16,
+                      width: 16,
                       decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                              width: 1,
-                              color: isselected2 == true
-                                  ? Colors.black
-                                  : Colors.black)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: isselected2 == true
-                                  ? LinearGradient(
-                                      colors: [blackcolor, black1Color],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                    )
-                                  : const LinearGradient(
-                                      colors: [
-                                        Colors.transparent,
-                                        Colors.transparent
-                                      ],
-                                    )),
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: isselected2 == true
+                              ? [
+                                  const Color(0xff9E9E9E),
+                                  const Color(0xff1B1B1B),
+                                ]
+                              : [
+                                  const Color(0xff9E9E9E).withOpacity(0.5),
+                                  const Color(0xff1B1B1B).withOpacity(0.5),
+                                ],
                         ),
+                      ),
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        decoration: isselected2 == false
+                            ? const BoxDecoration(
+                                shape: BoxShape.circle, color: appColorWhite)
+                            : BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: appColorWhite, width: 2),
+                                gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Color(0xff9E9E9E),
+                                    Color(0xff1B1B1B),
+                                  ],
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(
@@ -739,8 +982,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 'Username',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.black),
+                    fontSize: 11,
+                    fontFamily: "Poppins",
+                    color: Color(0xff3A3333)),
               ),
             ],
           ),
@@ -760,9 +1004,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: appgrey)),
+                      borderSide: const BorderSide(color: Color(0xffEFEFEF))),
                   focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: appgrey),
+                      borderSide: const BorderSide(color: Color(0xffEFEFEF)),
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
@@ -791,8 +1035,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               'Last Name',
               style: TextStyle(
                   fontWeight: FontWeight.w500,
-                  fontSize: 12,
-                  color: Colors.black),
+                  fontSize: 11,
+                  fontFamily: "Poppins",
+                  color: Color(0xff3A3333)),
             ),
           ],
         ),
@@ -811,9 +1056,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               decoration: InputDecoration(
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: appgrey)),
+                    borderSide: const BorderSide(color: Color(0xffEFEFEF))),
                 focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: appgrey),
+                    borderSide: const BorderSide(color: Color(0xffEFEFEF)),
                     borderRadius: BorderRadius.circular(10)),
                 contentPadding:
                     const EdgeInsets.only(top: 1, left: 15, bottom: 1),
@@ -833,7 +1078,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   }
 
   Widget userImg() {
-    profileImg;
     if (checkForNull(Hive.box(userdata).get(userImage)) != null) {
       profileImg = Hive.box(userdata).get(userImage);
     }
@@ -842,7 +1086,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       borderRadius: BorderRadius.circular(100),
       child: GestureDetector(
         onTap: () {
-          selectImageSource();
+          piceImagePopup();
         },
         child: Container(
           height: 110,
@@ -860,42 +1104,199 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               ]),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(110),
-              child: image == null
-                  ? isLoading
-                      ? CircularProgressIndicator(color: yellow1Color)
-                      : userProfileModel.resData!.profileImage != null
-                          ? CachedNetworkImage(
-                              imageUrl: userProfileModel.resData!.profileImage!,
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: imageProvider,
-                                    fit: BoxFit.cover,
+              child: profileImg != null &&
+                      profileImg !=
+                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                      avatarController.avatarIndex.value == -1 &&
+                      image == null
+                  ? avatarController.avatarsData
+                          .where((avatar) => avatar.avtarMedia == profileImg)
+                          .map((avatar) => avatar.avtarMedia!)
+                          .isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: profileImg!,
+                          imageBuilder: (context, imageProvider) => Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.person, color: chatColor),
+                        )
+                      : CachedNetworkImage(
+                          imageUrl: profileImg!,
+                          imageBuilder: (context, imageProvider) => Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.person, color: chatColor),
+                        )
+                  : image == null
+                      ? Obx(
+                          () => avatarController.avatarIndex.value != -1
+                              ? CachedNetworkImage(
+                                  imageUrl: avatarController
+                                      .avatarsData[
+                                          avatarController.avatarIndex.value]
+                                      .avtarMedia!,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: imageProvider,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.person, color: chatColor),
-                            )
-                          : Container(
-                              height: 30,
-                              width: 30,
-                              decoration: const BoxDecoration(
-                                  color: Color(0xffE7E8EC),
-                                  shape: BoxShape.circle),
-                              child: const Icon(
-                                Icons.person,
-                                size: 15,
-                                color: Colors.black,
-                              ),
-                            )
-                  : Image.file(image!, fit: BoxFit.cover)),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.person,
+                                          color: chatColor),
+                                )
+                              : Hive.box(userdata).get(userGender) == "male"
+                                  ? CachedNetworkImage(
+                                      imageUrl: avatarController.avatarsData
+                                          .where((avatar) =>
+                                              avatar.avatarGender == "male" &&
+                                              avatar.defaultAvtar == true)
+                                          .map((avatar) => avatar.avtarMedia!)
+                                          .first,
+                                      imageBuilder: (context, imageProvider) =>
+                                          Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.person,
+                                              color: chatColor),
+                                    )
+                                  : Hive.box(userdata).get(userGender) !=
+                                              null &&
+                                          Hive.box(userdata).get(userGender) ==
+                                              "female"
+                                      ? CachedNetworkImage(
+                                          imageUrl: avatarController.avatarsData
+                                              .where((avatar) =>
+                                                  avatar.avatarGender ==
+                                                      "female" &&
+                                                  avatar.defaultAvtar == true)
+                                              .map((avatar) =>
+                                                  avatar.avtarMedia!)
+                                              .first,
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.person,
+                                                  color: chatColor),
+                                        )
+                                      : Container(
+                                          height: 30,
+                                          width: 30,
+                                          decoration: const BoxDecoration(
+                                              color: Color(0xFFFCC604),
+                                              shape: BoxShape.circle),
+                                          child: const Icon(
+                                            Icons.person,
+                                            size: 30,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                        )
+                      : Image.file(image!, fit: BoxFit.cover)),
         ),
       ),
     );
   }
+
+  // Widget userImg() {
+  //   profileImg;
+  //   if (checkForNull(Hive.box(userdata).get(userImage)) != null) {
+  //     profileImg = Hive.box(userdata).get(userImage);
+  //   }
+  //   return Material(
+  //     elevation: 0,
+  //     borderRadius: BorderRadius.circular(100),
+  //     child: GestureDetector(
+  //       onTap: () {
+  //         // selectImageSource();
+  //         piceImagePopup();
+  //       },
+  //       child: Container(
+  //         height: 110,
+  //         width: 110,
+  //         decoration: const BoxDecoration(
+  //             shape: BoxShape.circle,
+  //             color: Colors.white,
+  //             boxShadow: [
+  //               BoxShadow(
+  //                   color: Colors.grey,
+  //                   blurRadius: 1.0,
+  //                   spreadRadius: 0.0,
+  //                   offset: Offset(0.0, 0.0) // shadow direction: bottom right
+  //                   )
+  //             ]),
+  //         child: ClipRRect(
+  //             borderRadius: BorderRadius.circular(110),
+  //             child: image == null
+  //                 ? isLoading
+  //                     ? CircularProgressIndicator(color: yellow1Color)
+  //                     : userProfileModel.resData!.profileImage != null
+  //                         ? CachedNetworkImage(
+  //                             imageUrl: userProfileModel.resData!.profileImage!,
+  //                             imageBuilder: (context, imageProvider) =>
+  //                                 Container(
+  //                               decoration: BoxDecoration(
+  //                                 shape: BoxShape.circle,
+  //                                 image: DecorationImage(
+  //                                   image: imageProvider,
+  //                                   fit: BoxFit.cover,
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                             errorWidget: (context, url, error) =>
+  //                                 const Icon(Icons.person, color: chatColor),
+  //                           )
+  //                         : Container(
+  //                             height: 30,
+  //                             width: 30,
+  //                             decoration: const BoxDecoration(
+  //                                 color: Color(0xffE7E8EC),
+  //                                 shape: BoxShape.circle),
+  //                             child: const Icon(
+  //                               Icons.person,
+  //                               size: 15,
+  //                               color: Colors.black,
+  //                             ),
+  //                           )
+  //                 : Image.file(image!, fit: BoxFit.cover)),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   selectImageSource() {
     return showDialog(
@@ -1018,8 +1419,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 'First Name',
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
-                    color: Colors.black),
+                    fontSize: 11,
+                    fontFamily: "Poppins",
+                    color: Color(0xff3A3333)),
               ),
             ],
           ),
@@ -1039,9 +1441,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(color: appgrey)),
+                      borderSide: const BorderSide(color: Color(0xffEFEFEF))),
                   focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: appgrey),
+                      borderSide: const BorderSide(color: Color(0xffEFEFEF)),
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
@@ -1063,164 +1465,174 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
 
   Widget Nationality() {
     final String nation = nationController.text;
-    return Container(
-      height: 48,
-      width: Get.width * 0.90,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300)),
-      child: Row(
-        children: [
-          const SizedBox(width: 10),
-          Image.asset("assets/images/location1.png", height: 21),
-          const SizedBox(width: 10),
-          Column(
+    return widget.isRought == true
+        ? Container(
+            height: 48,
+            width: Get.width * 0.90,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                border: Border.all(color: const Color(0XffEFEFEF))),
+            child: Row(
+              children: [
+                const SizedBox(width: 10),
+                Image.asset("assets/images/location1.png", height: 21),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Country",
+                      style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromRGBO(80, 80, 80, 1)),
+                    ),
+                    Text(
+                      nation,
+                      style: const TextStyle(
+                          fontSize: 10, fontWeight: FontWeight.w600),
+                    )
+                  ],
+                )
+              ],
+            ),
+          )
+        : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 "Country",
                 style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w400,
-                    color: Color.fromRGBO(80, 80, 80, 1)),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                    fontFamily: "Poppins",
+                    color: Color(0xff3A3333)),
               ),
-              Text(
-                nation,
-                style:
-                    const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
-              )
+              const SizedBox(
+                height: 4,
+              ),
+              Container(
+                height: 48,
+                width: Get.width * 0.90,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0XffEFEFEF))),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 10),
+                    Image.asset("assets/images/location1.png", height: 21),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          nation,
+                          style: const TextStyle(
+                              fontSize: 10, fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
             ],
-          )
-        ],
-      ),
-      // child: SizedBox(
-      //   height: 50,
-      //   width: MediaQuery.of(context).size.width,
-      //   child: TextField(
-      //       controller: nationController,
-      //       readOnly: false,
-      //       enabled: false,
-      //       style: TextStyle(color: Colors.grey.shade500),
-      //       keyboardType: TextInputType.number,
-      //       decoration: InputDecoration(
-      //         border: OutlineInputBorder(
-      //             borderRadius: BorderRadius.circular(10),
-      //             borderSide: const BorderSide(color: appgrey)),
-      //         enabledBorder: OutlineInputBorder(
-      //             borderRadius: BorderRadius.circular(10),
-      //             borderSide: const BorderSide(color: appgrey)),
-      //         focusedBorder: OutlineInputBorder(
-      //             borderSide: const BorderSide(color: appgrey),
-      //             borderRadius: BorderRadius.circular(10)),
-      //         contentPadding:
-      //             const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-      //         // hintText: 'Add a brief description',
-      //         hintStyle: const TextStyle(
-      //             fontSize: 17,
-      //             color: Colors.grey,
-      //             fontWeight: FontWeight.w400),
-      //         filled: true,
-      //         fillColor: const Color.fromARGB(255, 235, 235, 235),
-
-      //         // ),
-      //       )),
-      // ),
-    );
+          );
   }
 
   Widget MobileNumber() {
     final String number = mobController.text;
-    return Container(
-      height: 48,
-      width: Get.width * 0.90,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          border: Border.all(color: Colors.grey.shade300)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+    return widget.isRought == true
+        ? Container(
+            height: 48,
+            width: Get.width * 0.90,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                border: Border.all(color: const Color(0XffEFEFEF))),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Image.asset("assets/images/call_1.png",
+                        color: Colors.black, height: 21),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "Phone",
+                          style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w400,
+                              color: Color.fromRGBO(80, 80, 80, 1)),
+                        ),
+                        Text(
+                          number,
+                          style: const TextStyle(
+                              fontSize: 10, fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                Image.asset("assets/images/verify.png", height: 17)
+              ],
+            ).paddingSymmetric(horizontal: 10),
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset("assets/images/call_1.png",
-                  color: Colors.black, height: 21),
-              const SizedBox(width: 10),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Phone",
-                    style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w400,
-                        color: Color.fromRGBO(80, 80, 80, 1)),
-                  ),
-                  Text(
-                    number,
-                    style: const TextStyle(
-                        fontSize: 10, fontWeight: FontWeight.w600),
-                  )
-                ],
-              )
+              const Text(
+                "Phone Number",
+                style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                    fontFamily: "Poppins",
+                    color: Color(0xff3A3333)),
+              ),
+              const SizedBox(
+                height: 4,
+              ),
+              Container(
+                height: 48,
+                width: Get.width * 0.90,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    border: Border.all(color: const Color(0XffEFEFEF))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Image.asset("assets/images/call_1.png",
+                            color: Colors.black, height: 21),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              number,
+                              style: const TextStyle(
+                                  fontSize: 10, fontWeight: FontWeight.w600),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    Image.asset("assets/images/verify.png", height: 17)
+                  ],
+                ).paddingSymmetric(horizontal: 10),
+              ),
             ],
-          ),
-          Image.asset("assets/images/verify.png", height: 17)
-        ],
-      ).paddingSymmetric(horizontal: 10),
-      // child: Column(
-      //   children: [
-      //     const Row(
-      //       children: [
-      //         Text(
-      //           'Mobile Number',
-      //           style: TextStyle(
-      //               fontWeight: FontWeight.w400,
-      //               fontSize: 13,
-      //               color: Colors.black),
-      //         ),
-      //       ],
-      //     ),
-      //     const SizedBox(
-      //       height: 10,
-      //     ),
-      //     SizedBox(
-      //       height: 50,
-      //       width: MediaQuery.of(context).size.width,
-      //       child: TextField(
-      //           controller: mobController,
-      //           readOnly: false,
-      //           enabled: false,
-      //           style: TextStyle(color: Colors.grey.shade500),
-      //           keyboardType: TextInputType.number,
-      //           decoration: InputDecoration(
-      //             border: OutlineInputBorder(
-      //                 borderRadius: BorderRadius.circular(25),
-      //                 borderSide: const BorderSide(color: appgrey)),
-      //             enabledBorder: OutlineInputBorder(
-      //                 borderRadius: BorderRadius.circular(25),
-      //                 borderSide: const BorderSide(color: appgrey)),
-      //             focusedBorder: OutlineInputBorder(
-      //                 borderSide: const BorderSide(color: appgrey),
-      //                 borderRadius: BorderRadius.circular(25)),
-      //             contentPadding:
-      //                 const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-      //             // hintText: 'Add a brief description',
-      //             hintStyle: const TextStyle(
-      //                 fontSize: 17,
-      //                 color: Colors.grey,
-      //                 fontWeight: FontWeight.w400),
-      //             filled: true,
-      //             fillColor: const Color.fromARGB(255, 235, 235, 235),
-
-      //             // ),
-      //           )),
-      //     )
-      //   ],
-      // ),
-    );
+          );
   }
 
   openImageFromCamOrGallary(BuildContext context) {

@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, prefer_conditional_assignment, unrelated_type_equality_checks, unnecessary_null_comparison
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
@@ -36,7 +37,7 @@ class SingleChatContorller extends GetxController {
   Rx<ClearAllChatModel?> clearChatModel = ClearAllChatModel().obs;
 
   // get message list
-  getdetailschat(conversationID) async {
+  getdetailschat(conversationID, {bool isAddData = false}) async {
     try {
       isLoading(true);
 
@@ -145,11 +146,21 @@ class SingleChatContorller extends GetxController {
     }
   }
 
+  loadingTime() {
+    Timer(const Duration(seconds: 15), () {
+      if (isSendMsg.value == true) {
+        isSendMsg(false);
+        showCustomToast('Something Wrong, Please Try Again');
+      }
+    });
+  }
+
   //================== send DOC message api ==================================
   sendMessageIMGDoc(conversationID, msgtype, filePath, String mobileNum,
       String forwardid, String replyid, bool isforwardUrl) async {
     print("PATH:$filePath");
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -232,87 +243,96 @@ class SingleChatContorller extends GetxController {
   //======================= send text message api ==============================
   sendMessageText(String message, String conversationID, String msgtype,
       String mobileNum, String forwardid, String replyid) async {
-    print(message);
-    print(conversationID);
-    print(msgtype);
-    print(mobileNum);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-    var request = http.MultipartRequest("POST", uri);
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
+    try {
+      print(message);
+      print(conversationID);
+      print(msgtype);
+      print(mobileNum);
+      var uri = Uri.parse(apiHelper.sendChatMsg);
+      var request = http.MultipartRequest("POST", uri);
+      Map<String, String> headers = {
+        'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+        "Accept": "application/json",
+      };
 
-    //add headers
-    request.headers.addAll(headers);
+      //add headers
+      request.headers.addAll(headers);
 
-    //adding params
-    request.fields['message'] = message;
-    request.fields['message_type'] = msgtype;
-    request.fields['conversation_id'] = conversationID;
-    request.fields['phone_number'] = mobileNum;
-    request.fields['forward_id'] = forwardid;
-    request.fields['reply_id'] = replyid;
+      //adding params
+      request.fields['message'] = message;
+      request.fields['message_type'] = msgtype;
+      request.fields['conversation_id'] = conversationID;
+      request.fields['phone_number'] = mobileNum;
+      request.fields['forward_id'] = forwardid;
+      request.fields['reply_id'] = replyid;
 
-    print(request.fields);
-    // send
-    var response = await request.send();
+      print(request.fields);
+      // send
+      var response = await request.send();
 
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
+      String responseData =
+          await response.stream.transform(utf8.decoder).join();
+      debugPrint("message responseData $responseData");
+      var useData = json.decode(responseData);
 
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    print("object: ${request.fields}");
-    print(responseData);
-    final newMessage = MessageList.fromJson(useData);
+      sendMsgModel.value = SendMsgModel.fromJson(useData);
+      print("object: ${request.fields}");
+      print(responseData);
+      final newMessage = MessageList.fromJson(useData);
 
-    if (userdetailschattModel.value?.messageList == null) {
-      print("check.......1");
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......2");
-      final lastMessages =
-          userdetailschattModel.value!.messageList!.toList().reversed.toList();
-      bool todayDateFound = false;
-      final today = DateTime.now().toUtc();
+      if (userdetailschattModel.value?.messageList == null) {
+        print("check.......1");
+        userdetailschattModel.value =
+            SingleChatListModel(messageList: [newMessage]);
+      } else {
+        print("check.......2");
+        final lastMessages = userdetailschattModel.value!.messageList!
+            .toList()
+            .reversed
+            .toList();
+        bool todayDateFound = false;
+        final today = DateTime.now().toUtc();
 
 // Check if today's date message already exists
-      for (var i = 0; i < lastMessages.length; i++) {
-        if (lastMessages[i].messageType == "date") {
-          final lastMessageDate = DateTime.parse(lastMessages[i]
-              .message!); // Assuming UTC date is stored in message field
+        for (var i = 0; i < lastMessages.length; i++) {
+          if (lastMessages[i].messageType == "date") {
+            final lastMessageDate = DateTime.parse(lastMessages[i]
+                .message!); // Assuming UTC date is stored in message field
 
-          if (lastMessageDate.year == today.year &&
-              lastMessageDate.month == today.month &&
-              lastMessageDate.day == today.day) {
-            todayDateFound = true;
-            break;
+            if (lastMessageDate.year == today.year &&
+                lastMessageDate.month == today.month &&
+                lastMessageDate.day == today.day) {
+              todayDateFound = true;
+              break;
+            }
           }
         }
-      }
 
 // If no date message with today's date exists, add it
-      if (!todayDateFound) {
-        final todayDateMessage = MessageList(
-          message: today.toIso8601String(),
-          messageType: "date",
-          // Add any other necessary fields here
-        );
-        userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
-      }
+        if (!todayDateFound) {
+          final todayDateMessage = MessageList(
+            message: today.toIso8601String(),
+            messageType: "date",
+            // Add any other necessary fields here
+          );
+          userdetailschattModel.value!.messageList!.insert(0, todayDateMessage);
+        }
 
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
+        userdetailschattModel.value!.messageList!.insert(0, newMessage);
+      }
+      userdetailschattModel.refresh();
+      Get.find<ChatListController>().forChatList();
+      print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+    } catch (e) {
+      debugPrint("send message error $e");
     }
-    userdetailschattModel.refresh();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
 
   //======================= Send Location message Api ==========================
   sendMessageLocation(String conversationID, String msgtype, String lat,
       String long, String mobileNum, String forwardid, String replyid) async {
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -394,6 +414,7 @@ class SingleChatContorller extends GetxController {
   sendMessageGIF(conversationID, msgtype, Uint8List? bytes, String forwardurl,
       String mobileNum, String forwardid, String replyid) async {
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -487,6 +508,7 @@ class SingleChatContorller extends GetxController {
       String replyid,
       bool isforwardUrl) async {
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -580,6 +602,7 @@ class SingleChatContorller extends GetxController {
       String forwardid, String replyid, bool isforwardUrl) async {
     print("RESPONSE:$filePath");
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.sendChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -744,62 +767,70 @@ class SingleChatContorller extends GetxController {
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
 
-  sendMessageStatusMessage(String message, String msgtype, String mobileNum,
-      String forwardid, String replyid, String statusID) async {
-    print(message);
-    print(msgtype);
-    print(mobileNum);
-    isSendMsg(true);
-    var uri = Uri.parse(apiHelper.sendChatMsg);
-    var request = http.MultipartRequest("POST", uri);
-    Map<String, String> headers = {
-      'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
-      "Accept": "application/json",
-    };
+  sendMessageStatusMessage(
+      String message, String msgtype, String mobileNum, String statusID) async {
+    try {
+      print(message);
+      print(msgtype);
+      print(mobileNum);
+      isSendMsg(true);
+      loadingTime();
+      var uri = Uri.parse(apiHelper.sendChatMsg);
+      var request = http.MultipartRequest("POST", uri);
+      Map<String, String> headers = {
+        'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+        "Accept": "application/json",
+      };
 
-    //add headers
-    request.headers.addAll(headers);
+      //add headers
+      request.headers.addAll(headers);
 
-    //adding params
-    request.fields['message'] = message;
-    request.fields['message_type'] = msgtype;
-    request.fields['phone_number'] = mobileNum;
-    request.fields['forward_id'] = forwardid;
-    request.fields['reply_id'] = replyid;
-    request.fields['status_id'] = statusID;
+      //adding params
+      request.fields['message'] = message;
+      request.fields['message_type'] = msgtype;
+      request.fields['phone_number'] = mobileNum;
+      request.fields['status_id'] = statusID;
+      // request.fields['forward_id'] = "";
+      // request.fields['reply_id'] = "";
 
-    print(request.fields);
-    // send
-    var response = await request.send();
+      print(request.fields);
+      // send
+      var response = await request.send();
 
-    String responseData = await response.stream.transform(utf8.decoder).join();
-    var useData = json.decode(responseData);
+      String responseData =
+          await response.stream.transform(utf8.decoder).join();
+      var useData = json.decode(responseData);
 
-    sendMsgModel.value = SendMsgModel.fromJson(useData);
-    isSendMsg(false);
-    print("object: ${request.fields}");
-    print(responseData);
-    final newMessage = MessageList.fromJson(useData);
+      sendMsgModel.value = SendMsgModel.fromJson(useData);
+      print("object: ${request.fields}");
+      print("message responseData $responseData");
+      // final newMessage = MessageList.fromJson(useData);
 
-    if (userdetailschattModel.value?.messageList == null) {
-      userdetailschattModel.value =
-          SingleChatListModel(messageList: [newMessage]);
-    } else {
-      print("check.......");
-      userdetailschattModel.value!.messageList!.insert(0, newMessage);
+      // if (userdetailschattModel.value?.messageList == null) {
+      //   userdetailschattModel.value =
+      //       SingleChatListModel(messageList: [newMessage]);
+      // } else {
+      //   print("check.......");
+      //   userdetailschattModel.value!.messageList!.insert(0, newMessage);
+      // }
+      // userdetailschattModel.refresh();
+      // // final respo = MessageList.fromJson(useData);
+      // // userdetailschattModel.value!.messageList!.add(respo);
+      // // Get.back();
+      Get.find<ChatListController>().forChatList();
+      // print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
+
+      isSendMsg(false);
+    } catch (e) {
+      isSendMsg(false);
     }
-    userdetailschattModel.refresh();
-    // final respo = MessageList.fromJson(useData);
-    // userdetailschattModel.value!.messageList!.add(respo);
-    Get.back();
-    Get.find<ChatListController>().forChatList();
-    print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
 
     // getdetailschat(conversationID);
   }
 
   deleteChatApi(chatID, bool deleteFrom, String mobileNum) async {
     isSendMsg(true);
+    loadingTime();
     var uri = Uri.parse(apiHelper.deleteChatMsg);
 
     var request = http.MultipartRequest("POST", uri);
@@ -839,7 +870,7 @@ class SingleChatContorller extends GetxController {
     print("LLIISSTT:${userdetailschattModel.value!.messageList!.length}");
   }
 
-  addStarApi(chatID) async {
+  addStarApi(chatID, conversationId) async {
     print(chatID);
     isStar(true);
     try {
@@ -853,6 +884,7 @@ class SingleChatContorller extends GetxController {
       //add headers
       request.headers.addAll(headers);
       request.fields['message_id'] = chatID;
+      request.fields['conversation_id'] = conversationId;
       var response = await request.send();
       print("chatid:${request.fields}");
 

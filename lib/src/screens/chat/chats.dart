@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
+import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/common_widget.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
@@ -32,6 +33,8 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   ChatListController chatListController = Get.put(ChatListController());
   OnlineOfflineController onlieController = Get.find();
   TextEditingController controller = TextEditingController();
+  ChatProfileController chatProfileController =
+      Get.put(ChatProfileController());
 
   Future<void> requestPermissions() async {
     // Request notification permission
@@ -193,6 +196,10 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                   data.isGroup!, data.userName!, data.groupName!, data);
             },
             onTap: () {
+              if (data.isGroup == true) {
+                chatProfileController
+                    .getProfileDATA(data.conversationId.toString());
+              }
               Navigator.push(
                 context,
                 PageTransition(
@@ -240,7 +247,8 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                             ),
                             child: ClipRRect(
                                 borderRadius: BorderRadius.circular(100),
-                                child: data.profileImage != ""
+                                child: data.profileImage != "" &&
+                                        data.isGroup == false
                                     ? CustomCachedNetworkImage(
                                         imageUrl: data.profileImage.toString(),
                                         placeholderColor: chatownColor,
@@ -782,79 +790,83 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
     return showDialog(
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return Stack(
             children: [
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: const Color.fromRGBO(30, 30, 30, 0.37),
-                ),
-              ),
-              AlertDialog(
-                insetPadding: const EdgeInsets.all(5),
-                alignment: Alignment.bottomCenter,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                content: SizedBox(
-                  height: isGroup == false ? 87 : 45,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40,
-                        child: ListTile(
-                          leading: const Icon(
-                            Icons.archive_outlined,
-                            size: 19,
-                            color: Colors.black,
-                          ),
-                          title: const Text(
-                            'Archive chat',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                // child: Container(
+                //   color: const Color.fromRGBO(30, 30, 30, 0.37),
+                // ),
+
+                child: AlertDialog(
+                  insetPadding: const EdgeInsets.all(15),
+                  alignment: Alignment.bottomCenter,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  content: SizedBox(
+                    height: isGroup == false ? 87 : 45,
+                    width: Get.width,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: ListTile(
+                            leading: const Icon(
+                              Icons.archive_outlined,
+                              size: 19,
+                              color: Colors.black,
                             ),
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            isGroup == false
-                                ? chatListController.addArchveApi(cID, uname)
-                                : chatListController.addArchveApi(cID, gpname);
-                            chatListController
-                                .userChatListModel.value!.chatList!
-                                .remove(data);
-                          },
-                        ),
-                      ),
-                      isGroup == false
-                          ? const SizedBox(height: 5)
-                          : const SizedBox.shrink(),
-                      isGroup == false
-                          ? SizedBox(
-                              height: 40,
-                              child: ListTile(
-                                title: Text(
-                                  isblock == false ? 'Block' : "Unblock",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                leading: Image.asset("assets/images/block.png",
-                                    height: 18),
-                                onTap: () {
-                                  setState(() {});
-                                  Navigator.pop(context);
-                                  chatListController.blockUserApi(cID);
-                                },
+                            title: const Text(
+                              'Archive chat',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                               ),
-                            )
-                          : const SizedBox.shrink()
-                    ],
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              isGroup == false
+                                  ? chatListController.addArchveApi(cID, uname)
+                                  : chatListController.addArchveApi(
+                                      cID, gpname);
+                              chatListController
+                                  .userChatListModel.value!.chatList!
+                                  .remove(data);
+                            },
+                          ),
+                        ),
+                        isGroup == false
+                            ? const SizedBox(height: 5)
+                            : const SizedBox.shrink(),
+                        isGroup == false
+                            ? SizedBox(
+                                height: 40,
+                                child: ListTile(
+                                  title: Text(
+                                    isblock == false ? 'Block' : "Unblock",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  leading: Image.asset(
+                                      "assets/images/block.png",
+                                      height: 18),
+                                  onTap: () {
+                                    setState(() {});
+                                    Navigator.pop(context);
+                                    chatListController.blockUserApi(cID);
+                                  },
+                                ),
+                              )
+                            : const SizedBox.shrink()
+                      ],
+                    ),
                   ),
                 ),
               ),

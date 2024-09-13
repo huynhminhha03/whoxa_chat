@@ -20,6 +20,7 @@ class SendMsgModel {
   int? conversationId;
   bool? isStarMessage;
   bool? myMessage;
+  List<StatusData>? statusData;
   SenderData? senderData;
 
   SendMsgModel(
@@ -44,6 +45,7 @@ class SendMsgModel {
       this.conversationId,
       this.isStarMessage,
       this.myMessage,
+      this.statusData,
       this.senderData});
 
   SendMsgModel.fromJson(Map<String, dynamic> json) {
@@ -68,6 +70,12 @@ class SendMsgModel {
     conversationId = json['conversation_id'];
     isStarMessage = json['is_star_message'];
     myMessage = json['myMessage'];
+    if (json['statusData'] != null) {
+      statusData = <StatusData>[];
+      json['statusData'].forEach((v) {
+        statusData!.add(StatusData.fromJson(v));
+      });
+    }
     senderData = json['senderData'] != null
         ? SenderData.fromJson(json['senderData'])
         : null;
@@ -96,9 +104,69 @@ class SendMsgModel {
     data['conversation_id'] = conversationId;
     data['is_star_message'] = isStarMessage;
     data['myMessage'] = myMessage;
+    if (statusData != null) {
+      data['statusData'] = statusData!.map((v) => v.toJson()).toList();
+    }
     if (senderData != null) {
       data['senderData'] = senderData!.toJson();
     }
+    return data;
+  }
+}
+
+class StatusData {
+  int? statusId;
+  String? updatedAt;
+  String? createdAt;
+  List<StatusMedia>? statusMedia;
+
+  StatusData({this.statusId, this.updatedAt, this.createdAt, this.statusMedia});
+
+  StatusData.fromJson(Map<String, dynamic> json) {
+    statusId = json['status_id'];
+    updatedAt = json['updatedAt'];
+    createdAt = json['createdAt'];
+    if (json['StatusMedia'] != null) {
+      statusMedia = <StatusMedia>[];
+      json['StatusMedia'].forEach((v) {
+        statusMedia!.add(StatusMedia.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_id'] = statusId;
+    data['updatedAt'] = updatedAt;
+    data['createdAt'] = createdAt;
+    if (statusMedia != null) {
+      data['StatusMedia'] = statusMedia!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class StatusMedia {
+  String? statusText;
+  String? url;
+  int? statusMediaId;
+  String? updatedAt;
+
+  StatusMedia({this.statusText, this.url, this.statusMediaId, this.updatedAt});
+
+  StatusMedia.fromJson(Map<String, dynamic> json) {
+    statusText = json['status_text'];
+    url = json['url'];
+    statusMediaId = json['status_media_id'];
+    updatedAt = json['updatedAt'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_text'] = statusText;
+    data['url'] = url;
+    data['status_media_id'] = statusMediaId;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

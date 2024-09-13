@@ -2,6 +2,7 @@
 
 // ignore_for_file: avoid_print, must_be_immutable, use_build_context_synchronously, non_constant_identifier_names, file_names, use_full_hex_values_for_flutter_colors, unused_field
 import 'dart:developer';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -133,6 +134,13 @@ class _GroupProfileState extends State<GroupProfile> {
                         child: IconButton(
                             onPressed: () {
                               Navigator.pop(context);
+                              // Get.find<SingleChatContorller>()
+                              //     .userdetailschattModel
+                              //     .value
+                              //     ?.messageList
+                              //     ?.clear();
+                              // Get.find<SingleChatContorller>()
+                              //     .getdetailschat(widget.conversationID);
                             },
                             icon: const Icon(Icons.arrow_back_ios, size: 19))),
                     Positioned(
@@ -261,7 +269,7 @@ class _GroupProfileState extends State<GroupProfile> {
         Text(
           capitalizeFirstLetter(data.groupName!),
           style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 20),
-        )
+        ).paddingSymmetric(horizontal: 15)
       ],
     );
   }
@@ -372,10 +380,122 @@ class _GroupProfileState extends State<GroupProfile> {
                 const SizedBox(height: 30),
                 InkWell(
                   onTap: () {
-                    Navigator.pop(context);
-                    chatProfileController.removeAdminApi(
-                        widget.conversationID, data.user!.userId.toString());
-                    chatProfileController.users.remove(data);
+                    showDialog(
+                      barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+                      context: context,
+                      builder: (BuildContext context) {
+                        return BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                          child: AlertDialog(
+                            insetPadding: const EdgeInsets.all(8),
+                            alignment: Alignment.bottomCenter,
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20),
+                              ),
+                            ),
+                            content: SizedBox(
+                              width: Get.width,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    "Are you sure you want to Remove?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Text(
+                                    "Are you sure you want to remove ${data.user!.userName} from this group?",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: appgrey2,
+                                        fontSize: 13),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: [
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        child: Container(
+                                          height: 40,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: yellow2Color,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(12)),
+                                          child: const Center(
+                                              child: Text(
+                                            'Cancel',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: chatColor),
+                                          )),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      InkWell(
+                                        onTap: () async {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                          chatProfileController.removeAdminApi(
+                                              widget.conversationID,
+                                              data.user!.userId.toString());
+                                          chatProfileController.users
+                                              .remove(data);
+                                        },
+                                        child: Container(
+                                          height: 40,
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.35,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                              gradient: LinearGradient(
+                                                  colors: [
+                                                    yellow1Color,
+                                                    yellow2Color
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter)),
+                                          child: const Center(
+                                              child: Text(
+                                            'Remove',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w400,
+                                                color: chatColor),
+                                          )),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
                   },
                   child: const Text(
                     'Remove from group',
@@ -593,12 +713,14 @@ class _GroupProfileState extends State<GroupProfile> {
         PopupMenuItem(
             onTap: () {
               showDialog(
+                barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
                 context: context,
                 builder: (BuildContext context) {
-                  return Container(
-                    decoration:
-                        BoxDecoration(color: Colors.white.withOpacity(0.4)),
+                  return BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                     child: AlertDialog(
+                      insetPadding: const EdgeInsets.all(8),
+                      alignment: Alignment.bottomCenter,
                       backgroundColor: Colors.white,
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(
@@ -606,30 +728,26 @@ class _GroupProfileState extends State<GroupProfile> {
                         ),
                       ),
                       content: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.90,
-                        height: 200,
+                        width: Get.width,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 5),
+                            const SizedBox(height: 10),
                             const Text(
-                              "Group exit",
+                              "Are you sure you want to Remove?",
                               style: TextStyle(
-                                  color: chatColor,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 22),
+                                  fontWeight: FontWeight.w600, fontSize: 16),
                             ),
-                            const SizedBox(
-                              height: 30,
-                            ),
+                            const SizedBox(height: 15),
                             Text(
                               "Are you exit from ${data.groupName!} group?",
-                              textAlign: TextAlign.center,
                               style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   color: appgrey2,
                                   fontSize: 13),
                             ),
-                            const SizedBox(height: 30),
+                            const SizedBox(height: 20),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
@@ -640,18 +758,18 @@ class _GroupProfileState extends State<GroupProfile> {
                                   child: Container(
                                     height: 40,
                                     width: MediaQuery.of(context).size.width *
-                                        0.30,
+                                        0.35,
                                     decoration: BoxDecoration(
                                         border: Border.all(
-                                            color: chatColor, width: 1),
+                                            color: yellow2Color, width: 1),
                                         borderRadius:
-                                            BorderRadius.circular(20)),
+                                            BorderRadius.circular(12)),
                                     child: const Center(
                                         child: Text(
                                       'Cancel',
                                       style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
                                           color: chatColor),
                                     )),
                                   ),
@@ -660,24 +778,30 @@ class _GroupProfileState extends State<GroupProfile> {
                                   width: 10,
                                 ),
                                 InkWell(
-                                  onTap: () {
+                                  onTap: () async {
                                     chatProfileController.exitGroupApi(
                                         cID: widget.conversationID);
                                   },
                                   child: Container(
                                     height: 40,
                                     width: MediaQuery.of(context).size.width *
-                                        0.30,
+                                        0.35,
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(20),
-                                        color: chatColor),
+                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              yellow1Color,
+                                              yellow2Color
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter)),
                                     child: const Center(
                                         child: Text(
                                       'Exit',
                                       style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: chatColor),
                                     )),
                                   ),
                                 ),
@@ -690,6 +814,104 @@ class _GroupProfileState extends State<GroupProfile> {
                   );
                 },
               );
+              // showDialog(
+              //   context: context,
+              //   builder: (BuildContext context) {
+              //     return Container(
+              //       decoration:
+              //           BoxDecoration(color: Colors.white.withOpacity(0.4)),
+              //       child: AlertDialog(
+              //         backgroundColor: Colors.white,
+              //         shape: const RoundedRectangleBorder(
+              //           borderRadius: BorderRadius.all(
+              //             Radius.circular(20),
+              //           ),
+              //         ),
+              //         content: SizedBox(
+              //           width: MediaQuery.of(context).size.width * 0.90,
+              //           height: 200,
+              //           child: Column(
+              //             children: [
+              //               const SizedBox(height: 5),
+              //               const Text(
+              //                 "Group exit",
+              //                 style: TextStyle(
+              //                     color: chatColor,
+              //                     fontWeight: FontWeight.w500,
+              //                     fontSize: 22),
+              //               ),
+              //               const SizedBox(
+              //                 height: 30,
+              //               ),
+              //               Text(
+              //                 "Are you exit from ${data.groupName!} group?",
+              //                 textAlign: TextAlign.center,
+              //                 style: const TextStyle(
+              //                     fontWeight: FontWeight.w500,
+              //                     color: appgrey2,
+              //                     fontSize: 13),
+              //               ),
+              //               const SizedBox(height: 30),
+              //               Row(
+              //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+              //                 children: [
+              //                   InkWell(
+              //                     onTap: () {
+              //                       Navigator.pop(context);
+              //                     },
+              //                     child: Container(
+              //                       height: 40,
+              //                       width: MediaQuery.of(context).size.width *
+              //                           0.30,
+              //                       decoration: BoxDecoration(
+              //                           border: Border.all(
+              //                               color: chatColor, width: 1),
+              //                           borderRadius:
+              //                               BorderRadius.circular(20)),
+              //                       child: const Center(
+              //                           child: Text(
+              //                         'Cancel',
+              //                         style: TextStyle(
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.w500,
+              //                             color: chatColor),
+              //                       )),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(
+              //                     width: 10,
+              //                   ),
+              //                   InkWell(
+              //                     onTap: () {
+              //                       chatProfileController.exitGroupApi(
+              //                           cID: widget.conversationID);
+              //                     },
+              //                     child: Container(
+              //                       height: 40,
+              //                       width: MediaQuery.of(context).size.width *
+              //                           0.30,
+              //                       decoration: BoxDecoration(
+              //                           borderRadius: BorderRadius.circular(20),
+              //                           color: chatColor),
+              //                       child: const Center(
+              //                           child: Text(
+              //                         'Exit',
+              //                         style: TextStyle(
+              //                             fontSize: 15,
+              //                             fontWeight: FontWeight.w500,
+              //                             color: Colors.white),
+              //                       )),
+              //                     ),
+              //                   ),
+              //                 ],
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     );
+              //   },
+              // );
             },
             child: const Text("Group exit")),
         PopupMenuItem(

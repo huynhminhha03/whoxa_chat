@@ -44,13 +44,14 @@ class _ContactSendState extends State<ContactSend> {
 
   Future<void> apis() async {
     await _fetchContacts();
-    await getContactsFromGloble();
-    log("MY_DEVICE_CONTACS: $mobileContacts");
-    var contactJson = json.encode(mobileContacts);
+    // await getContactsFromGloble();
+    log("MY_DEVICE_CONTACS: ${addContactController.mobileContacts}");
+    var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
   }
 
   Future _fetchContacts() async {
+    
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
     } else {
@@ -224,8 +225,8 @@ class _ContactSendState extends State<ContactSend> {
 
   List<Contact> getFilteredContacts(String searchText) {
     List<Contact> filteredContacts = [];
-    for (int i = 0; i < allcontacts.length; i++) {
-      Contact contact = allcontacts[i];
+    for (int i = 0; i < addContactController.allcontacts.length; i++) {
+      Contact contact = addContactController.allcontacts[i];
       if ((contact.displayName.toLowerCase().contains(searchText))) {
         filteredContacts.add(contact);
       }

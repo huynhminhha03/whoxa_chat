@@ -1150,89 +1150,89 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
     return showDialog(
         barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: true,
         builder: (BuildContext context) {
           return Stack(
             children: [
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                child: Container(
-                  color: const Color.fromRGBO(30, 30, 30, 0.37),
-                ),
-              ),
-              AlertDialog(
-                insetPadding: const EdgeInsets.all(5),
-                alignment: Alignment.bottomCenter,
-                backgroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-                content: SizedBox(
-                  height: isGroup == false ? 87 : 50,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40,
-                        child: ListTile(
-                          leading: const Text(
-                            'Unarchive',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          trailing: const Icon(
-                            Icons.archive_outlined,
-                            size: 19,
-                            color: Colors.black,
-                          ),
-                          onTap: () {
-                            Navigator.pop(context);
-                            isGroup == false
-                                ? chatListController.addArchveApi(cID, uname)
-                                : chatListController.addArchveApi(cID, gpname);
-                            chatListController
-                                .userArchiveListModel.value!.archiveList!
-                                .remove(data);
-                          },
-                        ),
-                      ),
-                      isGroup == false
-                          ? const SizedBox(height: 5)
-                          : const SizedBox.shrink(),
-                      isGroup == false
-                          ? Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: Colors.grey[200],
-                            )
-                          : const SizedBox.shrink(),
-                      isGroup == false
-                          ? SizedBox(
-                              height: 40,
-                              child: ListTile(
-                                leading: Text(
-                                  isblock == "false" ? 'Block' : "Unblock",
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                trailing: const Icon(
-                                  Icons.block,
-                                  size: 19,
-                                  color: Colors.black,
-                                ),
-                                onTap: () async {
-                                  Navigator.pop(context);
-                                  await chatListController.blockUserApi(cID);
-                                  await chatListController.forArchiveChatList();
-                                },
+                child: AlertDialog(
+                  insetPadding: const EdgeInsets.all(15),
+                  alignment: Alignment.bottomCenter,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  content: SizedBox(
+                    height: isGroup == false ? 87 : 50,
+                    width: Get.width,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: 40,
+                          child: ListTile(
+                            title: const Text(
+                              'Unarchive',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
                               ),
-                            )
-                          : const SizedBox.shrink()
-                    ],
+                            ),
+                            leading: const Icon(
+                              Icons.archive_outlined,
+                              size: 19,
+                              color: Colors.black,
+                            ),
+                            onTap: () {
+                              Navigator.pop(context);
+                              isGroup == false
+                                  ? chatListController.addArchveApi(cID, uname)
+                                  : chatListController.addArchveApi(
+                                      cID, gpname);
+                              chatListController
+                                  .userArchiveListModel.value!.archiveList!
+                                  .remove(data);
+                            },
+                          ),
+                        ),
+                        isGroup == false
+                            ? const SizedBox(height: 5)
+                            : const SizedBox.shrink(),
+                        isGroup == false
+                            ? Divider(
+                                height: 1,
+                                thickness: 1,
+                                color: Colors.grey[200],
+                              )
+                            : const SizedBox.shrink(),
+                        isGroup == false
+                            ? SizedBox(
+                                height: 40,
+                                child: ListTile(
+                                  title: Text(
+                                    isblock == "false" ? 'Block' : "Unblock",
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  leading: const Icon(
+                                    Icons.block,
+                                    size: 19,
+                                    color: Colors.black,
+                                  ),
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    await chatListController.blockUserApi(cID);
+                                    await chatListController
+                                        .forArchiveChatList();
+                                  },
+                                ),
+                              )
+                            : const SizedBox.shrink()
+                      ],
+                    ),
                   ),
                 ),
               ),

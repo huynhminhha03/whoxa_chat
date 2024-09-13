@@ -30,18 +30,21 @@ class MyStorySeenListData {
 
 class StatusViewsList {
   String? createdAt;
+  int? statusCount;
   User? user;
 
   StatusViewsList({this.createdAt, this.user});
 
   StatusViewsList.fromJson(Map<String, dynamic> json) {
     createdAt = json['createdAt'];
+    statusCount = json['status_count'];
     user = json['User'] != null ? User.fromJson(json['User']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['createdAt'] = createdAt;
+    data['status_count'] = statusCount;
     if (user != null) {
       data['User'] = user!.toJson();
     }

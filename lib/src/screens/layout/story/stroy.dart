@@ -24,7 +24,8 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
 
   @override
   void initState() {
-    storyController.getAllUsersStory();
+     storyController.getAllUsersStory();
+    
     super.initState();
   }
 
@@ -139,29 +140,30 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                   fontSize: 16, color: blackcolor),
                               subtitleTextStyle: const TextStyle(
                                   fontSize: 14, color: Colors.grey),
-                              trailing: Wrap(
-                                children: [
-                                  const SizedBox(width: 10),
-                                  (storyController.isAllUserStoryLoad.value) ||
-                                          (storyController
-                                              .isMyStorySeenLoading.value) ||
-                                          (storyController
-                                              .isProfileLoading.value) ||
-                                          storyController.storyListData.value
-                                              .myStatus!.statuses!.isEmpty ||
-                                          storyController.storyListData.value
-                                              .myStatus!.statuses!.isEmpty
-                                      ? const SizedBox.shrink()
-                                      : InkWell(
-                                          onTap: () {
-                                            Get.to(() => const StoryScreen6PM(
-                                                  isForMyStory: true,
-                                                ));
-                                          },
-                                          child: Image.asset(
-                                              'assets/images/eye.png',
-                                              height: 23)),
-                                ],
+                              trailing: Obx(
+                                () => Wrap(
+                                  children: [
+                                    const SizedBox(width: 10),
+                                    (storyController
+                                                .isAllUserStoryLoad.value) ||
+                                            // (storyController
+                                            //             .isMyStorySeenLoading.value) ||
+                                            (storyController
+                                                .isProfileLoading.value) ||
+                                            storyController.storyListData.value
+                                                .myStatus!.statuses!.isEmpty
+                                        ? const SizedBox.shrink()
+                                        : InkWell(
+                                            onTap: () {
+                                              Get.to(() => const StoryScreen6PM(
+                                                    isForMyStory: true,
+                                                  ));
+                                            },
+                                            child: Image.asset(
+                                                'assets/images/eye.png',
+                                                height: 23)),
+                                  ],
+                                ),
                               ),
                             ),
                             const Divider(),

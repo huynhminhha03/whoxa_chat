@@ -27,7 +27,7 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
 
   @override
   void initState() {
-    var contactJson = json.encode(mobileContacts);
+    var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
     filteredChatList = chatListController.userChatListModel.value!.chatList!;
     filteredContactList = getAllDeviceContact.getList;

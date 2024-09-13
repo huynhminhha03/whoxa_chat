@@ -1,6 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api, unnecessary_null_comparison, prefer_is_empty, must_be_immutable, deprecated_member_use, unused_field, avoid_print
 
-import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -26,11 +25,11 @@ class FlutterContactsExample extends StatefulWidget {
 
 class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   List<Contact>? _contacts;
-  bool _permissionDenied = false;
+  // bool _permissionDenied = false;
   TextEditingController controller = TextEditingController();
   String searchText = '';
   GetAllDeviceContact getAllDeviceContact = Get.find();
-  AddContactController addContactController = Get.put(AddContactController());
+  AddContactController addContactController = Get.find();
   ChatListController chatListController = Get.find();
   List<Contact> filteredContacts = [];
 
@@ -42,27 +41,26 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   }
 
   Future<void> apis() async {
-    await _fetchContacts();
-    await getContactsFromGloble();
-    log("MY_DEVICE_CONTACS: $mobileContacts");
-    var contactJson = json.encode(mobileContacts);
-    getAllDeviceContact.getAllContactApi(contact: contactJson);
+    // await getContactsFromGloble();
+    log("MY_DEVICE_CONTACS: ${addContactController.mobileContacts}");
+
     chatListController.forChatList();
+    // await _fetchContacts();
   }
 
-  Future _fetchContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
-      final contacts = await FlutterContacts.getContacts(
-          withProperties: true, withPhoto: true);
-      setState(() {
-        _contacts = contacts;
-        filteredContacts =
-            contacts; // Initially set filteredContacts to all contacts
-      });
-    }
-  }
+  // Future _fetchContacts() async {
+  //   if (!await FlutterContacts.requestPermission(readonly: true)) {
+  //     setState(() => _permissionDenied = true);
+  //   } else {
+  //     final contacts = await FlutterContacts.getContacts(
+  //         withProperties: true, withPhoto: true);
+  //     setState(() {
+  //       _contacts = contacts;
+  //       filteredContacts =
+  //           contacts; // Initially set filteredContacts to all contacts
+  //     });
+  //   }
+  // }
 
   void filterContacts(String query) {
     if (_contacts != null) {
@@ -156,47 +154,92 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                 ),
               ),
               // New group and contact text design widget
-              controller.text.trim().isEmpty
-                  ? contactDesign()
-                  : const SizedBox.shrink(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Obx(() {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        getAllDeviceContact.getList.isNotEmpty
-                            ? contactsWidget()
-                            : const SizedBox.shrink(),
-                        controller.text.trim().isEmpty
-                            ? const SizedBox(height: 5)
-                            : const SizedBox.shrink(),
-                        controller.text.trim().isEmpty
-                            ? Divider(
-                                thickness: 1.5,
-                                color: Colors.grey.shade200,
-                              )
-                            : const SizedBox.shrink(),
-                        controller.text.trim().isEmpty
-                            ? const Padding(
-                                padding: EdgeInsets.only(left: 18, top: 10),
-                                child: Text(
-                                  'Invite Friend to Chatweb ',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                        controller.text.trim().isEmpty
-                            ? const SizedBox(height: 5)
-                            : const SizedBox.shrink(),
-                        inviteFriend(searchText)
-                      ],
-                    );
-                  }),
+              const SizedBox(height: 15),
+              InkWell(
+                onTap: () {
+                  //images();
+                  Get.to(() => AddMembersinGroup1());
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 17),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 45,
+                        width: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade200,
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipRRect(
+                            borderRadius: BorderRadius.circular(100),
+                            child: Center(
+                                child:
+                                    Image.asset("assets/images/group1.png"))),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "New Group",
+                        style: TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
-              )
+              ),
+              const SizedBox(height: 8),
+              Divider(
+                thickness: 1.5,
+                color: Colors.grey.shade200,
+              ),
+
+              Expanded(
+                child: Obx(
+                  () => addContactController
+                                  .isGetContectsFromDeviceLoading.value ==
+                              true &&
+                          addContactController.allcontacts.isEmpty
+                      ? loader(context)
+                      : SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              controller.text.trim().isEmpty
+                                  ? contactDesign()
+                                  : const SizedBox.shrink(),
+                              getAllDeviceContact.getList.isNotEmpty
+                                  ? contactsWidget()
+                                  : const SizedBox.shrink(),
+                              controller.text.trim().isEmpty
+                                  ? const SizedBox(height: 5)
+                                  : const SizedBox.shrink(),
+                              controller.text.trim().isEmpty
+                                  ? Divider(
+                                      thickness: 1.5,
+                                      color: Colors.grey.shade200,
+                                    )
+                                  : const SizedBox.shrink(),
+                              controller.text.trim().isEmpty
+                                  ? const Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 18, top: 10),
+                                      child: Text(
+                                        'Invite Friend to Chatweb ',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              controller.text.trim().isEmpty
+                                  ? const SizedBox(height: 5)
+                                  : const SizedBox.shrink(),
+                              inviteFriend(searchText)
+                            ],
+                          ),
+                        ),
+                ),
+              ),
             ],
           ),
         ],
@@ -205,109 +248,128 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   }
 
   Widget contactsWidget() {
-    return getAllDeviceContact.getList.isNotEmpty
-        ? ListView.builder(
-            padding: const EdgeInsets.all(0),
-            itemCount: getAllDeviceContact.getList.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (BuildContext context, int index) {
-              var contact = getAllDeviceContact.getList[index];
-              contact.fullName.toString().toLowerCase().contains(searchText);
-              return Column(
-                children: <Widget>[
-                  ListTile(
-                    onTap: () {
-                      if (chatListController
-                          .userChatListModel.value!.chatList!.isEmpty) {
-                        addContactController.addContactApi(contact.fullName!,
-                            contact.phoneNumber, contact.profileImage!);
-                      } else {
-                        for (var i = 0;
-                            i <
-                                chatListController
-                                    .userChatListModel.value!.chatList!.length;
-                            i++) {
-                          if (chatListController.userChatListModel.value!
-                                  .chatList![i].phoneNumber ==
-                              getAllDeviceContact.getList[index].phoneNumber) {
-                            print('1111111');
-                            Get.to(() => SingleChatMsg(
-                                  conversationID:
-                                      getUserID(contact.phoneNumber.toString()),
-                                  username: contact.fullName!,
-                                  userPic: contact.profileImage,
-                                  mobileNum: contact.phoneNumber.toString(),
-                                  index: 0,
-                                  isBlock: chatListController.userChatListModel
-                                      .value!.chatList![i].isBlock,
-                                  userID: chatListController.userChatListModel
-                                      .value!.chatList![i].userId
-                                      .toString(),
-                                ));
-                          } else {
-                            print('22222');
+    return getAllDeviceContact.isGetContectLoading.value == true &&
+            getAllDeviceContact.getList.isEmpty
+        ? loader(context)
+        : getAllDeviceContact.getList.isNotEmpty
+            ? ListView.builder(
+                padding: const EdgeInsets.all(0),
+                itemCount: getAllDeviceContact.getList.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (BuildContext context, int index) {
+                  var contact = getAllDeviceContact.getList[index];
+                  contact.fullName
+                      .toString()
+                      .toLowerCase()
+                      .contains(searchText);
+                  return Column(
+                    children: <Widget>[
+                      ListTile(
+                        onTap: () {
+                          if (chatListController
+                              .userChatListModel.value!.chatList!.isEmpty) {
                             addContactController.addContactApi(
                                 contact.fullName!,
                                 contact.phoneNumber,
                                 contact.profileImage!);
+                          } else {
+                            for (var i = 0;
+                                i <
+                                    chatListController.userChatListModel.value!
+                                        .chatList!.length;
+                                i++) {
+                              if (chatListController.userChatListModel.value!
+                                      .chatList![i].phoneNumber ==
+                                  getAllDeviceContact
+                                      .getList[index].phoneNumber) {
+                                print('1111111');
+                                Get.to(() => SingleChatMsg(
+                                      conversationID: getUserID(
+                                          contact.phoneNumber.toString()),
+                                      username: contact.fullName!,
+                                      userPic: contact.profileImage,
+                                      mobileNum: contact.phoneNumber.toString(),
+                                      index: 0,
+                                      isBlock: chatListController
+                                          .userChatListModel
+                                          .value!
+                                          .chatList![i]
+                                          .isBlock,
+                                      userID: chatListController
+                                          .userChatListModel
+                                          .value!
+                                          .chatList![i]
+                                          .userId
+                                          .toString(),
+                                    ));
+                              } else {
+                                print('22222');
+                                if (addContactController.isLoading.value ==
+                                    false) {
+                                  addContactController.addContactApi(
+                                      contact.fullName!,
+                                      contact.phoneNumber,
+                                      contact.profileImage!);
+                                }
+                              }
+                            }
                           }
-                        }
-                      }
-                    },
-                    leading: Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        shape: BoxShape.circle,
+                        },
+                        leading: Container(
+                          height: 45,
+                          width: 45,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade200,
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: CustomCachedNetworkImage(
+                                  imageUrl: contact.profileImage!,
+                                  placeholderColor: chatownColor,
+                                  errorWidgeticon: const Icon(Icons.person))),
+                        ),
+                        title: Text(
+                          contact.fullName!,
+                          style: const TextStyle(
+                            fontSize: 15.0,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: Container(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            contact.phoneNumber.toString(),
+                            style: const TextStyle(
+                                fontSize: 13,
+                                color: Color.fromRGBO(73, 73, 73, 1)),
+                          ),
+                        ),
+                        trailing:
+                            Image.asset("assets/images/Chat1.png", height: 10),
                       ),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child: CustomCachedNetworkImage(
-                              imageUrl: contact.profileImage!,
-                              placeholderColor: chatownColor,
-                              errorWidgeticon: const Icon(Icons.person))),
-                    ),
-                    title: Text(
-                      contact.fullName!,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        fontFamily: 'Poppins',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Container(
-                      padding: const EdgeInsets.only(top: 2.0),
-                      child: Text(
-                        contact.phoneNumber.toString(),
-                        style: const TextStyle(
-                            fontSize: 13, color: Color.fromRGBO(73, 73, 73, 1)),
-                      ),
-                    ),
-                    trailing:
-                        Image.asset("assets/images/Chat1.png", height: 10),
-                  ),
-                  if (index != getAllDeviceContact.getList.length - 1)
-                    Divider(
-                      color: Colors.grey.shade300,
-                    )
-                ],
+                      if (index != getAllDeviceContact.getList.length - 1)
+                        Divider(
+                          color: Colors.grey.shade300,
+                        )
+                    ],
+                  );
+                },
+              )
+            : const SizedBox(
+                height: 100,
+                child: Center(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.black),
+                    SizedBox(width: 10),
+                    Text("Please wait...!"),
+                  ],
+                )),
               );
-            },
-          )
-        : const SizedBox(
-            height: 100,
-            child: Center(
-                child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(color: Colors.black),
-                SizedBox(width: 10),
-                Text("Please wait...!"),
-              ],
-            )),
-          );
   }
 
   bool isMatchinginvite(String userNumber) {
@@ -324,8 +386,8 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
 
   List<Contact> getFilteredContacts(String searchText) {
     List<Contact> filteredContacts = [];
-    for (int i = 0; i < allcontacts.length; i++) {
-      Contact contact = allcontacts[i];
+    for (int i = 0; i < addContactController.allcontacts.length; i++) {
+      Contact contact = addContactController.allcontacts[i];
       if (isMatchinginvite(
               getMobile(contact.phones.map((e) => e.number).toString())) &&
           (contact.displayName.toLowerCase().contains(searchText))) {
@@ -337,98 +399,104 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
 
   Widget inviteFriend(String searchText) {
     List<Contact> filteredContacts = getFilteredContacts(searchText);
-    return ListView.builder(
-      padding: const EdgeInsets.all(0),
-      itemCount: filteredContacts.length,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (BuildContext context, int index) {
-        var contact = filteredContacts[index];
-        //Uint8List? image = contact.photo;
-        return Column(
-          children: <Widget>[
-            getMobile(Hive.box(userdata).get(userMobile)) ==
-                    getMobile(contact.phones.map((e) => e.number).toString())
-                ? const SizedBox.shrink()
-                : ListTile(
-                    onTap: () {
-                      inviteMe(contact.phones.map((e) => e.number).toString());
-                    },
-                    leading: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                              colors: [
-                                blackColor,
-                                black1Color,
-                              ],
-                              stops: const [
-                                1.0,
-                                3.0
-                              ],
-                              begin: FractionalOffset.topLeft,
-                              end: FractionalOffset.bottomRight,
-                              tileMode: TileMode.repeated)),
-                      child: ClipRRect(
-                          borderRadius: BorderRadius.circular(100),
-                          child:
-                              // contact.photo != null
-                              //     ? Image.memory(
-                              //         image!,
-                              //         fit: BoxFit.cover,
-                              //         width: 50,
-                              //         height: 50,
-                              //       )
-                              //     :
-                              Center(
-                            child: Text(
-                              contact.displayName != null
-                                  ? contact.displayName[0]
-                                  : "?",
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontFamily: "MontserratBold",
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          )),
-                    ),
-                    title: Text(
-                      contact.displayName,
-                      maxLines: 1,
-                      style: const TextStyle(
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Container(
-                        padding: const EdgeInsets.only(top: 2.0),
-                        child: Text(
+    return addContactController.isGetContectsFromDeviceLoading.value == true &&
+            addContactController.allcontacts.isEmpty
+        ? loader(context)
+        : ListView.builder(
+            padding: const EdgeInsets.all(0),
+            itemCount: filteredContacts.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (BuildContext context, int index) {
+              var contact = filteredContacts[index];
+              //Uint8List? image = contact.photo;
+              return Column(
+                children: <Widget>[
+                  getMobile(Hive.box(userdata).get(userMobile)) ==
                           getMobile(
-                              contact.phones.map((e) => e.number).toString()),
-                          maxLines: 1,
-                          style: const TextStyle(
-                              color: Color.fromRGBO(73, 73, 73, 1)),
-                        )),
-                    trailing: const Text(
-                      "Invite",
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: chatownColor,
-                          fontWeight: FontWeight.w500),
-                    ),
-                  ),
-            if (index != filteredContacts.length - 1)
-              Divider(
-                color: Colors.grey.shade300,
-              )
-          ],
-        );
-      },
-    );
+                              contact.phones.map((e) => e.number).toString())
+                      ? const SizedBox.shrink()
+                      : ListTile(
+                          onTap: () {
+                            inviteMe(
+                                contact.phones.map((e) => e.number).toString());
+                          },
+                          leading: Container(
+                            height: 50,
+                            width: 50,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                    colors: [
+                                      blackColor,
+                                      black1Color,
+                                    ],
+                                    stops: const [
+                                      1.0,
+                                      3.0
+                                    ],
+                                    begin: FractionalOffset.topLeft,
+                                    end: FractionalOffset.bottomRight,
+                                    tileMode: TileMode.repeated)),
+                            child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child:
+                                    // contact.photo != null
+                                    //     ? Image.memory(
+                                    //         image!,
+                                    //         fit: BoxFit.cover,
+                                    //         width: 50,
+                                    //         height: 50,
+                                    //       )
+                                    //     :
+                                    Center(
+                                  child: Text(
+                                    contact.displayName != null
+                                        ? contact.displayName[0]
+                                        : "?",
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontFamily: "MontserratBold",
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                )),
+                          ),
+                          title: Text(
+                            contact.displayName,
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Container(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: Text(
+                                getMobile(contact.phones
+                                    .map((e) => e.number)
+                                    .toString()),
+                                maxLines: 1,
+                                style: const TextStyle(
+                                    color: Color.fromRGBO(73, 73, 73, 1)),
+                              )),
+                          trailing: const Text(
+                            "Invite",
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: chatownColor,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                  if (index != filteredContacts.length - 1)
+                    Divider(
+                      color: Colors.grey.shade300,
+                    )
+                ],
+              );
+            },
+          );
   }
 
   inviteMe(phone) async {
@@ -450,53 +518,17 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   }
 
   Widget contactDesign() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 15),
-        InkWell(
-          onTap: () {
-            //images();
-            Get.to(() => AddMembersinGroup1());
-          },
-          child: Padding(
-            padding: const EdgeInsets.only(left: 17),
-            child: Row(
-              children: [
-                Container(
-                  height: 45,
-                  width: 45,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    shape: BoxShape.circle,
-                  ),
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(100),
-                      child: Center(
-                          child: Image.asset("assets/images/group1.png"))),
-                ),
-                const SizedBox(width: 10),
-                const Text(
-                  "New Group",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Divider(
-          thickness: 1.5,
-          color: Colors.grey.shade200,
-        ),
-        const Padding(
+        Padding(
           padding: EdgeInsets.only(left: 20, top: 10),
           child: Text(
             "Contact on Chatweb",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
       ],
     );
   }

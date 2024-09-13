@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -15,6 +16,8 @@ class SaveContact extends StatefulWidget {
 }
 
 class _SaveContactState extends State<SaveContact> {
+  AddContactController addContactController = Get.find();
+
   Future<void> saveContactInBackground(Map<String, String> contactData) async {
     final String name = contactData['name']!;
     final String number = contactData['number']!;
@@ -71,23 +74,25 @@ class _SaveContactState extends State<SaveContact> {
                   )
                 ],
               ),
-              containerWidget(
-                  onTap: () async {
-                    print("@@@@@@@@@@@@@@@@@@@@@");
-                    // Request permission to access contacts
-                    // if (await FlutterContacts.requestPermission()) {
-                    //   // Passing a simple map to the isolate
-                    //   final contactData = {
-                    //     'name': widget.name,
-                    //     'number': widget.number,
-                    //   };
-
-                    //   // Using the compute function to run saveContactInBackground in the background
-                    //   await compute(saveContactInBackground, contactData);
-                    // }
-                    inviteMe(widget.number);
-                  },
-                  title: "Invite")
+              //  containerWidget(
+              //         onTap: () async {
+              //           print("@@@@@@@@@@@@@@@@@@@@@");
+              //           inviteMe(widget.number);
+              //         },
+              //         title: "Invite")
+              //     :
+              addContactController.mobileContacts
+                          .where(
+                              (element) => element["number"] == widget.number)
+                          .isEmpty ==
+                      true
+                  ? containerWidget(
+                      onTap: () async {
+                        print("@@@@@@@@@@@@@@@@@@@@@");
+                        inviteMe(widget.number);
+                      },
+                      title: "Invite")
+                  : containerWidget(onTap: () async {}, title: "Chat"),
             ],
           ).paddingSymmetric(horizontal: 20),
           Row(

@@ -11,10 +11,13 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
+import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
+import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
+import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/main.dart';
@@ -53,10 +56,13 @@ class _TabbarScreenState extends State<TabbarScreen>
   ChatListController chatListController = Get.put(ChatListController());
   GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
   RoomIdController getRoomController = Get.put(RoomIdController());
+  AddContactController addContactController = Get.put(AddContactController());
+  SingleChatContorller singleChatContorller = Get.put(SingleChatContorller());
   AllBlockListController allBlockListController =
       Get.put(AllBlockListController());
   AllStaredMsgController allStaredMsgController =
       Get.put(AllStaredMsgController());
+  AvatarController avatarController = Get.put(AvatarController());
   String _timeZone = 'Fetching time zone...';
 
   void _selectTab(int tabItem) {
@@ -286,13 +292,13 @@ class _TabbarScreenState extends State<TabbarScreen>
   permissionAcessPhone() async {
     var permission = await Permission.contacts.request();
     if (permission.isGranted) {
-      await getContactsFromGloble();
-      print("@@@@@@@@@@@: ${mobileContacts.runtimeType}");
-      log("MY_DEVICE_CONTACS: ${mobileContacts}");
-      var contactJson = json.encode(mobileContacts);
-      //jsonEncode(mobileContacts);
-      //log("JSON: $contactJson");
-      getAllDeviceContact.getAllContactApi(contact: contactJson);
+      await addContactController.getContactsFromGloble();
+      print("@@@@@@@@@@@: ${addContactController.mobileContacts.runtimeType}");
+      log("MY_DEVICE_CONTACS: ${addContactController.mobileContacts}");
+      // var contactJson = json.encode(addContactController.mobileContacts);
+      // //jsonEncode(mobileContacts);
+      // //log("JSON: $contactJson");
+      // getAllDeviceContact.getAllContactApi(contact: contactJson);
     } else {
       permissionAcessPhone();
     }

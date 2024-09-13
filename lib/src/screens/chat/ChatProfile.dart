@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously, avoid_print, must_be_immutable, file_names
+// ignore_for_file: use_build_context_synchronously, avoid_print, must_be_immutable, file_names, unused_element
 
 import 'dart:developer';
 import 'dart:ui';
@@ -98,8 +98,8 @@ class _ChatProfileState extends State<ChatProfile> {
                 ),
               );
       }),
-      bottomNavigationBar:
-          BottomAppBar(color: Colors.white, elevation: 0, child: blockButton()),
+      // bottomNavigationBar:
+      //     BottomAppBar(color: Colors.white, elevation: 0, child: blockButton()),
     );
   }
 
@@ -147,17 +147,8 @@ class _ChatProfileState extends State<ChatProfile> {
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      "assets/images/call_1.png",
-                      height: 20,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(
-                      width: 5,
-                    ),
                     Text(
-                        data.conversationsUsers![0].user!.phoneNumber
-                            .toString(),
+                        "${data.conversationsUsers![0].user!.countryCode.toString()} ${data.conversationsUsers![0].user!.phoneNumber.toString()}",
                         style: const TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 14,
@@ -216,16 +207,17 @@ class _ChatProfileState extends State<ChatProfile> {
           ],
         ),
         const SizedBox(height: 20),
-        Container(
-          width: MediaQuery.sizeOf(context).width * 0.90,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: const Color.fromRGBO(243, 243, 243, 1.000)),
-          child: Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: SelectableText(matchNum(widget.fullName!)),
-          ),
-        ),
+        bioAndCreatedAt(data),
+        // Container(
+        //   width: MediaQuery.sizeOf(context).width * 0.90,
+        //   decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(10),
+        //       color: const Color.fromRGBO(243, 243, 243, 1.000)),
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(15.0),
+        //     child: SelectableText(matchNum(widget.fullName!)),
+        //   ),
+        // ),
         const SizedBox(
           height: 20,
         ),
@@ -235,9 +227,349 @@ class _ChatProfileState extends State<ChatProfile> {
         ),
         stareContainer(),
         const SizedBox(
-          height: 20,
+          height: 36,
+        ),
+        others(data),
+      ],
+    );
+  }
+
+  Widget others(ConversationDetails data) {
+    return Column(
+      children: [
+        GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onTap: () {
+            showDialog(
+              barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return Stack(
+                  children: [
+                    BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                      child: Container(
+                        color: const Color.fromRGBO(30, 30, 30, 0.37),
+                      ),
+                    ),
+                    AlertDialog(
+                      insetPadding: const EdgeInsets.all(8),
+                      alignment: Alignment.bottomCenter,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      content: SizedBox(
+                        height: 150,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 10),
+                            Text(
+                              chatListController.blockModel.value!.isBlock ==
+                                      true
+                                  ? "Are you sure you want to Unblock?"
+                                  : "Are you sure you want to Block?",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 16),
+                            ),
+                            const SizedBox(height: 15),
+                            Text(
+                              chatListController.blockModel.value!.isBlock ==
+                                      true
+                                  ? "Are you sure you want to unblock profile of  @${widget.fullName}?"
+                                  : "Are you sure you want to block profile of  @${widget.fullName}?",
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: appgrey2,
+                                  fontSize: 13),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    height: 38,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.35,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: yellow2Color, width: 1),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: const Center(
+                                        child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: chatColor),
+                                    )),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {});
+                                    chatListController
+                                        .blockUserApi(widget.peeid);
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.35,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              yellow1Color,
+                                              yellow2Color
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter)),
+                                    child: Center(
+                                        child: Text(
+                                      chatListController
+                                                  .blockModel.value!.isBlock ==
+                                              true
+                                          ? "Unblock"
+                                          : 'Block',
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: chatColor),
+                                    )),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+          child: Container(
+            decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+              BoxShadow(
+                blurRadius: 0.5,
+                spreadRadius: 0,
+                offset: Offset(0, 0.4),
+                color: Color.fromRGBO(239, 239, 239, 1),
+              )
+            ]),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 25, top: 15, right: 25, bottom: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        "assets/icons/block.png",
+                        height: 18,
+                        width: 18,
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        chatListController.blockModel.value!.isBlock == true
+                            ? 'Unblock ${data.conversationsUsers![0].user!.userName!}'
+                            : 'Block ${data.conversationsUsers![0].user!.userName!}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xffFF2525),
+                          fontFamily: "Poppins",
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 1,
+        ),
+        Container(
+          decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+            BoxShadow(
+              blurRadius: 0.5,
+              spreadRadius: 0,
+              offset: Offset(0, 0.4),
+              color: Color.fromRGBO(239, 239, 239, 1),
+            )
+          ]),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 25, top: 15, right: 25, bottom: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/icons/report.png",
+                      height: 18,
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Report ${data.conversationsUsers![0].user!.userName!}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xffFF2525),
+                        fontFamily: "Poppins",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 1,
+        ),
+        Container(
+          decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+            BoxShadow(
+              blurRadius: 0.5,
+              spreadRadius: 0,
+              offset: Offset(0, 0.4),
+              color: Color.fromRGBO(239, 239, 239, 1),
+            )
+          ]),
+          child: Padding(
+            padding:
+                const EdgeInsets.only(left: 25, top: 15, right: 25, bottom: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/icons/delete.png",
+                      height: 18,
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Text(
+                      'Delete ${data.conversationsUsers![0].user!.userName!}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xffFF2525),
+                        fontFamily: "Poppins",
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ],
+    );
+  }
+
+  Widget bioAndCreatedAt(ConversationDetails data) {
+    return Container(
+      decoration: const BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+          blurRadius: 0.5,
+          spreadRadius: 0,
+          offset: Offset(0, 0.4),
+          color: Color.fromRGBO(239, 239, 239, 1),
+        )
+      ]),
+      child: InkWell(
+        onTap: () {
+          Get.to(
+              () => AllStarredMsgList(
+                  conversationid: widget.peeid, isPersonal: true),
+              transition: Transition.rightToLeft);
+        },
+        child: Padding(
+          padding:
+              const EdgeInsets.only(left: 50, top: 10, right: 25, bottom: 10),
+          child: Column(
+            children: [
+              SizedBox(
+                width: Get.width * 0.80,
+                child: Text(
+                  data.conversationsUsers![0].user!.bio!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      fontFamily: "Poppins",
+                      color: Color(0xff000000)),
+                ),
+              ),
+              Row(
+                children: [
+                  Text(
+                    "Logged in",
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 9,
+                        fontFamily: "Poppins",
+                        color: const Color(0xff000000).withOpacity(0.26)),
+                  ),
+                  const SizedBox(
+                    width: 2,
+                  ),
+                  Text(
+                    dateFormate(
+                      convertToLocalDate(
+                          data.conversationsUsers![0].user!.createdAt),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 9,
+                        fontFamily: "Poppins",
+                        color: const Color(0xff000000).withOpacity(0.26)),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -440,7 +772,7 @@ class _ChatProfileState extends State<ChatProfile> {
                     width: 10,
                   ),
                   const Text(
-                    'Started Messages',
+                    'Starred Messages',
                     style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
                   ),
                 ],

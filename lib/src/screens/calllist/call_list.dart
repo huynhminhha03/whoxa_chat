@@ -279,16 +279,8 @@ class _call_historyState extends State<call_history>
                                                                 .get(userId)
                                                         ? "assets/icons/outgoing_audio_call.png"
                                                         : "assets/icons/incoming_audio_call.png",
-                                        scale: roomIdController
-                                                        .callHistoryData[index]
-                                                        .callType ==
-                                                    "video_call" &&
-                                                roomIdController
-                                                        .callHistoryData[index]
-                                                        .missedCall ==
-                                                    "1"
-                                            ? 2
-                                            : 3,
+                                        height: 14,
+                                        width: 14,
                                       ),
                                       const SizedBox(
                                         width: 4,
@@ -483,18 +475,8 @@ class _call_historyState extends State<call_history>
                                                       "video_call"
                                                   ? "assets/icons/missed_video_call.png"
                                                   : "assets/icons/missed_audio_call.png",
-                                              scale: roomIdController
-                                                              .callHistoryData[
-                                                                  index]
-                                                              .callType ==
-                                                          "video_call" &&
-                                                      roomIdController
-                                                              .callHistoryData[
-                                                                  index]
-                                                              .missedCall ==
-                                                          "1"
-                                                  ? 2
-                                                  : 3,
+                                              height: 14,
+                                              width: 14,
                                             ),
                                             const SizedBox(
                                               width: 4,

@@ -34,6 +34,7 @@ class StroyGetxController extends GetxController {
   var isProfileLoading = false.obs;
   var isMyStorySeenLoading = false.obs;
   var isMyStoryDeleteLoading = false.obs;
+  var isViewStoryLoading = false.obs;
 
   var isSeenUserOpen = false;
 
@@ -323,6 +324,8 @@ class StroyGetxController extends GetxController {
       if (kDebugMode) {
         print("Status of get_story_by_user : ${result.statusCode}");
       }
+      myStorySeenListAPI(
+          storyListData.value.myStatus!.statuses![0].statusId!.toString());
       isAllUserStoryLoad(false);
     } catch (e) {
       log(e.toString());
@@ -334,6 +337,7 @@ class StroyGetxController extends GetxController {
 
   viewStoryAPI(String storyID, viewCount, pageIndex) async {
     try {
+      isViewStoryLoading.value = true;
       Map<String, dynamic> data = {
         'status_id': storyID,
         'status_count': viewCount
@@ -391,9 +395,11 @@ class StroyGetxController extends GetxController {
       // }
 
       viewStoryData = respo.obs;
+      isViewStoryLoading.value = false;
     } catch (e) {
       log(e.toString());
-    } finally {}
+      isViewStoryLoading.value = false;
+    }
   }
 
   myStorySeenListAPI(String storyID) async {
@@ -459,8 +465,6 @@ class StroyGetxController extends GetxController {
       }
     } catch (e) {
       log(e.toString());
-    } finally {
-      isMyStorySeenLoading(false);
     }
   }
 
@@ -491,8 +495,10 @@ class StroyGetxController extends GetxController {
 
       if (deleteStatusModel.value.success == true) {
         isMyStoryDeleteLoading(false);
-        showCustomToast("You Story Removed");
+        storyListData.value.myStatus!.statuses![0].statusMedia!.removeWhere(
+            (element) => element.statusMediaId.toString() == statusMediaID);
         storyListData.refresh();
+        showCustomToast("You Story Removed");
         Get.back();
       }
     } catch (e) {

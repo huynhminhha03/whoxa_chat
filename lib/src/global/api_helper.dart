@@ -37,6 +37,7 @@ class ApiHelper {
   String callCutByReceiver = '$baseUrl/call-cut-by-receiver';
   String statusDetele = '$baseUrl/delete-status-media-by-id';
   String callHistory = '$baseUrl/call-list';
+  String listOfAvatars = '$baseUrl/list-all-avtars';
 
   Future<Map<String, dynamic>> postMethod(
       {required String url,

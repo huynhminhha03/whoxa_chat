@@ -1,6 +1,5 @@
 // ignore_for_file: file_names
 
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -21,19 +20,26 @@ class _FileViewState extends State<FileView> {
     super.initState();
   }
 
+  final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
-    return BackdropFilter(
-      filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Material(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: SfPdfViewer.network(
+              widget.file,
+              key: _pdfViewerKey,
+            ),
           ),
-          child: SfPdfViewer.network(widget.file),
-        ),
+        ).paddingOnly(top: 30),
       ),
-    ).paddingOnly(top: 30);
+    );
   }
 }

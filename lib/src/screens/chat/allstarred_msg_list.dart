@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_print, must_be_immutable, prefer_is_empty
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
@@ -26,6 +28,7 @@ import 'package:meyaoo_new/src/screens/chat/chatvideo.dart';
 import 'package:meyaoo_new/src/screens/chat/group_chat_temp.dart';
 import 'package:meyaoo_new/src/screens/chat/imageView.dart';
 import 'package:meyaoo_new/src/screens/chat/single_chat.dart';
+import 'package:meyaoo_new/src/screens/save_contact.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:http/http.dart' as http;
@@ -228,29 +231,33 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 25),
                                     child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        SizedBox(
-                                          height: MediaQuery.sizeOf(context)
-                                                  .height *
-                                              0.3,
-                                        ),
                                         Image.asset(
-                                            "assets/images/starfill.png",
-                                            color: chatColor,
-                                            height: 28),
-                                        const SizedBox(height: 25),
+                                          "assets/images/empty_stared_list.png",
+                                          height: 200,
+                                          width: 200,
+                                        ),
+                                        // const SizedBox(height: 25),
                                         const Text(
                                           "No starred Messages",
                                           style: TextStyle(
-                                              color: chatColor,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500),
+                                              color: Color(0xff000000),
+                                              fontSize: 16,
+                                              fontFamily: "Poppins",
+                                              fontWeight: FontWeight.w400),
                                         ),
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 4),
                                         const Text(
                                           "Tap and hold on any message to star it, so you can easily find it later.",
                                           textAlign: TextAlign.center,
-                                        )
+                                          style: TextStyle(
+                                              color: Color(0xff959595),
+                                              fontSize: 10,
+                                              fontFamily: "Poppins",
+                                              fontWeight: FontWeight.w400),
+                                        ).paddingSymmetric(horizontal: 50)
                                       ],
                                     ),
                                   ),
@@ -379,164 +386,402 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 60,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId)
-                              ? starId.remove(data.chat!.messageId)
-                              : starId.add(data.chat!.messageId);
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: data.chat!.user!.userId ==
-                                      Hive.box(userdata).get(userId)
-                                  ? null
-                                  : Colors.grey.shade200,
-                              gradient: data.chat!.user!.userId ==
-                                      Hive.box(userdata).get(userId)
-                                  ? LinearGradient(
-                                      colors: [yellow1Color, yellow2Color],
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter)
-                                  : null),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 15,
-                                vertical: 10,
-                              ),
-                              child: Container(
-                                constraints: const BoxConstraints(
-                                  minHeight: 20.0,
-                                  minWidth: 10.0,
-                                  maxWidth: 230,
-                                ),
-                                child: Text(
-                                  data.chat!.message.toString(),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myText(index, data)
+              : otherText(index, data),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherText(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: data.chat!.user!.userId ==
+                                  Hive.box(userdata).get(userId)
+                              ? yellow1Color
+                              : grey1Color,
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 10,
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minHeight: 20.0,
+                                minWidth: 10.0,
+                                maxWidth: 230,
+                              ),
+                              child: Text(
+                                data.chat!.message.toString(),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ).paddingSymmetric(horizontal: 5, vertical: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 3,
+                              right: 3,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myText(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: data.chat!.user!.userId ==
+                                  Hive.box(userdata).get(userId)
+                              ? yellow1Color
+                              : grey1Color,
+                        ),
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 10,
+                            ),
+                            child: Container(
+                              constraints: const BoxConstraints(
+                                minHeight: 20.0,
+                                minWidth: 10.0,
+                                maxWidth: 230,
+                              ),
+                              child: Text(
+                                data.chat!.message.toString(),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              ).paddingSymmetric(horizontal: 5, vertical: 5),
+                            ),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 3,
+                              right: 3,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getImgMessageWidget(index, StarMessageList data) {
@@ -577,164 +822,531 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 95,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                  curve: Curves.linear,
-                                  type: PageTransitionType.rightToLeft,
-                                  child: ImageView(
-                                    image: data.chat!.url!,
-                                    userimg: "",
-                                  )),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: data.chat!.user!.userId ==
-                                      Hive.box(userdata).get(userId)
-                                  ? yellow1Color
-                                  : Colors.grey.shade200,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(3.0),
-                              child: Container(
-                                  height: 120,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      data.chat!.url!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myImage(index, data)
+              : otherImage(index, data),
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child:
+          // InkWell(
+          //             onTap: () {
+          //               Navigator.push(
+          //                 context,
+          //                 PageTransition(
+          //                     curve: Curves.linear,
+          //                     type: PageTransitionType.rightToLeft,
+          //                     child: ImageView(
+          //                       image: data.chat!.url!,
+          //                       userimg: "",
+          //                     )),
+          //               );
+          //             },
+          //             child: Container(
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(10),
+          //                 color: data.chat!.user!.userId ==
+          //                         Hive.box(userdata).get(userId)
+          //                     ? yellow1Color
+          //                     : Colors.grey.shade200,
+          //               ),
+          //               child: Padding(
+          //                 padding: const EdgeInsets.all(3.0),
+          //                 child: Container(
+          //                     height: 120,
+          //                     width: 120,
+          //                     decoration: BoxDecoration(
+          //                         borderRadius: BorderRadius.circular(10)),
+          //                     child: ClipRRect(
+          //                       borderRadius: BorderRadius.circular(10),
+          //                       child: Image.network(
+          //                         data.chat!.url!,
+          //                         fit: BoxFit.cover,
+          //                       ),
+          //                     )),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherImage(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                curve: Curves.linear,
+                                type: PageTransitionType.rightToLeft,
+                                child: ImageView(
+                                  image: data.chat!.url!,
+                                  userimg: "",
+                                )),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : Colors.grey.shade200,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Container(
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    data.chat!.url!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myImage(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                curve: Curves.linear,
+                                type: PageTransitionType.rightToLeft,
+                                child: ImageView(
+                                  image: data.chat!.url!,
+                                  userimg: "",
+                                )),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : Colors.grey.shade200,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Container(
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    data.chat!.url!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getLocationMessageWidget(index, StarMessageList data) {
@@ -775,204 +1387,850 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myLocation(index, data)
+              : otherLocation(index, data),
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child: Container(
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(10),
+          //               color: data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? yellow1Color
+          //                   : Colors.grey.shade200,
+          //             ),
+          //             child: Padding(
+          //               padding: const EdgeInsets.all(3.0),
+          //               child: Container(
+          //                   decoration: BoxDecoration(
+          //                     borderRadius: BorderRadius.circular(10),
+          //                   ),
+          //                   constraints: const BoxConstraints(
+          //                       minHeight: 10.0,
+          //                       minWidth: 10.0,
+          //                       maxWidth: 250),
+          //                   child: InkWell(
+          //                     onTap: () {
+          //                       MapUtils.openMap(
+          //                           double.parse(data.chat!.latitude!),
+          //                           double.parse(data.chat!.longitude!));
+          //                     },
+          //                     child: Container(
+          //                       height: 130,
+          //                       width: 250,
+          //                       decoration: BoxDecoration(
+          //                           borderRadius:
+          //                               BorderRadius.circular(10)),
+          //                       child: ClipRRect(
+          //                         borderRadius: BorderRadius.circular(10),
+          //                         child: data.chat!.latitude.toString() ==
+          //                                     "" ||
+          //                                 data.chat!.longitude.toString() ==
+          //                                     ""
+          //                             ? Container(
+          //                                 decoration: const BoxDecoration(
+          //                                     borderRadius:
+          //                                         BorderRadius.only(
+          //                                             topLeft:
+          //                                                 Radius.circular(
+          //                                                     10),
+          //                                             topRight:
+          //                                                 Radius.circular(
+          //                                                     10)),
+          //                                     image: DecorationImage(
+          //                                         image: AssetImage(
+          //                                             "assets/images/map_Blurr.png"),
+          //                                         fit: BoxFit.cover)),
+          //                                 child: Icon(
+          //                                   Icons.error_outline,
+          //                                   color: chatownColor
+          //                                       .withOpacity(0.6),
+          //                                   size: 50,
+          //                                 ),
+          //                               )
+          //                             : GoogleMap(
+          //                                 zoomControlsEnabled: false,
+          //                                 zoomGesturesEnabled: false,
+          //                                 initialCameraPosition:
+          //                                     CameraPosition(
+          //                                         target: LatLng(
+          //                                             double.parse(data
+          //                                                 .chat!.latitude!),
+          //                                             double.parse(data
+          //                                                 .chat!
+          //                                                 .longitude!)),
+          //                                         zoom: 15),
+          //                                 mapType: MapType.normal,
+          //                                 onMapCreated: (GoogleMapController
+          //                                     controller111) {
+          //                                   // controller.complete();
+          //                                 },
+          //                               ),
+          //                       ),
+          //                     ),
+          //                   )),
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
+        ),
+      ),
+    ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherLocation(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 105,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
                       ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: grey1Color),
+                    constraints: const BoxConstraints(
+                        minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 130,
+                          width: 250,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? yellow1Color
-                                : Colors.grey.shade200,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3.0),
-                            child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                constraints: const BoxConstraints(
-                                    minHeight: 10.0,
-                                    minWidth: 10.0,
-                                    maxWidth: 250),
-                                child: InkWell(
-                                  onTap: () {
-                                    MapUtils.openMap(
-                                        double.parse(data.chat!.latitude!),
-                                        double.parse(data.chat!.longitude!));
-                                  },
-                                  child: Container(
-                                    height: 130,
-                                    width: 250,
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(10),
-                                      child: data.chat!.latitude.toString() ==
-                                                  "" ||
-                                              data.chat!.longitude.toString() ==
-                                                  ""
-                                          ? Container(
-                                              decoration: const BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  10),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  10)),
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          "assets/images/map_Blurr.png"),
-                                                      fit: BoxFit.cover)),
-                                              child: Icon(
-                                                Icons.error_outline,
-                                                color: chatownColor
-                                                    .withOpacity(0.6),
-                                                size: 50,
-                                              ),
-                                            )
-                                          : GoogleMap(
-                                              zoomControlsEnabled: false,
-                                              zoomGesturesEnabled: false,
-                                              initialCameraPosition:
-                                                  CameraPosition(
-                                                      target: LatLng(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: data.chat!.latitude.toString() == "" ||
+                                      data.chat!.longitude.toString() == ""
+                                  ? Container(
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10)),
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  "assets/images/map_Blurr.png"),
+                                              fit: BoxFit.cover)),
+                                      child: Icon(
+                                        Icons.error_outline,
+                                        color: chatownColor.withOpacity(0.6),
+                                        size: 50,
+                                      ),
+                                    )
+                                  : FutureBuilder<Uint8List>(
+                                      future: getBytesFromAsset(
+                                        'assets/images/location_for_google.png',
+                                        70,
+                                        70,
+                                      ),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<Uint8List> snapshot) {
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(18)),
+                                            height: 100,
+                                            child: Stack(
+                                              children: [
+                                                GoogleMap(
+                                                  zoomControlsEnabled: false,
+                                                  onTap: (argument) {
+                                                    MapUtils.openMap(
+                                                        double.parse(data
+                                                            .chat!.latitude!),
+                                                        double.parse(data
+                                                            .chat!.longitude!));
+                                                  },
+                                                  mapType: MapType.normal,
+                                                  compassEnabled: false,
+                                                  initialCameraPosition:
+                                                      CameraPosition(
+                                                          target: LatLng(
+                                                              double.parse(data
+                                                                  .chat!
+                                                                  .latitude!),
+                                                              double.parse(data
+                                                                  .chat!
+                                                                  .longitude!)),
+                                                          zoom: 15),
+                                                  markers: {
+                                                    Marker(
+                                                      icon: BitmapDescriptor
+                                                          .fromBytes(
+                                                              snapshot.data!),
+                                                      markerId: const MarkerId(
+                                                          'my_location'),
+                                                      position: LatLng(
                                                           double.parse(data
                                                               .chat!.latitude!),
                                                           double.parse(data
                                                               .chat!
                                                               .longitude!)),
-                                                      zoom: 15),
-                                              mapType: MapType.normal,
-                                              onMapCreated: (GoogleMapController
-                                                  controller111) {
-                                                // controller.complete();
-                                              },
+                                                    ),
+                                                  },
+                                                ),
+                                              ],
                                             ),
-                                    ),
-                                  ),
-                                )),
+                                          );
+                                        } else {
+                                          return const Center(
+                                              child:
+                                                  CupertinoActivityIndicator());
+                                        }
+                                      },
+                                    )
+
+                              // GoogleMap(
+                              //     zoomControlsEnabled: false,
+                              //     zoomGesturesEnabled: false,
+                              //     onTap: (argument) {
+                              //       MapUtils.openMap(
+                              //           double.parse(data.latitude!),
+                              //           double.parse(
+                              //               data.longitude!));
+                              //     },
+                              //     markers: {
+                              //       Marker(
+                              //         icon:
+                              //             BitmapDescriptor.fromBytes(
+                              //                 snapshot.data!),
+                              //         markerId: const MarkerId(
+                              //             'my_location'),
+                              //         position: LatLng(
+                              //             double.parse(
+                              //                 widget.latitude!),
+                              //             double.parse(
+                              //                 widget.longitude!)),
+                              //       ),
+                              //     },
+                              //     initialCameraPosition:
+                              //         CameraPosition(
+                              //             target: LatLng(
+                              //                 double.parse(
+                              //                     data.latitude!),
+                              //                 double.parse(
+                              //                     data.longitude!)),
+                              //             zoom: 15),
+                              //     mapType: MapType.normal,
+                              //     onMapCreated: (GoogleMapController
+                              //         controller111) {
+                              //       // controller.complete();
+                              //     },
+                              //   ),
+                              ),
+                        ).paddingOnly(
+                          left: 4,
+                          top: 4,
+                          right: 4,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            MapUtils.openMap(double.parse(data.chat!.latitude!),
+                                double.parse(data.chat!.longitude!));
+                          },
+                          child: Container(
+                            width: Get.width,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(7),
+                                  bottomRight: Radius.circular(7)),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xffDDDDDD),
+                                  Color(0xffCDCDCD),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                            child: const Column(
+                              children: [
+                                Text(
+                                  "View Location",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: chatColor),
+                                ),
+                              ],
+                            ).paddingSymmetric(vertical: 5),
                           ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
                   ),
-                  const SizedBox(height: 5),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    ).paddingOnly(bottom: 10);
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myLocation(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        color: yellow1Color),
+                    constraints: const BoxConstraints(
+                        minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 130,
+                          width: 250,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10)),
+                          child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: data.chat!.latitude == "" ||
+                                      data.chat!.longitude.toString() == ""
+                                  ? Container(
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10)),
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  "assets/images/map_Blurr.png"),
+                                              fit: BoxFit.cover)),
+                                      child: Icon(
+                                        Icons.error_outline,
+                                        color: chatownColor.withOpacity(0.6),
+                                        size: 50,
+                                      ),
+                                    )
+                                  : FutureBuilder<Uint8List>(
+                                      future: getBytesFromAsset(
+                                        'assets/images/location_for_google.png',
+                                        70,
+                                        70,
+                                      ),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<Uint8List> snapshot) {
+                                        if (snapshot.connectionState ==
+                                                ConnectionState.done &&
+                                            snapshot.hasData) {
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(18)),
+                                            height: 100,
+                                            child: Stack(
+                                              children: [
+                                                GoogleMap(
+                                                  zoomControlsEnabled: false,
+                                                  onTap: (argument) {
+                                                    MapUtils.openMap(
+                                                        double.parse(data
+                                                            .chat!.latitude!),
+                                                        double.parse(data
+                                                            .chat!.longitude!));
+                                                  },
+                                                  mapType: MapType.normal,
+                                                  compassEnabled: false,
+                                                  initialCameraPosition:
+                                                      CameraPosition(
+                                                          target: LatLng(
+                                                              double.parse(data
+                                                                  .chat!
+                                                                  .latitude!),
+                                                              double.parse(data
+                                                                  .chat!
+                                                                  .longitude!)),
+                                                          zoom: 15),
+                                                  markers: {
+                                                    Marker(
+                                                      icon: BitmapDescriptor
+                                                          .fromBytes(
+                                                              snapshot.data!),
+                                                      markerId: const MarkerId(
+                                                          'my_location'),
+                                                      position: LatLng(
+                                                          double.parse(data
+                                                              .chat!.latitude!),
+                                                          double.parse(data
+                                                              .chat!
+                                                              .longitude!)),
+                                                    ),
+                                                  },
+                                                ),
+                                                data.chat!.user!.userId !=
+                                                        Hive.box(userdata)
+                                                            .get(userId)
+                                                    ? const SizedBox.shrink()
+                                                    : const Positioned(
+                                                        bottom: 3,
+                                                        right: 3,
+                                                        child: Icon(
+                                                          Icons
+                                                              .star_rate_rounded,
+                                                          color:
+                                                              Color(0xff000000),
+                                                          size: 15,
+                                                        ),
+                                                      ),
+                                              ],
+                                            ),
+                                          );
+                                        } else {
+                                          return const Center(
+                                              child:
+                                                  CupertinoActivityIndicator());
+                                        }
+                                      },
+                                    )
+
+                              // GoogleMap(
+                              //     zoomControlsEnabled: false,
+                              //     zoomGesturesEnabled: false,
+                              //     onTap: (argument) {
+                              //       MapUtils.openMap(
+                              //           double.parse(data.latitude!),
+                              //           double.parse(
+                              //               data.longitude!));
+                              //     },
+                              //     markers: {
+                              //       Marker(
+                              //         icon:
+                              //             BitmapDescriptor.fromBytes(
+                              //                 snapshot.data!),
+                              //         markerId: const MarkerId(
+                              //             'my_location'),
+                              //         position: LatLng(
+                              //             double.parse(
+                              //                 widget.latitude!),
+                              //             double.parse(
+                              //                 widget.longitude!)),
+                              //       ),
+                              //     },
+                              //     initialCameraPosition:
+                              //         CameraPosition(
+                              //             target: LatLng(
+                              //                 double.parse(
+                              //                     data.latitude!),
+                              //                 double.parse(
+                              //                     data.longitude!)),
+                              //             zoom: 15),
+                              //     mapType: MapType.normal,
+                              //     onMapCreated: (GoogleMapController
+                              //         controller111) {
+                              //       // controller.complete();
+                              //     },
+                              //   ),
+                              ),
+                        ).paddingOnly(
+                          left: 4,
+                          top: 4,
+                          right: 4,
+                        ),
+                        InkWell(
+                          onTap: () {
+                            MapUtils.openMap(double.parse(data.chat!.latitude!),
+                                double.parse(data.chat!.longitude!));
+                          },
+                          child: Container(
+                            width: Get.width,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(7),
+                                bottomRight: Radius.circular(7),
+                              ),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xffFFEDAB),
+                                  Color(0xffFCC604),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                            child: const Column(
+                              children: [
+                                Text(
+                                  "View Location",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: chatColor),
+                                ),
+                              ],
+                            ).paddingSymmetric(vertical: 5),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Future<Uint8List> getBytesFromAsset(
+      String path, int width, int height) async {
+    final byteData = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(
+      byteData.buffer.asUint8List(),
+      targetWidth: width,
+      targetHeight: height,
+    );
+    final frame = await codec.getNextFrame();
+    return (await frame.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
   }
 
   Widget getVideoMessageWidget(index, StarMessageList data) {
@@ -1013,93 +2271,267 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myVideo(index, data)
+              : otherVideo(index, data),
+
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child: Stack(
+          //             alignment: Alignment.center,
+          //             children: [
+          //               Container(
+          //                 decoration: BoxDecoration(
+          //                   borderRadius: BorderRadius.circular(10),
+          //                   color: data.chat!.user!.userId ==
+          //                           Hive.box(userdata).get(userId)
+          //                       ? yellow1Color
+          //                       : Colors.grey.shade200,
+          //                 ),
+          //                 child: Padding(
+          //                   padding: const EdgeInsets.all(3.0),
+          //                   child: Container(
+          //                       height: 120,
+          //                       width: 120,
+          //                       decoration: BoxDecoration(
+          //                           borderRadius:
+          //                               BorderRadius.circular(10)),
+          //                       child: ClipRRect(
+          //                         borderRadius: BorderRadius.circular(10),
+          //                         child: Image.network(
+          //                           data.chat!.thumbnail!,
+          //                           fit: BoxFit.cover,
+          //                         ),
+          //                       )),
+          //                 ),
+          //               ),
+          //               InkWell(
+          //                 onTap: () {
+          //                   Navigator.push(
+          //                       context,
+          //                       MaterialPageRoute(
+          //                         builder: (context) => VideoViewFix(
+          //                             username: "",
+          //                             //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
+          //                             url: data.chat!.url!,
+          //                             play: true,
+          //                             mute: false,
+          //                             date: ""
+          //                             // convertUTCTimeTo12HourFormat(
+          //                             //     data.createdAt!),
+          //                             ),
+          //                       ));
+          //                 },
+          //                 child: CircleAvatar(
+          //                     radius: 18,
+          //                     backgroundColor: Colors.grey.shade300,
+          //                     foregroundColor: chatownColor,
+          //                     child: Image.asset("assets/images/play1.png",
+          //                         color: chatColor, height: 15)),
+          //               )
+          //             ],
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
+        ),
+      ),
+    ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherVideo(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 95,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
                       ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
                       )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
                     children: [
                       Align(
                         alignment: Alignment.topLeft,
@@ -1112,7 +2544,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                 color: data.chat!.user!.userId ==
                                         Hive.box(userdata).get(userId)
                                     ? yellow1Color
-                                    : Colors.grey.shade200,
+                                    : grey1Color,
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(3.0),
@@ -1150,43 +2582,276 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                               },
                               child: CircleAvatar(
                                   radius: 18,
-                                  backgroundColor: Colors.grey.shade300,
+                                  backgroundColor:
+                                      const Color(0xff000000).withOpacity(0.56),
                                   foregroundColor: chatownColor,
-                                  child: Image.asset("assets/images/play1.png",
-                                      color: chatColor, height: 15)),
+                                  child: Image.asset("assets/images/play2.png",
+                                      height: 12)),
                             )
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
                   ),
-                  const SizedBox(height: 5),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    ).paddingOnly(bottom: 10);
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myVideo(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: data.chat!.user!.userId ==
+                                        Hive.box(userdata).get(userId)
+                                    ? yellow1Color
+                                    : grey1Color,
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Container(
+                                    height: 120,
+                                    width: 120,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.network(
+                                        data.chat!.thumbnail!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VideoViewFix(
+                                          username: "",
+                                          //"${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}",
+                                          url: data.chat!.url!,
+                                          play: true,
+                                          mute: false,
+                                          date: ""
+                                          // convertUTCTimeTo12HourFormat(
+                                          //     data.createdAt!),
+                                          ),
+                                    ));
+                              },
+                              child: CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor:
+                                      const Color(0xff000000).withOpacity(0.56),
+                                  foregroundColor: chatownColor,
+                                  child: Image.asset("assets/images/play2.png",
+                                      height: 12)),
+                            )
+                          ],
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getDocMessageWidget(index, StarMessageList data) {
@@ -1227,250 +2892,845 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 65,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                PageTransition(
-                                  curve: Curves.linear,
-                                  type: PageTransitionType.rightToLeft,
-                                  child: FileView(file: "${data.chat!.url}"),
-                                ));
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: data.chat!.user!.userId ==
-                                      Hive.box(userdata).get(userId)
-                                  ? yellow1Color
-                                  : Colors.grey.shade200,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 5, bottom: 5, left: 5, right: 5),
-                              child: Container(
-                                width: Get.width * 0.50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: Row(
-                                    children: [
-                                      const Image(
-                                        height: 30,
-                                        image:
-                                            AssetImage('assets/images/pdf.png'),
-                                      ),
-                                      FutureBuilder<Map<String, dynamic>>(
-                                        future: getPdfInfo(data.chat!.url!),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            return Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  extractFilename(
-                                                          data.chat!.url!)
-                                                      .toString()
-                                                      .split("-")
-                                                      .last,
-                                                  style: const TextStyle(
-                                                    color: chatColor,
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                                const Text(
-                                                  '0 Page - 0 KB',
-                                                  style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                )
-                                              ],
-                                            ).paddingOnly(left: 12);
-                                          } else if (snapshot.hasError) {
-                                            return const Text('');
-                                          } else if (snapshot.hasData) {
-                                            final int pageCount =
-                                                snapshot.data!['pageCount'];
-                                            final String fileSize =
-                                                snapshot.data!['fileSize'];
-                                            return Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 11),
-                                                  child: Text(
-                                                    extractFilename(
-                                                            data.chat!.url!)
-                                                        .toString()
-                                                        .split("-")
-                                                        .last,
-                                                    style: const TextStyle(
-                                                      color: chatColor,
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  '$pageCount Page - $fileSize',
-                                                  style: const TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ).paddingOnly(left: 12),
-                                              ],
-                                            );
-                                          } else {
-                                            return const Text(
-                                                'No PDF info available');
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myDocument(index, data)
+              : otherDocument(index, data),
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child:
+          //           InkWell(
+          //             onTap: () {
+          //               Navigator.push(
+          //                   context,
+          //                   PageTransition(
+          //                     curve: Curves.linear,
+          //                     type: PageTransitionType.rightToLeft,
+          //                     child: FileView(file: "${data.chat!.url}"),
+          //                   ));
+          //             },
+          //             child: Container(
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(10),
+          //                 color: data.chat!.user!.userId ==
+          //                         Hive.box(userdata).get(userId)
+          //                     ? yellow1Color
+          //                     : Colors.grey.shade200,
+          //               ),
+          //               child: Padding(
+          //                 padding: const EdgeInsets.only(
+          //                     top: 5, bottom: 5, left: 5, right: 5),
+          //                 child: Container(
+          //                   width: Get.width * 0.50,
+          //                   decoration: BoxDecoration(
+          //                     borderRadius: BorderRadius.circular(10),
+          //                     color: Colors.white,
+          //                   ),
+          //                   child: Padding(
+          //                     padding: const EdgeInsets.symmetric(
+          //                         horizontal: 10, vertical: 5),
+          //                     child: Row(
+          //                       children: [
+          //                         const Image(
+          //                           height: 30,
+          //                           image:
+          //                               AssetImage('assets/images/pdf.png'),
+          //                         ),
+          //                         FutureBuilder<Map<String, dynamic>>(
+          //                           future: getPdfInfo(data.chat!.url!),
+          //                           builder: (context, snapshot) {
+          //                             if (snapshot.connectionState ==
+          //                                 ConnectionState.waiting) {
+          //                               return Column(
+          //                                 mainAxisAlignment:
+          //                                     MainAxisAlignment.center,
+          //                                 crossAxisAlignment:
+          //                                     CrossAxisAlignment.start,
+          //                                 children: [
+          //                                   Text(
+          //                                     extractFilename(
+          //                                             data.chat!.url!)
+          //                                         .toString()
+          //                                         .split("-")
+          //                                         .last,
+          //                                     style: const TextStyle(
+          //                                       color: chatColor,
+          //                                       fontSize: 14,
+          //                                       fontWeight: FontWeight.w500,
+          //                                     ),
+          //                                   ),
+          //                                   const Text(
+          //                                     '0 Page - 0 KB',
+          //                                     style: TextStyle(
+          //                                       color: Colors.grey,
+          //                                       fontSize: 10,
+          //                                       fontWeight: FontWeight.w400,
+          //                                     ),
+          //                                   )
+          //                                 ],
+          //                               ).paddingOnly(left: 12);
+          //                             } else if (snapshot.hasError) {
+          //                               return const Text('');
+          //                             } else if (snapshot.hasData) {
+          //                               final int pageCount =
+          //                                   snapshot.data!['pageCount'];
+          //                               final String fileSize =
+          //                                   snapshot.data!['fileSize'];
+          //                               return Column(
+          //                                 mainAxisAlignment:
+          //                                     MainAxisAlignment.center,
+          //                                 crossAxisAlignment:
+          //                                     CrossAxisAlignment.start,
+          //                                 children: [
+          //                                   Container(
+          //                                     padding:
+          //                                         const EdgeInsets.only(
+          //                                             left: 11),
+          //                                     child: Text(
+          //                                       extractFilename(
+          //                                               data.chat!.url!)
+          //                                           .toString()
+          //                                           .split("-")
+          //                                           .last,
+          //                                       style: const TextStyle(
+          //                                         color: chatColor,
+          //                                         fontSize: 14,
+          //                                         fontWeight:
+          //                                             FontWeight.w500,
+          //                                       ),
+          //                                     ),
+          //                                   ),
+          //                                   Text(
+          //                                     '$pageCount Page - $fileSize',
+          //                                     style: const TextStyle(
+          //                                       color: Colors.grey,
+          //                                       fontSize: 10,
+          //                                       fontWeight: FontWeight.w400,
+          //                                     ),
+          //                                   ).paddingOnly(left: 12),
+          //                                 ],
+          //                               );
+          //                             } else {
+          //                               return const Text(
+          //                                   'No PDF info available');
+          //                             }
+          //                           },
+          //                         ),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherDocument(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                        left: 3, right: 3, top: 0, bottom: 0),
+                    margin: const EdgeInsets.only(bottom: 5),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: data.chat!.user!.userId !=
+                                Hive.box(userdata).get(userId)
+                            ? grey1Color
+                            : yellow1Color),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          width: 240,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.rightToLeft,
+                                        child: FileView(
+                                          file: "${data.chat!.url}",
+                                        ),
+                                      ));
+                                },
+                                child: SizedBox(
+                                  width: Get.width * 0.50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(8.0),
+                                      bottomRight: data.chat!.user!.userId !=
+                                              Hive.box(userdata).get(userId)
+                                          ? const Radius.circular(8)
+                                          : const Radius.circular(0.0),
+                                      topLeft: const Radius.circular(8.0),
+                                      bottomLeft: data.chat!.user!.userId !=
+                                              Hive.box(userdata).get(userId)
+                                          ? const Radius.circular(0)
+                                          : const Radius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          const Image(
+                                            height: 30,
+                                            image: AssetImage(
+                                                'assets/images/pdf.png'),
+                                          ),
+                                          FutureBuilder<Map<String, dynamic>>(
+                                            future: getPdfInfo(data.chat!.url!),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      extractFilename(
+                                                              data.chat!.url!)
+                                                          .toString()
+                                                          .split("-")
+                                                          .last,
+                                                      style: const TextStyle(
+                                                        color: chatColor,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      '0 Page - 0 KB',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ).paddingOnly(left: 12);
+                                              } else if (snapshot.hasError) {
+                                                return const Text('');
+                                              } else if (snapshot.hasData) {
+                                                final int pageCount =
+                                                    snapshot.data!['pageCount'];
+                                                final String fileSize =
+                                                    snapshot.data!['fileSize'];
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 11),
+                                                      child: Text(
+                                                        extractFilename(
+                                                                data.chat!.url!)
+                                                            .toString()
+                                                            .split("-")
+                                                            .last,
+                                                        style: const TextStyle(
+                                                          color: chatColor,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '$pageCount Page - $fileSize',
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ).paddingOnly(left: 12),
+                                                  ],
+                                                );
+                                              } else {
+                                                return const Text(
+                                                    'No PDF info available');
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).paddingOnly(top: 3, bottom: 3),
+                        SizedBox(
+                          height: 16,
+                          child: data.chat!.user!.userId !=
+                                  Hive.box(userdata).get(userId)
+                              ? const SizedBox.shrink()
+                              : const Positioned(
+                                  bottom: 3,
+                                  right: 3,
+                                  child: Icon(
+                                    Icons.star_rate_rounded,
+                                    color: Color(0xff000000),
+                                    size: 15,
+                                  ),
+                                ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myDocument(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                        left: 3, right: 3, top: 0, bottom: 0),
+                    margin: const EdgeInsets.only(bottom: 5),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: data.chat!.user!.userId !=
+                                Hive.box(userdata).get(userId)
+                            ? grey1Color
+                            : yellow1Color),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Container(
+                          width: 240,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white),
+                          padding: const EdgeInsets.symmetric(vertical: 13),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.rightToLeft,
+                                        child: FileView(
+                                          file: "${data.chat!.url}",
+                                        ),
+                                      ));
+                                },
+                                child: SizedBox(
+                                  width: Get.width * 0.50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(8.0),
+                                      bottomRight: data.chat!.user!.userId !=
+                                              Hive.box(userdata).get(userId)
+                                          ? const Radius.circular(8)
+                                          : const Radius.circular(0.0),
+                                      topLeft: const Radius.circular(8.0),
+                                      bottomLeft: data.chat!.user!.userId !=
+                                              Hive.box(userdata).get(userId)
+                                          ? const Radius.circular(0)
+                                          : const Radius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          const Image(
+                                            height: 30,
+                                            image: AssetImage(
+                                                'assets/images/pdf.png'),
+                                          ),
+                                          FutureBuilder<Map<String, dynamic>>(
+                                            future: getPdfInfo(data.chat!.url!),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      extractFilename(
+                                                              data.chat!.url!)
+                                                          .toString()
+                                                          .split("-")
+                                                          .last,
+                                                      style: const TextStyle(
+                                                        color: chatColor,
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const Text(
+                                                      '0 Page - 0 KB',
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ).paddingOnly(left: 12);
+                                              } else if (snapshot.hasError) {
+                                                return const Text('');
+                                              } else if (snapshot.hasData) {
+                                                final int pageCount =
+                                                    snapshot.data!['pageCount'];
+                                                final String fileSize =
+                                                    snapshot.data!['fileSize'];
+                                                return Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 11),
+                                                      child: Text(
+                                                        extractFilename(
+                                                                data.chat!.url!)
+                                                            .toString()
+                                                            .split("-")
+                                                            .last,
+                                                        style: const TextStyle(
+                                                          color: chatColor,
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '$pageCount Page - $fileSize',
+                                                      style: const TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ).paddingOnly(left: 12),
+                                                  ],
+                                                );
+                                              } else {
+                                                return const Text(
+                                                    'No PDF info available');
+                                              }
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).paddingOnly(top: 3, bottom: 3),
+                        SizedBox(
+                          height: 16,
+                          child: data.chat!.user!.userId !=
+                                  Hive.box(userdata).get(userId)
+                              ? const SizedBox.shrink()
+                              : const Icon(
+                                  Icons.star_rate_rounded,
+                                  color: Color(0xff000000),
+                                  size: 15,
+                                ).paddingOnly(bottom: 4, right: 2),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getVoiceMessageWidget(index, StarMessageList data) {
@@ -1511,133 +3771,403 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 70,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          _audio(
-                              message: data.chat!.url!,
-                              index: index,
-                              duration: data.chat!.audioTime!,
-                              data: data),
-                        ],
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myVoice(index, data)
+              : otherVoice(index, data),
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           mainAxisAlignment: MainAxisAlignment.start,
+          //           children: [
+          //             _audio(
+          //                 message: data.chat!.url!,
+          //                 index: index,
+          //                 duration: data.chat!.audioTime!,
+          //                 data: data),
+          //           ],
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherVoice(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: _audio(
+                      message: data.chat!.url!,
+                      index: index,
+                      duration: data.chat!.audioTime!,
+                      data: data),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myVoice(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: _audio(
+                      message: data.chat!.url!,
+                      index: index,
+                      duration: data.chat!.audioTime!,
+                      data: data),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getGifMessage(index, StarMessageList data) {
@@ -1678,164 +4208,530 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 95,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                  curve: Curves.linear,
-                                  type: PageTransitionType.rightToLeft,
-                                  child: ImageView(
-                                    image: data.chat!.url!,
-                                    userimg: "",
-                                  )),
-                            );
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: data.chat!.user!.userId ==
-                                      Hive.box(userdata).get(userId)
-                                  ? yellow1Color
-                                  : Colors.grey.shade200,
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(3.0),
-                              child: Container(
-                                  height: 120,
-                                  width: 120,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      data.chat!.url!,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  )),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myGif(index, data)
+              : otherGif(index, data),
+          //  Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child: InkWell(
+          //             onTap: () {
+          //               Navigator.push(
+          //                 context,
+          //                 PageTransition(
+          //                     curve: Curves.linear,
+          //                     type: PageTransitionType.rightToLeft,
+          //                     child: ImageView(
+          //                       image: data.chat!.url!,
+          //                       userimg: "",
+          //                     )),
+          //               );
+          //             },
+          //             child: Container(
+          //               decoration: BoxDecoration(
+          //                 borderRadius: BorderRadius.circular(10),
+          //                 color: data.chat!.user!.userId ==
+          //                         Hive.box(userdata).get(userId)
+          //                     ? yellow1Color
+          //                     : Colors.grey.shade200,
+          //               ),
+          //               child: Padding(
+          //                 padding: const EdgeInsets.all(3.0),
+          //                 child: Container(
+          //                     height: 120,
+          //                     width: 120,
+          //                     decoration: BoxDecoration(
+          //                         borderRadius: BorderRadius.circular(10)),
+          //                     child: ClipRRect(
+          //                       borderRadius: BorderRadius.circular(10),
+          //                       child: Image.network(
+          //                         data.chat!.url!,
+          //                         fit: BoxFit.cover,
+          //                       ),
+          //                     )),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherGif(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                curve: Curves.linear,
+                                type: PageTransitionType.rightToLeft,
+                                child: ImageView(
+                                  image: data.chat!.url!,
+                                  userimg: "",
+                                )),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : grey1Color,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Container(
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    data.chat!.url!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 6,
+                              right: 6,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myGif(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            PageTransition(
+                                curve: Curves.linear,
+                                type: PageTransitionType.rightToLeft,
+                                child: ImageView(
+                                  image: data.chat!.url!,
+                                  userimg: "",
+                                )),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : grey1Color,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Container(
+                                height: 120,
+                                width: 120,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    data.chat!.url!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 6,
+                              right: 6,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getHttpLinkMessage(index, StarMessageList data) {
@@ -1876,284 +4772,886 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
-          children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 80,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? yellow1Color
-                                : Colors.grey.shade200,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 3, left: 3, right: 3),
-                            child: Container(
-                              constraints: BoxConstraints(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height / 8.3,
-                                  maxWidth:
-                                      MediaQuery.of(context).size.width * .7),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey.shade200),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: InkWell(
-                                onTap: () {
-                                  launchURL(data.chat!.message!);
-                                },
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.only(
-                                          left: 5, right: 5, top: 5, bottom: 5),
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: FlutterLinkPreview(
-                                        url: data.chat!.message!,
-                                        builder: (info) {
-                                          if (info is WebInfo) {
-                                            return info.title == null &&
-                                                    info.description == null
-                                                ? Text(
-                                                    data.chat!.message!,
-                                                    style: const TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        color: Colors.white),
-                                                  )
-                                                : Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      if (info.image != null)
-                                                        Container(
-                                                          height: 50,
-                                                          width: 50,
-                                                          decoration: BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10)),
-                                                          child: ClipRRect(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            child:
-                                                                Image.network(
-                                                                    info.image!,
-                                                                    fit: BoxFit
-                                                                        .cover),
-                                                          ),
-                                                        ),
-                                                      const SizedBox(width: 5),
-                                                      Expanded(
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            if (info.title !=
-                                                                null)
-                                                              Text(
-                                                                info.title!,
-                                                                maxLines: 1,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontSize: 14,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                ),
-                                                              ).paddingAll(2),
-                                                            info.image == null
-                                                                ? const SizedBox(
-                                                                    height: 5)
-                                                                : const SizedBox
-                                                                    .shrink(),
-                                                            if (info.description !=
-                                                                null)
-                                                              Text(
-                                                                info.description!,
-                                                                maxLines: 2,
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .ellipsis,
-                                                                style: const TextStyle(
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            68,
-                                                                            68,
-                                                                            68,
-                                                                            1),
-                                                                    fontSize: 9,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400),
-                                                              ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                          }
-                                          return const CircularProgressIndicator();
-                                        },
-                                        titleStyle: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    Text(
-                                      data.chat!.message!,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: linkColor,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w400),
-                                    ).paddingOnly(left: 10)
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                ],
-              ),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myLink(index, data)
+              : otherLink(index, data),
+
+          // Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Align(
+          //           alignment: Alignment.topLeft,
+          //           child:
+          // Container(
+          //             decoration: BoxDecoration(
+          //               borderRadius: BorderRadius.circular(10),
+          //               color: data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? yellow1Color
+          //                   : Colors.grey.shade200,
+          //             ),
+          //             child: Padding(
+          //               padding: const EdgeInsets.only(
+          //                   top: 3, left: 3, right: 3),
+          //               child: Container(
+          //                 constraints: BoxConstraints(
+          //                     maxHeight:
+          //                         MediaQuery.of(context).size.height / 8.3,
+          //                     maxWidth:
+          //                         MediaQuery.of(context).size.width * .7),
+          //                 decoration: BoxDecoration(
+          //                   border: Border.all(color: Colors.grey.shade200),
+          //                   borderRadius: BorderRadius.circular(10),
+          //                 ),
+          //                 child: InkWell(
+          //                   onTap: () {
+          //                     launchURL(data.chat!.message!);
+          //                   },
+          //                   child: Column(
+          //                     crossAxisAlignment: CrossAxisAlignment.start,
+          //                     children: [
+          //                       Container(
+          //                         padding: const EdgeInsets.only(
+          //                             left: 5, right: 5, top: 5, bottom: 5),
+          //                         decoration: BoxDecoration(
+          //                             color: Colors.white,
+          //                             borderRadius:
+          //                                 BorderRadius.circular(10)),
+          //                         child: FlutterLinkPreview(
+          //                           url: data.chat!.message!,
+          //                           builder: (info) {
+          //                             if (info is WebInfo) {
+          //                               return info.title == null &&
+          //                                       info.description == null
+          //                                   ? Text(
+          //                                       data.chat!.message!,
+          //                                       style: const TextStyle(
+          //                                           fontSize: 14,
+          //                                           fontWeight:
+          //                                               FontWeight.w400,
+          //                                           color: Colors.white),
+          //                                     )
+          //                                   : Row(
+          //                                       mainAxisAlignment:
+          //                                           MainAxisAlignment.start,
+          //                                       crossAxisAlignment:
+          //                                           CrossAxisAlignment
+          //                                               .center,
+          //                                       children: [
+          //                                         if (info.image != null)
+          //                                           Container(
+          //                                             height: 50,
+          //                                             width: 50,
+          //                                             decoration: BoxDecoration(
+          //                                                 borderRadius:
+          //                                                     BorderRadius
+          //                                                         .circular(
+          //                                                             10)),
+          //                                             child: ClipRRect(
+          //                                               borderRadius:
+          //                                                   BorderRadius
+          //                                                       .circular(
+          //                                                           10),
+          //                                               child:
+          //                                                   Image.network(
+          //                                                       info.image!,
+          //                                                       fit: BoxFit
+          //                                                           .cover),
+          //                                             ),
+          //                                           ),
+          //                                         const SizedBox(width: 5),
+          //                                         Expanded(
+          //                                           child: Column(
+          //                                             mainAxisAlignment:
+          //                                                 MainAxisAlignment
+          //                                                     .start,
+          //                                             crossAxisAlignment:
+          //                                                 CrossAxisAlignment
+          //                                                     .start,
+          //                                             children: [
+          //                                               if (info.title !=
+          //                                                   null)
+          //                                                 Text(
+          //                                                   info.title!,
+          //                                                   maxLines: 1,
+          //                                                   overflow:
+          //                                                       TextOverflow
+          //                                                           .ellipsis,
+          //                                                   style:
+          //                                                       const TextStyle(
+          //                                                     fontSize: 14,
+          //                                                     fontWeight:
+          //                                                         FontWeight
+          //                                                             .w600,
+          //                                                   ),
+          //                                                 ).paddingAll(2),
+          //                                               info.image == null
+          //                                                   ? const SizedBox(
+          //                                                       height: 5)
+          //                                                   : const SizedBox
+          //                                                       .shrink(),
+          //                                               if (info.description !=
+          //                                                   null)
+          //                                                 Text(
+          //                                                   info.description!,
+          //                                                   maxLines: 2,
+          //                                                   overflow:
+          //                                                       TextOverflow
+          //                                                           .ellipsis,
+          //                                                   style: const TextStyle(
+          //                                                       color: Color
+          //                                                           .fromRGBO(
+          //                                                               68,
+          //                                                               68,
+          //                                                               68,
+          //                                                               1),
+          //                                                       fontSize: 9,
+          //                                                       fontWeight:
+          //                                                           FontWeight
+          //                                                               .w400),
+          //                                                 ),
+          //                                             ],
+          //                                           ),
+          //                                         ),
+          //                                       ],
+          //                                     );
+          //                             }
+          //                             return const CircularProgressIndicator();
+          //                           },
+          //                           titleStyle: const TextStyle(
+          //                             color: Colors.black,
+          //                             fontWeight: FontWeight.bold,
+          //                           ),
+          //                         ),
+          //                       ),
+          //                       const SizedBox(height: 3),
+          //                       Text(
+          //                         data.chat!.message!,
+          //                         maxLines: 1,
+          //                         overflow: TextOverflow.ellipsis,
+          //                         style: TextStyle(
+          //                             color: linkColor,
+          //                             fontSize: 10,
+          //                             fontWeight: FontWeight.w400),
+          //                       ).paddingOnly(left: 10)
+          //                     ],
+          //                   ),
+          //                 ),
+          //               ),
+          //             ),
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
         ),
       ),
     ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherLink(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: data.chat!.user!.userId ==
+                                  Hive.box(userdata).get(userId)
+                              ? yellow1Color
+                              : grey1Color,
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(top: 3, left: 3, right: 3),
+                          child: Container(
+                            constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height / 8.3,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * .7),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade200),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                launchURL(data.chat!.message!);
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5, top: 5, bottom: 5),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: FlutterLinkPreview(
+                                      url: data.chat!.message!,
+                                      builder: (info) {
+                                        if (info is WebInfo) {
+                                          return info.title == null &&
+                                                  info.description == null
+                                              ? Text(
+                                                  data.chat!.message!,
+                                                  style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white),
+                                                )
+                                              : Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    if (info.image != null)
+                                                      Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child: Image.network(
+                                                              info.image!,
+                                                              fit:
+                                                                  BoxFit.cover),
+                                                        ),
+                                                      ),
+                                                    const SizedBox(width: 5),
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          if (info.title !=
+                                                              null)
+                                                            Text(
+                                                              info.title!,
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ).paddingAll(2),
+                                                          info.image == null
+                                                              ? const SizedBox(
+                                                                  height: 5)
+                                                              : const SizedBox
+                                                                  .shrink(),
+                                                          if (info.description !=
+                                                              null)
+                                                            Text(
+                                                              info.description!,
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: const TextStyle(
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          68,
+                                                                          68,
+                                                                          68,
+                                                                          1),
+                                                                  fontSize: 9,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                        }
+                                        return const CircularProgressIndicator();
+                                      },
+                                      titleStyle: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    data.chat!.message!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: linkColor,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400),
+                                  ).paddingOnly(left: 10)
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 3,
+                              right: 3,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myLink(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: data.chat!.user!.userId ==
+                                  Hive.box(userdata).get(userId)
+                              ? yellow1Color
+                              : grey1Color,
+                        ),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.only(top: 3, left: 3, right: 3),
+                          child: Container(
+                            constraints: BoxConstraints(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height / 8.3,
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * .7),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade200),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                launchURL(data.chat!.message!);
+                              },
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 5, right: 5, top: 5, bottom: 5),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: FlutterLinkPreview(
+                                      url: data.chat!.message!,
+                                      builder: (info) {
+                                        if (info is WebInfo) {
+                                          return info.title == null &&
+                                                  info.description == null
+                                              ? Text(
+                                                  data.chat!.message!,
+                                                  style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: Colors.white),
+                                                )
+                                              : Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    if (info.image != null)
+                                                      Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child: Image.network(
+                                                              info.image!,
+                                                              fit:
+                                                                  BoxFit.cover),
+                                                        ),
+                                                      ),
+                                                    const SizedBox(width: 5),
+                                                    Expanded(
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .start,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          if (info.title !=
+                                                              null)
+                                                            Text(
+                                                              info.title!,
+                                                              maxLines: 1,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 14,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                              ),
+                                                            ).paddingAll(2),
+                                                          info.image == null
+                                                              ? const SizedBox(
+                                                                  height: 5)
+                                                              : const SizedBox
+                                                                  .shrink(),
+                                                          if (info.description !=
+                                                              null)
+                                                            Text(
+                                                              info.description!,
+                                                              maxLines: 2,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style: const TextStyle(
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          68,
+                                                                          68,
+                                                                          68,
+                                                                          1),
+                                                                  fontSize: 9,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                        }
+                                        return const CircularProgressIndicator();
+                                      },
+                                      titleStyle: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    data.chat!.message!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        color: linkColor,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400),
+                                  ).paddingOnly(left: 10)
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                          ? const SizedBox.shrink()
+                          : const Positioned(
+                              bottom: 3,
+                              right: 3,
+                              child: Icon(
+                                Icons.star_rate_rounded,
+                                color: Color(0xff000000),
+                                size: 15,
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
   }
 
   Widget getContactMessage(index, StarMessageList data) {
@@ -2194,118 +5692,331 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       },
       child: Container(
         color: const Color(0xffFFFFFF),
-        child: Stack(
+        child: Padding(
+          padding: EdgeInsets.only(
+              top: 5, bottom: 5, left: starId.isNotEmpty ? 34 : 28, right: 28),
+          child: data.chat!.user!.userId == Hive.box(userdata).get(userId)
+              ? myContact(index, data)
+              : otherContact(index, data),
+          // Column(
+          //   children: [
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Row(
+          //           children: [
+          //             Text(
+          //               data.chat!.user!.userId ==
+          //                       Hive.box(userdata).get(userId)
+          //                   ? "You"
+          //                   : data.chat!.user!.firstName! +
+          //                       data.chat!.user!.lastName!,
+          //               style: const TextStyle(
+          //                 fontWeight: FontWeight.w500,
+          //                 fontSize: 11,
+          //               ),
+          //             ),
+          //             const Icon(Icons.arrow_right_rounded, size: 30),
+          //             data.chat!.conversation!.isGroup == false
+          //                 ? Text(
+          //                     data.otherUserDetails![0].userId ==
+          //                             data.chat!.user!.userId
+          //                         ? "You"
+          //                         : data.otherUserDetails![0].firstName! +
+          //                             data.otherUserDetails![0].lastName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   )
+          //                 : Text(
+          //                     data.chat!.conversation!.groupName!,
+          //                     style: const TextStyle(
+          //                       fontWeight: FontWeight.w500,
+          //                       fontSize: 11,
+          //                     ),
+          //                   ),
+          //           ],
+          //         ),
+          //         Text(
+          //           date(convertToLocalDate(data.updatedAt!)),
+          //           style: TextStyle(
+          //               fontSize: 8.5,
+          //               fontWeight: FontWeight.w400,
+          //               color: Colors.grey.shade500),
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(
+          //       height: 10,
+          //     ),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //       children: [
+          //         Container(
+          //           constraints: BoxConstraints(
+          //               maxWidth: MediaQuery.of(context).size.width * .6),
+          //           decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(10),
+          //             color: data.chat!.user!.userId ==
+          //                     Hive.box(userdata).get(userId)
+          //                 ? yellow1Color
+          //                 : Colors.grey.shade200,
+          //           ),
+          //           padding: const EdgeInsets.all(3),
+          //           child: Column(
+          //             children: [
+          //               Container(
+          //                 height: 50,
+          //                 width: 200,
+          //                 decoration: const BoxDecoration(
+          //                     borderRadius: BorderRadius.only(
+          //                         topLeft: Radius.circular(10),
+          //                         topRight: Radius.circular(10)),
+          //                     color: Colors.white),
+          //                 child: Row(
+          //                   mainAxisAlignment: MainAxisAlignment.center,
+          //                   children: [
+          //                     Container(
+          //                       height: 30,
+          //                       width: 30,
+          //                       decoration: BoxDecoration(
+          //                           borderRadius:
+          //                               BorderRadius.circular(35)),
+          //                       child: ClipRRect(
+          //                         borderRadius: BorderRadius.circular(35),
+          //                         child: CustomCachedNetworkImage(
+          //                             imageUrl: data
+          //                                 .chat!.sharedContactProfileImage!,
+          //                             placeholderColor: chatownColor,
+          //                             errorWidgeticon: const Icon(
+          //                               Icons.groups,
+          //                               size: 30,
+          //                             )),
+          //                       ),
+          //                     ),
+          //                     const SizedBox(width: 5),
+          //                     Column(
+          //                       mainAxisAlignment: MainAxisAlignment.center,
+          //                       crossAxisAlignment:
+          //                           CrossAxisAlignment.start,
+          //                       children: [
+          //                         Text(
+          //                           capitalizeFirstLetter(
+          //                               data.chat!.sharedContactName!),
+          //                           style: const TextStyle(
+          //                               fontSize: 12,
+          //                               fontWeight: FontWeight.w500,
+          //                               color: chatColor),
+          //                         ),
+          //                         Text(
+          //                           capitalizeFirstLetter(
+          //                               data.chat!.sharedContactNumber!),
+          //                           style: const TextStyle(
+          //                               fontSize: 12,
+          //                               fontWeight: FontWeight.w500,
+          //                               color: chatColor),
+          //                         ),
+          //                       ],
+          //                     ),
+          //                   ],
+          //                 ),
+          //               ),
+          //               const SizedBox(height: 3),
+          //               Container(
+          //                 height: 30,
+          //                 width: 200,
+          //                 decoration: const BoxDecoration(
+          //                     borderRadius: BorderRadius.only(
+          //                         bottomLeft: Radius.circular(10),
+          //                         bottomRight: Radius.circular(10)),
+          //                     color: Colors.white),
+          //                 child: const Column(
+          //                   children: [
+          //                     SizedBox(height: 3),
+          //                     Text(
+          //                       "Message",
+          //                       textAlign: TextAlign.center,
+          //                       style: TextStyle(
+          //                           fontSize: 14,
+          //                           fontWeight: FontWeight.w400,
+          //                           color: chatColor),
+          //                     ),
+          //                   ],
+          //                 ),
+          //               )
+          //             ],
+          //           ),
+          //         ),
+          //         Icon(
+          //           Icons.arrow_forward_ios,
+          //           size: 15,
+          //           color: Colors.grey.shade500,
+          //         )
+          //       ],
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Row(
+          //       mainAxisAlignment: MainAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           convertUTCTimeTo12HourFormat(data.createdAt!),
+          //           style: TextStyle(
+          //             fontSize: 11,
+          //             color: Colors.grey.shade500,
+          //             fontWeight: FontWeight.w400,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     const SizedBox(height: 5),
+          //   ],
+          // ),
+        ),
+      ),
+    ).paddingOnly(bottom: 10);
+  }
+
+  Widget otherContact(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            isSelectedmessage == "1"
-                ? Positioned(
-                    left: 10,
-                    top: 80,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          starId.contains(data.chat!.messageId.toString())
-                              ? starId.remove(data.chat!.messageId.toString())
-                              : starId.add(data.chat!.messageId.toString());
-                        });
-                        print("STARID:$starId");
-                      },
-                      child: starId.length == 0
-                          ? const SizedBox()
-                          : Transform.scale(
-                              scale: 1.1,
-                              child: starId
-                                      .contains(data.chat!.messageId.toString())
-                                  ? checkContainer()
-                                  : removeCheckContainer(),
-                            ),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-            Padding(
-              padding: EdgeInsets.only(
-                  top: 5,
-                  bottom: 5,
-                  left: starId.isNotEmpty ? 34 : 28,
-                  right: 28),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            data.chat!.user!.userId ==
-                                    Hive.box(userdata).get(userId)
-                                ? "You"
-                                : data.chat!.user!.firstName! +
-                                    data.chat!.user!.lastName!,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const Icon(Icons.arrow_right_rounded, size: 30),
-                          data.chat!.conversation!.isGroup == false
-                              ? Text(
-                                  data.otherUserDetails![0].userId ==
-                                          data.chat!.user!.userId
-                                      ? "You"
-                                      : data.otherUserDetails![0].firstName! +
-                                          data.otherUserDetails![0].lastName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                )
-                              : Text(
-                                  data.chat!.conversation!.groupName!,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 11,
-                                  ),
-                                ),
-                        ],
+            Row(
+              children: [
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
                       ),
-                      Text(
-                        date(convertToLocalDate(data.updatedAt!)),
-                        style: TextStyle(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.grey.shade500),
-                      )
-                    ],
+                    ),
                   ),
-                  const SizedBox(
-                    height: 10,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * .6),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: data.chat!.user!.userId ==
-                                  Hive.box(userdata).get(userId)
-                              ? yellow1Color
-                              : Colors.grey.shade200,
+                ),
+                // data.chat!.conversation!.isGroup == false
+                //     ? const SizedBox.shrink()
+                //     :
+                const Icon(Icons.arrow_right_rounded, size: 30),
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    //  const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
                         ),
-                        padding: const EdgeInsets.all(3),
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 50,
-                              width: 200,
-                              decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(10),
-                                      topRight: Radius.circular(10)),
-                                  color: Colors.white),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+              ],
+            ),
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * .6),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: data.chat!.user!.userId !=
+                                Hive.box(userdata).get(userId)
+                            ? grey1Color
+                            : yellow1Color),
+                    padding: const EdgeInsets.all(3),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 200,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  matchContact(data.chat!.sharedContactNumber!)
+                                      ? BorderRadius.circular(10)
+                                      : const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10)),
+                              color: Colors.white),
+                          child: Stack(
+                            children: [
+                              Row(
                                 children: [
+                                  const SizedBox(width: 20),
                                   Container(
                                     height: 30,
                                     width: 30,
@@ -2319,28 +6030,32 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                               .chat!.sharedContactProfileImage!,
                                           placeholderColor: chatownColor,
                                           errorWidgeticon: const Icon(
-                                            Icons.groups,
+                                            Icons.person,
                                             size: 30,
                                           )),
                                     ),
                                   ),
-                                  const SizedBox(width: 5),
+                                  const SizedBox(width: 10),
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        capitalizeFirstLetter(
-                                            data.chat!.sharedContactName!),
-                                        style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                            color: chatColor),
+                                      SizedBox(
+                                        width: Get.width * 0.30,
+                                        child: Text(
+                                          capitalizeFirstLetter(
+                                              data.chat!.sharedContactName!),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: chatColor),
+                                        ),
                                       ),
                                       Text(
-                                        capitalizeFirstLetter(
-                                            data.chat!.sharedContactNumber!),
+                                        data.chat!.sharedContactNumber!,
                                         style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,
@@ -2350,62 +6065,390 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 3),
-                            Container(
-                              height: 30,
-                              width: 200,
-                              decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(10),
-                                      bottomRight: Radius.circular(10)),
-                                  color: Colors.white),
-                              child: const Column(
-                                children: [
-                                  SizedBox(height: 3),
-                                  Text(
-                                    "Message",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: chatColor),
-                                  ),
-                                ],
+                              data.chat!.user!.userId !=
+                                      Hive.box(userdata).get(userId)
+                                  ? const SizedBox.shrink()
+                                  : const Positioned(
+                                      bottom: 3,
+                                      right: 3,
+                                      child: Icon(
+                                        Icons.star_rate_rounded,
+                                        color: Color(0xff000000),
+                                        size: 15,
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        InkWell(
+                          onTap: () {
+                            Get.to(() => SaveContact(
+                                name: data.chat!.sharedContactName!,
+                                number: data.chat!.sharedContactNumber!));
+                          },
+                          child: Container(
+                            height: 30,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(7),
+                                  bottomRight: Radius.circular(7)),
+                              gradient: LinearGradient(
+                                colors: data.chat!.user!.userId ==
+                                        Hive.box(userdata).get(userId)
+                                    ? [
+                                        const Color(0xffFFEDAB),
+                                        const Color(0xffFCC604),
+                                      ]
+                                    : [
+                                        const Color(0xffDDDDDD),
+                                        const Color(0xffCDCDCD),
+                                      ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
                               ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        size: 15,
-                        color: Colors.grey.shade500,
-                      )
-                    ],
+                            ),
+                            child: const Column(
+                              children: [
+                                SizedBox(height: 3),
+                                Text(
+                                  "View contact",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: chatColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        convertUTCTimeTo12HourFormat(data.createdAt!),
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey.shade500,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                ),
+                const Spacer(),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
                   ),
-                  const SizedBox(height: 5),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-    ).paddingOnly(bottom: 10);
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  Widget myContact(index, StarMessageList data) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              date(convertToLocalDate(data.updatedAt!)),
+              style: TextStyle(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.grey.shade500),
+            ),
+            Row(
+              children: [
+                data.chat!.conversation!.isGroup == false
+                    ?
+                    // const SizedBox.shrink()
+                    Text(
+                        data.otherUserDetails![0].userId ==
+                                data.chat!.user!.userId
+                            ? "You"
+                            : data.otherUserDetails![0].firstName! +
+                                data.otherUserDetails![0].lastName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      )
+                    : Text(
+                        data.chat!.conversation!.groupName!,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                        ),
+                      ),
+                data.chat!.conversation!.isGroup == false
+                    ? const Icon(Icons.arrow_left_outlined, size: 30)
+                    : const Icon(Icons.arrow_left_outlined, size: 30),
+                Text(
+                  data.chat!.user!.userId == Hive.box(userdata).get(userId)
+                      ? "You"
+                      : data.chat!.user!.firstName! +
+                          data.chat!.user!.lastName!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  height: 28,
+                  width: 28,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(28)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: CachedNetworkImage(
+                      imageUrl: data.chat!.user!.profileImage!,
+                      placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                        color: chatownColor,
+                      )),
+                      errorWidget: (context, url, error) => const Icon(
+                        Icons.person,
+                        color: Color(0xffBFBFBF),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Row(
+              children: [
+                isSelectedmessage == "1"
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            starId.contains(data.chat!.messageId)
+                                ? starId.remove(data.chat!.messageId)
+                                : starId.add(data.chat!.messageId);
+                          });
+                          print("STARID:$starId");
+                        },
+                        child: starId.length == 0
+                            ? const SizedBox()
+                            : Transform.scale(
+                                scale: 1.1,
+                                child: starId.contains(
+                                        data.chat!.messageId.toString())
+                                    ? checkContainer()
+                                    : removeCheckContainer(),
+                              ),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 10 : 0,
+                ),
+                Icon(
+                  Icons.arrow_back_ios,
+                  size: 15,
+                  color: Colors.grey.shade500,
+                ),
+                const Spacer(),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Container(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width * .6),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: data.chat!.user!.userId !=
+                                Hive.box(userdata).get(userId)
+                            ? grey1Color
+                            : yellow1Color),
+                    padding: const EdgeInsets.all(3),
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 50,
+                          width: 200,
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  matchContact(data.chat!.sharedContactNumber!)
+                                      ? BorderRadius.circular(10)
+                                      : const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10)),
+                              color: Colors.white),
+                          child: Stack(
+                            children: [
+                              Row(
+                                children: [
+                                  const SizedBox(width: 20),
+                                  Container(
+                                    height: 30,
+                                    width: 30,
+                                    decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(35)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(35),
+                                      child: CustomCachedNetworkImage(
+                                          imageUrl: data
+                                              .chat!.sharedContactProfileImage!,
+                                          placeholderColor: chatownColor,
+                                          errorWidgeticon: const Icon(
+                                            Icons.person,
+                                            size: 30,
+                                          )),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: Get.width * 0.30,
+                                        child: Text(
+                                          capitalizeFirstLetter(
+                                              data.chat!.sharedContactName!),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w500,
+                                              color: chatColor),
+                                        ),
+                                      ),
+                                      Text(
+                                        data.chat!.sharedContactNumber!,
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: chatColor),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              data.chat!.user!.userId !=
+                                      Hive.box(userdata).get(userId)
+                                  ? const SizedBox.shrink()
+                                  : const Positioned(
+                                      bottom: 3,
+                                      right: 3,
+                                      child: Icon(
+                                        Icons.star_rate_rounded,
+                                        color: Color(0xff000000),
+                                        size: 15,
+                                      ),
+                                    ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        InkWell(
+                          onTap: () {
+                            Get.to(() => SaveContact(
+                                name: data.chat!.sharedContactName!,
+                                number: data.chat!.sharedContactNumber!));
+                          },
+                          child: Container(
+                            height: 30,
+                            width: 200,
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                  bottomLeft: Radius.circular(7),
+                                  bottomRight: Radius.circular(7)),
+                              gradient: LinearGradient(
+                                colors: data.chat!.user!.userId ==
+                                        Hive.box(userdata).get(userId)
+                                    ? [
+                                        const Color(0xffFFEDAB),
+                                        const Color(0xffFCC604),
+                                      ]
+                                    : [
+                                        const Color(0xffDDDDDD),
+                                        const Color(0xffCDCDCD),
+                                      ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                            child: const Column(
+                              children: [
+                                SizedBox(height: 3),
+                                Text(
+                                  "View contact",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: chatColor),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: isSelectedmessage == "1" ? 20 : 0,
+                ),
+                Text(
+                  convertUTCTimeTo12HourFormat(data.createdAt!),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey.shade500,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+      ],
+    );
+  }
+
+  bool matchContact(String num) {
+    for (var i = 0; i < getAllDeviceContact.getList.length; i++) {
+      if (num == getAllDeviceContact.getList[i].phoneNumber) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Widget getReplyMessage(index, StarMessageList data) {
@@ -3342,85 +7385,100 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.7,
       ),
-      height: 65,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: data.chat!.user!.userId == Hive.box(userdata).get(userId)
             ? yellow1Color
-            : Colors.grey.shade200,
+            : grey1Color,
       ),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.white),
-        child: Row(
-          children: [
-            const SizedBox(width: 5),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  audioController.onPressedPlayButton(index, message);
-                });
-              },
-              onSecondaryTap: () {
-                audioPlayer.stop();
-              },
-              child: Obx(
-                () => (audioController.isRecordPlaying &&
-                        audioController.currentId == index)
-                    ? Icon(
-                        CupertinoIcons.pause_circle_fill,
-                        color: data.chat!.user!.userId ==
-                                Hive.box(userdata).get(userId)
-                            ? yellow1Color
-                            : grey1Color,
-                      )
-                    : Icon(
-                        CupertinoIcons.play_circle_fill,
-                        color: data.chat!.user!.userId ==
-                                Hive.box(userdata).get(userId)
-                            ? yellow1Color
-                            : grey1Color,
-                      ),
-              ),
-            ),
-            const SizedBox(width: 5),
-            Obx(
-              () => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      LinearProgressIndicator(
-                        minHeight: 5,
-                        backgroundColor: Colors.grey,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.black),
-                        value: (audioController.isRecordPlaying &&
-                                audioController.currentId == index)
-                            ? (audioController.totalDuration.value > 0
-                                ? audioController.completedPercentage.value
-                                : 0.0)
-                            : 0.0,
-                      ),
-                    ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10), color: Colors.white),
+            child: Row(
+              children: [
+                const SizedBox(width: 5),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      audioController.onPressedPlayButton(index, message);
+                    });
+                  },
+                  onSecondaryTap: () {
+                    audioPlayer.stop();
+                  },
+                  child: Obx(
+                    () => (audioController.isRecordPlaying &&
+                            audioController.currentId == index)
+                        ? Icon(
+                            CupertinoIcons.pause_circle_fill,
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : grey1Color,
+                          )
+                        : Icon(
+                            CupertinoIcons.play_circle_fill,
+                            color: data.chat!.user!.userId ==
+                                    Hive.box(userdata).get(userId)
+                                ? yellow1Color
+                                : grey1Color,
+                          ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 5),
+                Obx(
+                  () => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          LinearProgressIndicator(
+                            minHeight: 5,
+                            backgroundColor: Colors.grey,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.black),
+                            value: (audioController.isRecordPlaying &&
+                                    audioController.currentId == index)
+                                ? (audioController.totalDuration.value > 0
+                                    ? audioController.completedPercentage.value
+                                    : 0.0)
+                                : 0.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  duration,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey),
+                ),
+                const SizedBox(width: 10)
+              ],
             ),
-            const SizedBox(width: 10),
-            Text(
-              duration,
-              style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey),
-            ),
-            const SizedBox(width: 10)
-          ],
-        ),
+          ),
+          SizedBox(
+            height: 16,
+            child: data.chat!.user!.userId != Hive.box(userdata).get(userId)
+                ? const SizedBox.shrink()
+                : const Icon(
+                    Icons.star_rate_rounded,
+                    color: Color(0xff000000),
+                    size: 15,
+                  ),
+          ),
+        ],
       ),
     );
   }

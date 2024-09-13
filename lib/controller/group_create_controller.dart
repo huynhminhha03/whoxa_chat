@@ -84,7 +84,7 @@ class GroupCreateController extends GetxController {
           .replaceAll("]", "")
           .replaceAll(" ", "");
 
-      print(request.fields);
+      print("add members ${request.fields}");
 
       var response = await request.send();
       String responseData =
@@ -96,7 +96,7 @@ class GroupCreateController extends GetxController {
 
       if (model.value!.success == true) {
         isMember(false);
-        Get.to(() => TabbarScreen(currentTab: 0));
+        Get.offAll(() => TabbarScreen(currentTab: 0));
       } else {
         isMember(false);
       }

@@ -131,17 +131,20 @@ class User {
   String? firstName;
   String? lastName;
   String? bio;
+  String? createdAt;
 
-  User(
-      {this.profileImage,
-      this.userId,
-      this.phoneNumber,
-      this.countryCode,
-      this.country,
-      this.userName,
-      this.firstName,
-      this.lastName,
-      this.bio});
+  User({
+    this.profileImage,
+    this.userId,
+    this.phoneNumber,
+    this.countryCode,
+    this.country,
+    this.userName,
+    this.firstName,
+    this.lastName,
+    this.bio,
+    this.createdAt,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     profileImage = json['profile_image'];
@@ -153,6 +156,7 @@ class User {
     firstName = json['first_name'];
     lastName = json['last_name'];
     bio = json['bio'];
+    createdAt = json['createdAt'];
   }
 
   Map<String, dynamic> toJson() {
@@ -166,6 +170,7 @@ class User {
     data['first_name'] = firstName;
     data['last_name'] = lastName;
     data['bio'] = bio;
+    data['createdAt'] = createdAt;
     return data;
   }
 }

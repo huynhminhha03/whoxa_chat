@@ -4,10 +4,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:meyaoo_new/controller/add_contact_controller.dart';
+import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
@@ -56,6 +57,8 @@ bool isURL(String text) {
 }
 
 List<Person> persons = [];
+GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
+AddContactController addContactController = Get.put(AddContactController());
 
 // List localcontname = [];
 
@@ -383,14 +386,6 @@ Widget timestpa(String messageseen, String timestamp, bool isstar) {
         color: Colors.grey,
       ),
     ),
-    const WidgetSpan(child: SizedBox(width: 5)),
-    WidgetSpan(
-      child: Icon(
-        Icons.done_all,
-        color: messageseen == "1" ? Colors.blue : Colors.grey.shade400,
-        size: 15,
-      ),
-    )
   ]));
 }
 
@@ -905,6 +900,45 @@ class CustomCachedNetworkImage extends StatelessWidget {
   }
 }
 
+//================================================================= GET ALL CONTACT =========================================================
+// List<Map<String, String>> mobileContacts = [];
+// //var mobileContacts = [];
+// List<Contact> allcontacts = [];
+
+// Future getContactsFromGloble() async {
+//   var getContacts = [];
+
+//   var contacts = (await FlutterContacts.getContacts(
+//     withProperties: true,
+//     withPhoto: true,
+//   ))
+//       .toList();
+
+//   allcontacts = contacts.toList();
+
+//   // for (int i = 0; i < allcontacts.length; i++) {
+//   //   Contact c = allcontacts.elementAt(i);
+//   //   if (c.phones.isNotEmpty) {
+//   //     getContacts.add(c.phones.map((e) => getMobile(e.number)));
+//   //   }
+//   // }
+//   String cleanNumber(String number) {
+//     return getMobile(number);
+//   }
+
+//   for (Contact c in allcontacts) {
+//     if (c.phones.isNotEmpty) {
+//       // Get the cleaned phone numbers
+//       List<String> cleanedNumbers =
+//           c.phones.map((e) => cleanNumber(e.number)).toList();
+//       for (String number in cleanedNumbers) {
+//         // Add contact with display name and cleaned number
+//         mobileContacts.add({'name': c.displayName, 'number': number});
+//       }
+//     }
+//   }
+// }
+
 String formatCreateDate(String dateString) {
   // Parse the date string
   DateTime date = DateTime.parse(dateString).toLocal();
@@ -975,50 +1009,19 @@ String date(String dateString) {
   return DateFormat('dd/MM/yyyy').format(date);
 }
 
+String dateFormate(String dateStr) {
+  // Parse the input date string
+  DateTime parsedDate = DateFormat("dd MMMM yyyy").parse(dateStr);
+
+  // Format the parsed date to the desired format
+  return DateFormat("MMMM dd, yyyy").format(parsedDate);
+}
+
 String convertToLocalDate(String? dateString) {
   if (dateString == null || dateString.isEmpty) return "";
   final DateTime dateTime = DateTime.parse(dateString);
   final DateFormat formatter = DateFormat('dd MMMM yyyy');
   return formatter.format(dateTime);
-}
-
-//================================================================= GET ALL CONTACT =========================================================
-List<Map<String, String>> mobileContacts = [];
-//var mobileContacts = [];
-List<Contact> allcontacts = [];
-
-Future getContactsFromGloble() async {
-  var getContacts = [];
-
-  var contacts = (await FlutterContacts.getContacts(
-    withProperties: true,
-    withPhoto: true,
-  ))
-      .toList();
-
-  allcontacts = contacts.toList();
-
-  // for (int i = 0; i < allcontacts.length; i++) {
-  //   Contact c = allcontacts.elementAt(i);
-  //   if (c.phones.isNotEmpty) {
-  //     getContacts.add(c.phones.map((e) => getMobile(e.number)));
-  //   }
-  // }
-  String cleanNumber(String number) {
-    return getMobile(number);
-  }
-
-  for (Contact c in allcontacts) {
-    if (c.phones.isNotEmpty) {
-      // Get the cleaned phone numbers
-      List<String> cleanedNumbers =
-          c.phones.map((e) => cleanNumber(e.number)).toList();
-      for (String number in cleanedNumbers) {
-        // Add contact with display name and cleaned number
-        mobileContacts.add({'name': c.displayName, 'number': number});
-      }
-    }
-  }
 }
 
 //   for (int i = 0; i < getContacts.length; i++) {
@@ -1315,14 +1318,13 @@ Future getContactsFromGloble() async {
 String getContactName(mobile) {
   if (mobile != null) {
     var name = mobile;
-    for (var i = 0; i < allcontacts.length; i++) {
-      if (allcontacts[i]
-          .phones
+    for (var i = 0; i < addContactController.allcontacts.length; i++) {
+      if (addContactController.allcontacts[i].phones
           .map((e) => e.number)
           .toString()
           .replaceAll(RegExp(r"\s+\b|\b\s"), "")
           .contains(mobile)) {
-        name = allcontacts[i].displayName;
+        name = addContactController.allcontacts[i].displayName;
       }
     }
     return name;
@@ -1623,14 +1625,13 @@ String getContact1(mobile, name1) {
   if (mobile != null) {
     var name = mobile;
     bool found = false;
-    for (var i = 0; i < allcontacts.length; i++) {
-      if (allcontacts[i]
-          .phones
+    for (var i = 0; i < addContactController.allcontacts.length; i++) {
+      if (addContactController.allcontacts[i].phones
           .map((e) => e.number)
           .toString()
           .replaceAll(RegExp(r"\s+\b|\b\s"), "")
           .contains(mobile)) {
-        name = allcontacts[i].displayName;
+        name = addContactController.allcontacts[i].displayName;
         found = true;
         break; // Once found, no need to continue searching
       }
@@ -1884,8 +1885,8 @@ class CustomButtom extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             gradient: const LinearGradient(colors: [
-              Color.fromRGBO(252, 198, 4, 0.5),
-              Color.fromRGBO(252, 198, 4, 1)
+              Color(0xffFFEDAB),
+              Color(0xffFCC604),
             ], begin: Alignment.topCenter, end: Alignment.bottomCenter),
           ),
           child: Container(

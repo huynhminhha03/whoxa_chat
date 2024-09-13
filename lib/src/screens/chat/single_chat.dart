@@ -1,10 +1,12 @@
-// ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names, unused_field, prefer_is_empty
+// ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names, unused_field, prefer_is_empty, curly_braces_in_flow_control_structures, deprecated_member_use
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
@@ -20,7 +22,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
-import 'package:lottie/lottie.dart';
+import 'package:lottie/lottie.dart' as lt;
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
@@ -44,13 +46,13 @@ import 'package:page_transition/page_transition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:place_picker/place_picker.dart';
-import 'package:record_mp3/record_mp3.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:meyaoo_new/model/chatdetails/single_chat_list_model.dart';
 import 'package:light_compressor/light_compressor.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart' as path;
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:record/record.dart';
 
 class SingleChatMsg extends StatefulWidget {
   String? conversationID;
@@ -90,6 +92,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   ChatListController chatListController = Get.put(ChatListController());
   ValueNotifier<bool> isLast = ValueNotifier(false);
   GetAllDeviceContact getAllDeviceContact = Get.put(GetAllDeviceContact());
+  late Record audioRecord;
+  late AudioPlayer audioPlayer;
 
   @override
   void initState() {
@@ -171,12 +175,14 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       // }
     });
     apis();
+    audioPlayer = AudioPlayer();
+    audioRecord = Record();
     super.initState();
   }
 
   Future<void> apis() async {
-    await getContactsFromGloble();
-    var contactJson = json.encode(mobileContacts);
+    // await getContactsFromGloble();
+    var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
   }
 
@@ -195,7 +201,6 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
   List<MessageList> chatMessageList = [];
   final TextEditingController _searchController = TextEditingController();
   TextEditingController messagecontroller = TextEditingController();
-  AudioPlayer audioPlayer = AudioPlayer();
   AudioController audioController = Get.put(AudioController());
   bool isKeyboard = false;
   String isSelectedmessage = "0";
@@ -296,6 +301,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     // chatContorller.userdetailschattModel.value!.messageList!.clear();
     // chatContorller.userdetailschattModel = SingleChatListModel().obs;
     chatContorller.onClose();
+    audioRecord.dispose();
+    audioPlayer.dispose();
     super.dispose();
   }
 
@@ -487,8 +494,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                             style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
-                                                                      .bold,
+                                                                      .w400,
                                                               fontSize: 17,
+                                                              fontFamily:
+                                                                  "Poppins",
                                                             ),
                                                           ),
                                                         )
@@ -581,8 +590,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           //             Container(
                           //               decoration: BoxDecoration(
                           //                   color: Colors.grey[300],
-                          //                   borderRadius: const BorderRadius.all(
-                          //                       Radius.circular(20))),
+                          //                   borderRadius:
+                          //                       const BorderRadius.all(
+                          //                           Radius.circular(20))),
                           //               height: 35,
                           //               // width: 120,
                           //               child: Padding(
@@ -595,8 +605,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           //                       CrossAxisAlignment.center,
                           //                   children: [
                           //                     Padding(
-                          //                       padding:
-                          //                           const EdgeInsets.only(top: 0),
+                          //                       padding: const EdgeInsets.only(
+                          //                           top: 0),
                           //                       child: ValueListenableBuilder<
                           //                           String>(
                           //                         valueListenable: dateNotifier,
@@ -626,11 +636,11 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           //   ),
                           // ),
                           // arrow down button
-                          chatContorller.userdetailschattModel.value!
+                          (chatContorller.userdetailschattModel.value!
                                       .messageList!.isEmpty ||
                                   chatContorller.userdetailschattModel.value!
                                           .messageList!.first.message ==
-                                      null
+                                      null)
                               ? const SizedBox.shrink()
                               : Padding(
                                   padding: const EdgeInsets.only(top: 40),
@@ -884,9 +894,187 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         return data.replyId == 0
             ? getAudioCallWidget(index, data)
             : getReplyMessage(index, data);
+      case 'status':
+        return data.replyId == 0
+            ? getStatusWidget(index, data)
+            : getReplyMessage(index, data);
       default:
         return const SizedBox.shrink();
     }
+  }
+
+  Widget getStatusWidget(index, MessageList data) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20, right: 10, left: 10),
+      child: Align(
+        alignment: data.myMessage == false
+            ? Alignment.centerLeft
+            : Alignment.centerRight,
+        child: Column(
+          crossAxisAlignment: data.myMessage == false
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.end,
+          children: [
+            Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      borderRadius: data.myMessage == false
+                          ? const BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(10))
+                          : const BorderRadius.only(
+                              topRight: Radius.circular(10),
+                              topLeft: Radius.circular(10),
+                              bottomLeft: Radius.circular(10)),
+                      color:
+                          data.myMessage == false ? grey1Color : yellow1Color),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(maxWidth: Get.width * 0.6),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(7),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      constraints: BoxConstraints(
+                                          maxWidth: Get.width * 0.22),
+                                      child: Text(
+                                        data.senderId!.toString() ==
+                                                widget.userID.toString()
+                                            ? "You"
+                                            : widget.username!,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: const TextStyle(
+                                          color: Color(0xffFCC604),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    Image.asset(
+                                      "assets/images/arrow-right-play.png",
+                                      scale: 1.7,
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    const Text(
+                                      "Status",
+                                      style: TextStyle(
+                                        color: Color(0xffFCC604),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Image.asset(
+                                      "assets/images/gallery.png",
+                                      scale: 4,
+                                    ),
+                                    const SizedBox(
+                                      width: 2,
+                                    ),
+                                    SizedBox(
+                                      width: Get.width * 0.3,
+                                      child: Text(
+                                        data.statusData![0].statusMedia![0]
+                                            .statusText!,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          color: Color(0xff808080),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ).paddingOnly(
+                              left: 16,
+                              top: 12,
+                              bottom: 12,
+                            ),
+                            ClipRRect(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(3)),
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    data.statusData![0].statusMedia![0].url!,
+                                placeholder: (context, url) => const Center(
+                                  child: CupertinoActivityIndicator(),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                                fit: BoxFit.cover,
+                                height: 56,
+                                width: 56,
+                              ),
+                            ).paddingAll(7),
+                          ],
+                        ),
+                      ).paddingAll(3),
+                      Container(
+                        constraints: BoxConstraints(maxWidth: Get.width * 0.6),
+                        child: Text(
+                          data.message!,
+                          maxLines: 2,
+                          style: const TextStyle(
+                            color: Color(0xff000000),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ).paddingSymmetric(horizontal: 20, vertical: 10),
+                      ),
+                    ],
+                  ),
+                ),
+                data.myMessage == false
+                    ? const SizedBox.shrink()
+                    : Positioned(
+                        bottom: 3,
+                        right: 3,
+                        child: Icon(
+                          Icons.done_all,
+                          color: data.messageRead.toString() == "1"
+                              ? Colors.blue
+                              : Colors.grey.shade400,
+                          size: 15,
+                        ))
+              ],
+            ),
+            Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: SizedBox(
+                  child: timestpa(data.messageRead.toString(), data.createdAt!,
+                      data.isStarMessage!),
+                ))
+          ],
+        ),
+      ),
+    );
   }
 
   Widget getVideoCallWidget(index, MessageList data) {
@@ -911,7 +1099,6 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       : CrossAxisAlignment.end,
                   children: [
                     Container(
-                      height: 40,
                       padding: const EdgeInsets.only(
                           left: 3, right: 3, top: 0, bottom: 0),
                       margin: const EdgeInsets.only(bottom: 5),
@@ -928,75 +1115,97 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           color: data.myMessage == false
                               ? grey1Color
                               : yellow1Color),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: Get.width * 0.50,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topRight: const Radius.circular(8.0),
-                                  bottomRight: data.myMessage == false
-                                      ? const Radius.circular(8)
-                                      : const Radius.circular(0.0),
-                                  topLeft: const Radius.circular(8.0),
-                                  bottomLeft: data.myMessage == false
-                                      ? const Radius.circular(0)
-                                      : const Radius.circular(8),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        data.messageType == "video_call"
-                                            ? data.message == "1,0,0"
-                                                ? "assets/icons/missed_video_call.png"
-                                                : data.message == "0,0,2"
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: Get.width * 0.50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(8.0),
+                                      bottomRight: data.myMessage == false
+                                          ? const Radius.circular(8)
+                                          : const Radius.circular(0.0),
+                                      topLeft: const Radius.circular(8.0),
+                                      bottomLeft: data.myMessage == false
+                                          ? const Radius.circular(0)
+                                          : const Radius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            data.messageType == "video_call"
+                                                ? data.message == "1,0,0"
                                                     ? "assets/icons/missed_video_call.png"
-                                                    : data.senderData!.userId ==
-                                                            Hive.box(userdata)
-                                                                .get(userId)
-                                                        ? "assets/icons/outgoing_video_call.png"
-                                                        : "assets/icons/incoming_video_call.png"
-                                            : "",
-                                        height: 18,
+                                                    : data.message == "0,0,2"
+                                                        ? "assets/icons/missed_video_call.png"
+                                                        : data.senderData!
+                                                                    .userId ==
+                                                                Hive.box(
+                                                                        userdata)
+                                                                    .get(userId)
+                                                            ? "assets/icons/outgoing_video_call.png"
+                                                            : "assets/icons/incoming_video_call.png"
+                                                : "",
+                                            height: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 4,
+                                          ),
+                                          Text(
+                                            data.messageType == "video_call"
+                                                ? data.message == "1,0,0"
+                                                    ? "Missed Video Call"
+                                                    : data.message == "0,0,2"
+                                                        ? "Video Call Declined"
+                                                        : data.senderData!
+                                                                    .userId ==
+                                                                Hive.box(
+                                                                        userdata)
+                                                                    .get(userId)
+                                                            ? "Outgoing Video Call"
+                                                            : "Incoming Video Call"
+                                                : "",
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                              color: Color(0xffA4A4A4),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      Text(
-                                        data.messageType == "video_call"
-                                            ? data.message == "1,0,0"
-                                                ? "Missed Video Call"
-                                                : data.message == "0,0,2"
-                                                    ? "Video Call Declined"
-                                                    : data.senderData!.userId ==
-                                                            Hive.box(userdata)
-                                                                .get(userId)
-                                                        ? "Outgoing Video Call"
-                                                        : "Incoming Video Call"
-                                            : "",
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 12,
-                                          color: Color(0xffA4A4A4),
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ).paddingOnly(top: 3, bottom: 3),
+                          ).paddingOnly(top: 3, bottom: 3),
+                          SizedBox(
+                            height: 16,
+                            child: data.myMessage == false
+                                ? const SizedBox()
+                                : Icon(
+                                    Icons.done_all,
+                                    color: data.messageRead.toString() == "1"
+                                        ? Colors.blue
+                                        : Colors.grey.shade400,
+                                    size: 15,
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
                     data.myMessage == false
                         ? SizedBox(
@@ -1037,7 +1246,6 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       : CrossAxisAlignment.end,
                   children: [
                     Container(
-                      height: 40,
                       padding: const EdgeInsets.only(
                           left: 3, right: 3, top: 0, bottom: 0),
                       margin: const EdgeInsets.only(bottom: 5),
@@ -1054,75 +1262,97 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           color: data.myMessage == false
                               ? grey1Color
                               : yellow1Color),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: Get.width * 0.50,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.only(
-                                  topRight: const Radius.circular(8.0),
-                                  bottomRight: data.myMessage == false
-                                      ? const Radius.circular(8)
-                                      : const Radius.circular(0.0),
-                                  topLeft: const Radius.circular(8.0),
-                                  bottomLeft: data.myMessage == false
-                                      ? const Radius.circular(0)
-                                      : const Radius.circular(8),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                    children: [
-                                      Image.asset(
-                                        data.messageType == "audio_call"
-                                            ? data.message == "1,0,0"
-                                                ? "assets/icons/missed_audio_call.png"
-                                                : data.message == "0,0,2"
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: Get.width * 0.50,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: const Radius.circular(8.0),
+                                      bottomRight: data.myMessage == false
+                                          ? const Radius.circular(8)
+                                          : const Radius.circular(0.0),
+                                      topLeft: const Radius.circular(8.0),
+                                      bottomLeft: data.myMessage == false
+                                          ? const Radius.circular(0)
+                                          : const Radius.circular(8),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Row(
+                                        children: [
+                                          Image.asset(
+                                            data.messageType == "audio_call"
+                                                ? data.message == "1,0,0"
                                                     ? "assets/icons/missed_audio_call.png"
-                                                    : data.senderData!.userId ==
-                                                            Hive.box(userdata)
-                                                                .get(userId)
-                                                        ? "assets/icons/outgoing_audio_call.png"
-                                                        : "assets/icons/incoming_audio_call.png"
-                                            : "",
-                                        height: 18,
+                                                    : data.message == "0,0,2"
+                                                        ? "assets/icons/missed_audio_call.png"
+                                                        : data.senderData!
+                                                                    .userId ==
+                                                                Hive.box(
+                                                                        userdata)
+                                                                    .get(userId)
+                                                            ? "assets/icons/outgoing_audio_call.png"
+                                                            : "assets/icons/incoming_audio_call.png"
+                                                : "",
+                                            height: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 4,
+                                          ),
+                                          Text(
+                                            data.messageType == "audio_call"
+                                                ? data.message == "1,0,0"
+                                                    ? "Missed Audio Call"
+                                                    : data.message == "0,0,2"
+                                                        ? "Audio Call Declined"
+                                                        : data.senderData!
+                                                                    .userId ==
+                                                                Hive.box(
+                                                                        userdata)
+                                                                    .get(userId)
+                                                            ? "Outgoing Audio Call"
+                                                            : "Incoming Audio Call"
+                                                : "",
+                                            style: const TextStyle(
+                                              fontFamily: 'Poppins',
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 12,
+                                              color: Color(0xffA4A4A4),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      Text(
-                                        data.messageType == "audio_call"
-                                            ? data.message == "1,0,0"
-                                                ? "Missed Audio Call"
-                                                : data.message == "0,0,2"
-                                                    ? "Audio Call Declined"
-                                                    : data.senderData!.userId ==
-                                                            Hive.box(userdata)
-                                                                .get(userId)
-                                                        ? "Outgoing Audio Call"
-                                                        : "Incoming Audio Call"
-                                            : "",
-                                        style: const TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 12,
-                                          color: Color(0xffA4A4A4),
-                                        ),
-                                      )
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ).paddingOnly(top: 3, bottom: 3),
+                          ).paddingOnly(top: 3, bottom: 3),
+                          SizedBox(
+                            height: 16,
+                            child: data.myMessage == false
+                                ? const SizedBox()
+                                : Icon(
+                                    Icons.done_all,
+                                    color: data.messageRead.toString() == "1"
+                                        ? Colors.blue
+                                        : Colors.grey.shade400,
+                                    size: 15,
+                                  ),
+                          ),
+                        ],
+                      ),
                     ),
                     data.myMessage == false
                         ? SizedBox(
@@ -1304,28 +1534,21 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     maxWidth:
                                         MediaQuery.of(context).size.width * .6),
                                 decoration: BoxDecoration(
-                                    borderRadius: data.myMessage == false
-                                        ? const BorderRadius.only(
-                                            topLeft: Radius.circular(15),
-                                            topRight: Radius.circular(15),
-                                            bottomRight: Radius.circular(15))
-                                        : const BorderRadius.only(
-                                            topRight: Radius.circular(15),
-                                            topLeft: Radius.circular(15),
-                                            bottomLeft: Radius.circular(15)),
-                                    color: data.myMessage == false
-                                        ? grey1Color
-                                        : null,
-                                    gradient: data.myMessage == false
-                                        ? null
-                                        : LinearGradient(
-                                            colors: [
-                                                yellow1Color,
-                                                yellow2Color
-                                              ],
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter)),
-                                padding: const EdgeInsets.all(10),
+                                  borderRadius: data.myMessage == false
+                                      ? const BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15),
+                                          bottomRight: Radius.circular(15))
+                                      : const BorderRadius.only(
+                                          topRight: Radius.circular(15),
+                                          topLeft: Radius.circular(15),
+                                          bottomLeft: Radius.circular(15)),
+                                  color: data.myMessage == false
+                                      ? grey1Color
+                                      : yellow1Color,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
                                 child: Text(
                                   capitalizeFirstLetter(data.message!),
                                   style: const TextStyle(
@@ -1334,6 +1557,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                       color: chatColor),
                                 ),
                               ),
+                              data.myMessage == false
+                                  ? const SizedBox.shrink()
+                                  : Positioned(
+                                      bottom: 3,
+                                      right: 3,
+                                      child: Icon(
+                                        Icons.done_all,
+                                        color:
+                                            data.messageRead.toString() == "1"
+                                                ? Colors.blue
+                                                : Colors.grey.shade400,
+                                        size: 15,
+                                      ))
                             ],
                           ),
                           Padding(
@@ -1478,22 +1714,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         width: 150,
                         height: 150,
                         decoration: BoxDecoration(
-                            borderRadius: data.myMessage == false
-                                ? const BorderRadius.only(
-                                    topLeft: Radius.circular(15),
-                                    topRight: Radius.circular(15),
-                                    bottomRight: Radius.circular(15))
-                                : const BorderRadius.only(
-                                    topRight: Radius.circular(15),
-                                    topLeft: Radius.circular(15),
-                                    bottomLeft: Radius.circular(15)),
-                            color: data.myMessage == false ? grey1Color : null,
-                            gradient: data.myMessage == false
-                                ? null
-                                : LinearGradient(
-                                    colors: [yellow1Color, yellow2Color],
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter)),
+                          borderRadius: data.myMessage == false
+                              ? const BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15))
+                              : const BorderRadius.only(
+                                  topRight: Radius.circular(15),
+                                  topLeft: Radius.circular(15),
+                                  bottomLeft: Radius.circular(15)),
+                          color: data.myMessage == false
+                              ? grey1Color
+                              : yellow1Color,
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(2.0),
                           child: ClipRRect(
@@ -1506,26 +1739,44 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     topRight: Radius.circular(15),
                                     topLeft: Radius.circular(15),
                                     bottomLeft: Radius.circular(15)),
-                            child: CachedNetworkImage(
-                              imageUrl: data.url!,
-                              imageBuilder: (context, imageProvider) => Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
+                            child: Stack(
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl: data.url!,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              placeholder: (context, url) => const Center(
-                                child: CupertinoActivityIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                              fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CupertinoActivityIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                ),
+                                data.myMessage == false
+                                    ? const SizedBox.shrink()
+                                    : Positioned(
+                                        bottom: 3,
+                                        right: 3,
+                                        child: Icon(
+                                          Icons.done_all,
+                                          color:
+                                              data.messageRead.toString() == "1"
+                                                  ? Colors.blue
+                                                  : Colors.grey.shade400,
+                                          size: 15,
+                                        ))
+                              ],
                             ),
                           ),
                         ),
@@ -1547,7 +1798,21 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     );
   }
 
-  Widget getLocationMessageWidget(index, MessageList data) {
+  Future<Uint8List> getBytesFromAsset(
+      String path, int width, int height) async {
+    final byteData = await rootBundle.load(path);
+    final codec = await ui.instantiateImageCodec(
+      byteData.buffer.asUint8List(),
+      targetWidth: width,
+      targetHeight: height,
+    );
+    final frame = await codec.getNextFrame();
+    return (await frame.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
+  }
+
+  getLocationMessageWidget(index, MessageList data) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: InkWell(
@@ -1648,100 +1913,249 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                       right: 12,
                       top: 0,
                       bottom: 0),
-                  child: InkWell(
-                    onTap: () {},
-                    child: Stack(
-                      alignment: data.myMessage == false
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight,
-                      children: [
-                        Column(
-                          crossAxisAlignment: data.myMessage == false
-                              ? CrossAxisAlignment.start
-                              : CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: data.myMessage == false
-                                      ? const BorderRadius.only(
-                                          topLeft: Radius.circular(15),
-                                          topRight: Radius.circular(15),
-                                          bottomRight: Radius.circular(15))
-                                      : const BorderRadius.only(
-                                          topRight: Radius.circular(15),
-                                          topLeft: Radius.circular(15),
-                                          bottomLeft: Radius.circular(15)),
-                                  color: data.myMessage == false
-                                      ? grey1Color
-                                      : yellow1Color),
-                              constraints: const BoxConstraints(
-                                  minHeight: 10.0,
-                                  minWidth: 10.0,
-                                  maxWidth: 250),
-                              child: InkWell(
-                                onTap: () {
-                                  MapUtils.openMap(double.parse(data.latitude!),
-                                      double.parse(data.longitude!));
-                                },
-                                child: Container(
+                  child: Stack(
+                    alignment: data.myMessage == false
+                        ? Alignment.centerLeft
+                        : Alignment.centerRight,
+                    children: [
+                      Column(
+                        crossAxisAlignment: data.myMessage == false
+                            ? CrossAxisAlignment.start
+                            : CrossAxisAlignment.end,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius: data.myMessage == false
+                                    ? const BorderRadius.only(
+                                        topLeft: Radius.circular(15),
+                                        topRight: Radius.circular(15),
+                                        bottomRight: Radius.circular(15))
+                                    : const BorderRadius.only(
+                                        topRight: Radius.circular(15),
+                                        topLeft: Radius.circular(15),
+                                        bottomLeft: Radius.circular(15)),
+                                color: data.myMessage == false
+                                    ? grey1Color
+                                    : yellow1Color),
+                            constraints: const BoxConstraints(
+                                minHeight: 10.0, minWidth: 10.0, maxWidth: 250),
+                            child: Column(
+                              children: [
+                                Container(
                                   height: 130,
                                   width: 250,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10)),
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: data.latitude.toString() == "" ||
-                                            data.longitude.toString() == ""
-                                        ? Container(
-                                            decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(10),
-                                                    topRight:
-                                                        Radius.circular(10)),
-                                                image: DecorationImage(
-                                                    image: AssetImage(
-                                                        "assets/images/map_Blurr.png"),
-                                                    fit: BoxFit.cover)),
-                                            child: Icon(
-                                              Icons.error_outline,
-                                              color:
-                                                  chatownColor.withOpacity(0.6),
-                                              size: 50,
-                                            ),
-                                          )
-                                        : GoogleMap(
-                                            zoomControlsEnabled: false,
-                                            zoomGesturesEnabled: false,
-                                            initialCameraPosition:
-                                                CameraPosition(
-                                                    target: LatLng(
-                                                        double.parse(
-                                                            data.latitude!),
-                                                        double.parse(
-                                                            data.longitude!)),
-                                                    zoom: 15),
-                                            mapType: MapType.normal,
-                                            onMapCreated: (GoogleMapController
-                                                controller111) {
-                                              // controller.complete();
-                                            },
-                                          ),
-                                  ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: data.latitude.toString() == "" ||
+                                              data.longitude.toString() == ""
+                                          ? Container(
+                                              decoration: const BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10)),
+                                                  image: DecorationImage(
+                                                      image: AssetImage(
+                                                          "assets/images/map_Blurr.png"),
+                                                      fit: BoxFit.cover)),
+                                              child: Icon(
+                                                Icons.error_outline,
+                                                color: chatownColor
+                                                    .withOpacity(0.6),
+                                                size: 50,
+                                              ),
+                                            )
+                                          : FutureBuilder<Uint8List>(
+                                              future: getBytesFromAsset(
+                                                'assets/images/location_for_google.png',
+                                                70,
+                                                70,
+                                              ),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<Uint8List>
+                                                      snapshot) {
+                                                if (snapshot.connectionState ==
+                                                        ConnectionState.done &&
+                                                    snapshot.hasData) {
+                                                  return Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(18)),
+                                                    height: 100,
+                                                    child: Stack(
+                                                      children: [
+                                                        GoogleMap(
+                                                          zoomControlsEnabled:
+                                                              false,
+                                                          onTap: (argument) {
+                                                            MapUtils.openMap(
+                                                                double.parse(data
+                                                                    .latitude!),
+                                                                double.parse(data
+                                                                    .longitude!));
+                                                          },
+                                                          mapType:
+                                                              MapType.normal,
+                                                          compassEnabled: false,
+                                                          initialCameraPosition: CameraPosition(
+                                                              target: LatLng(
+                                                                  double.parse(data
+                                                                      .latitude!),
+                                                                  double.parse(data
+                                                                      .longitude!)),
+                                                              zoom: 15),
+                                                          markers: {
+                                                            Marker(
+                                                              icon: BitmapDescriptor
+                                                                  .fromBytes(
+                                                                      snapshot
+                                                                          .data!),
+                                                              markerId:
+                                                                  const MarkerId(
+                                                                      'my_location'),
+                                                              position: LatLng(
+                                                                  double.parse(data
+                                                                      .latitude!),
+                                                                  double.parse(data
+                                                                      .longitude!)),
+                                                            ),
+                                                          },
+                                                        ),
+                                                        data.myMessage == false
+                                                            ? const SizedBox
+                                                                .shrink()
+                                                            : Positioned(
+                                                                bottom: 3,
+                                                                right: 3,
+                                                                child: Icon(
+                                                                  Icons
+                                                                      .done_all,
+                                                                  color: data.messageRead
+                                                                              .toString() ==
+                                                                          "1"
+                                                                      ? Colors
+                                                                          .blue
+                                                                      : Colors
+                                                                          .grey
+                                                                          .shade400,
+                                                                  size: 15,
+                                                                ),
+                                                              ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                } else {
+                                                  return const Center(
+                                                      child:
+                                                          CupertinoActivityIndicator());
+                                                }
+                                              },
+                                            )
+
+                                      // GoogleMap(
+                                      //     zoomControlsEnabled: false,
+                                      //     zoomGesturesEnabled: false,
+                                      //     onTap: (argument) {
+                                      //       MapUtils.openMap(
+                                      //           double.parse(data.latitude!),
+                                      //           double.parse(
+                                      //               data.longitude!));
+                                      //     },
+                                      //     markers: {
+                                      //       Marker(
+                                      //         icon:
+                                      //             BitmapDescriptor.fromBytes(
+                                      //                 snapshot.data!),
+                                      //         markerId: const MarkerId(
+                                      //             'my_location'),
+                                      //         position: LatLng(
+                                      //             double.parse(
+                                      //                 widget.latitude!),
+                                      //             double.parse(
+                                      //                 widget.longitude!)),
+                                      //       ),
+                                      //     },
+                                      //     initialCameraPosition:
+                                      //         CameraPosition(
+                                      //             target: LatLng(
+                                      //                 double.parse(
+                                      //                     data.latitude!),
+                                      //                 double.parse(
+                                      //                     data.longitude!)),
+                                      //             zoom: 15),
+                                      //     mapType: MapType.normal,
+                                      //     onMapCreated: (GoogleMapController
+                                      //         controller111) {
+                                      //       // controller.complete();
+                                      //     },
+                                      //   ),
+                                      ),
+                                ).paddingOnly(
+                                  left: 4,
+                                  top: 4,
+                                  right: 4,
                                 ),
-                              ).paddingOnly(
-                                  left: 4, top: 4, right: 4, bottom: 4),
+                                InkWell(
+                                  onTap: () {
+                                    MapUtils.openMap(
+                                        double.parse(data.latitude!),
+                                        double.parse(data.longitude!));
+                                  },
+                                  child: Container(
+                                    width: Get.width,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(
+                                          bottomLeft: Radius.circular(
+                                              data.myMessage == false ? 0 : 7),
+                                          bottomRight: Radius.circular(
+                                              data.myMessage == false ? 7 : 0)),
+                                      gradient: LinearGradient(
+                                        colors: data.myMessage == true
+                                            ? [
+                                                const Color(0xffFFEDAB),
+                                                const Color(0xffFCC604),
+                                              ]
+                                            : [
+                                                const Color(0xffDDDDDD),
+                                                const Color(0xffCDCDCD),
+                                              ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                    child: const Column(
+                                      children: [
+                                        Text(
+                                          "View Location",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400,
+                                              color: chatColor),
+                                        ),
+                                      ],
+                                    ).paddingSymmetric(vertical: 5),
+                                  ),
+                                )
+                              ],
                             ),
-                            Padding(
-                                padding: const EdgeInsets.only(top: 4.0),
-                                child: SizedBox(
-                                  child: timestpa(data.messageRead.toString(),
-                                      data.createdAt!, data.isStarMessage!),
-                                ))
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                          Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: SizedBox(
+                                child: timestpa(data.messageRead.toString(),
+                                    data.createdAt!, data.isStarMessage!),
+                              ))
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -1908,24 +2322,43 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     child:
                                         // video thumbnail generater
                                         //getUrlWidget(data.url!)
+                                        Stack(
+                                      children: [
                                         CachedNetworkImage(
-                                      imageUrl: data.thumbnail!,
-                                      imageBuilder: (context, imageProvider) =>
-                                          Container(
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: imageProvider,
-                                            fit: BoxFit.cover,
+                                          imageUrl: data.thumbnail!,
+                                          imageBuilder:
+                                              (context, imageProvider) =>
+                                                  Container(
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: imageProvider,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
                                           ),
+                                          placeholder: (context, url) =>
+                                              const Center(
+                                            child: CupertinoActivityIndicator(),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Icon(Icons.error),
+                                          fit: BoxFit.cover,
                                         ),
-                                      ),
-                                      placeholder: (context, url) =>
-                                          const Center(
-                                        child: CupertinoActivityIndicator(),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.error),
-                                      fit: BoxFit.cover,
+                                        data.myMessage == false
+                                            ? const SizedBox.shrink()
+                                            : Positioned(
+                                                bottom: 3,
+                                                right: 3,
+                                                child: Icon(
+                                                  Icons.done_all,
+                                                  color: data.messageRead
+                                                              .toString() ==
+                                                          "1"
+                                                      ? Colors.blue
+                                                      : Colors.grey.shade400,
+                                                  size: 15,
+                                                ))
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -2075,8 +2508,6 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         : CrossAxisAlignment.end,
                     children: [
                       Container(
-                        height: 70,
-                        width: 250,
                         padding: EdgeInsets.only(
                             left:
                                 chatID.isNotEmpty || chatMessageList.isNotEmpty
@@ -2101,137 +2532,174 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                             color: data.myMessage == false
                                 ? grey1Color
                                 : yellow1Color),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType.rightToLeft,
-                                        child: FileView(file: "${data.url}"),
-                                      ));
-                                },
-                                child: SizedBox(
-                                  width: Get.width * 0.50,
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.only(
-                                      topRight: const Radius.circular(8.0),
-                                      bottomRight: data.myMessage == false
-                                          ? const Radius.circular(8)
-                                          : const Radius.circular(0.0),
-                                      topLeft: const Radius.circular(8.0),
-                                      bottomLeft: data.myMessage == false
-                                          ? const Radius.circular(0)
-                                          : const Radius.circular(8),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      child: Row(
-                                        children: [
-                                          const Image(
-                                            height: 30,
-                                            image: AssetImage(
-                                                'assets/images/pdf.png'),
-                                          ),
-                                          FutureBuilder<Map<String, dynamic>>(
-                                            future: getPdfInfo(data.url!),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.connectionState ==
-                                                  ConnectionState.waiting) {
-                                                return Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      extractFilename(data.url!)
-                                                          .toString()
-                                                          .split("-")
-                                                          .last,
-                                                      style: const TextStyle(
-                                                        color: chatColor,
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                    const Text(
-                                                      '0 Page - 0 KB',
-                                                      style: TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                    )
-                                                  ],
-                                                ).paddingOnly(left: 12);
-                                              } else if (snapshot.hasError) {
-                                                return const Text('');
-                                              } else if (snapshot.hasData) {
-                                                final int pageCount =
-                                                    snapshot.data!['pageCount'];
-                                                final String fileSize =
-                                                    snapshot.data!['fileSize'];
-                                                return Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 11),
-                                                      child: Text(
-                                                        extractFilename(
-                                                                data.url!)
-                                                            .toString()
-                                                            .split("-")
-                                                            .last,
-                                                        style: const TextStyle(
-                                                          color: chatColor,
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              width: 240,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white),
+                              padding: const EdgeInsets.symmetric(vertical: 13),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  InkWell(
+                                    onTap: () async {
+                                      Navigator.push(
+                                          context,
+                                          PageTransition(
+                                            curve: Curves.linear,
+                                            type:
+                                                PageTransitionType.rightToLeft,
+                                            child: FileView(
+                                              file: "${data.url}",
+                                            ),
+                                          ));
+                                    },
+                                    child: SizedBox(
+                                      width: Get.width * 0.50,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.only(
+                                          topRight: const Radius.circular(8.0),
+                                          bottomRight: data.myMessage == false
+                                              ? const Radius.circular(8)
+                                              : const Radius.circular(0.0),
+                                          topLeft: const Radius.circular(8.0),
+                                          bottomLeft: data.myMessage == false
+                                              ? const Radius.circular(0)
+                                              : const Radius.circular(8),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10),
+                                          child: Row(
+                                            children: [
+                                              const Image(
+                                                height: 30,
+                                                image: AssetImage(
+                                                    'assets/images/pdf.png'),
+                                              ),
+                                              FutureBuilder<
+                                                  Map<String, dynamic>>(
+                                                future: getPdfInfo(data.url!),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          extractFilename(
+                                                                  data.url!)
+                                                              .toString()
+                                                              .split("-")
+                                                              .last,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: chatColor,
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '$pageCount Page - $fileSize',
-                                                      style: const TextStyle(
-                                                        color: Colors.grey,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                    ).paddingOnly(left: 12),
-                                                  ],
-                                                );
-                                              } else {
-                                                return const Text(
-                                                    'No PDF info available');
-                                              }
-                                            },
+                                                        const Text(
+                                                          '0 Page - 0 KB',
+                                                          style: TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ).paddingOnly(left: 12);
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return const Text('');
+                                                  } else if (snapshot.hasData) {
+                                                    final int pageCount =
+                                                        snapshot
+                                                            .data!['pageCount'];
+                                                    final String fileSize =
+                                                        snapshot
+                                                            .data!['fileSize'];
+                                                    return Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  left: 11),
+                                                          child: Text(
+                                                            extractFilename(
+                                                                    data.url!)
+                                                                .toString()
+                                                                .split("-")
+                                                                .last,
+                                                            style:
+                                                                const TextStyle(
+                                                              color: chatColor,
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          '$pageCount Page - $fileSize',
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ).paddingOnly(left: 12),
+                                                      ],
+                                                    );
+                                                  } else {
+                                                    return const Text(
+                                                        'No PDF info available');
+                                                  }
+                                                },
+                                              ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ).paddingOnly(top: 3, bottom: 3),
+                            ).paddingOnly(top: 3, bottom: 3),
+                            SizedBox(
+                              height: 16,
+                              child: data.myMessage == false
+                                  ? const SizedBox()
+                                  : Icon(
+                                      Icons.done_all,
+                                      color: data.messageRead.toString() == "1"
+                                          ? Colors.blue
+                                          : Colors.grey.shade400,
+                                      size: 15,
+                                    ),
+                            )
+                          ],
+                        ),
                       ),
                       data.myMessage == false
                           ? SizedBox(
@@ -2495,26 +2963,45 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     topRight: Radius.circular(10),
                                     topLeft: Radius.circular(10),
                                     bottomLeft: Radius.circular(10)),
-                            child: CachedNetworkImage(
-                              imageUrl: data.url!,
-                              imageBuilder: (context, imageProvider) => Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
+                            child: Stack(
+                              children: [
+                                CachedNetworkImage(
+                                  imageUrl: data.url!,
+                                  imageBuilder: (context, imageProvider) =>
+                                      Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              placeholder: (context, url) => const Center(
-                                child: CupertinoActivityIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                              fit: BoxFit.cover,
+                                  placeholder: (context, url) => const Center(
+                                    child: CupertinoActivityIndicator(),
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                  fit: BoxFit.cover,
+                                ),
+                                data.myMessage == false
+                                    ? const SizedBox.shrink()
+                                    : Positioned(
+                                        bottom: 3,
+                                        right: 3,
+                                        child: Icon(
+                                          Icons.done_all,
+                                          color:
+                                              data.messageRead.toString() == "1"
+                                                  ? Colors.blue
+                                                  : Colors.grey.shade400,
+                                          size: 15,
+                                        ),
+                                      ),
+                              ],
                             ),
                           ),
                         ),
@@ -2815,6 +3302,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                   ),
                                 ),
                               ),
+                              data.myMessage == false
+                                  ? const SizedBox.shrink()
+                                  : Positioned(
+                                      bottom: 3,
+                                      right: 3,
+                                      child: Icon(
+                                        Icons.done_all,
+                                        color:
+                                            data.messageRead.toString() == "1"
+                                                ? Colors.blue
+                                                : Colors.grey.shade400,
+                                        size: 15,
+                                      ))
                             ],
                           ),
                           Padding(
@@ -2981,96 +3481,137 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                   topRight:
                                                       Radius.circular(10)),
                                           color: Colors.white),
-                                      child: Row(
+                                      child: Stack(
                                         children: [
-                                          const SizedBox(width: 20),
-                                          Container(
-                                            height: 30,
-                                            width: 30,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(35)),
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(35),
-                                              child: CustomCachedNetworkImage(
-                                                  imageUrl: data
-                                                      .sharedContactProfileImage!,
-                                                  placeholderColor:
-                                                      chatownColor,
-                                                  errorWidgeticon: const Icon(
-                                                    Icons.person,
-                                                    size: 30,
-                                                  )),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          Row(
                                             children: [
-                                              Text(
-                                                capitalizeFirstLetter(
-                                                    data.sharedContactName!),
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: chatColor),
-                                              ),
-                                              Text(
-                                                capitalizeFirstLetter(
-                                                    data.sharedContactNumber!),
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: chatColor),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 3),
-                                    matchContact(data.sharedContactNumber!)
-                                        ? const SizedBox.shrink()
-                                        : InkWell(
-                                            onTap: () {
-                                              Get.to(() => SaveContact(
-                                                  name: data.sharedContactName!,
-                                                  number: data
-                                                      .sharedContactNumber!));
-                                            },
-                                            child: Container(
-                                              height: 30,
-                                              width: 200,
-                                              decoration: const BoxDecoration(
+                                              const SizedBox(width: 20),
+                                              Container(
+                                                height: 30,
+                                                width: 30,
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            35)),
+                                                child: ClipRRect(
                                                   borderRadius:
-                                                      BorderRadius.only(
-                                                          bottomLeft:
-                                                              Radius.circular(
-                                                                  10),
-                                                          bottomRight:
-                                                              Radius.circular(
-                                                                  10)),
-                                                  color: Colors.white),
-                                              child: const Column(
+                                                      BorderRadius.circular(35),
+                                                  child:
+                                                      CustomCachedNetworkImage(
+                                                          imageUrl: data
+                                                              .sharedContactProfileImage!,
+                                                          placeholderColor:
+                                                              chatownColor,
+                                                          errorWidgeticon:
+                                                              const Icon(
+                                                            Icons.person,
+                                                            size: 30,
+                                                          )),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
-                                                  SizedBox(height: 3),
+                                                  SizedBox(
+                                                    width: Get.width * 0.30,
+                                                    child: Text(
+                                                      capitalizeFirstLetter(data
+                                                          .sharedContactName!),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: chatColor),
+                                                    ),
+                                                  ),
                                                   Text(
-                                                    "View contact",
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
+                                                    data.sharedContactNumber!,
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
                                                         fontWeight:
-                                                            FontWeight.w400,
+                                                            FontWeight.w500,
                                                         color: chatColor),
                                                   ),
                                                 ],
                                               ),
+                                            ],
+                                          ),
+                                          data.myMessage == false
+                                              ? const SizedBox.shrink()
+                                              : Positioned(
+                                                  bottom: 3,
+                                                  right: 3,
+                                                  child: Icon(
+                                                    Icons.done_all,
+                                                    color: data.messageRead
+                                                                .toString() ==
+                                                            "1"
+                                                        ? Colors.blue
+                                                        : Colors.grey.shade400,
+                                                    size: 15,
+                                                  ))
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    // matchContact(data.sharedContactNumber!)
+                                    //     ? const SizedBox.shrink()
+                                    //     :
+                                    InkWell(
+                                      onTap: () {
+                                        Get.to(() => SaveContact(
+                                            name: data.sharedContactName!,
+                                            number: data.sharedContactNumber!));
+                                      },
+                                      child: Container(
+                                        height: 30,
+                                        width: 200,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(
+                                                  data.myMessage == false
+                                                      ? 0
+                                                      : 7),
+                                              bottomRight: Radius.circular(
+                                                  data.myMessage == false
+                                                      ? 7
+                                                      : 0)),
+                                          gradient: LinearGradient(
+                                            colors: data.myMessage == true
+                                                ? [
+                                                    const Color(0xffFFEDAB),
+                                                    const Color(0xffFCC604),
+                                                  ]
+                                                : [
+                                                    const Color(0xffDDDDDD),
+                                                    const Color(0xffCDCDCD),
+                                                  ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                          ),
+                                        ),
+                                        child: const Column(
+                                          children: [
+                                            SizedBox(height: 3),
+                                            Text(
+                                              "View contact",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: chatColor),
                                             ),
-                                          )
+                                          ],
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
@@ -3364,7 +3905,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
-                          print(e);
+                          print("error text sent $e");
                           showCustomToast("Something Error1");
                         }
                         messagecontroller.clear();
@@ -3392,7 +3933,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               listScrollController!.position.minScrollExtent);
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
-                          print(e);
+                          print("error text sent 1 $e");
                           showCustomToast("Something Error1");
                         }
                         messagecontroller.clear();
@@ -3620,7 +4161,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
 //============================================================= AUDIO PLAYER VOICE MESSAGE ===============================================================
 //============================================================= AUDIO PLAYER VOICE MESSAGE ===============================================================
 //============================================================= AUDIO PLAYER VOICE MESSAGE ===============================================================
+
   String recordFilePath = '';
+  String audioPath = '';
   Future<bool> checkPermission() async {
     if (!await Permission.microphone.isGranted) {
       PermissionStatus status = await Permission.microphone.request();
@@ -3643,62 +4186,123 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     return "$sdPath/test_${i++}.mp3";
   }
 
-  void startRecord() async {
-    recordFilePath = '';
-    bool hasPermission = await checkPermission();
-    if (hasPermission) {
-      recordFilePath = await getFilePath();
-      RecordMp3.instance.start(recordFilePath, (type) {
-        setState(() {});
-      });
-    } else {
-      showCustomToast("No microphone permission");
-    }
-    setState(() {});
-  }
+  // void startRecord() async {
+  //   recordFilePath = '';
+  //   bool hasPermission = await checkPermission();
+  //   if (hasPermission) {
+  //     recordFilePath = await getFilePath();
+  //     RecordMp3.instance.start(recordFilePath, (type) {
+  //       setState(() {});
+  //     });
+  //   } else {
+  //     showCustomToast("No microphone permission");
+  //   }
+  //   setState(() {});
+  // }
 
-  void stopRecord() async {
-    bool stop = RecordMp3.instance.stop();
-    audioController.end.value = DateTime.now();
-    audioController.calcDuration();
-    var ap = AudioPlayer();
-    await ap.play(AssetSource("audio/notification.mp3"));
-    ap.onPlayerComplete.listen((a) {});
-    print("ADUIOOOO:$recordFilePath");
-    if (stop) {
-      audioController.isRecording.value = false;
-      audioController.isSending.value = true;
-      print("DURATION:::${audioController.total}");
-      if (SelectedreplyText == true) {
-        chatContorller.sendMessageVoice(
-            widget.conversationID!,
-            "audio",
-            File(recordFilePath),
-            '',
-            audioController.total,
-            widget.mobileNum.toString(),
-            '',
-            reply_chatID,
-            false);
-        SelectedreplyText = false;
-        listScrollController!
-            .jumpTo(listScrollController!.position.minScrollExtent);
+  Future<void> startRecord() async {
+    try {
+      if (await audioRecord.hasPermission()) {
+        await audioRecord.start();
       } else {
-        chatContorller.sendMessageVoice(
-            widget.conversationID!,
-            "audio",
-            File(recordFilePath),
-            '',
-            audioController.total,
-            widget.mobileNum.toString(),
-            '',
-            '',
-            false);
-        listScrollController!
-            .jumpTo(listScrollController!.position.minScrollExtent);
+        showCustomToast("No microphone permission");
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Strat recording Error :::$e');
       }
     }
   }
+
+  Future<void> stopRecord({bool isCancel = false}) async {
+    try {
+      String? path = await audioRecord.stop();
+      audioController.end.value = DateTime.now();
+      audioController.calcDuration();
+      setState(() {
+        audioPath = path!;
+        audioPath;
+        if (kDebugMode) {
+          print("audiopath --> $audioPath");
+        }
+        if (isCancel == false) {
+          if (SelectedreplyText == true) {
+            chatContorller.sendMessageVoice(
+                widget.conversationID!,
+                "audio",
+                File(audioPath),
+                '',
+                audioController.total,
+                widget.mobileNum.toString(),
+                '',
+                reply_chatID,
+                false);
+            SelectedreplyText = false;
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
+          } else {
+            chatContorller.sendMessageVoice(
+                widget.conversationID!,
+                "audio",
+                File(audioPath),
+                '',
+                audioController.total,
+                widget.mobileNum.toString(),
+                '',
+                '',
+                false);
+            listScrollController!
+                .jumpTo(listScrollController!.position.minScrollExtent);
+          }
+        }
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Stop recording Error :::$e');
+      }
+    }
+  }
+  // void stopRecord() async {
+  //   bool stop = RecordMp3.instance.stop();
+  //   audioController.end.value = DateTime.now();
+  //   audioController.calcDuration();
+  //   var ap = AudioPlayer();
+  //   await ap.play(AssetSource("audio/notification.mp3"));
+  //   print("ADUIOOOO:$recordFilePath");
+  //   if (stop) {
+  //     audioController.isRecording.value = false;
+  //     audioController.isSending.value = true;
+  //     print("DURATION:::${audioController.total}");
+  //     if (SelectedreplyText == true) {
+  //       chatContorller.sendMessageVoice(
+  //           widget.conversationID!,
+  //           "audio",
+  //           File(recordFilePath),
+  //           '',
+  //           audioController.total,
+  //           widget.mobileNum.toString(),
+  //           '',
+  //           reply_chatID,
+  //           false);
+  //       SelectedreplyText = false;
+  //       listScrollController!
+  //           .jumpTo(listScrollController!.position.minScrollExtent);
+  //     } else {
+  //       chatContorller.sendMessageVoice(
+  //           widget.conversationID!,
+  //           "audio",
+  //           File(recordFilePath),
+  //           '',
+  //           audioController.total,
+  //           widget.mobileNum.toString(),
+  //           '',
+  //           '',
+  //           false);
+  //       listScrollController!
+  //           .jumpTo(listScrollController!.position.minScrollExtent);
+  //     }
+  //   }
+  // }
 
   void stopTimer() {
     seconds = 0;
@@ -3779,7 +4383,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     alignment: Alignment.center,
                     children: [
                       record == true
-                          ? Lottie.asset(
+                          ? lt.Lottie.asset(
                               'assets/Lottie ANIMATION/voice_record_animation.json',
                               height: 120,
                               width: 120,
@@ -3858,8 +4462,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                   ),
                   InkWell(
                     onTap: () async {
-                      RecordMp3.instance.stop();
-                      stopRecord();
+                      // RecordMp3.instance.stop();
+                      stopRecord(isCancel: true);
                       stopTimer();
                       _cancle();
                       Navigator.pop(context);
@@ -3910,7 +4514,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         message: data.url!,
                         isCurrentUser: data.myMessage == false,
                         index: index,
-                        duration: data.audioTime!)
+                        duration: data.audioTime!,
+                        data: data,
+                      )
                     : _audioReply(
                         message: data.url!,
                         isCurrentUser: data.myMessage == false,
@@ -3940,12 +4546,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     required bool isCurrentUser,
     required int index,
     required String duration,
+    required MessageList data,
   }) {
     return Container(
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width * 0.7,
       ),
-      height: 65,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
           borderRadius: isCurrentUser
@@ -3958,71 +4564,89 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                   topLeft: Radius.circular(10),
                   bottomLeft: Radius.circular(10)),
           color: isCurrentUser ? grey1Color : yellow1Color),
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10), color: Colors.white),
-        child: Row(
-          children: [
-            const SizedBox(width: 5),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  audioController.onPressedPlayButton(index, message);
-                });
-              },
-              onSecondaryTap: () {
-                audioPlayer.stop();
-              },
-              child: Obx(
-                () => (audioController.isRecordPlaying &&
-                        audioController.currentId == index)
-                    ? Icon(
-                        CupertinoIcons.pause_circle_fill,
-                        color: isCurrentUser ? grey1Color : yellow1Color,
-                      )
-                    : Icon(
-                        CupertinoIcons.play_circle_fill,
-                        color: isCurrentUser ? grey1Color : yellow1Color,
-                      ),
-              ),
-            ),
-            const SizedBox(width: 5),
-            Obx(
-              () => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 0),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: [
-                      LinearProgressIndicator(
-                        minHeight: 5,
-                        backgroundColor: Colors.grey,
-                        valueColor:
-                            const AlwaysStoppedAnimation<Color>(Colors.black),
-                        value: (audioController.isRecordPlaying &&
-                                audioController.currentId == index)
-                            ? (audioController.totalDuration.value > 0
-                                ? audioController.completedPercentage.value
-                                : 0.0)
-                            : 0.0,
-                      ),
-                    ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10), color: Colors.white),
+            child: Row(
+              children: [
+                const SizedBox(width: 5),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      audioController.onPressedPlayButton(index, message);
+                    });
+                  },
+                  onSecondaryTap: () {
+                    audioPlayer.stop();
+                  },
+                  child: Obx(
+                    () => (audioController.isRecordPlaying &&
+                            audioController.currentId == index)
+                        ? Icon(
+                            CupertinoIcons.pause_circle_fill,
+                            color: isCurrentUser ? grey1Color : yellow1Color,
+                          )
+                        : Icon(
+                            CupertinoIcons.play_circle_fill,
+                            color: isCurrentUser ? grey1Color : yellow1Color,
+                          ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 5),
+                Obx(
+                  () => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          LinearProgressIndicator(
+                            minHeight: 5,
+                            backgroundColor: Colors.grey,
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                                Colors.black),
+                            value: (audioController.isRecordPlaying &&
+                                    audioController.currentId == index)
+                                ? (audioController.totalDuration.value > 0
+                                    ? audioController.completedPercentage.value
+                                    : 0.0)
+                                : 0.0,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  duration,
+                  style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.grey),
+                ),
+                const SizedBox(width: 10)
+              ],
             ),
-            const SizedBox(width: 10),
-            Text(
-              duration,
-              style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.grey),
-            ),
-            const SizedBox(width: 10)
-          ],
-        ),
+          ),
+          SizedBox(
+            height: 16,
+            child: data.myMessage == false
+                ? const SizedBox()
+                : Icon(
+                    Icons.done_all,
+                    color: data.messageRead.toString() == "1"
+                        ? Colors.blue
+                        : Colors.grey.shade400,
+                    size: 15,
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -4475,291 +5099,285 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Stack(
-          children: [
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-              child: Container(
-                color: const Color.fromRGBO(30, 30, 30, 0.37),
-              ),
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: AlertDialog(
+            insetPadding: const EdgeInsets.all(15),
+            alignment: Alignment.bottomCenter,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(25.0),
             ),
-            AlertDialog(
-              insetPadding: const EdgeInsets.all(15),
-              alignment: Alignment.bottomCenter,
-              backgroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(25.0),
+            title: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: bg1,
               ),
-              title: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: bg1,
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    data.messageType == "location"
-                        ? capitalizeFirstLetter("📌 Location")
-                        : data.messageType == "video"
-                            ? capitalizeFirstLetter("🎥 Video")
-                            : data.messageType == "image"
-                                ? capitalizeFirstLetter("📷 Photo")
-                                : data.messageType == "document"
-                                    ? capitalizeFirstLetter("📄 Documenet")
-                                    : data.messageType == "audio"
-                                        ? capitalizeFirstLetter(
-                                            "🔊 Voice message")
-                                        : data.messageType == "link"
-                                            ? capitalizeFirstLetter(
-                                                data.message!)
-                                            : data.messageType == "gif"
-                                                ? "😈 GIF"
-                                                : data.messageType == "contact"
-                                                    ? "📞 Contact"
-                                                    : capitalizeFirstLetter(
-                                                        data.message!),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: chatColor,
-                    ),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  data.messageType == "location"
+                      ? capitalizeFirstLetter("📌 Location")
+                      : data.messageType == "video"
+                          ? capitalizeFirstLetter("🎥 Video")
+                          : data.messageType == "image"
+                              ? capitalizeFirstLetter("📷 Photo")
+                              : data.messageType == "document"
+                                  ? capitalizeFirstLetter("📄 Documenet")
+                                  : data.messageType == "audio"
+                                      ? capitalizeFirstLetter(
+                                          "🔊 Voice message")
+                                      : data.messageType == "link"
+                                          ? capitalizeFirstLetter(data.message!)
+                                          : data.messageType == "gif"
+                                              ? "😈 GIF"
+                                              : data.messageType == "contact"
+                                                  ? "📞 Contact"
+                                                  : capitalizeFirstLetter(
+                                                      data.message!),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: chatColor,
                   ),
                 ),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  //================ COPY ===============================
-                  data.messageType != "location" &&
-                          data.messageType != "image" &&
-                          data.messageType != "video" &&
-                          data.messageType != "document" &&
-                          data.messageType != "audio" &&
-                          data.messageType != "gif" &&
-                          data.messageType != "contact"
-                      ? SizedBox(
-                          height: 45,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                // chatID.add(msgID);
-                                // isSelectedmessage = "1";
-                              });
-                              Navigator.pop(context);
-                              Clipboard.setData(
-                                  ClipboardData(text: data.message!));
-                              showCustomToast("Message copied");
-                              // Add your copy functionality here
-                            },
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 10),
-                                Image.asset("assets/images/copy.png",
-                                    height: 18, color: chatColor),
-                                const SizedBox(width: 10),
-                                const Text(
-                                  'Copy',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                )
-                              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                //================ COPY ===============================
+                data.messageType != "location" &&
+                        data.messageType != "image" &&
+                        data.messageType != "video" &&
+                        data.messageType != "document" &&
+                        data.messageType != "audio" &&
+                        data.messageType != "gif" &&
+                        data.messageType != "contact"
+                    ? SizedBox(
+                        height: 45,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              // chatID.add(msgID);
+                              // isSelectedmessage = "1";
+                            });
+                            Navigator.pop(context);
+                            Clipboard.setData(
+                                ClipboardData(text: data.message!));
+                            showCustomToast("Message copied");
+                            // Add your copy functionality here
+                          },
+                          child: Row(
+                            children: [
+                              const SizedBox(width: 10),
+                              Image.asset("assets/images/copy.png",
+                                  height: 18, color: chatColor),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'Copy',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              )
+                            ],
+                          ),
+                        ))
+                    : const SizedBox.shrink(),
+                // Add SizedBox between Copy and Forward
+                data.messageType != "location" &&
+                        data.messageType != "image" &&
+                        data.messageType != "video" &&
+                        data.messageType != "docdocument" &&
+                        data.messageType != "audio" &&
+                        data.messageType != "gif" &&
+                        data.messageType != "contact"
+                    ? Divider(
+                        height: 1,
+                        thickness: 1,
+                        color: Colors.grey[200],
+                      )
+                    : const SizedBox.shrink(),
+                //================================== REPLY ================================
+                SizedBox(
+                    height: 45,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          SelectedreplyText = !SelectedreplyText;
+                          USERTEXT = data.myMessage == false
+                              ? "${users.firstName} ${users.lastName!}"
+                              : "You";
+                          replyText = (data.messageType == "text"
+                              ? data.message
+                              : data.messageType == "location"
+                                  ? "📌 Location"
+                                  : data.messageType == "image"
+                                      ? "📷 Photo"
+                                      : data.messageType == "video"
+                                          ? "🎥 Video"
+                                          : data.messageType == "docdocument"
+                                              ? "📄 Documenet"
+                                              : data.messageType == "audio"
+                                                  ? "🔊 Voice message"
+                                                  : data.messageType == "gif"
+                                                      ? "GIF"
+                                                      : data.messageType ==
+                                                              "contact"
+                                                          ? "Contact"
+                                                          : data.message)!;
+                          reply_chatID = data.messageId.toString();
+                          // rplyTime = time;
+                          print("TEXT:$replyText");
+                          print("RPLYTIME:$rplyTime");
+                          print("RPLY$SelectedreplyText");
+                          print("SELECT_MSG_ID:$reply_chatID");
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 10),
+                          Image.asset("assets/images/reply.png",
+                              height: 18, color: chatColor),
+                          const SizedBox(width: 10),
+                          const Text(
+                            'Reply',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
                             ),
-                          ))
-                      : const SizedBox.shrink(),
-                  // Add SizedBox between Copy and Forward
-                  data.messageType != "location" &&
-                          data.messageType != "image" &&
-                          data.messageType != "video" &&
-                          data.messageType != "docdocument" &&
-                          data.messageType != "audio" &&
-                          data.messageType != "gif" &&
-                          data.messageType != "contact"
-                      ? Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: Colors.grey[200],
+                          )
+                        ],
+                      ),
+                    )),
+
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey[200],
+                ),
+                // Add your forward functionality here
+                SizedBox(
+                  height: 45,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        chatID.add(data.messageId.toString());
+                        chatMessageList.add(data);
+                        isSelectedmessage = "1";
+                        print("MSGID:${data.messageId}");
+                        print("MESSAGE_LIST:${chatMessageList.length}");
+                      });
+                      // Add your forward functionality here
+                    },
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        Image.asset("assets/images/forward1.png",
+                            height: 18, color: chatColor),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Forward',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
                         )
-                      : const SizedBox.shrink(),
-                  //================================== REPLY ================================
-                  SizedBox(
-                      height: 45,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            SelectedreplyText = !SelectedreplyText;
-                            USERTEXT = data.myMessage == false
-                                ? "${users.firstName} ${users.lastName!}"
-                                : "You";
-                            replyText = (data.messageType == "text"
-                                ? data.message
-                                : data.messageType == "location"
-                                    ? "📌 Location"
-                                    : data.messageType == "image"
-                                        ? "📷 Photo"
-                                        : data.messageType == "video"
-                                            ? "🎥 Video"
-                                            : data.messageType == "docdocument"
-                                                ? "📄 Documenet"
-                                                : data.messageType == "audio"
-                                                    ? "🔊 Voice message"
-                                                    : data.messageType == "gif"
-                                                        ? "GIF"
-                                                        : data.messageType ==
-                                                                "contact"
-                                                            ? "Contact"
-                                                            : data.message)!;
-                            reply_chatID = data.messageId.toString();
-                            // rplyTime = time;
-                            print("TEXT:$replyText");
-                            print("RPLYTIME:$rplyTime");
-                            print("RPLY$SelectedreplyText");
-                            print("SELECT_MSG_ID:$reply_chatID");
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 10),
-                            Image.asset("assets/images/reply.png",
-                                height: 18, color: chatColor),
-                            const SizedBox(width: 10),
-                            const Text(
-                              'Reply',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            )
-                          ],
-                        ),
-                      )),
-
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey[200],
-                  ),
-                  // Add your forward functionality here
-                  SizedBox(
-                    height: 45,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          chatID.add(data.messageId.toString());
-                          chatMessageList.add(data);
-                          isSelectedmessage = "1";
-                          print("MSGID:${data.messageId}");
-                          print("MESSAGE_LIST:${chatMessageList.length}");
-                        });
-                        // Add your forward functionality here
-                      },
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          Image.asset("assets/images/forward1.png",
-                              height: 18, color: chatColor),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Forward',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        ],
-                      ),
+                      ],
                     ),
                   ),
+                ),
 
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey[200],
-                  ),
-                  // ========================== delete =============================
-                  SizedBox(
-                    height: 45,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          chatID.add(data.messageId.toString());
-                          chatMessageList.add(data);
-                          isSelectedmessage = "1";
-                          print("MSGID:${data.messageId}");
-                          print("MESSAGE_LIST:$chatMessageList");
-                        });
-                      },
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 10),
-                          Image.asset("assets/images/trash.png",
-                              height: 18, color: chatColor),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Delete',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        ],
-                      ),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey[200],
+                ),
+                // ========================== delete =============================
+                SizedBox(
+                  height: 45,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        chatID.add(data.messageId.toString());
+                        chatMessageList.add(data);
+                        isSelectedmessage = "1";
+                        print("MSGID:${data.messageId}");
+                        print("MESSAGE_LIST:$chatMessageList");
+                      });
+                    },
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        Image.asset("assets/images/trash.png",
+                            height: 18, color: chatColor),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Delete',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                  Divider(
-                    height: 1,
-                    thickness: 1,
-                    color: Colors.grey[200],
-                  ),
-                  SizedBox(
-                    height: 45,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                        if (data.isStarMessage != false) {
-                          print("******");
-                          chatContorller
-                              .removeStarApi(data.messageId.toString());
-                        } else {
-                          chatContorller.addStarApi(data.messageId.toString());
-                          print("+++++++");
-                        }
-                        // starchat(msgID);
-                      },
-                      child: Row(
-                        children: [
-                          const SizedBox(width: 10),
+                ),
+                Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: Colors.grey[200],
+                ),
+                SizedBox(
+                  height: 45,
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                      if (data.isStarMessage != false) {
+                        print("******");
+                        chatContorller.removeStarApi(data.messageId.toString());
+                      } else {
+                        chatContorller.addStarApi(
+                          data.messageId.toString(),
+                          widget.conversationID,
+                        );
+                        print("+++++++");
+                      }
+                      // starchat(msgID);
+                    },
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        data.isStarMessage != false
+                            ? Image.asset("assets/images/star-slash.png",
+                                color: chatColor, height: 18) //starUnfill
+                            : Image.asset("assets/images/starUnfill.png",
+                                color: chatColor, height: 18),
+                        const SizedBox(width: 10),
+                        Text(
                           data.isStarMessage != false
-                              ? Image.asset("assets/images/star-slash.png",
-                                  color: chatColor, height: 18) //starUnfill
-                              : Image.asset("assets/images/starUnfill.png",
-                                  color: chatColor, height: 18),
-                          const SizedBox(width: 10),
-                          Text(
-                            data.isStarMessage != false
-                                ? 'Unstar Message'
-                                : 'Star Message',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          )
-                        ],
-                      ),
+                              ? 'Unstar Message'
+                              : 'Star Message',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        )
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
@@ -5833,8 +6451,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           controller: _searchController,
           onChanged: (String searchText) {
             if (searchText.isEmpty) {
-              Get.find<SingleChatContorller>()
-                  .getdetailschat(widget.conversationID);
+              // Get.find<SingleChatContorller>()
+              //     .getdetailschat(widget.conversationID);
               _searchResult.clear();
               _searchController.clear();
             } else {
@@ -5864,8 +6482,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 setState(() {
                   isSearchSelect = '0';
                   isTextFieldHide = '0';
-                  Get.find<SingleChatContorller>()
-                      .getdetailschat(widget.conversationID);
+                  // Get.find<SingleChatContorller>()
+                  //     .getdetailschat(widget.conversationID);
                   _searchResult.clear();
                   _searchController.clear();
                 });
@@ -6035,32 +6653,33 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             children: [
               InkWell(
                 onTap: () {
-                  try {
-                    chatContorller.isSendMsg.value = true;
-                    chatContorller.deleteChatApi(
-                        chatID, false, widget.mobileNum.toString());
+                  deleteMessage(context);
+                  // try {
+                  //   chatContorller.isSendMsg.value = true;
+                  //   chatContorller.deleteChatApi(
+                  //       chatID, false, widget.mobileNum.toString());
 
-                    for (var id in chatID) {
-                      chatContorller.userdetailschattModel.value!.messageList!
-                          .removeWhere((element) =>
-                              element.messageId.toString() == id.toString());
-                    }
-                    chatContorller.userdetailschattModel.refresh();
+                  //   for (var id in chatID) {
+                  //     chatContorller.userdetailschattModel.value!.messageList!
+                  //         .removeWhere((element) =>
+                  //             element.messageId.toString() == id.toString());
+                  //   }
+                  //   chatContorller.userdetailschattModel.refresh();
 
-                    setState(() {
-                      isSelectedmessage = "0";
-                      chatID = [];
-                      chatMessageList = [];
-                    });
-                    chatContorller.isSendMsg.value = false;
-                  } catch (e) {
-                    setState(() {
-                      isSelectedmessage = "0";
-                      chatID = [];
-                      chatMessageList = [];
-                    });
-                    chatContorller.isSendMsg.value = false;
-                  }
+                  //   setState(() {
+                  //     isSelectedmessage = "0";
+                  //     chatID = [];
+                  //     chatMessageList = [];
+                  //   });
+                  //   chatContorller.isSendMsg.value = false;
+                  // } catch (e) {
+                  //   setState(() {
+                  //     isSelectedmessage = "0";
+                  //     chatID = [];
+                  //     chatMessageList = [];
+                  //   });
+                  //   chatContorller.isSendMsg.value = false;
+                  // }
                 },
                 child: Image.asset("assets/images/trash.png",
                     height: 24, color: chatColor),
@@ -6069,6 +6688,131 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
           ),
         )
       ],
+    );
+  }
+
+  deleteMessage(BuildContext context) {
+    return showDialog(
+      barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+      context: context,
+      builder: (BuildContext context) {
+        return BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          child: AlertDialog(
+            insetPadding: const EdgeInsets.all(8),
+            alignment: Alignment.bottomCenter,
+            backgroundColor: Colors.white,
+            elevation: 0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                Radius.circular(20),
+              ),
+            ),
+            content: SizedBox(
+              width: Get.width,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 10),
+                  const Text(
+                    "Are you sure you want to Delete?",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  ),
+                  const SizedBox(height: 15),
+                  const Text(
+                    "Are you sure you want to delete your message?",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: appgrey2,
+                        fontSize: 13),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.35,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: yellow2Color, width: 1),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: const Center(
+                              child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: chatColor),
+                          )),
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      InkWell(
+                        onTap: () {
+                          try {
+                            chatContorller.isSendMsg.value = true;
+                            chatContorller.deleteChatApi(
+                                chatID, false, widget.mobileNum.toString());
+
+                            for (var id in chatID) {
+                              chatContorller
+                                  .userdetailschattModel.value!.messageList!
+                                  .removeWhere((element) =>
+                                      element.messageId.toString() ==
+                                      id.toString());
+                            }
+                            chatContorller.userdetailschattModel.refresh();
+
+                            setState(() {
+                              isSelectedmessage = "0";
+                              chatID = [];
+                              chatMessageList = [];
+                            });
+                            chatContorller.isSendMsg.value = false;
+                          } catch (e) {
+                            setState(() {
+                              isSelectedmessage = "0";
+                              chatID = [];
+                              chatMessageList = [];
+                            });
+                            chatContorller.isSendMsg.value = false;
+                          }
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          height: 40,
+                          width: MediaQuery.of(context).size.width * 0.35,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              gradient: LinearGradient(
+                                  colors: [yellow1Color, yellow2Color],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter)),
+                          child: const Center(
+                              child: Text(
+                            'Delete',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: chatColor),
+                          )),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

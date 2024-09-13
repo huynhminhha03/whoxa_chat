@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print, use_build_context_synchronously, unnecessary_null_comparison
 import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
+import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -68,6 +70,13 @@ class _ProfileState extends State<Profile> {
               const SizedBox(height: 10),
             ],
           ),
+          const Positioned(
+              top: 45,
+              left: 15,
+              child: Text(
+                "Settings",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              )),
           // internetController.isOnline.value
           //     ? const SizedBox.shrink()
           //     : Positioned(
@@ -161,6 +170,8 @@ class _ProfileState extends State<Profile> {
               onTap: () {
                 // internetController.isOnline.value
                 //     ?
+
+                Get.find<AvatarController>().avatarIndex.value = -1;
                 Get.to(AddPersonaDetails(isRought: true, isback: true),
                         duration: const Duration(milliseconds: 800),
                         transition: Transition.rightToLeft)!
@@ -356,21 +367,121 @@ class _ProfileState extends State<Profile> {
             onTap: () async {
               //when app logout then user offline
               //store all uerData clear
-              var box = Hive.box(userdata);
+              showDialog(
+                barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+                context: context,
+                builder: (BuildContext context) {
+                  return BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                    child: AlertDialog(
+                      insetPadding: const EdgeInsets.all(8),
+                      alignment: Alignment.bottomCenter,
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(20),
+                        ),
+                      ),
+                      content: SizedBox(
+                        width: Get.width,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const SizedBox(height: 10),
+                            const Text(
+                              "Are you sure you want to Logout?",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 16),
+                            ),
+                            const SizedBox(height: 15),
+                            const Text(
+                              "Your session will expire upon logout. Are you absolutely sure?",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: appgrey2,
+                                  fontSize: 13),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.35,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: yellow2Color, width: 1),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: const Center(
+                                        child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: chatColor),
+                                    )),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                InkWell(
+                                  onTap: () async {
+                                    var box = Hive.box(userdata);
 
-              // Delete specific keys
-              await box.delete(userId);
-              await box.delete(authToken);
-              await box.delete(firstName);
-              await box.delete(lastName);
-              Hive.box(userdata).clear();
-              // then navigate to login page
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const Flogin(),
-                  ),
-                  (route) => false);
+                                    // Delete specific keys
+                                    await box.delete(userId);
+                                    await box.delete(authToken);
+                                    await box.delete(firstName);
+                                    await box.delete(lastName);
+                                    Hive.box(userdata).clear();
+                                    // then navigate to login page
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const Flogin(),
+                                        ),
+                                        (route) => false);
+                                  },
+                                  child: Container(
+                                    height: 40,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.35,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: LinearGradient(
+                                            colors: [
+                                              yellow1Color,
+                                              yellow2Color
+                                            ],
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter)),
+                                    child: const Center(
+                                        child: Text(
+                                      'Logout',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          color: chatColor),
+                                    )),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
             },
             child: Container(
               height: 46,
@@ -405,6 +516,18 @@ class _ProfileState extends State<Profile> {
                 ],
               ).paddingSymmetric(horizontal: 10),
             ),
+          ),
+
+          const SizedBox(
+            height: 38,
+          ),
+          const CustomButtom(
+            title: "Delete Account",
+          ).paddingSymmetric(
+            horizontal: 37,
+          ),
+          const SizedBox(
+            height: 30,
           ),
         ],
       ),

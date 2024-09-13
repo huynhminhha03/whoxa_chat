@@ -38,9 +38,9 @@ class _InviteFriendState extends State<InviteFriend> {
 
   Future<void> apis() async {
     await _fetchContacts();
-    await getContactsFromGloble();
-    log("MY_DEVICE_CONTACS: $mobileContacts");
-    var contactJson = json.encode(mobileContacts);
+    // await getContactsFromGloble();
+    log("MY_DEVICE_CONTACS: ${addContactController.mobileContacts}");
+    var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
     chatListController.forChatList();
   }
@@ -169,8 +169,8 @@ class _InviteFriendState extends State<InviteFriend> {
 
   List<Contact> getFilteredContacts(String searchText) {
     List<Contact> filteredContacts = [];
-    for (int i = 0; i < allcontacts.length; i++) {
-      Contact contact = allcontacts[i];
+    for (int i = 0; i < addContactController.allcontacts.length; i++) {
+      Contact contact = addContactController.allcontacts[i];
       if (isMatchinginvite(
               getMobile(contact.phones.map((e) => e.number).toString())) &&
           (contact.displayName.toLowerCase().contains(searchText))) {
@@ -256,14 +256,16 @@ class _InviteFriendState extends State<InviteFriend> {
 
   inviteMe(phone) async {
     // Android
-    String uri =
-        'sms:$phone?body=${"‎Hey there! Join me on our Chat app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
+    String fullMessage =
+        "‎Hey there! Join me on our Chat app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!";
+    String uri = 'sms:$phone?body=${Uri.encodeComponent(fullMessage)}';
+    // ${"‎Hey there! Join me on our Chat app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
     if (await canLaunch(uri)) {
       await launch(uri);
     } else {
       // iOS
-      String uri =
-          'sms:$phone?body=${"‎Hey there! Join me on our Chat app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
+      String uri = 'sms:$phone?body=${Uri.encodeComponent(fullMessage)}';
+      // ${"‎Hey there! Join me on our Chat app!\nChat with friends, share photos & videos instantly.\nDownload now.\nLet's stay connected!"}';
       if (await canLaunch(uri)) {
         await launch(uri);
       } else {

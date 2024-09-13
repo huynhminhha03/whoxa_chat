@@ -1,9 +1,9 @@
-// import 'package:meyaoo_new/Models/reply_msg_model.dart';
-
 class SingleChatListModel {
   List<MessageList>? messageList;
+  int? totalPages;
+  int? currentPage;
 
-  SingleChatListModel({this.messageList});
+  SingleChatListModel({this.messageList, this.totalPages, this.currentPage});
 
   SingleChatListModel.fromJson(Map<String, dynamic> json) {
     if (json['MessageList'] != null) {
@@ -12,6 +12,8 @@ class SingleChatListModel {
         messageList!.add(MessageList.fromJson(v));
       });
     }
+    totalPages = json['totalPages'];
+    currentPage = json['currentPage'];
   }
 
   Map<String, dynamic> toJson() {
@@ -19,6 +21,8 @@ class SingleChatListModel {
     if (messageList != null) {
       data['MessageList'] = messageList!.map((v) => v.toJson()).toList();
     }
+    data['totalPages'] = totalPages;
+    data['currentPage'] = currentPage;
     return data;
   }
 }
@@ -29,12 +33,14 @@ class MessageList {
   int? messageId;
   String? message;
   String? messageType;
+  String? whoSeenTheMessage;
   int? messageRead;
   String? videoTime;
   String? audioTime;
   String? latitude;
   String? longitude;
   String? sharedContactName;
+  String? sharedContactProfileImage;
   String? sharedContactNumber;
   int? forwardId;
   int? replyId;
@@ -45,10 +51,8 @@ class MessageList {
   int? conversationId;
   bool? isStarMessage;
   bool? myMessage;
+  List<StatusData>? statusData;
   SenderData? senderData;
-  String? whoSeenTheMessage;
-  String? sharedContactProfileImage;
-  // ResData? resData;
 
   MessageList(
       {this.url,
@@ -56,12 +60,14 @@ class MessageList {
       this.messageId,
       this.message,
       this.messageType,
+      this.whoSeenTheMessage,
       this.messageRead,
       this.videoTime,
       this.audioTime,
       this.latitude,
       this.longitude,
       this.sharedContactName,
+      this.sharedContactProfileImage,
       this.sharedContactNumber,
       this.forwardId,
       this.replyId,
@@ -72,11 +78,8 @@ class MessageList {
       this.conversationId,
       this.isStarMessage,
       this.myMessage,
-      this.senderData,
-      this.whoSeenTheMessage,
-      this.sharedContactProfileImage
-      // this.resData
-      });
+      this.statusData,
+      this.senderData});
 
   MessageList.fromJson(Map<String, dynamic> json) {
     url = json['url'];
@@ -84,12 +87,14 @@ class MessageList {
     messageId = json['message_id'];
     message = json['message'];
     messageType = json['message_type'];
+    whoSeenTheMessage = json['who_seen_the_message'];
     messageRead = json['message_read'];
     videoTime = json['video_time'];
     audioTime = json['audio_time'];
     latitude = json['latitude'];
     longitude = json['longitude'];
     sharedContactName = json['shared_contact_name'];
+    sharedContactProfileImage = json['shared_contact_profile_image'];
     sharedContactNumber = json['shared_contact_number'];
     forwardId = json['forward_id'];
     replyId = json['reply_id'];
@@ -100,13 +105,15 @@ class MessageList {
     conversationId = json['conversation_id'];
     isStarMessage = json['is_star_message'];
     myMessage = json['myMessage'];
+    if (json['statusData'] != null) {
+      statusData = <StatusData>[];
+      json['statusData'].forEach((v) {
+        statusData!.add(StatusData.fromJson(v));
+      });
+    }
     senderData = json['senderData'] != null
         ? SenderData.fromJson(json['senderData'])
         : null;
-    whoSeenTheMessage = json['who_seen_the_message'];
-    sharedContactProfileImage = json['shared_contact_profile_image'];
-    // resData =
-    //     json['resData'] != null ? ResData.fromJson(json['resData']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -116,12 +123,14 @@ class MessageList {
     data['message_id'] = messageId;
     data['message'] = message;
     data['message_type'] = messageType;
+    data['who_seen_the_message'] = whoSeenTheMessage;
     data['message_read'] = messageRead;
     data['video_time'] = videoTime;
     data['audio_time'] = audioTime;
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     data['shared_contact_name'] = sharedContactName;
+    data['shared_contact_profile_image'] = sharedContactProfileImage;
     data['shared_contact_number'] = sharedContactNumber;
     data['forward_id'] = forwardId;
     data['reply_id'] = replyId;
@@ -132,14 +141,69 @@ class MessageList {
     data['conversation_id'] = conversationId;
     data['is_star_message'] = isStarMessage;
     data['myMessage'] = myMessage;
+    if (statusData != null) {
+      data['statusData'] = statusData!.map((v) => v.toJson()).toList();
+    }
     if (senderData != null) {
       data['senderData'] = senderData!.toJson();
     }
-    data['who_seen_the_message'] = whoSeenTheMessage;
-    data['shared_contact_profile_image'] = sharedContactProfileImage;
-    // if (resData != null) {
-    //   data['resData'] = resData!.toJson();
-    // }
+    return data;
+  }
+}
+
+class StatusData {
+  int? statusId;
+  String? updatedAt;
+  String? createdAt;
+  List<StatusMedia>? statusMedia;
+
+  StatusData({this.statusId, this.updatedAt, this.createdAt, this.statusMedia});
+
+  StatusData.fromJson(Map<String, dynamic> json) {
+    statusId = json['status_id'];
+    updatedAt = json['updatedAt'];
+    createdAt = json['createdAt'];
+    if (json['StatusMedia'] != null) {
+      statusMedia = <StatusMedia>[];
+      json['StatusMedia'].forEach((v) {
+        statusMedia!.add(StatusMedia.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_id'] = statusId;
+    data['updatedAt'] = updatedAt;
+    data['createdAt'] = createdAt;
+    if (statusMedia != null) {
+      data['StatusMedia'] = statusMedia!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class StatusMedia {
+  String? statusText;
+  String? url;
+  int? statusMediaId;
+  String? updatedAt;
+
+  StatusMedia({this.statusText, this.url, this.statusMediaId, this.updatedAt});
+
+  StatusMedia.fromJson(Map<String, dynamic> json) {
+    statusText = json['status_text'];
+    url = json['url'];
+    statusMediaId = json['status_media_id'];
+    updatedAt = json['updatedAt'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_text'] = statusText;
+    data['url'] = url;
+    data['status_media_id'] = statusMediaId;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }
