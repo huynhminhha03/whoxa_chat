@@ -30,6 +30,7 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   AllBlockListController allBlockListController = Get.find();
   AllStaredMsgController allStaredMsgController = Get.find();
+  AvatarController avatarController = Get.find();
 
   @override
   void initState() {
@@ -94,7 +95,13 @@ class _ProfileState extends State<Profile> {
         ]));
   }
 
+  String? profileImg;
+
   Widget profileWidget() {
+    profileImg;
+    if (checkForNull(Hive.box(userdata).get(userImage)) != null) {
+      profileImg = Hive.box(userdata).get(userImage);
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
@@ -112,11 +119,149 @@ class _ProfileState extends State<Profile> {
                     borderRadius: BorderRadius.circular(110)),
                 child: Padding(
                     padding: const EdgeInsets.all(10),
-                    child: CustomCachedNetworkImage(
-                      imageUrl: Hive.box(userdata).get(userImage),
-                      placeholderColor: chatownColor,
-                      errorWidgeticon: const Icon(Icons.person),
-                    )),
+                    child: profileImg != null &&
+                            profileImg !=
+                                "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
+                            avatarController.avatarIndex.value == -1 &&
+                            image == null
+                        ? avatarController.avatarsData
+                                .where(
+                                    (avatar) => avatar.avtarMedia == profileImg)
+                                .map((avatar) => avatar.avtarMedia!)
+                                .isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: profileImg!,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.person, color: chatColor),
+                              )
+                            : CachedNetworkImage(
+                                imageUrl: profileImg!,
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.person, color: chatColor),
+                              )
+                        : image == null
+                            ? Obx(
+                                () => avatarController.avatarIndex.value != -1
+                                    ? CachedNetworkImage(
+                                        imageUrl: avatarController
+                                            .avatarsData[avatarController
+                                                .avatarIndex.value]
+                                            .avtarMedia!,
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                Container(
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              image: imageProvider,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            const Icon(Icons.person,
+                                                color: chatColor),
+                                      )
+                                    : Hive.box(userdata).get(userGender) ==
+                                            "male"
+                                        ? CachedNetworkImage(
+                                            imageUrl: avatarController
+                                                .avatarsData
+                                                .where((avatar) =>
+                                                    avatar.avatarGender ==
+                                                        "male" &&
+                                                    avatar.defaultAvtar == true)
+                                                .map((avatar) =>
+                                                    avatar.avtarMedia!)
+                                                .first,
+                                            imageBuilder:
+                                                (context, imageProvider) =>
+                                                    Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Icon(Icons.person,
+                                                        color: chatColor),
+                                          )
+                                        : Hive.box(userdata).get(userGender) !=
+                                                    null &&
+                                                Hive.box(userdata)
+                                                        .get(userGender) ==
+                                                    "female"
+                                            ? CachedNetworkImage(
+                                                imageUrl: avatarController
+                                                    .avatarsData
+                                                    .where((avatar) =>
+                                                        avatar.avatarGender ==
+                                                            "female" &&
+                                                        avatar.defaultAvtar ==
+                                                            true)
+                                                    .map((avatar) =>
+                                                        avatar.avtarMedia!)
+                                                    .first,
+                                                imageBuilder:
+                                                    (context, imageProvider) =>
+                                                        Container(
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: imageProvider,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(Icons.person,
+                                                            color: chatColor),
+                                              )
+                                            : Container(
+                                                height: 30,
+                                                width: 30,
+                                                decoration: const BoxDecoration(
+                                                    color: Color(0xFFFCC604),
+                                                    shape: BoxShape.circle),
+                                                child: const Icon(
+                                                  Icons.person,
+                                                  size: 30,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                              )
+                            : Image.file(image!, fit: BoxFit.cover)
+                    //  CustomCachedNetworkImage(
+                    //   imageUrl: Hive.box(userdata).get(userImage),
+                    //   placeholderColor: chatownColor,
+                    //   errorWidgeticon: const Icon(Icons.person),
+                    // ),
+                    ),
               ),
             ),
           ),

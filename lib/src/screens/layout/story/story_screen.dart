@@ -236,64 +236,87 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
               return widget.isForMyStory
                   ? Container(
                       color: Colors.black,
-                      child: StoryImage(
-                        /// key is required
-                        key: ValueKey(
-                          storyGetxController.storyListData.value.myStatus!
-                              .statuses![0].statusMedia![storyIndex].url!,
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: StoryImage(
+                          width: Get.width,
+                          height: Get.height,
+                          key: ValueKey(
+                            storyGetxController.storyListData.value.myStatus!
+                                .statuses![0].statusMedia![storyIndex].url!,
+                          ),
+                          imageProvider: CachedNetworkImageProvider(
+                            storyGetxController.storyListData.value.myStatus!
+                                .statuses![0].statusMedia![storyIndex].url!,
+                          ),
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: const CircularProgressIndicator(
+                                color: chatownColor,
+                              ).marginAll(280),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(
+                            Icons.network_check,
+                            size: 40,
+                            color: chatownColor,
+                          ).marginAll(280),
                         ),
-                        imageProvider: CachedNetworkImageProvider(
-                          storyGetxController.storyListData.value.myStatus!
-                              .statuses![0].statusMedia![storyIndex].url!,
-                        ),
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                            child: CircularProgressIndicator(
-                              color: chatownColor,
-                            ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.network_check, size: 40),
                       ),
                     )
                   : Container(
                       color: Colors.black,
-                      child: StoryImage(
-                        /// key is required
-                        key: ValueKey(
-                          storyGetxController
-                              .notViewedStatusList[
-                                  storyGetxController.pageIndexValue.value]
-                              .userData!
-                              .statuses![0]
-                              .statusMedia![
-                                  storyGetxController.storyIndexValue.value]
-                              .url,
+                      child: FittedBox(
+                        fit: BoxFit.cover,
+                        child: StoryImage(
+                          /// key is required
+                          width: Get.width,
+                          height: Get.height,
+                          key: ValueKey(
+                            storyGetxController
+                                .notViewedStatusList[
+                                    storyGetxController.pageIndexValue.value]
+                                .userData!
+                                .statuses![0]
+                                .statusMedia![
+                                    storyGetxController.storyIndexValue.value]
+                                .url,
+                          ),
+                          imageProvider: CachedNetworkImageProvider(
+                            storyGetxController
+                                .notViewedStatusList[
+                                    storyGetxController.pageIndexValue.value]
+                                .userData!
+                                .statuses![0]
+                                .statusMedia![
+                                    storyGetxController.storyIndexValue.value]
+                                .url!,
+                          ),
+                          loadingBuilder: (BuildContext context, Widget child,
+                              ImageChunkEvent? loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: const CircularProgressIndicator(
+                                color: chatownColor,
+                              ).marginAll(280),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) =>
+                              //  Center(
+                              //   child: const CircularProgressIndicator(
+                              //     color: chatownColor,
+                              //   ).marginAll(280),
+                              // ),
+                              const Icon(
+                            Icons.network_check,
+                            size: 40,
+                            color: chatownColor,
+                          ).marginAll(280),
+                          // fit: BoxFit.contain,
                         ),
-                        imageProvider: CachedNetworkImageProvider(
-                          storyGetxController
-                              .notViewedStatusList[
-                                  storyGetxController.pageIndexValue.value]
-                              .userData!
-                              .statuses![0]
-                              .statusMedia![
-                                  storyGetxController.storyIndexValue.value]
-                              .url!,
-                        ),
-                        loadingBuilder: (BuildContext context, Widget child,
-                            ImageChunkEvent? loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const Center(
-                            child:
-                                CircularProgressIndicator(color: chatownColor),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.network_check, size: 40),
-                        // fit: BoxFit.contain,
                       ),
                     );
             },
@@ -314,8 +337,8 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                 ReadMoreText(
                                   trimLines: 3,
                                   trimMode: TrimMode.Line,
-                                  trimCollapsedText: 'Read more'.tr,
-                                  trimExpandedText: 'Read less'.tr,
+                                  trimCollapsedText: ' Read more'.tr,
+                                  trimExpandedText: ' Read less'.tr,
                                   colorClickableText: yellow2Color,
                                   // widget.isForMyStory
                                   //     ?
@@ -330,7 +353,9 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: Color.fromRGBO(255, 255, 255, 1)),
-                                ).paddingSymmetric(horizontal: 10),
+                                )
+                                    .paddingSymmetric(horizontal: 20)
+                                    .paddingOnly(bottom: 60),
                                 (storyGetxController.isAllUserStoryLoad.value ==
                                                 true ||
                                             storyGetxController.myStorySeenData
@@ -442,8 +467,8 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                           ReadMoreText(
                                             trimLines: 3,
                                             trimMode: TrimMode.Line,
-                                            trimCollapsedText: 'Read more'.tr,
-                                            trimExpandedText: 'Read less'.tr,
+                                            trimCollapsedText: ' Read more'.tr,
+                                            trimExpandedText: ' Read less'.tr,
                                             colorClickableText: chatownColor,
                                             storyGetxController
                                                     .notViewedStatusList.isEmpty
@@ -462,7 +487,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                                 fontWeight: FontWeight.w500,
                                                 color: Color.fromRGBO(
                                                     255, 255, 255, 1)),
-                                          ).paddingSymmetric(horizontal: 10),
+                                          ).paddingSymmetric(horizontal: 20),
                                           const SizedBox(height: 10),
                                           Row(
                                             children: [

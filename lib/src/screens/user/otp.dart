@@ -70,7 +70,7 @@ class _otpState extends State<otp> {
 
   VerifyOTPModel? send;
   void _startTimer() {
-    _counter = 60;
+    _counter = 300;
     if (_timer != null) {
       _timer!.cancel();
     }
@@ -82,7 +82,13 @@ class _otpState extends State<otp> {
         showCustomToast("Please resend OTP");
         _code = "";
       }
-      print(_counter);
+
+      // Add minutes and seconds calculation
+      int minutes = _counter ~/ 60;
+      int seconds = _counter % 60;
+
+      print('$minutes:${seconds.toString().padLeft(2, '0')}');
+      // print(_counter);
       _events!.add(_counter);
     });
   }
@@ -223,7 +229,7 @@ class _otpState extends State<otp> {
         StreamBuilder<int>(
             stream: _events!.stream,
             builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-              print(snapshot.data.toString());
+              // print(snapshot.data.toString());
               return SingleChildScrollView(
                 child: Column(
                   children: [
@@ -304,14 +310,15 @@ class _otpState extends State<otp> {
                               showCustomToast(
                                   "You can't send otp once it's enetered");
                             } else {
-                              snapshot.data == 0
+                              "${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')}" ==
+                                      "00:00"
                                   ?
                                   // widget.otpStatus == "firebase"
                                   //     ? resendOtpFirebase()
                                   //     : resendoTP()
                                   resendoTP()
                                   : showCustomToast(
-                                      "Wait for a  00:${snapshot.data.toString()} ");
+                                      "Wait for a ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')} ");
                             }
                           },
                           child: Text(
@@ -319,8 +326,8 @@ class _otpState extends State<otp> {
                             style: TextStyle(
                                 fontSize: 14,
                                 color:
-                                    snapshot.data.toString().padLeft(2, '0') ==
-                                            "00"
+                                    "${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')}" ==
+                                            "00:00"
                                         ? const Color.fromRGBO(252, 198, 4, 1)
                                         : Colors.grey,
                                 fontWeight: FontWeight.w500,
@@ -339,7 +346,8 @@ class _otpState extends State<otp> {
                         },
                         child: Center(
                           child: Text(
-                            'Resend Code in 00:${snapshot.data.toString().padLeft(2, '0')}',
+                            // 'Resend Code in 00:${snapshot.data.toString().padLeft(2, '0')}',
+                            "Resend Code in ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')}",
                             style: const TextStyle(
                                 color: Color.fromRGBO(113, 113, 113, 1),
                                 fontWeight: FontWeight.w500,
@@ -359,23 +367,23 @@ class _otpState extends State<otp> {
     );
   }
 
-  void startTimer() {
-    print("--------------------->>>>>>>");
-    const onsec = Duration(seconds: 1);
-    Timer _timer = Timer.periodic(onsec, (timer) {
-      print(start);
-      if (start == 0) {
-        setState(() {
-          timer.cancel();
-          wait = false;
-        });
-      } else {
-        setState(() {
-          start--;
-        });
-      }
-    });
-  }
+  // void startTimer() {
+  //   print("--------------------->>>>>>>");
+  //   const onsec = Duration(seconds: 1);
+  //   Timer _timer = Timer.periodic(onsec, (timer) {
+  //     print(start);
+  //     if (start == 0) {
+  //       setState(() {
+  //         timer.cancel();
+  //         wait = false;
+  //       });
+  //     } else {
+  //       setState(() {
+  //         start--;
+  //       });
+  //     }
+  //   });
+  // }
 
   otpcheck() async {
     if (_code.isNotEmpty) {
@@ -571,7 +579,7 @@ class _otpState extends State<otp> {
       _timer?.cancel();
 
       // Reset the counter back to 60
-      _counter = 60;
+      _counter = 300;
       var uri = Uri.parse(apiHelper.registerPhone);
       var request = http.MultipartRequest("POST", uri);
       Map<String, String> headers = {
@@ -591,7 +599,6 @@ class _otpState extends State<otp> {
 
         print('REQUESTED FIELDS : ${request.fields}');
         print('OTP SENT SUCESSFULLY');
-        startTimer();
         showCustomToast("OTP SENT SUCESSFULLY");
       } else {
         setState(() {

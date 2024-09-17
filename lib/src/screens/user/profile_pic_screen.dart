@@ -28,6 +28,13 @@ class ProfilePicScreen extends StatefulWidget {
 
 class _ProfilePicScreenState extends State<ProfilePicScreen> {
   AvatarController avatarController = Get.put(AvatarController());
+
+  @override
+  void initState() {
+    super.initState();
+    avatarController.avatarIndex.value = -1;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -175,7 +182,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
                               setState(() {});
                               avatarController.avatarIndex.value = index;
                             },
-                            child: profileImg == "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                            child: profileImg == "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                     image == null &&
                                     Hive.box(userdata).get(userGender) ==
                                         "male" &&
@@ -242,7 +249,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
                                       )
                                     ],
                                   )
-                                : profileImg == "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                                : profileImg == "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                         image == null &&
                                         Hive.box(userdata)
                                                 .get(userGender) ==
@@ -383,7 +390,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
                                           )
                                         : profileImg!.isNotEmpty &&
                                                 profileImg !=
-                                                    "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                                                    "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                                 avatarController.avatarsData
                                                     .where((avatar) =>
                                                         avatar.avtarMedia ==
@@ -563,7 +570,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
             borderRadius: BorderRadius.circular(110),
             child: profileImg != null &&
                     profileImg !=
-                        "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                        "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                     avatarController.avatarIndex.value == -1 &&
                     image == null
                 ? avatarController.avatarsData
@@ -896,7 +903,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
           .toString();
     } else if (profileImg!.isNotEmpty &&
         profileImg !=
-            "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+            "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
         avatarController.avatarsData
             .where((avatar) => avatar.avtarMedia == profileImg)
             .map((avatar) => avatar.avtarMedia!)

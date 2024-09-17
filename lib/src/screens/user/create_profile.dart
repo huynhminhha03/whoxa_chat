@@ -235,12 +235,12 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             .toString();
       } else if (profileImg!.isNotEmpty &&
           profileImg !=
-              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
           avatarController.avatarsData
               .where((avatar) => avatar.avtarMedia == profileImg)
               .map((avatar) => avatar.avtarMedia!)
               .isNotEmpty &&
-          // profileImg == avatarController.avatarsData[index].avtarMedia && 
+          // profileImg == avatarController.avatarsData[index].avtarMedia &&
           avatarController.avatarIndex.value == -1 &&
           image == null) {
         request.fields['avatar_id'] = avatarController.avatarsData
@@ -1106,7 +1106,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               borderRadius: BorderRadius.circular(110),
               child: profileImg != null &&
                       profileImg !=
-                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                       avatarController.avatarIndex.value == -1 &&
                       image == null
                   ? avatarController.avatarsData
@@ -1467,7 +1467,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     final String nation = nationController.text;
     return widget.isRought == true
         ? Container(
-            height: 48,
+            height: 50,
             width: Get.width * 0.90,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -1514,7 +1514,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 height: 4,
               ),
               Container(
-                height: 48,
+                height: 50,
                 width: Get.width * 0.90,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -1532,7 +1532,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         Text(
                           nation,
                           style: const TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.w600),
+                              fontSize: 12, fontWeight: FontWeight.w600),
                         )
                       ],
                     )
@@ -1547,7 +1547,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     final String number = mobController.text;
     return widget.isRought == true
         ? Container(
-            height: 48,
+            height: 50,
             width: Get.width * 0.90,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -1600,7 +1600,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                 height: 4,
               ),
               Container(
-                height: 48,
+                height: 50,
                 width: Get.width * 0.90,
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -1621,7 +1621,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                             Text(
                               number,
                               style: const TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.w600),
+                                  fontSize: 12, fontWeight: FontWeight.w600),
                             )
                           ],
                         )

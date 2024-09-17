@@ -320,6 +320,8 @@ class StroyGetxController extends GetxController {
       log("STORY-LIST:$respo");
       log("STORY-LIST:${storyListData.toString()}");
       log("STORY-LIST:${allStoryListData.toString()}");
+      log("STORY-LIST viewedStatusList.length :${viewedStatusList.length}");
+      log("STORY-LIST notViewedStatusList.length :${notViewedStatusList.length}");
       //log("SEEN-LIST:$seenList");
       if (kDebugMode) {
         print("Status of get_story_by_user : ${result.statusCode}");

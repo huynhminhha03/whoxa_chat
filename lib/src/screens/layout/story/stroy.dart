@@ -24,8 +24,8 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
 
   @override
   void initState() {
-     storyController.getAllUsersStory();
-    
+    storyController.getAllUsersStory();
+
     super.initState();
   }
 
@@ -91,7 +91,9 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                       height: 50,
                                       width: 50,
                                       decoration: BoxDecoration(
-                                          color: Colors.grey.withOpacity(0.60),
+                                          color: Colors.transparent,
+                                          border: Border.all(
+                                              color: appColorYellow, width: 1),
                                           shape: BoxShape.circle),
                                       child: CachedNetworkImage(
                                         imageUrl:
@@ -103,7 +105,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                             color: blackcolor,
                                           );
                                         },
-                                      ),
+                                      ).marginAll(2),
                                     ),
                                   ),
                                   // CircleAvatar(backgroundColor: blackcolor),

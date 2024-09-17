@@ -730,7 +730,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Image.asset("assets/images/archive2.png", height: 15),
+                Image.asset("assets/images/archive2.png", height: 20),
                 const SizedBox(width: 10),
                 Row(
                   children: [
@@ -796,10 +796,6 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
             children: [
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                // child: Container(
-                //   color: const Color.fromRGBO(30, 30, 30, 0.37),
-                // ),
-
                 child: AlertDialog(
                   insetPadding: const EdgeInsets.all(15),
                   alignment: Alignment.bottomCenter,

@@ -75,7 +75,7 @@ class _AvatarsPopupState extends State<AvatarsPopup> {
                                 });
                               },
                               child: Hive.box(userdata).get(userImage) ==
-                                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                       widget.image == null &&
                                       Hive.box(userdata).get(userGender) ==
                                           "male" &&
@@ -142,7 +142,7 @@ class _AvatarsPopupState extends State<AvatarsPopup> {
                                       ],
                                     )
                                   : Hive.box(userdata).get(userImage) ==
-                                              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                                              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                           widget.image == null &&
                                           Hive.box(userdata).get(userGender) ==
                                               "female" &&
@@ -288,7 +288,7 @@ class _AvatarsPopupState extends State<AvatarsPopup> {
                                                       .get(userImage)!
                                                       .isNotEmpty &&
                                                   Hive.box(userdata).get(userImage) !=
-                                                      "http://62.72.36.245:3000/uploads/not-found-images/profile-image.jpg" &&
+                                                      "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
                                                   avatarController.avatarsData
                                                       .where((avatar) =>
                                                           avatar.avtarMedia ==
