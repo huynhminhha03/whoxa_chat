@@ -5660,7 +5660,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                     child: Row(
                       children: [
                         const SizedBox(width: 10),
-                        Image.asset("assets/images/trash.png",
+                        Image.asset("assets/images/trash1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
                         const Text(
@@ -6009,7 +6009,11 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: data.messageType == "text"
-                                      ? Text(data.message!)
+                                      ? Text(data.message!).paddingOnly(
+                                          left: 15,
+                                          top: 5,
+                                          bottom: 5,
+                                        )
                                       : data.messageType == "document"
                                           ? InkWell(
                                               onTap: () {
@@ -6321,45 +6325,81 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                           .circular(
                                                                               10)),
                                                               child: ClipRRect(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            10),
-                                                                child: data.latitude ==
-                                                                            "" ||
-                                                                        data.longitude ==
-                                                                            ""
-                                                                    ? Container(
-                                                                        decoration:
-                                                                            const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/map_Blurr.png"), fit: BoxFit.cover)),
-                                                                        child:
-                                                                            Icon(
-                                                                          Icons
-                                                                              .error_outline,
-                                                                          color:
-                                                                              chatownColor.withOpacity(0.6),
-                                                                          size:
-                                                                              50,
-                                                                        ),
-                                                                      )
-                                                                    : GoogleMap(
-                                                                        zoomControlsEnabled:
-                                                                            false,
-                                                                        zoomGesturesEnabled:
-                                                                            false,
-                                                                        initialCameraPosition: CameraPosition(
-                                                                            target:
-                                                                                LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
-                                                                            zoom: 15),
-                                                                        mapType:
-                                                                            MapType.normal,
-                                                                        onMapCreated:
-                                                                            (GoogleMapController
-                                                                                controller111) {
-                                                                          // controller.complete();
-                                                                        },
-                                                                      ),
-                                                              ),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10),
+                                                                  child: data.latitude ==
+                                                                              "" ||
+                                                                          data.longitude ==
+                                                                              ""
+                                                                      ? Container(
+                                                                          decoration:
+                                                                              const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/map_Blurr.png"), fit: BoxFit.cover)),
+                                                                          child:
+                                                                              Icon(
+                                                                            Icons.error_outline,
+                                                                            color:
+                                                                                chatownColor.withOpacity(0.6),
+                                                                            size:
+                                                                                50,
+                                                                          ),
+                                                                        )
+                                                                      : FutureBuilder<
+                                                                          Uint8List>(
+                                                                          future:
+                                                                              getBytesFromAsset(
+                                                                            'assets/images/location_for_google.png',
+                                                                            70,
+                                                                            70,
+                                                                          ),
+                                                                          builder:
+                                                                              (BuildContext context, AsyncSnapshot<Uint8List> snapshot) {
+                                                                            if (snapshot.connectionState == ConnectionState.done &&
+                                                                                snapshot.hasData) {
+                                                                              return Container(
+                                                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
+                                                                                height: 100,
+                                                                                child: GoogleMap(
+                                                                                  zoomControlsEnabled: false,
+                                                                                  onTap: (argument) {
+                                                                                    MapUtils.openMap(double.parse(data.latitude!), double.parse(data.longitude!));
+                                                                                  },
+                                                                                  mapType: MapType.normal,
+                                                                                  compassEnabled: false,
+                                                                                  initialCameraPosition: CameraPosition(target: LatLng(double.parse(data.latitude!), double.parse(data.longitude!)), zoom: 15),
+                                                                                  markers: {
+                                                                                    Marker(
+                                                                                      icon: BitmapDescriptor.fromBytes(snapshot.data!),
+                                                                                      markerId: const MarkerId('my_location'),
+                                                                                      position: LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
+                                                                                    ),
+                                                                                  },
+                                                                                ),
+                                                                              );
+                                                                            } else {
+                                                                              return const Center(child: CupertinoActivityIndicator());
+                                                                            }
+                                                                          },
+                                                                        )
+                                                                  // GoogleMap(
+                                                                  //     zoomControlsEnabled:
+                                                                  //         false,
+                                                                  //     zoomGesturesEnabled:
+                                                                  //         false,
+                                                                  //     initialCameraPosition: CameraPosition(
+                                                                  //         target:
+                                                                  //             LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
+                                                                  //         zoom: 15),
+                                                                  //     mapType:
+                                                                  //         MapType.normal,
+                                                                  //     onMapCreated:
+                                                                  //         (GoogleMapController
+                                                                  //             controller111) {
+                                                                  //       // controller.complete();
+                                                                  //     },
+                                                                  //   ),
+                                                                  ),
                                                             ),
                                                           ),
                                                         )

@@ -252,110 +252,140 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
             getAllDeviceContact.getList.isEmpty
         ? loader(context)
         : getAllDeviceContact.getList.isNotEmpty
-            ? ListView.builder(
+            ? ListView.separated(
                 padding: const EdgeInsets.all(0),
                 itemCount: getAllDeviceContact.getList.length,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
+                separatorBuilder: (context, index) {
+                  var contact = getAllDeviceContact.getList[index];
+                  return getAllDeviceContact.getList.any((element) =>
+                          element.phoneNumber.toString() ==
+                          Hive.box(userdata).get(userMobile))
+                      ? Hive.box(userdata).get(userMobile) ==
+                              contact.phoneNumber.toString()
+                          ? const SizedBox.shrink()
+                          : index != getAllDeviceContact.getList.length - 2
+                              ? Divider(
+                                  color: Colors.grey.shade300,
+                                )
+                              : const SizedBox.shrink()
+                      : index != getAllDeviceContact.getList.length - 1
+                          ? Divider(
+                              color: Colors.grey.shade300,
+                            )
+                          : const SizedBox.shrink();
+                },
                 itemBuilder: (BuildContext context, int index) {
                   var contact = getAllDeviceContact.getList[index];
                   contact.fullName
                       .toString()
                       .toLowerCase()
                       .contains(searchText);
-                  return Column(
-                    children: <Widget>[
-                      ListTile(
-                        onTap: () {
-                          if (chatListController
-                              .userChatListModel.value!.chatList!.isEmpty) {
-                            addContactController.addContactApi(
-                                contact.fullName!,
-                                contact.phoneNumber,
-                                contact.profileImage!);
-                          } else {
-                            for (var i = 0;
-                                i <
-                                    chatListController.userChatListModel.value!
-                                        .chatList!.length;
-                                i++) {
-                              if (chatListController.userChatListModel.value!
-                                      .chatList![i].phoneNumber ==
-                                  getAllDeviceContact
-                                      .getList[index].phoneNumber) {
-                                print('1111111');
-                                Get.to(() => SingleChatMsg(
-                                      conversationID: getUserID(
-                                          contact.phoneNumber.toString()),
-                                      username: contact.fullName!,
-                                      userPic: contact.profileImage,
-                                      mobileNum: contact.phoneNumber.toString(),
-                                      index: 0,
-                                      isBlock: chatListController
-                                          .userChatListModel
-                                          .value!
-                                          .chatList![i]
-                                          .isBlock,
-                                      userID: chatListController
-                                          .userChatListModel
-                                          .value!
-                                          .chatList![i]
-                                          .userId
-                                          .toString(),
-                                    ));
-                              } else {
-                                print('22222');
-                                if (addContactController.isLoading.value ==
-                                    false) {
+                  return Hive.box(userdata).get(userMobile) ==
+                          contact.phoneNumber.toString()
+                      ? const SizedBox.shrink()
+                      : Column(
+                          children: <Widget>[
+                            ListTile(
+                              onTap: () {
+                                if (chatListController.userChatListModel.value!
+                                    .chatList!.isEmpty) {
                                   addContactController.addContactApi(
                                       contact.fullName!,
                                       contact.phoneNumber,
                                       contact.profileImage!);
+                                } else {
+                                  for (var i = 0;
+                                      i <
+                                          chatListController.userChatListModel
+                                              .value!.chatList!.length;
+                                      i++) {
+                                    if (chatListController.userChatListModel
+                                            .value!.chatList![i].phoneNumber ==
+                                        getAllDeviceContact
+                                            .getList[index].phoneNumber) {
+                                      print('1111111');
+                                      Get.to(() => SingleChatMsg(
+                                            conversationID: getUserID(
+                                                contact.phoneNumber.toString()),
+                                            username: contact.fullName!,
+                                            userPic: contact.profileImage,
+                                            mobileNum:
+                                                contact.phoneNumber.toString(),
+                                            index: 0,
+                                            isBlock: chatListController
+                                                .userChatListModel
+                                                .value!
+                                                .chatList![i]
+                                                .isBlock,
+                                            userID: chatListController
+                                                .userChatListModel
+                                                .value!
+                                                .chatList![i]
+                                                .userId
+                                                .toString(),
+                                          ));
+                                    } else {
+                                      print('22222');
+                                      if (addContactController
+                                              .isLoading.value ==
+                                          false) {
+                                        addContactController.addContactApi(
+                                            contact.fullName!,
+                                            contact.phoneNumber,
+                                            contact.profileImage!);
+                                      }
+                                    }
+                                  }
                                 }
-                              }
-                            }
-                          }
-                        },
-                        leading: Container(
-                          height: 45,
-                          width: 45,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade200,
-                            shape: BoxShape.circle,
-                          ),
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: CustomCachedNetworkImage(
-                                  imageUrl: contact.profileImage!,
-                                  placeholderColor: chatownColor,
-                                  errorWidgeticon: const Icon(Icons.person))),
-                        ),
-                        title: Text(
-                          contact.fullName!,
-                          style: const TextStyle(
-                            fontSize: 15.0,
-                            fontFamily: 'Poppins',
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        subtitle: Container(
-                          padding: const EdgeInsets.only(top: 2.0),
-                          child: Text(
-                            contact.phoneNumber.toString(),
-                            style: const TextStyle(
-                                fontSize: 13,
-                                color: Color.fromRGBO(73, 73, 73, 1)),
-                          ),
-                        ),
-                        trailing:
-                            Image.asset("assets/images/Chat1.png", height: 10),
-                      ),
-                      if (index != getAllDeviceContact.getList.length - 1)
-                        Divider(
-                          color: Colors.grey.shade300,
-                        )
-                    ],
-                  );
+                              },
+                              leading: Container(
+                                height: 45,
+                                width: 45,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100),
+                                    child: CustomCachedNetworkImage(
+                                        imageUrl: contact.profileImage!,
+                                        placeholderColor: chatownColor,
+                                        errorWidgeticon:
+                                            const Icon(Icons.person))),
+                              ),
+                              title: Text(
+                                contact.fullName!,
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              subtitle: Container(
+                                padding: const EdgeInsets.only(top: 2.0),
+                                child: Text(
+                                  contact.phoneNumber.toString(),
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      color: Color.fromRGBO(73, 73, 73, 1)),
+                                ),
+                              ),
+                              trailing: Image.asset("assets/images/Chat1.png",
+                                  height: 10),
+                            ),
+                            // if (getAllDeviceContact.getList.contains(
+                            //         Hive.box(userdata).get(userMobile))
+                            //     ? index !=
+                            //         getAllDeviceContact.getList.length - 2
+                            //     : index !=
+                            //         getAllDeviceContact.getList.length - 1)
+                            //   Divider(
+                            //     color: Colors.grey.shade300,
+                            //   )
+                          ],
+                        );
                 },
               )
             : const SizedBox(

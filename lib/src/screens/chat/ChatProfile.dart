@@ -514,14 +514,16 @@ class _ChatProfileState extends State<ChatProfile> {
       child: InkWell(
         onTap: () {
           Get.to(
-              () => AllStarredMsgList(
-                  conversationid: widget.peeid, isPersonal: true),
-              transition: Transition.rightToLeft);
+            () => AllStarredMsgList(
+                conversationid: widget.peeid, isPersonal: true),
+            transition: Transition.rightToLeft,
+          );
         },
         child: Padding(
           padding:
-              const EdgeInsets.only(left: 50, top: 10, right: 25, bottom: 10),
+              const EdgeInsets.only(left: 20, top: 10, right: 25, bottom: 10),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
                 width: Get.width * 0.80,
@@ -531,7 +533,7 @@ class _ChatProfileState extends State<ChatProfile> {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                       fontWeight: FontWeight.w500,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontFamily: "Poppins",
                       color: Color(0xff000000)),
                 ),

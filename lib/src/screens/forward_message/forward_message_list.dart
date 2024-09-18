@@ -384,23 +384,31 @@ class _ForwardMessageState extends State<ForwardMessage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                chatlist[index].userName.toString().isEmpty
-                                    ? Text(
-                                        capitalizeFirstLetter(
-                                            '${chatlist[index].groupName}'),
-                                        textAlign: TextAlign.left,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16),
-                                      )
-                                    : Text(
-                                        capitalizeFirstLetter(
-                                            chatlist[index].userName!),
-                                        textAlign: TextAlign.left,
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 16),
-                                      ),
+                                SizedBox(
+                                  width: Get.width * 0.6,
+                                  child: chatlist[index]
+                                          .userName
+                                          .toString()
+                                          .isEmpty
+                                      ? Text(
+                                          capitalizeFirstLetter(
+                                              '${chatlist[index].groupName}'),
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.left,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 16),
+                                        )
+                                      : Text(
+                                          capitalizeFirstLetter(
+                                              chatlist[index].userName!),
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.left,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 16),
+                                        ),
+                                ),
                               ],
                             ),
                           ],

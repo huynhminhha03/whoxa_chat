@@ -5317,7 +5317,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     child: Row(
                       children: [
                         const SizedBox(width: 10),
-                        Image.asset("assets/images/trash.png",
+                        Image.asset("assets/images/trash1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
                         const Text(
@@ -5655,7 +5655,11 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: data.messageType == "text"
-                                      ? Text(data.message!)
+                                      ? Text(data.message!).paddingOnly(
+                                          left: 15,
+                                          top: 5,
+                                          bottom: 5,
+                                        )
                                       : data.messageType == "document"
                                           ? InkWell(
                                               onTap: () {
@@ -5935,38 +5939,30 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                     )
                                                   : data.messageType ==
                                                           "location"
-                                                      ? InkWell(
-                                                          onTap: () {
-                                                            MapUtils.openMap(
-                                                                double.parse(data
-                                                                    .latitude!),
-                                                                double.parse(data
-                                                                    .longitude!));
-                                                          },
+                                                      ? Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15),
+                                                          ),
+                                                          constraints:
+                                                              const BoxConstraints(
+                                                                  minHeight:
+                                                                      10.0,
+                                                                  minWidth:
+                                                                      10.0,
+                                                                  maxWidth:
+                                                                      250),
                                                           child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15),
-                                                            ),
-                                                            constraints:
-                                                                const BoxConstraints(
-                                                                    minHeight:
-                                                                        10.0,
-                                                                    minWidth:
-                                                                        10.0,
-                                                                    maxWidth:
-                                                                        250),
-                                                            child: Container(
-                                                              height: 130,
-                                                              decoration: BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10)),
-                                                              child: ClipRRect(
+                                                            height: 130,
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            child: ClipRRect(
                                                                 borderRadius:
                                                                     BorderRadius
                                                                         .circular(
@@ -5988,25 +5984,71 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                               50,
                                                                         ),
                                                                       )
-                                                                    : GoogleMap(
-                                                                        zoomControlsEnabled:
-                                                                            false,
-                                                                        zoomGesturesEnabled:
-                                                                            false,
-                                                                        initialCameraPosition: CameraPosition(
-                                                                            target:
-                                                                                LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
-                                                                            zoom: 15),
-                                                                        mapType:
-                                                                            MapType.normal,
-                                                                        onMapCreated:
-                                                                            (GoogleMapController
-                                                                                controller111) {
-                                                                          // controller.complete();
+                                                                    : FutureBuilder<
+                                                                        Uint8List>(
+                                                                        future:
+                                                                            getBytesFromAsset(
+                                                                          'assets/images/location_for_google.png',
+                                                                          70,
+                                                                          70,
+                                                                        ),
+                                                                        builder: (BuildContext
+                                                                                context,
+                                                                            AsyncSnapshot<Uint8List>
+                                                                                snapshot) {
+                                                                          if (snapshot.connectionState == ConnectionState.done &&
+                                                                              snapshot.hasData) {
+                                                                            return Container(
+                                                                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(18)),
+                                                                              height: 100,
+                                                                              child: GoogleMap(
+                                                                                zoomControlsEnabled: false,
+                                                                                onTap: (argument) {
+                                                                                  MapUtils.openMap(double.parse(data.latitude!), double.parse(data.longitude!));
+                                                                                },
+                                                                                mapType: MapType.normal,
+                                                                                compassEnabled: false,
+                                                                                initialCameraPosition: CameraPosition(target: LatLng(double.parse(data.latitude!), double.parse(data.longitude!)), zoom: 15),
+                                                                                markers: {
+                                                                                  Marker(
+                                                                                    icon: BitmapDescriptor.fromBytes(snapshot.data!),
+                                                                                    markerId: const MarkerId('my_location'),
+                                                                                    position: LatLng(double.parse(data.latitude!), double.parse(data.longitude!)),
+                                                                                  ),
+                                                                                },
+                                                                              ),
+                                                                            );
+                                                                          } else {
+                                                                            return const Center(child: CupertinoActivityIndicator());
+                                                                          }
                                                                         },
-                                                                      ),
-                                                              ),
-                                                            ),
+                                                                      )
+                                                                // GoogleMap(
+                                                                //     zoomControlsEnabled:
+                                                                //         false,
+                                                                //     zoomGesturesEnabled:
+                                                                //         false,
+                                                                //     onTap:
+                                                                //         (argument) {
+                                                                //       MapUtils.openMap(
+                                                                //           double.parse(data.latitude!),
+                                                                //           double.parse(data.longitude!));
+                                                                //     },
+                                                                //     initialCameraPosition: CameraPosition(
+                                                                //         target: LatLng(
+                                                                //             double.parse(data.latitude!),
+                                                                //             double.parse(data.longitude!)),
+                                                                //         zoom: 15),
+                                                                //     mapType:
+                                                                //         MapType
+                                                                //             .normal,
+                                                                //     onMapCreated:
+                                                                //         (GoogleMapController
+                                                                //             controller111) {
+                                                                //       // controller.complete();
+                                                                //     },
+                                                                //   ),
+                                                                ),
                                                           ),
                                                         )
                                                       : data.messageType ==
