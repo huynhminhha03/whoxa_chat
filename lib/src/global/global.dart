@@ -1972,15 +1972,19 @@ Widget containerProfileDesign(
           ),
           Row(
             children: [
-              Text(
-                about!,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400,
+              SizedBox(
+                width: Get.width * 0.5,
+                child: Text(
+                  about!,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
               const Icon(Icons.arrow_forward_ios, size: 16),
             ],

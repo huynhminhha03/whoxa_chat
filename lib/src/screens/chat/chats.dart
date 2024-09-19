@@ -494,14 +494,12 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                         ? Row(
                                                                             children: [
                                                                               Image.asset(
-                                                                                data.lastMessage == "1,0,0"
+                                                                                data.lastMessage!.split(',')[0] == "1"
                                                                                     ? "assets/icons/missed_video_call.png"
-                                                                                    : data.lastMessage == "0,0,2"
+                                                                                    : data.lastMessage!.split(',')[2] == "1"
                                                                                         ? "assets/icons/missed_video_call.png"
-                                                                                        : data.userId == Hive.box(userdata).get(userId)
-                                                                                            ? isUserInList
-                                                                                                ? ""
-                                                                                                : "assets/icons/outgoing_video_call.png"
+                                                                                        : data.lastMessage!.split(',')[3] == Hive.box(userdata).get(userId)
+                                                                                            ? "assets/icons/outgoing_video_call.png"
                                                                                             : "assets/icons/incoming_video_call.png",
                                                                                 height: 14,
                                                                               ),
@@ -509,14 +507,16 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                                 width: 4,
                                                                               ),
                                                                               Text(
-                                                                                data.lastMessage == "1,0,0"
+                                                                                data.lastMessage!.split(',')[0] == "1"
                                                                                     ? "Missed Video Call"
-                                                                                    : data.lastMessage == "0,0,2"
+                                                                                    : data.lastMessage!.split(',')[2] == "1"
                                                                                         ? "Video Call Declined"
-                                                                                        : data.userId == Hive.box(userdata).get(userId)
-                                                                                            ? isUserInList
-                                                                                                ? ""
-                                                                                                : "Outgoing Video Call"
+                                                                                        : data.lastMessage!.split(',')[3] == Hive.box(userdata).get(userId)
+                                                                                            ?
+                                                                                            //  isUserInList
+                                                                                            //     ? ""
+                                                                                            //     :
+                                                                                            "Outgoing Video Call"
                                                                                             : "Incoming Video Call",
                                                                                 style: const TextStyle(
                                                                                   fontFamily: 'Poppins',
@@ -532,14 +532,12 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                             ? Row(
                                                                                 children: [
                                                                                   Image.asset(
-                                                                                    data.lastMessage == "1,0,0"
+                                                                                    data.lastMessage!.split(',')[0] == "1"
                                                                                         ? "assets/icons/missed_audio_call.png"
-                                                                                        : data.lastMessage == "0,0,2"
-                                                                                            ? "assets/icons/missed_video_call.png"
-                                                                                            : data.userId == Hive.box(userdata).get(userId)
-                                                                                                ? isUserInList
-                                                                                                    ? ""
-                                                                                                    : "assets/icons/outgoing_audio_call.png"
+                                                                                        : data.lastMessage!.split(',')[2] == "1"
+                                                                                            ? "assets/icons/missed_audio_call.png"
+                                                                                            : data.lastMessage!.split(',')[3] == Hive.box(userdata).get(userId).toString()
+                                                                                                ? "assets/icons/outgoing_audio_call.png"
                                                                                                 : "assets/icons/incoming_audio_call.png",
                                                                                     height: 14,
                                                                                   ),
@@ -547,14 +545,12 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                                     width: 4,
                                                                                   ),
                                                                                   Text(
-                                                                                    data.lastMessage == "1,0,0"
+                                                                                    data.lastMessage!.split(',')[0] == "1"
                                                                                         ? "Missed Audio Call"
-                                                                                        : data.lastMessage == "0,0,2"
+                                                                                        : data.lastMessage!.split(',')[2] == "1"
                                                                                             ? "Audio Call Declined"
-                                                                                            : data.userId == Hive.box(userdata).get(userId)
-                                                                                                ? isUserInList
-                                                                                                    ? ""
-                                                                                                    : "Outgoing Audio Call"
+                                                                                            : data.lastMessage!.split(',')[3] == Hive.box(userdata).get(userId)
+                                                                                                ? "Outgoing Audio Call"
                                                                                                 : "Incoming Audio Call",
                                                                                     style: const TextStyle(
                                                                                       fontFamily: 'Poppins',

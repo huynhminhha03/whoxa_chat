@@ -38,6 +38,8 @@ class _GroupProfileState extends State<GroupProfile> {
   AllStaredMsgController allStaredMsgController = Get.find();
   bool isLoading = false;
   bool isParticipantsOpen = true;
+  bool isShowOptions = false;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -51,7 +53,25 @@ class _GroupProfileState extends State<GroupProfile> {
       });
       allStaredMsgController.getAllStarMsg(widget.conversationID);
     });
+    // Add a listener to detect scroll events
+    _scrollController.addListener(() {
+      if (_scrollController.position.isScrollingNotifier.value) {
+        setState(() {
+          isShowOptions = false; // User is scrolling
+        });
+      } else {
+        // setState(() {
+        //   _isScrolling = false; // User stopped scrolling
+        // });
+      }
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   bool isIamAdmin = false;
@@ -83,85 +103,296 @@ class _GroupProfileState extends State<GroupProfile> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
-      bottomNavigationBar: isIamAdmin == true
-          ? BottomAppBar(
-              elevation: 0,
-              color: Colors.white,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Addparticipants(),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : null,
-      body: Obx(() {
-        return chatProfileController.isLoading.value
-            ? loader(context)
-            : SingleChildScrollView(
-                child: Stack(
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isShowOptions = false;
+        });
+      },
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
+        bottomNavigationBar: isIamAdmin == true
+            ? BottomAppBar(
+                elevation: 0,
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: Get.height * 0.27,
-                      width: double.infinity,
-                      child: Image.asset(
-                        cacheHeight: 140,
-                        "assets/images/back_img1.png",
-                        fit: BoxFit.cover,
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Addparticipants(),
                       ),
                     ),
-                    Column(
-                      children: [
-                        SizedBox(height: Get.height * 0.13),
-                        profilePic(chatProfileController
-                            .profileModel.value!.conversationDetails!),
-                        const SizedBox(height: 10),
-                        groupprofiledetails(chatProfileController
-                            .profileModel.value!.conversationDetails!),
-                      ],
-                    ),
-                    Positioned(
-                        top: 40,
-                        left: 5,
-                        child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              // Get.find<SingleChatContorller>()
-                              //     .userdetailschattModel
-                              //     .value
-                              //     ?.messageList
-                              //     ?.clear();
-                              // Get.find<SingleChatContorller>()
-                              //     .getdetailschat(widget.conversationID);
-                            },
-                            icon: const Icon(Icons.arrow_back_ios, size: 19))),
-                    Positioned(
-                        top: 40,
-                        right: 5,
-                        child: Obx(() {
-                          return chatProfileController.isLoading.value
-                              ? const Icon(
-                                  Icons.more_vert,
-                                  color: chatColor,
-                                  size: 24,
-                                ).paddingOnly(right: 5)
-                              : _popMenu(
-                                  context,
-                                  chatProfileController.profileModel.value!
-                                      .conversationDetails!);
-                        }))
                   ],
                 ),
-              );
-      }),
+              )
+            : null,
+        body: Obx(() {
+          return chatProfileController.isLoading.value
+              ? loader(context)
+              : SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        height: Get.height * 0.27,
+                        width: double.infinity,
+                        child: Image.asset(
+                          cacheHeight: 140,
+                          "assets/images/back_img1.png",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Column(
+                        children: [
+                          SizedBox(height: Get.height * 0.13),
+                          profilePic(chatProfileController
+                              .profileModel.value!.conversationDetails!),
+                          const SizedBox(height: 10),
+                          groupprofiledetails(chatProfileController
+                              .profileModel.value!.conversationDetails!),
+                        ],
+                      ),
+                      Positioned(
+                          top: 40,
+                          left: 5,
+                          child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                // Get.find<SingleChatContorller>()
+                                //     .userdetailschattModel
+                                //     .value
+                                //     ?.messageList
+                                //     ?.clear();
+                                // Get.find<SingleChatContorller>()
+                                //     .getdetailschat(widget.conversationID);
+                              },
+                              icon:
+                                  const Icon(Icons.arrow_back_ios, size: 19))),
+                      Positioned(
+                          top: 40,
+                          right: 5,
+                          child: Obx(() {
+                            return chatProfileController.isLoading.value
+                                ? const Icon(
+                                    Icons.more_vert,
+                                    color: chatColor,
+                                    size: 24,
+                                  ).paddingOnly(right: 5)
+                                : isShowOptions == false
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            isShowOptions = true;
+                                          });
+                                        },
+                                        child: const Icon(
+                                          Icons.more_vert,
+                                          color: chatColor,
+                                          size: 24,
+                                        ).paddingOnly(right: 5),
+                                      )
+                                    : Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 10),
+                                        margin: const EdgeInsets.only(
+                                            right: 5, top: 2),
+                                        decoration: const BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5))),
+                                        child: Column(
+                                          children: [
+                                            GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    barrierColor:
+                                                        const Color.fromRGBO(
+                                                            30, 30, 30, 0.37),
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return BackdropFilter(
+                                                        filter:
+                                                            ImageFilter.blur(
+                                                                sigmaX: 5.0,
+                                                                sigmaY: 5.0),
+                                                        child: AlertDialog(
+                                                          insetPadding:
+                                                              const EdgeInsets
+                                                                  .all(8),
+                                                          alignment: Alignment
+                                                              .bottomCenter,
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          shape:
+                                                              const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .all(
+                                                              Radius.circular(
+                                                                  20),
+                                                            ),
+                                                          ),
+                                                          content: SizedBox(
+                                                            width: Get.width,
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              mainAxisSize:
+                                                                  MainAxisSize
+                                                                      .min,
+                                                              children: [
+                                                                const SizedBox(
+                                                                    height: 10),
+                                                                const Text(
+                                                                  "Are you sure you want to Remove?",
+                                                                  style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                      fontSize:
+                                                                          16),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 15),
+                                                                Text(
+                                                                  "Are you exit from ${chatProfileController.profileModel.value!.conversationDetails!.groupName!} group?",
+                                                                  style: const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w500,
+                                                                      color:
+                                                                          appgrey2,
+                                                                      fontSize:
+                                                                          13),
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 20),
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceAround,
+                                                                  children: [
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            40,
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.35,
+                                                                        decoration: BoxDecoration(
+                                                                            border:
+                                                                                Border.all(color: yellow2Color, width: 1),
+                                                                            borderRadius: BorderRadius.circular(12)),
+                                                                        child: const Center(
+                                                                            child: Text(
+                                                                          'Cancel',
+                                                                          style: TextStyle(
+                                                                              fontSize: 14,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: chatColor),
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                    const SizedBox(
+                                                                      width: 10,
+                                                                    ),
+                                                                    InkWell(
+                                                                      onTap:
+                                                                          () async {
+                                                                        chatProfileController.exitGroupApi(
+                                                                            cID:
+                                                                                widget.conversationID);
+                                                                      },
+                                                                      child:
+                                                                          Container(
+                                                                        height:
+                                                                            40,
+                                                                        width: MediaQuery.of(context).size.width *
+                                                                            0.35,
+                                                                        decoration: BoxDecoration(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                12),
+                                                                            gradient:
+                                                                                LinearGradient(colors: [
+                                                                              yellow1Color,
+                                                                              yellow2Color
+                                                                            ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
+                                                                        child: const Center(
+                                                                            child: Text(
+                                                                          'Exit',
+                                                                          style: TextStyle(
+                                                                              fontSize: 14,
+                                                                              fontWeight: FontWeight.w400,
+                                                                              color: chatColor),
+                                                                        )),
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child:
+                                                    const Text("Group exit")),
+                                            const SizedBox(
+                                              height: 10,
+                                            ),
+                                            GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => group_profile(
+                                                            dp: chatProfileController
+                                                                .profileModel
+                                                                .value!
+                                                                .conversationDetails!
+                                                                .groupProfileImage!,
+                                                            groupid: widget
+                                                                .conversationID,
+                                                            name: chatProfileController
+                                                                .profileModel
+                                                                .value!
+                                                                .conversationDetails!
+                                                                .groupName!),
+                                                      )).then((value) {
+                                                    chatProfileController
+                                                        .getProfileDATAUpdate(
+                                                            widget
+                                                                .conversationID);
+                                                  });
+                                                },
+                                                child:
+                                                    const Text('Group edit')),
+                                          ],
+                                        ),
+                                      );
+
+                            // _popMenu(
+                            //     context,
+                            //     chatProfileController.profileModel.value!
+                            //         .conversationDetails!);
+                          }))
+                    ],
+                  ),
+                );
+        }),
+      ),
     );
   }
 
@@ -317,9 +548,6 @@ class _GroupProfileState extends State<GroupProfile> {
                                 username: data.user!.userName,
                                 userPic: data.user!.profileImage,
                                 index: 0,
-                                searchText: "",
-                                searchTime: "",
-                                mobileNum: "",
                                 isMsgHighLight: false,
                                 isBlock: isBlockUser(
                                     data.conversationsUserId.toString()),
@@ -696,242 +924,6 @@ class _GroupProfileState extends State<GroupProfile> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _popMenu(BuildContext context, ConversationDetails data) {
-    return PopupMenuButton(
-      shadowColor: Colors.grey,
-      color: Colors.white,
-      elevation: 0.8,
-      icon: const Icon(
-        Icons.more_vert,
-        color: chatColor,
-        size: 24,
-      ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-        PopupMenuItem(
-            onTap: () {
-              showDialog(
-                barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
-                context: context,
-                builder: (BuildContext context) {
-                  return BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-                    child: AlertDialog(
-                      insetPadding: const EdgeInsets.all(8),
-                      alignment: Alignment.bottomCenter,
-                      backgroundColor: Colors.white,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(20),
-                        ),
-                      ),
-                      content: SizedBox(
-                        width: Get.width,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const SizedBox(height: 10),
-                            const Text(
-                              "Are you sure you want to Remove?",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16),
-                            ),
-                            const SizedBox(height: 15),
-                            Text(
-                              "Are you exit from ${data.groupName!} group?",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                  color: appgrey2,
-                                  fontSize: 13),
-                            ),
-                            const SizedBox(height: 20),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.35,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: yellow2Color, width: 1),
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: const Center(
-                                        child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: chatColor),
-                                    )),
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    chatProfileController.exitGroupApi(
-                                        cID: widget.conversationID);
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: MediaQuery.of(context).size.width *
-                                        0.35,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        gradient: LinearGradient(
-                                            colors: [
-                                              yellow1Color,
-                                              yellow2Color
-                                            ],
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter)),
-                                    child: const Center(
-                                        child: Text(
-                                      'Exit',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: chatColor),
-                                    )),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-              // showDialog(
-              //   context: context,
-              //   builder: (BuildContext context) {
-              //     return Container(
-              //       decoration:
-              //           BoxDecoration(color: Colors.white.withOpacity(0.4)),
-              //       child: AlertDialog(
-              //         backgroundColor: Colors.white,
-              //         shape: const RoundedRectangleBorder(
-              //           borderRadius: BorderRadius.all(
-              //             Radius.circular(20),
-              //           ),
-              //         ),
-              //         content: SizedBox(
-              //           width: MediaQuery.of(context).size.width * 0.90,
-              //           height: 200,
-              //           child: Column(
-              //             children: [
-              //               const SizedBox(height: 5),
-              //               const Text(
-              //                 "Group exit",
-              //                 style: TextStyle(
-              //                     color: chatColor,
-              //                     fontWeight: FontWeight.w500,
-              //                     fontSize: 22),
-              //               ),
-              //               const SizedBox(
-              //                 height: 30,
-              //               ),
-              //               Text(
-              //                 "Are you exit from ${data.groupName!} group?",
-              //                 textAlign: TextAlign.center,
-              //                 style: const TextStyle(
-              //                     fontWeight: FontWeight.w500,
-              //                     color: appgrey2,
-              //                     fontSize: 13),
-              //               ),
-              //               const SizedBox(height: 30),
-              //               Row(
-              //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-              //                 children: [
-              //                   InkWell(
-              //                     onTap: () {
-              //                       Navigator.pop(context);
-              //                     },
-              //                     child: Container(
-              //                       height: 40,
-              //                       width: MediaQuery.of(context).size.width *
-              //                           0.30,
-              //                       decoration: BoxDecoration(
-              //                           border: Border.all(
-              //                               color: chatColor, width: 1),
-              //                           borderRadius:
-              //                               BorderRadius.circular(20)),
-              //                       child: const Center(
-              //                           child: Text(
-              //                         'Cancel',
-              //                         style: TextStyle(
-              //                             fontSize: 15,
-              //                             fontWeight: FontWeight.w500,
-              //                             color: chatColor),
-              //                       )),
-              //                     ),
-              //                   ),
-              //                   const SizedBox(
-              //                     width: 10,
-              //                   ),
-              //                   InkWell(
-              //                     onTap: () {
-              //                       chatProfileController.exitGroupApi(
-              //                           cID: widget.conversationID);
-              //                     },
-              //                     child: Container(
-              //                       height: 40,
-              //                       width: MediaQuery.of(context).size.width *
-              //                           0.30,
-              //                       decoration: BoxDecoration(
-              //                           borderRadius: BorderRadius.circular(20),
-              //                           color: chatColor),
-              //                       child: const Center(
-              //                           child: Text(
-              //                         'Exit',
-              //                         style: TextStyle(
-              //                             fontSize: 15,
-              //                             fontWeight: FontWeight.w500,
-              //                             color: Colors.white),
-              //                       )),
-              //                     ),
-              //                   ),
-              //                 ],
-              //               ),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     );
-              //   },
-              // );
-            },
-            child: const Text("Group exit")),
-        PopupMenuItem(
-            onTap: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => group_profile(
-                        dp: chatProfileController.profileModel.value!
-                            .conversationDetails!.groupProfileImage!,
-                        groupid: widget.conversationID,
-                        name: chatProfileController.profileModel.value!
-                            .conversationDetails!.groupName!),
-                  )).then((value) {
-                chatProfileController
-                    .getProfileDATAUpdate(widget.conversationID);
-              });
-            },
-            child: const Text('Group edit')),
-      ],
     );
   }
 

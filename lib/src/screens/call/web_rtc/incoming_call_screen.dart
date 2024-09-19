@@ -8,6 +8,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/src/Notification/notification_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/screens/call/web_rtc/audio_call_screen.dart';
@@ -243,6 +244,7 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                             caller_id: widget.caller_id,
                           );
                         }
+                        getx.Get.find<ChatListController>().forChatList();
                       },
                       child: Column(
                         children: [

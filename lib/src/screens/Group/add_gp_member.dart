@@ -2,12 +2,15 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/Models/get_contact_model.dart';
+import 'package:meyaoo_new/src/global/strings.dart';
 import 'package:meyaoo_new/src/screens/Group/create_gp.dart';
 
 class AddMembersinGroup1 extends StatefulWidget {
@@ -65,126 +68,189 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(color: Colors.grey.shade300)),
-        scrolledUnderElevation: 0,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        titleSpacing: 0,
-        leadingWidth: 50,
-        leading: InkWell(
-          onTap: () {
-            Get.back();
-          },
-          child: const Icon(Icons.arrow_back_ios, color: Colors.black),
-        ),
-        title: const Text(
-          'Add Participants',
-          style: TextStyle(color: Colors.black, fontSize: 18),
-        ),
-        actions: [
-          Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: containerWidget(
-                  onTap: () async {
-                    if (contactData.isNotEmpty) {
-                      final result = await Get.to(() => MyWidget(
-                          contactData: contactData, contactID: contactID));
-                      setState(() {
-                        contactData.length = result;
-                      });
-                    } else {
-                      showCustomToast("Please select members");
-                    }
-                  },
-                  title: "Next"))
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: const Color(0xffFFEDAB).withOpacity(0.05),
       ),
-      body: Column(children: [
-        const SizedBox(height: 10),
-        Container(
-            width: MediaQuery.of(context).size.width * 0.90,
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(0.0),
-                    topLeft: Radius.circular(0.0))),
-            child: SizedBox(
-              height: 45,
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: TextField(
-                  cursorColor: Colors.black,
-                  // controller: aboutController,
-                  readOnly: false,
-                  onChanged: filterSearchResults,
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color.fromARGB(255, 238, 238, 238),
-                        )),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Color.fromARGB(255, 238, 238, 238),
-                        ),
-                        borderRadius: BorderRadius.circular(10)),
-                    contentPadding:
-                        const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                    hintText: 'Search name or number',
-                    hintStyle: const TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey,
-                        fontWeight: FontWeight.w400),
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 238, 238, 238),
-                    prefixIcon: const Padding(
-                      padding: EdgeInsets.all(13),
-                      child: Image(
-                        image: AssetImage('assets/icons/search.png'),
-                      ),
-                    ),
-
-                    // ),
-                  )),
-            )),
-        const SizedBox(height: 10),
-        contactData.isEmpty ? const SizedBox.shrink() : selectedUsersList(),
-        contactData.isEmpty
-            ? const SizedBox.shrink()
-            : Divider(color: Colors.grey.shade300),
-        Expanded(
-            child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (searchQuery.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.only(left: 10, top: 20),
-                  child: Text(
-                    "Frequently Contacted",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        // appBar: AppBar(
+        //   shape: RoundedRectangleBorder(
+        //       side: BorderSide(color: Colors.grey.shade300)),
+        //   scrolledUnderElevation: 0,
+        //   backgroundColor: Colors.white,
+        //   elevation: 0,
+        //   automaticallyImplyLeading: false,
+        //   titleSpacing: 0,
+        //   leadingWidth: 50,
+        //   leading: InkWell(
+        //     onTap: () {
+        //       Get.back();
+        //     },
+        //     child: const Icon(Icons.arrow_back_ios, color: Colors.black),
+        //   ),
+        //   title: const Text(
+        //     'Add Participants',
+        //     style: TextStyle(color: Colors.black, fontSize: 18),
+        //   ),
+        //   actions: [
+        //     Padding(
+        //         padding: const EdgeInsets.only(right: 15),
+        //         child: containerWidget(
+        //             onTap: () async {
+        //               if (contactData.isNotEmpty) {
+        //                 final result = await Get.to(() => MyWidget(
+        //                     contactData: contactData, contactID: contactID));
+        //                 setState(() {
+        //                   contactData.length = result;
+        //                 });
+        //               } else {
+        //                 showCustomToast("Please select members");
+        //               }
+        //             },
+        //             title: "Next"))
+        //   ],
+        // ),
+        body: Column(children: [
+          Container(
+            height: 130,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  const Color(0xffFFEDAB).withOpacity(0.04),
+                  const Color(0xffFCC604).withOpacity(0.04),
+                ],
+              ),
+            ),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    Get.back();
+                  },
+                  child: const Icon(
+                    Icons.arrow_back_ios,
+                    size: 20,
+                    color: chatColor,
                   ),
                 ),
-              recentContactWidget(context),
-              if (searchQuery.isEmpty &&
-                  hasMatchingContacts()) // Check if there are matching contacts
-                const Padding(
-                  padding: EdgeInsets.only(
-                      left: 10, top: 10), // Reduced top padding to 10
-                  child: Text(
-                    "Contacts on ChatWeb",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                const SizedBox(
+                  width: 7,
+                ),
+                const Text(
+                  "Add Participants",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Poppins",
                   ),
                 ),
-              if (hasMatchingContacts()) listOfContactWidget(context),
-            ],
+                const Spacer(),
+                containerWidget(
+                    onTap: () async {
+                      if (contactData.isNotEmpty) {
+                        final result = await Get.to(() => MyWidget(
+                            contactData: contactData, contactID: contactID));
+                        setState(() {
+                          contactData.length = result;
+                        });
+                      } else {
+                        showCustomToast("Please select members");
+                      }
+                    },
+                    title: "Next"),
+              ],
+            ).paddingOnly(top: 20).paddingSymmetric(
+                  horizontal: 28,
+                ),
           ),
-        ))
-      ]),
+          const Divider(
+            color: Color(0xffE9E9E9),
+            height: 1,
+          ),
+          const SizedBox(height: 20),
+          Container(
+              width: MediaQuery.of(context).size.width * 0.90,
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(0.0),
+                      topLeft: Radius.circular(0.0))),
+              child: SizedBox(
+                height: 45,
+                width: MediaQuery.of(context).size.width * 0.9,
+                child: TextField(
+                    cursorColor: Colors.black,
+                    // controller: aboutController,
+                    readOnly: false,
+                    onChanged: filterSearchResults,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(255, 238, 238, 238),
+                          )),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Color.fromARGB(255, 238, 238, 238),
+                          ),
+                          borderRadius: BorderRadius.circular(10)),
+                      contentPadding:
+                          const EdgeInsets.only(top: 1, left: 15, bottom: 1),
+                      hintText: 'Search name or number',
+                      hintStyle: const TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w400),
+                      filled: true,
+                      fillColor: const Color.fromARGB(255, 238, 238, 238),
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.all(13),
+                        child: Image(
+                          image: AssetImage('assets/icons/search.png'),
+                        ),
+                      ),
+
+                      // ),
+                    )),
+              )),
+          const SizedBox(height: 10),
+          contactData.isEmpty ? const SizedBox.shrink() : selectedUsersList(),
+          contactData.isEmpty
+              ? const SizedBox.shrink()
+              : Divider(color: Colors.grey.shade300),
+          Expanded(
+              child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (searchQuery.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 10, top: 20),
+                    child: Text(
+                      "Frequently Contacted",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                  ),
+                recentContactWidget(context),
+                if (searchQuery.isEmpty &&
+                    hasMatchingContacts()) // Check if there are matching contacts
+                  const Padding(
+                    padding: EdgeInsets.only(
+                        left: 10, top: 10), // Reduced top padding to 10
+                    child: Text(
+                      "Contacts on ChatWeb",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                  ),
+                if (hasMatchingContacts()) listOfContactWidget(context),
+              ],
+            ),
+          ))
+        ]),
+      ),
     );
   }
 
@@ -200,6 +266,7 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
             0, 0, 0, 5), // Reduced bottom padding to 10
         child: ListView.builder(
           shrinkWrap: true,
+          padding: EdgeInsets.zero,
           scrollDirection: Axis.vertical,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: filteredChatList.length,
@@ -381,125 +448,128 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
 
   Widget chatcard(NewContactList data) {
     if (isMatching(data.userId.toString())) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Column(
-          children: [
-            InkWell(
-              onTap: () {
-                setState(() {
-                  contactID.contains(data.userId)
-                      ? contactID.remove(data.userId)
-                      : contactID.add(data.userId);
-                });
-                setState(() {
-                  // Create a contact object to be added or removed
-                  SelectedContact selectedContact = SelectedContact(
-                    userId: data.userId!,
-                    userName: data.userName!,
-                    profileImage: data.profileImage!,
-                  );
+      return Hive.box(userdata).get(userMobile) == data.phoneNumber!
+          ? const SizedBox.shrink()
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        contactID.contains(data.userId)
+                            ? contactID.remove(data.userId)
+                            : contactID.add(data.userId);
+                      });
+                      setState(() {
+                        // Create a contact object to be added or removed
+                        SelectedContact selectedContact = SelectedContact(
+                          userId: data.userId!,
+                          userName: data.userName!,
+                          profileImage: data.profileImage!,
+                        );
 
-                  // Check if the contact already exists in the list
-                  bool isSelect = contactData.contains(selectedContact);
+                        // Check if the contact already exists in the list
+                        bool isSelect = contactData.contains(selectedContact);
 
-                  // Add or remove based on the existence
-                  isSelect
-                      ? contactData.remove(selectedContact)
-                      : contactData.add(selectedContact);
-                });
-              },
-              child: SizedBox(
-                height: 70,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(width: 0),
-                    Container(
-                      height: 45,
-                      width: 45,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        shape: BoxShape.circle,
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: Image.network(
-                          data.profileImage!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.person),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width * 0.65,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        // Add or remove based on the existence
+                        isSelect
+                            ? contactData.remove(selectedContact)
+                            : contactData.add(selectedContact);
+                      });
+                    },
+                    child: SizedBox(
+                      height: 70,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: 17),
-                          Text(
-                            capitalizeFirstLetter(data.fullName!),
-                            textAlign: TextAlign.left,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w500, fontSize: 15),
-                          ),
-                          const SizedBox(height: 2),
-                          Row(
-                            children: [
-                              Text(
-                                data.phoneNumber!,
-                                textAlign: TextAlign.left,
-                                style: const TextStyle(
-                                    color: Color.fromRGBO(73, 73, 73, 1),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12),
+                          const SizedBox(width: 0),
+                          Container(
+                            height: 45,
+                            width: 45,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              shape: BoxShape.circle,
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Image.network(
+                                data.profileImage!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.person),
                               ),
-                            ],
+                            ),
                           ),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.65,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 17),
+                                Text(
+                                  capitalizeFirstLetter(data.fullName!),
+                                  textAlign: TextAlign.left,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15),
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Text(
+                                      data.phoneNumber!,
+                                      textAlign: TextAlign.left,
+                                      style: const TextStyle(
+                                          color: Color.fromRGBO(73, 73, 73, 1),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            height: 22,
+                            width: 22,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: contactID.contains(data.userId) ||
+                                          contactData.contains(SelectedContact(
+                                              userId: data.userId!,
+                                              userName: data.userName!,
+                                              profileImage: data.profileImage!))
+                                      ? Colors.white
+                                      : chatownColor,
+                                ),
+                                shape: BoxShape.circle,
+                                color: contactID.contains(data.userId) ||
+                                        contactData.contains(SelectedContact(
+                                            userId: data.userId!,
+                                            userName: data.userName!,
+                                            profileImage: data.profileImage!))
+                                    ? chatownColor
+                                    : Colors.white),
+                            child: Icon(Icons.check,
+                                size: 15,
+                                color: contactID.contains(data.userId) ||
+                                        contactData.contains(SelectedContact(
+                                            userId: data.userId!,
+                                            userName: data.userName!,
+                                            profileImage: data.profileImage!))
+                                    ? Colors.black
+                                    : Colors.white),
+                          ),
+                          const SizedBox(width: 5),
                         ],
                       ),
                     ),
-                    Container(
-                      height: 22,
-                      width: 22,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            color: contactID.contains(data.userId) ||
-                                    contactData.contains(SelectedContact(
-                                        userId: data.userId!,
-                                        userName: data.userName!,
-                                        profileImage: data.profileImage!))
-                                ? Colors.white
-                                : chatownColor,
-                          ),
-                          shape: BoxShape.circle,
-                          color: contactID.contains(data.userId) ||
-                                  contactData.contains(SelectedContact(
-                                      userId: data.userId!,
-                                      userName: data.userName!,
-                                      profileImage: data.profileImage!))
-                              ? chatownColor
-                              : Colors.white),
-                      child: Icon(Icons.check,
-                          size: 15,
-                          color: contactID.contains(data.userId) ||
-                                  contactData.contains(SelectedContact(
-                                      userId: data.userId!,
-                                      userName: data.userName!,
-                                      profileImage: data.profileImage!))
-                              ? Colors.black
-                              : Colors.white),
-                    ),
-                    const SizedBox(width: 5),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      );
+            );
     } else {
       return const SizedBox.shrink();
     }

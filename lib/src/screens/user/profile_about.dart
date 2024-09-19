@@ -52,178 +52,242 @@ class _aboutState extends State<about> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: appColorWhite,
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
-          side: BorderSide(color: Colors.grey.shade200),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: const Icon(
-            Icons.arrow_back_ios_new_rounded,
-            size: 18,
-            color: Colors.black,
-          ),
-        ),
-        title: const Text(
-          'About',
-          style: TextStyle(
-              color: Colors.black,
-              fontSize: 20,
-              fontFamily: "Poppins",
-              fontWeight: FontWeight.w500),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 12),
-            child: InkWell(
-              onTap: () {
-                editApiCall();
-              },
-              child: statusText.isEmpty
-                  ? const SizedBox.shrink()
-                  : const Icon(Icons.check, color: Colors.black),
-            ),
-          ),
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: const Color(0xffFFEDAB).withOpacity(0.05),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          color: const Color.fromRGBO(250, 250, 250, 1),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    'Currently set to',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 11,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Stack(
-                    children: [
-                      InkWell(
-                        onLongPress: () {
-                          Clipboard.setData(ClipboardData(text: statusText));
-                        },
-                        onTap: () async {
-                          final result = await Get.to(() => about2(
-                                initialText: statusText,
-                              ));
-                          if (result != null) {
-                            setState(() {
-                              statusText = result;
-                            });
-                          }
-                        },
-                        child: Container(
-                          width: Get.width * 0.90,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              border: Border.all(color: Colors.grey.shade300)),
-                          child: SelectableText(
-                            statusText,
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500),
-                          ).paddingAll(12),
-                        ),
-                      ),
-                      const Positioned(
-                          top: 13,
-                          right: 5,
-                          child: Icon(Icons.arrow_forward_ios, size: 17))
+      child: Scaffold(
+        backgroundColor: appColorWhite,
+        // appBar: AppBar(
+        //   shape: RoundedRectangleBorder(
+        //     borderRadius: BorderRadius.circular(0),
+        //     side: BorderSide(color: Colors.grey.shade200),
+        //   ),
+        //   elevation: 0,
+        //   backgroundColor: Colors.white,
+        //   leading: InkWell(
+        //     onTap: () {
+        //       Navigator.pop(context);
+        //     },
+        //     child: const Icon(
+        //       Icons.arrow_back_ios_new_rounded,
+        //       size: 18,
+        //       color: Colors.black,
+        //     ),
+        //   ),
+        //   title: const Text(
+        //     'About',
+        //     style: TextStyle(
+        //         color: Colors.black,
+        //         fontSize: 20,
+        //         fontFamily: "Poppins",
+        //         fontWeight: FontWeight.w500),
+        //   ),
+        //   actions: [
+        //     Padding(
+        //       padding: const EdgeInsets.only(right: 12),
+        //       child: InkWell(
+        //         onTap: () {
+        //           editApiCall();
+        //         },
+        //         child: statusText.isEmpty
+        //             ? const SizedBox.shrink()
+        //             : const Icon(Icons.check, color: Colors.black),
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: 130,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xffFFEDAB).withOpacity(0.04),
+                      const Color(0xffFCC604).withOpacity(0.04),
                     ],
                   ),
-                  // SizedBox(
-                  //   height: 60,
-                  //   width: MediaQuery.of(context).size.width,
-                  //   child: TextField(
-                  //       controller: aboutController,
-                  //       readOnly: false,
-                  //       enabled: false,
-                  //       autofocus: false,
-                  //       maxLength: 50,
-                  //       style: const TextStyle(
-                  //           color: Colors.black,
-                  //           fontSize: 12,
-                  //           fontWeight: FontWeight.w500),
-                  //       textCapitalization: TextCapitalization.sentences,
-                  //       decoration: InputDecoration(
-                  //         enabledBorder: OutlineInputBorder(
-                  //             borderRadius: BorderRadius.circular(10),
-                  //             borderSide: const BorderSide(color: appgrey)),
-                  //         focusedBorder: OutlineInputBorder(
-                  //             borderSide: const BorderSide(color: appgrey),
-                  //             borderRadius: BorderRadius.circular(10)),
-                  //         disabledBorder: OutlineInputBorder(
-                  //             borderSide: const BorderSide(color: appgrey),
-                  //             borderRadius: BorderRadius.circular(10)),
-                  //         border: OutlineInputBorder(
-                  //           borderRadius: BorderRadius.circular(10),
-                  //           borderSide: const BorderSide(color: appgrey),
-                  //         ),
-                  //         contentPadding: const EdgeInsets.only(
-                  //             top: 1, left: 15, bottom: 1),
-                  //         suffixIcon: const Icon(Icons.arrow_forward_ios,
-                  //             size: 17, color: Colors.black),
-                  //         hintText: 'Type here',
-                  //         hintStyle: const TextStyle(
-                  //             fontSize: 12,
-                  //             color: Colors.grey,
-                  //             fontWeight: FontWeight.w400),
-                  //         filled: true,
-                  //         fillColor: Colors.white,
-
-                  //         // ),
-                  //       )),
-                  // ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    'Select your About',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 12,
-                      color: Colors.black,
+                ),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: const Icon(
+                        Icons.arrow_back_ios,
+                        size: 20,
+                        color: chatColor,
+                      ),
                     ),
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey.shade300)),
-                    child: ListView.builder(
-                        itemCount: bioList.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        scrollDirection: Axis.vertical,
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              InkWell(
+                    const SizedBox(
+                      width: 7,
+                    ),
+                    const Text(
+                      "About",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: "Poppins",
+                      ),
+                    ),
+                    const Spacer(),
+                    GestureDetector(
+                      onTap: () {
+                        editApiCall();
+                      },
+                      child: statusText.isEmpty
+                          ? const SizedBox.shrink()
+                          : const Icon(Icons.check, color: Colors.black),
+                    ),
+                  ],
+                ).paddingOnly(top: 20).paddingSymmetric(
+                      horizontal: 28,
+                    ),
+              ),
+              const Divider(
+                color: Color(0xffE9E9E9),
+                height: 1,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 15, right: 15),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Currently set to',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 11,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Stack(
+                        children: [
+                          InkWell(
+                            onLongPress: () {
+                              Clipboard.setData(
+                                  ClipboardData(text: statusText));
+                            },
+                            onTap: () async {
+                              final result = await Get.to(() => about2(
+                                    initialText: statusText,
+                                  ));
+                              if (result != null) {
+                                setState(() {
+                                  statusText = result;
+                                });
+                              }
+                            },
+                            child: Container(
+                              width: Get.width * 0.90,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                  border:
+                                      Border.all(color: Colors.grey.shade300)),
+                              child: SelectableText(
+                                statusText,
+                                style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w500),
+                              ).paddingAll(12).paddingOnly(right: 5),
+                            ),
+                          ),
+                          const Positioned(
+                              top: 13,
+                              right: 5,
+                              child: Icon(Icons.arrow_forward_ios, size: 17))
+                        ],
+                      ),
+                      // SizedBox(
+                      //   height: 60,
+                      //   width: MediaQuery.of(context).size.width,
+                      //   child: TextField(
+                      //       controller: aboutController,
+                      //       readOnly: false,
+                      //       enabled: false,
+                      //       autofocus: false,
+                      //       maxLength: 50,
+                      //       style: const TextStyle(
+                      //           color: Colors.black,
+                      //           fontSize: 12,
+                      //           fontWeight: FontWeight.w500),
+                      //       textCapitalization: TextCapitalization.sentences,
+                      //       decoration: InputDecoration(
+                      //         enabledBorder: OutlineInputBorder(
+                      //             borderRadius: BorderRadius.circular(10),
+                      //             borderSide: const BorderSide(color: appgrey)),
+                      //         focusedBorder: OutlineInputBorder(
+                      //             borderSide: const BorderSide(color: appgrey),
+                      //             borderRadius: BorderRadius.circular(10)),
+                      //         disabledBorder: OutlineInputBorder(
+                      //             borderSide: const BorderSide(color: appgrey),
+                      //             borderRadius: BorderRadius.circular(10)),
+                      //         border: OutlineInputBorder(
+                      //           borderRadius: BorderRadius.circular(10),
+                      //           borderSide: const BorderSide(color: appgrey),
+                      //         ),
+                      //         contentPadding: const EdgeInsets.only(
+                      //             top: 1, left: 15, bottom: 1),
+                      //         suffixIcon: const Icon(Icons.arrow_forward_ios,
+                      //             size: 17, color: Colors.black),
+                      //         hintText: 'Type here',
+                      //         hintStyle: const TextStyle(
+                      //             fontSize: 12,
+                      //             color: Colors.grey,
+                      //             fontWeight: FontWeight.w400),
+                      //         filled: true,
+                      //         fillColor: Colors.white,
+
+                      //         // ),
+                      //       )),
+                      // ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      const Text(
+                        'Select your About',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          color: Colors.black,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade300)),
+                        child: ListView.separated(
+                            itemCount: bioList.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            padding: EdgeInsets.zero,
+                            separatorBuilder: (context, index) {
+                              return index != bioList.length - 1
+                                  ? Divider(
+                                      height: 1,
+                                      color: Colors.grey.shade300,
+                                    )
+                                  : const SizedBox.shrink();
+                            },
+                            itemBuilder: (context, index) {
+                              return InkWell(
                                 onTap: () {
                                   setState(() {
                                     selectedabouttext =
@@ -236,6 +300,7 @@ class _aboutState extends State<about> {
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Expanded(
                                       child:
@@ -265,20 +330,12 @@ class _aboutState extends State<about> {
                                         : const SizedBox()
                                   ],
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 15,
-                              ),
-                              if (index != bioList.length - 1)
-                                Divider(
-                                  height: 1,
-                                  color: Colors.grey.shade300,
-                                ),
-                            ],
-                          ).paddingOnly(top: 15);
-                        }),
-                  ),
-                ]),
+                              ).paddingOnly(top: 15, bottom: 15);
+                            }),
+                      ),
+                    ]),
+              ),
+            ],
           ),
         ),
       ),

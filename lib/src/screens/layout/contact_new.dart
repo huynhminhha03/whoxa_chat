@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, unnecessary_null_comparison, prefer_is_empty, must_be_immutable, deprecated_member_use, unused_field, avoid_print
 
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -194,50 +195,59 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
               ),
 
               Expanded(
-                child: Obx(
-                  () => addContactController
-                                  .isGetContectsFromDeviceLoading.value ==
-                              true &&
-                          addContactController.allcontacts.isEmpty
-                      ? loader(context)
-                      : SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              controller.text.trim().isEmpty
-                                  ? contactDesign()
-                                  : const SizedBox.shrink(),
-                              getAllDeviceContact.getList.isNotEmpty
-                                  ? contactsWidget()
-                                  : const SizedBox.shrink(),
-                              controller.text.trim().isEmpty
-                                  ? const SizedBox(height: 5)
-                                  : const SizedBox.shrink(),
-                              controller.text.trim().isEmpty
-                                  ? Divider(
-                                      thickness: 1.5,
-                                      color: Colors.grey.shade200,
-                                    )
-                                  : const SizedBox.shrink(),
-                              controller.text.trim().isEmpty
-                                  ? const Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 18, top: 10),
-                                      child: Text(
-                                        'Invite Friend to Chatweb ',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    )
-                                  : const SizedBox.shrink(),
-                              controller.text.trim().isEmpty
-                                  ? const SizedBox(height: 5)
-                                  : const SizedBox.shrink(),
-                              inviteFriend(searchText)
-                            ],
+                child: RefreshIndicator(
+                  color: appColorYellow,
+                  onRefresh: () {
+                    var contactJson =
+                        json.encode(addContactController.mobileContacts);
+                    return getAllDeviceContact.getAllContactApi(
+                        contact: contactJson);
+                  },
+                  child: Obx(
+                    () => addContactController
+                                    .isGetContectsFromDeviceLoading.value ==
+                                true &&
+                            addContactController.allcontacts.isEmpty
+                        ? loader(context)
+                        : SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                controller.text.trim().isEmpty
+                                    ? contactDesign()
+                                    : const SizedBox.shrink(),
+                                getAllDeviceContact.getList.isNotEmpty
+                                    ? contactsWidget()
+                                    : const SizedBox.shrink(),
+                                controller.text.trim().isEmpty
+                                    ? const SizedBox(height: 5)
+                                    : const SizedBox.shrink(),
+                                controller.text.trim().isEmpty
+                                    ? Divider(
+                                        thickness: 1.5,
+                                        color: Colors.grey.shade200,
+                                      )
+                                    : const SizedBox.shrink(),
+                                controller.text.trim().isEmpty
+                                    ? const Padding(
+                                        padding:
+                                            EdgeInsets.only(left: 18, top: 10),
+                                        child: Text(
+                                          'Invite Friend to Chatweb ',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                                controller.text.trim().isEmpty
+                                    ? const SizedBox(height: 5)
+                                    : const SizedBox.shrink(),
+                                inviteFriend(searchText)
+                              ],
+                            ),
                           ),
-                        ),
+                  ),
                 ),
               ),
             ],

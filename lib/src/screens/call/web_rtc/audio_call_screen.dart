@@ -11,6 +11,7 @@ import 'package:get/get.dart' as getx;
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
+import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/common_widget.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -213,6 +214,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                               currentTab: 0,
                             ),
                           ),
+                          getx.Get.find<ChatListController>().forChatList(),
                           // if (widget.isCaller == true)
                           //   {
                           //     getx.Get.back(),
@@ -250,6 +252,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
       setState(() {
         myPeer!.dispose();
       });
+      getx.Get.find<ChatListController>().forChatList();
     });
   }
 
@@ -410,6 +413,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
     // } else {
     disposeLocalRender();
     disposeRemoteRender();
+    getx.Get.find<ChatListController>().forChatList();
     getx.Get.offAll(
       TabbarScreen(
         currentTab: 0,

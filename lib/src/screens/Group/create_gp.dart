@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
@@ -26,65 +27,131 @@ class _MyWidgetState extends State<MyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-            side: BorderSide(color: Colors.grey.shade300)),
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        titleSpacing: 0,
-        leadingWidth: 50,
-        leading: InkWell(
-          onTap: () {
-            Get.back(result: widget.contactData.length);
-          },
-          child:
-              const Icon(Icons.arrow_back_ios, size: 17, color: Colors.black),
-        ),
-        title: const Text(
-          "New Group",
-          style: TextStyle(
-              fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black),
-        ),
-        actions: [
-          Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: containerWidget(
-                  onTap: () {
-                    if (controller.text.isEmpty) {
-                      showCustomToast("Enter group name");
-                    } else if (image == null) {
-                      showCustomToast("Set group profile");
-                    } else if (widget.contactData.isEmpty) {
-                      showCustomToast("Please add member");
-                    } else {
-                      gpCreateController.groupCreateApi(
-                          controller.text.toString(),
-                          image!.path.toString(),
-                          "",
-                          widget.contactData);
-                    }
-                  },
-                  title: "Create"))
-        ],
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: const Color(0xffFFEDAB).withOpacity(0.05),
       ),
-      body: Column(
-        children: [
-          const SizedBox(height: 20),
-          Center(child: gpCreate()),
-          const SizedBox(height: 32),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Members: ${widget.contactData.length.toString()} Out Of 230",
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+      child: Scaffold(
+        // appBar: AppBar(
+        //   shape: RoundedRectangleBorder(
+        //       side: BorderSide(color: Colors.grey.shade300)),
+        //   elevation: 0,
+        //   scrolledUnderElevation: 0,
+        //   titleSpacing: 0,
+        //   leadingWidth: 50,
+        //   leading: InkWell(
+        //     onTap: () {
+        //       Get.back(result: widget.contactData.length);
+        //     },
+        //     child:
+        //         const Icon(Icons.arrow_back_ios, size: 17, color: Colors.black),
+        //   ),
+        //   title: const Text(
+        //     "New Group",
+        //     style: TextStyle(
+        //         fontSize: 20, fontWeight: FontWeight.w500, color: Colors.black),
+        //   ),
+        //   actions: [
+        //     Padding(
+        //         padding: const EdgeInsets.only(right: 15),
+        //         child: containerWidget(
+        //             onTap: () {
+        //               if (controller.text.isEmpty) {
+        //                 showCustomToast("Enter group name");
+        //               } else if (image == null) {
+        //                 showCustomToast("Set group profile");
+        //               } else if (widget.contactData.isEmpty) {
+        //                 showCustomToast("Please add member");
+        //               } else {
+        //                 gpCreateController.groupCreateApi(
+        //                     controller.text.toString(),
+        //                     image!.path.toString(),
+        //                     "",
+        //                     widget.contactData);
+        //               }
+        //             },
+        //             title: "Create"))
+        //   ],
+        // ),
+        body: Column(
+          children: [
+            Container(
+              height: 130,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    const Color(0xffFFEDAB).withOpacity(0.04),
+                    const Color(0xffFCC604).withOpacity(0.04),
+                  ],
+                ),
+              ),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Get.back(result: widget.contactData.length);
+                    },
+                    child: const Icon(
+                      Icons.arrow_back_ios,
+                      size: 20,
+                      color: chatColor,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 7,
+                  ),
+                  const Text(
+                    "New Group",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: "Poppins",
+                    ),
+                  ),
+                  const Spacer(),
+                  containerWidget(
+                      onTap: () {
+                        if (controller.text.isEmpty) {
+                          showCustomToast("Enter group name");
+                        } else if (image == null) {
+                          showCustomToast("Set group profile");
+                        } else if (widget.contactData.isEmpty) {
+                          showCustomToast("Please add member");
+                        } else {
+                          gpCreateController.groupCreateApi(
+                              controller.text.toString(),
+                              image!.path.toString(),
+                              "",
+                              widget.contactData);
+                        }
+                      },
+                      title: "Create")
+                ],
+              ).paddingOnly(top: 20).paddingSymmetric(
+                    horizontal: 28,
+                  ),
             ),
-          ).paddingOnly(left: 20),
-          const SizedBox(height: 15),
-          widget.contactData.isEmpty
-              ? const SizedBox.shrink()
-              : selectedUsersList(),
-        ],
+            const Divider(
+              color: Color(0xffE9E9E9),
+              height: 1,
+            ),
+            const SizedBox(height: 20),
+            Center(child: gpCreate()),
+            const SizedBox(height: 32),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Members: ${widget.contactData.length.toString()} Out Of 230",
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              ),
+            ).paddingOnly(left: 20),
+            const SizedBox(height: 15),
+            widget.contactData.isEmpty
+                ? const SizedBox.shrink()
+                : selectedUsersList(),
+          ],
+        ),
       ),
     );
   }
