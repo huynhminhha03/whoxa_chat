@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:country_calling_code_picker/picker.dart';
@@ -125,7 +126,8 @@ class _FloginState extends State<Flogin> {
 
           startTimer();
 
-          showCustomToast("OTP SENT SUCESSFULLY");
+          showCustomToast(
+              languageController.textTranslate('OTP SENT SUCESSFULLY'));
 
           Navigator.push(
               context,
@@ -144,21 +146,25 @@ class _FloginState extends State<Flogin> {
             isLoading = false;
           });
 
-          showCustomToast("Enter valid Phone number");
+          showCustomToast(
+              languageController.textTranslate('Enter valid Phone number'));
         }
       } else {
         setState(() {
           isLoading = false;
         });
 
-        showCustomToast("Enter Phone number");
+        showCustomToast(languageController.textTranslate('Enter Phone number'));
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
       print(e);
-      Get.snackbar("Error", "Something went wrong while sending OTP");
+      Get.snackbar(
+          "Error",
+          languageController
+              .textTranslate('Something went wrong while sending OTP'));
     }
   }
   //-------------------------------------------------------------otpcheck-------------------------------------------------------------//
@@ -267,10 +273,12 @@ class _FloginState extends State<Flogin> {
                     //     ? sendOtp()
                     //     : oTPcaLL();
                   } else {
-                    Fluttertoast.showToast(msg: 'Enter valid mobile number');
+                    Fluttertoast.showToast(
+                        msg: languageController
+                            .textTranslate('Enter valid mobile number'));
                   }
                 },
-                title: 'Send OTP',
+                title: languageController.textTranslate('Send OTP'),
               ));
   }
 
@@ -294,9 +302,9 @@ class _FloginState extends State<Flogin> {
           const SizedBox(height: 15),
           Image.asset("assets/images/welcome.png", height: 44),
           const SizedBox(height: 8),
-          const Text(
-            "Hello welcome to chat app",
-            style: TextStyle(
+          Text(
+            languageController.textTranslate('Hello welcome to chat app'),
+            style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'Poppins'),
@@ -305,11 +313,11 @@ class _FloginState extends State<Flogin> {
           const SizedBox(
             height: 15,
           ),
-          const Align(
+          Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Mobile Number',
-                style: TextStyle(
+                languageController.textTranslate('Mobile Number'),
+                style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                     fontFamily: 'Poppins'),
@@ -418,11 +426,12 @@ class _FloginState extends State<Flogin> {
             ],
           ),
           const SizedBox(height: 15),
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
-                "We will send you 6 digit code on the given phone number",
-                style: TextStyle(
+                languageController.textTranslate(
+                    'We will send you 6 digit code on the given phone number'),
+                style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w400,
                     fontFamily: 'Poppins')),
@@ -490,7 +499,8 @@ class _FloginState extends State<Flogin> {
         if (kDebugMode) {
           print('PHONE PAGE VARIFI::::$verificationId');
         }
-        Fluttertoast.showToast(msg: 'OTP sent Succesfully');
+        Fluttertoast.showToast(
+            msg: languageController.textTranslate('OTP sent Succesfully'));
         setState(() {
           isLoading = false;
         });

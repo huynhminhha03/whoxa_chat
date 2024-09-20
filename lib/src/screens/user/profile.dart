@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/avatar_controller.dart';
@@ -17,6 +18,7 @@ import 'package:meyaoo_new/src/screens/layout/tell_friend_list.dart';
 import 'package:meyaoo_new/src/screens/user/FinalLogin.dart';
 import 'package:meyaoo_new/src/screens/user/block_contact_list.dart';
 import 'package:meyaoo_new/src/screens/user/create_profile.dart';
+import 'package:meyaoo_new/src/screens/user/language_popup.dart';
 import 'package:meyaoo_new/src/screens/user/profile_about.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -311,26 +313,29 @@ class _ProfileState extends State<Profile> {
       child: Column(
         children: [
           //_________________________________ PROFILE _____________________________________________
-          containerProfileDesign(
-              onTap: () {
-                // internetController.isOnline.value
-                //     ?
 
-                Get.find<AvatarController>().avatarIndex.value = -1;
-                Get.to(AddPersonaDetails(isRought: true, isback: true),
-                        duration: const Duration(milliseconds: 800),
-                        transition: Transition.rightToLeft)!
-                    .then((_) {
-                  setState(() {});
-                });
+          Obx(
+            () => containerProfileDesign(
+                onTap: () {
+                  // internetController.isOnline.value
+                  //     ?
 
-                // : Fluttertoast.showToast(
-                //     msg: "Check your connectivity",
-                //     gravity: ToastGravity.BOTTOM);
-              },
-              image: 'assets/images/about.png',
-              title: 'Profile',
-              about: ''),
+                  Get.find<AvatarController>().avatarIndex.value = -1;
+                  Get.to(AddPersonaDetails(isRought: true, isback: true),
+                          duration: const Duration(milliseconds: 800),
+                          transition: Transition.rightToLeft)!
+                      .then((_) {
+                    setState(() {});
+                  });
+
+                  // : Fluttertoast.showToast(
+                  //     msg: "Check your connectivity",
+                  //     gravity: ToastGravity.BOTTOM);
+                },
+                image: 'assets/images/about.png',
+                title: languageController.textTranslate('Profile'),
+                about: ''),
+          ),
 
           const SizedBox(height: 10),
           //__________________________________ AOBUT_______________________________________________
@@ -348,7 +353,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/about.png',
-              title: 'About',
+              title: 'About'.tr,
               about: Hive.box(userdata).get(userBio) == null
                   ? ""
                   : capitalizeFirstLetter(Hive.box(userdata).get(userBio))),
@@ -382,9 +387,9 @@ class _ProfileState extends State<Profile> {
                       Image.asset("assets/images/starUnfill.png",
                           color: black1Color, height: 16),
                       const SizedBox(width: 10),
-                      const Text(
-                        "Starred Messages",
-                        style: TextStyle(
+                      Text(
+                        "Starred Messages".tr,
+                        style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600),
@@ -445,9 +450,9 @@ class _ProfileState extends State<Profile> {
                         height: 16,
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        "Block Contacts",
-                        style: TextStyle(
+                      Text(
+                        "Block Contacts".tr,
+                        style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'Poppins',
                             fontWeight: FontWeight.w600),
@@ -477,6 +482,15 @@ class _ProfileState extends State<Profile> {
             ),
           ),
           const SizedBox(height: 10),
+          containerProfileDesign(
+            onTap: () {
+              chooseLanguage();
+            },
+            image: 'assets/images/language-square.png',
+            title: "App Language".tr,
+            about: '',
+          ),
+          const SizedBox(height: 10),
           //_________________________________ TELL FRIEND_____________________________________________
           containerProfileDesign(
               onTap: () {
@@ -489,7 +503,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/share1.png',
-              title: "Tell a firend",
+              title: "Tell a firend".tr,
               about: ''),
           const SizedBox(height: 10),
           //_________________________________ SHARE LINK_____________________________________________
@@ -504,7 +518,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/share2.png',
-              title: "Share a link",
+              title: "Share a link".tr,
               about: ''),
           const SizedBox(height: 10),
           //________________________________ LOGOUT ___________________________________________________
@@ -580,6 +594,8 @@ class _ProfileState extends State<Profile> {
                                 InkWell(
                                   onTap: () async {
                                     var box = Hive.box(userdata);
+                                    await languageController
+                                        .getLanguageTranslation();
 
                                     // Delete specific keys
                                     await box.delete(userId);
@@ -608,10 +624,10 @@ class _ProfileState extends State<Profile> {
                                             ],
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter)),
-                                    child: const Center(
+                                    child: Center(
                                         child: Text(
-                                      'Logout',
-                                      style: TextStyle(
+                                      'Logout'.tr,
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                           color: chatColor),
@@ -647,9 +663,9 @@ class _ProfileState extends State<Profile> {
                         height: 16,
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        "Logout",
-                        style: TextStyle(
+                      Text(
+                        "Logout".tr,
+                        style: const TextStyle(
                             fontSize: 12,
                             color: Colors.red,
                             fontFamily: 'Poppins',
@@ -677,6 +693,22 @@ class _ProfileState extends State<Profile> {
         ],
       ),
     );
+  }
+
+  chooseLanguage() {
+    return showDialog(
+        context: context,
+        barrierColor: const Color.fromRGBO(30, 30, 30, 0.37),
+        builder: (BuildContext context) {
+          return Stack(
+            children: [
+              BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                child: const LanguagePopUp(),
+              ),
+            ],
+          );
+        });
   }
 
   Future deleteAccAsk() {

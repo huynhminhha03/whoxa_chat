@@ -35,3 +35,4 @@ String userCountryName = 'userCountryName';
 String authToken = 'authToken';
 String utcLocaName = 'utcLocaName';
 String userBio = 'userBio';
+String lnId = 'lnId';

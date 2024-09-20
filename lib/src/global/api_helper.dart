@@ -39,6 +39,36 @@ class ApiHelper {
   String callHistory = '$baseUrl/call-list';
   String listOfAvatars = '$baseUrl/list-all-avtars';
 
+  Future<Map<String, dynamic>> getMethod(
+      {required String url,
+      Map<String, String>? headers,
+      Map<String, String>? queryParameters}) async {
+    try {
+      final uri = queryParameters != null
+          ? Uri.parse(url).replace(queryParameters: queryParameters)
+          : Uri.parse(url);
+      final response = await http.get(
+        uri,
+        headers: headers ??
+            <String, String>{
+              'Content-Type': 'application/json',
+            },
+      );
+      log("GET URL: $uri");
+      // log("$headers");
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        log('jsonResponse--->$jsonData');
+        return jsonData;
+      } else {
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> postMethod(
       {required String url,
       Map<String, String>? headers,

@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/VerifyotpModel.dart';
 import 'package:meyaoo_new/Models/firebase_otp_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -79,7 +80,7 @@ class _otpState extends State<otp> {
       (_counter > 0) ? _counter-- : _timer!.cancel();
       //});
       if (_counter == 0) {
-        showCustomToast("Please resend OTP");
+        showCustomToast(languageController.textTranslate('Please resend OTP'));
         _code = "";
       }
 
@@ -215,11 +216,13 @@ class _otpState extends State<otp> {
                         //     : otpcheck()
                         otpcheck()
                         : _counter == 0
-                            ? showCustomToast("Please Resend OTP")
-                            : showCustomToast("Please Enter OTP");
+                            ? showCustomToast(languageController
+                                .textTranslate('Please Resend OTP'))
+                            : showCustomToast(languageController
+                                .textTranslate('Please Enter OTP'));
                   });
                 },
-                title: "Login",
+                title: languageController.textTranslate('Login'),
               ));
   }
 
@@ -237,19 +240,21 @@ class _otpState extends State<otp> {
                     const SizedBox(height: 15),
                     Image.asset("assets/images/welcome.png", height: 44),
                     const SizedBox(height: 8),
-                    const Text(
-                      "Hello welcome to chat app",
-                      style: TextStyle(
+                    Text(
+                      languageController
+                          .textTranslate('Hello welcome to chat app'),
+                      style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'Poppins'),
                     ),
                     const SizedBox(height: 34),
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '6 digit OTP has been sent to',
-                        style: TextStyle(
+                        languageController
+                            .textTranslate('6 digit OTP has been sent to'),
+                        style: const TextStyle(
                             fontSize: 14,
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
@@ -318,11 +323,11 @@ class _otpState extends State<otp> {
                                   //     : resendoTP()
                                   resendoTP()
                                   : showCustomToast(
-                                      "Wait for a ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')} ");
+                                      "${languageController.textTranslate('Wait for a')} ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')} ");
                             }
                           },
                           child: Text(
-                            "Resend OTP",
+                            languageController.textTranslate('Resend OTP'),
                             style: TextStyle(
                                 fontSize: 14,
                                 color:
@@ -347,7 +352,7 @@ class _otpState extends State<otp> {
                         child: Center(
                           child: Text(
                             // 'Resend Code in 00:${snapshot.data.toString().padLeft(2, '0')}',
-                            "Resend Code in ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')}",
+                            "${languageController.textTranslate('Resend Code in')} ${(snapshot.data! ~/ 60).toString().padLeft(2, '0')}:${(snapshot.data! % 60).toString().padLeft(2, '0')}",
                             style: const TextStyle(
                                 color: Color.fromRGBO(113, 113, 113, 1),
                                 fontWeight: FontWeight.w500,
@@ -438,14 +443,14 @@ class _otpState extends State<otp> {
           isLoading2 = false;
         });
 
-        showCustomToast("CANNOT VERIFY OTP");
+        showCustomToast(languageController.textTranslate('CANNOT VERIFY OTP'));
       }
     } else {
       setState(() {
         isLoading2 = false;
       });
 
-      showCustomToast("Please Enter OTP");
+      showCustomToast(languageController.textTranslate('Please Enter OTP'));
     }
   }
 
@@ -502,13 +507,13 @@ class _otpState extends State<otp> {
         setState(() {
           isLoading2 = false;
         });
-        showCustomToast("CANNOT VERIFY OTP");
+        showCustomToast(languageController.textTranslate('CANNOT VERIFY OTP'));
       }
     } else {
       setState(() {
         isLoading2 = false;
       });
-      showCustomToast("Please Enter OTP");
+      showCustomToast(languageController.textTranslate('Please Enter OTP'));
     }
   }
 
@@ -555,7 +560,8 @@ class _otpState extends State<otp> {
           if (kDebugMode) {
             print('PHONE PAGE VARIFI::::$verificationId');
           }
-          Fluttertoast.showToast(msg: 'OTP sent Succesfully');
+          Fluttertoast.showToast(
+              msg: languageController.textTranslate('OTP sent Succesfully'));
           setState(() {
             isLoding = false;
           });
@@ -599,19 +605,21 @@ class _otpState extends State<otp> {
 
         print('REQUESTED FIELDS : ${request.fields}');
         print('OTP SENT SUCESSFULLY');
-        showCustomToast("OTP SENT SUCESSFULLY");
+        showCustomToast(
+            languageController.textTranslate('OTP SENT SUCESSFULLY'));
       } else {
         setState(() {
           isLoading = false;
         });
-        showCustomToast("Enter valid Phone number");
+        showCustomToast(
+            languageController.textTranslate('Enter valid Phone number'));
         print('Enter valid Phone number');
       }
     } else {
       setState(() {
         isLoading = false;
       });
-      showCustomToast("Enter Phone number");
+      showCustomToast(languageController.textTranslate('Enter Phone number'));
       print('Enter Phone number');
     }
   }

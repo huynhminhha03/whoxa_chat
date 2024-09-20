@@ -15,6 +15,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
 import 'package:meyaoo_new/Models/username_check_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -88,7 +89,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       }
     } on SocketException catch (_) {
       setState(() {
-        showCustomToast("No Internet Connection");
+        showCustomToast(
+            languageController.textTranslate('No Internet Connection'));
 
         ActiveConnection = false;
         fNameController.text = Hive.box(userdata).get(firstName) ?? "";
@@ -314,7 +316,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         //     ),
         //     (route) => false);
       }
-      showCustomToast("Success");
+      showCustomToast(languageController.textTranslate('Success'));
     } else {
       setState(() {
         buttonClick = false;
@@ -652,10 +654,12 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     const SizedBox(
                       width: 5,
                     ),
-                    const Text(
-                      "Profile",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                    Obx(
+                      () => Text(
+                        languageController.textTranslate('Profile'),
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ],
                 )),

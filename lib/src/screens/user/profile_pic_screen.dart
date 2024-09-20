@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -956,7 +957,7 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
           ),
           (route) => false);
 
-      showCustomToast("Success");
+      showCustomToast(languageController.textTranslate('Success'));
     } else {
       setState(() {
         buttonClick = false;

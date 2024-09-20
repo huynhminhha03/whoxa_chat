@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -52,7 +53,8 @@ class _profile2State extends State<profile2> {
       }
     } on SocketException catch (_) {
       setState(() {
-        showCustomToast("No Internet Connection");
+        showCustomToast(
+            languageController.textTranslate('No Internet Connection'));
 
         ActiveConnection = false;
         textController.text = Hive.box(userdata).get(firstName) ?? "";
@@ -192,9 +194,11 @@ class _profile2State extends State<profile2> {
                 height: 22, color: chatColor),
           ),
         ),
-        title: const Text(
-          'Profile',
-          style: TextStyle(color: Colors.black, fontSize: 17),
+        title: Obx(
+          () => Text(
+            languageController.textTranslate('Profile'),
+            style: const TextStyle(color: Colors.black, fontSize: 17),
+          ),
         ),
       ),
       // bottomNavigationBar: BottomAppBar(
@@ -404,7 +408,8 @@ class _profile2State extends State<profile2> {
         if (textController.text.isNotEmpty && textController1.text.isNotEmpty) {
           ActiveConnection
               ? editApiCall()
-              : showCustomToast("No Internet Connection");
+              : showCustomToast(
+                  languageController.textTranslate('No Internet Connection'));
         } else {
           if (textController.text.isEmpty) {
             showCustomToast("Please enter first name");

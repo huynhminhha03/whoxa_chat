@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meyaoo_new/app.dart';
+import 'package:meyaoo_new/controller/launguage_controller.dart';
 import 'package:meyaoo_new/src/Notification/one_signal_service.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/socket_initiallize.dart';
@@ -46,6 +47,9 @@ void main() async {
     await Hive.initFlutter();
   }
   await openHiveBox(userdata);
+
+  await Get.put(LanguageController())
+      .getLanguageTranslation(lnId: Hive.box(userdata).get(lnId) ?? "");
   // var box = Hive.box(userdata);
   // await box.delete(userId);
   // await box.delete(authToken);
@@ -87,8 +91,15 @@ void main() async {
     debugShowCheckedModeBanner: false,
     title: appName,
     color: Colors.white,
+
+    // locale: const Locale('en', 'US'),
+    // translations: LocaleString(),
     theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Poppins'),
-    home: const AppScreen(),
+    home: Obx(
+      () => Directionality(
+          textDirection: Get.find<LanguageController>().textDirection(),
+          child: const AppScreen()),
+    ),
   ));
 }
 

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -32,6 +33,7 @@ class Chats extends StatefulWidget {
 class _ChatsState extends State<Chats> with WidgetsBindingObserver {
   ChatListController chatListController = Get.put(ChatListController());
   OnlineOfflineController onlieController = Get.find();
+  // LanguageController languageController = Get.find();
   TextEditingController controller = TextEditingController();
   ChatProfileController chatProfileController =
       Get.put(ChatProfileController());
@@ -639,9 +641,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Chats",
-              style: TextStyle(
+            Text(
+              languageController.textTranslate("Chats"),
+              style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   fontFamily: "Poppins"),
@@ -660,9 +662,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                   children: [
                     Image.asset("assets/images/new-add.png", height: 15),
                     const SizedBox(width: 5),
-                    const Text(
-                      "New Group",
-                      style: TextStyle(
+                    Text(
+                      "New Group".tr,
+                      style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           fontFamily: "Poppins"),
@@ -691,7 +693,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                     borderSide: BorderSide(color: Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(15)),
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Search User',
+                hintText: 'Search User'.tr,
                 hintStyle: const TextStyle(
                     fontSize: 13,
                     color: Colors.grey,
@@ -730,9 +732,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                 const SizedBox(width: 10),
                 Row(
                   children: [
-                    const Text(
-                      'Archived',
-                      style: TextStyle(
+                    Text(
+                      'Archived'.tr,
+                      style: const TextStyle(
                           color: appgrey2,
                           fontSize: 14,
                           fontWeight: FontWeight.w400,

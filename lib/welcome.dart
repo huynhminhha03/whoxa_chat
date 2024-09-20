@@ -4,6 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/screens/user/FinalLogin.dart';
 import 'package:meyaoo_new/web_view.dart';
@@ -93,15 +95,18 @@ class _WelcomeState extends State<Welcome> {
                   const SizedBox(
                     height: 75,
                   ),
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Text(
-                      'Stay connected with your friends and family',
-                      style: TextStyle(
-                          fontSize: 34,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Schyler'),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Obx(
+                      () => Text(
+                        languageController.textTranslate(
+                            'Stay connected with your friends and family'),
+                        style: const TextStyle(
+                            fontSize: 34,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Schyler'),
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -141,53 +146,60 @@ class _WelcomeState extends State<Welcome> {
                           onTap: () {
                             // Add your navigation logic or any other action here
                           },
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'To continue, check ',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w500,
-                                fontFamily: 'Schyler',
+                          child: Obx(
+                            () => Text.rich(
+                              TextSpan(
+                                text: languageController
+                                    .textTranslate('To continue, check '),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontFamily: 'Schyler',
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: languageController
+                                        .textTranslate('Privacy Policy'),
+
+                                    style: const TextStyle(
+                                      fontSize: 14.5,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 1.5,
+                                    ),
+                                    // Add your onTap logic for Privacy Policy
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        // Add your navigation logic or any other action here
+                                        handleURLButtonPress(context,
+                                            "https://theprimocys.com/privacy-policy-whoxa.html");
+                                      },
+                                  ),
+                                  TextSpan(
+                                    text: languageController
+                                        .textTranslate(' and '),
+                                  ),
+                                  TextSpan(
+                                    text: languageController
+                                        .textTranslate('Terms & Conditions.'),
+                                    style: const TextStyle(
+                                      fontSize: 14.5,
+                                      decoration: TextDecoration.underline,
+                                      decorationColor: Colors.white,
+                                      decorationThickness: 1.5,
+                                    ),
+                                    // Add your onTap logic for Term Condition
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        // Add your navigation logic or any other action here
+                                        handleURLButtonPress(context,
+                                            "https://theprimocys.com/Terms-of-use-whoxa.html");
+                                      },
+                                  ),
+                                ],
                               ),
-                              children: [
-                                TextSpan(
-                                  text: 'Privacy Policy',
-                                  style: const TextStyle(
-                                    fontSize: 14.5,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Colors.white,
-                                    decorationThickness: 1.5,
-                                  ),
-                                  // Add your onTap logic for Privacy Policy
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      // Add your navigation logic or any other action here
-                                      handleURLButtonPress(context,
-                                          "https://theprimocys.com/privacy-policy-whoxa.html");
-                                    },
-                                ),
-                                const TextSpan(
-                                  text: ' and ',
-                                ),
-                                TextSpan(
-                                  text: 'Terms & Conditions.',
-                                  style: const TextStyle(
-                                    fontSize: 14.5,
-                                    decoration: TextDecoration.underline,
-                                    decorationColor: Colors.white,
-                                    decorationThickness: 1.5,
-                                  ),
-                                  // Add your onTap logic for Term Condition
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      // Add your navigation logic or any other action here
-                                      handleURLButtonPress(context,
-                                          "https://theprimocys.com/Terms-of-use-whoxa.html");
-                                    },
-                                ),
-                              ],
+                              textAlign: TextAlign.start,
                             ),
-                            textAlign: TextAlign.start,
                           ),
                         ),
                       )
@@ -206,8 +218,8 @@ class _WelcomeState extends State<Welcome> {
                                   builder: (context) => const Flogin()),
                               (route) => false)
                           : Fluttertoast.showToast(
-                              msg:
-                                  "Allow check to continue privacy policy and term condition",
+                              msg: languageController.textTranslate(
+                                  'Allow check to continue privacy policy and term condition'),
                               backgroundColor: Colors.white,
                               textColor: chatColor);
                     },
@@ -217,10 +229,10 @@ class _WelcomeState extends State<Welcome> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(100),
                           color: Colors.white),
-                      child: const Center(
+                      child: Center(
                           child: Text(
-                        'Get Started',
-                        style: TextStyle(
+                        languageController.textTranslate('Get Started'),
+                        style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Schyler'),

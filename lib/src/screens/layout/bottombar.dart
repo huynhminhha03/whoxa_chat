@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
@@ -237,6 +238,8 @@ class _TabbarScreenState extends State<TabbarScreen>
 
   @override
   initState() {
+    widget.currentPage =
+        widget.currentTab == 4 ? const Profile() : const Chats();
     WidgetsBinding.instance.addObserver(this);
     if (Hive.box(userdata).get(authToken) == '' &&
         Hive.box(userdata).get(authToken) == null) {
@@ -396,11 +399,11 @@ class _TabbarScreenState extends State<TabbarScreen>
                           ),
                           label: ""),
                   widget.currentTab == 4
-                      ? const BottomNavigationBarItem(
-                          icon: Image(
+                      ? BottomNavigationBarItem(
+                          icon: const Image(
                               image: AssetImage('assets/icons/setting1.png'),
                               width: 24),
-                          label: "Profile")
+                          label: languageController.textTranslate('Profile'))
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/setting.png'),

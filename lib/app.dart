@@ -16,6 +16,7 @@ import 'package:hive/hive.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 // import 'package:meyaoo_new/controller/call_history_controller.dart';
 import 'package:meyaoo_new/controller/get_delete_story.dart';
+import 'package:meyaoo_new/controller/launguage_controller.dart';
 import 'package:meyaoo_new/main.dart';
 import 'package:meyaoo_new/src/Notification/notifiactions_handler.dart';
 import 'package:meyaoo_new/src/Notification/notification_service.dart';
@@ -33,6 +34,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 
 import 'src/screens/layout/bottombar.dart';
+
+LanguageController languageController = Get.find();
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
