@@ -364,8 +364,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                 height: 15,
                                                 color: Colors.grey,
                                               ),
-                                              const Text(" Photo",
-                                                  style: TextStyle(
+                                              Text(
+                                                  " ${languageController.textTranslate('Photo')}",
+                                                  style: const TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.grey))
                                             ],
@@ -378,8 +379,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                     height: 15,
                                                     color: Colors.grey,
                                                   ),
-                                                  const Text(" Location",
-                                                      style: TextStyle(
+                                                  Text(
+                                                      " ${languageController.textTranslate('Location')}",
+                                                      style: const TextStyle(
                                                           fontSize: 12,
                                                           color: Colors.grey))
                                                 ],
@@ -392,46 +394,53 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                         height: 15,
                                                         color: Colors.grey,
                                                       ),
-                                                      const Text(" Video",
-                                                          style: TextStyle(
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.grey))
+                                                      Text(
+                                                          " ${languageController.textTranslate('Video')}",
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .grey))
                                                     ],
                                                   )
                                                 : data.lastMessageType == "gif"
-                                                    ? const Row(
+                                                    ? Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons
                                                                 .gif_box_outlined,
                                                             color: Colors.grey,
                                                           ),
                                                           Text(
-                                                            "GIF",
+                                                            languageController
+                                                                .textTranslate(
+                                                                    'GIF'),
                                                             maxLines: 1,
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontSize: 13),
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize:
+                                                                        13),
                                                           ),
                                                         ],
                                                       )
                                                     : data.lastMessageType ==
                                                             "link"
-                                                        ? const Row(
+                                                        ? Row(
                                                             children: [
-                                                              Icon(
+                                                              const Icon(
                                                                   CupertinoIcons
                                                                       .link,
                                                                   size: 15,
                                                                   color: Colors
                                                                       .grey),
-                                                              Text(" Link",
-                                                                  style: TextStyle(
+                                                              Text(
+                                                                  " ${languageController.textTranslate('Link')}",
+                                                                  style: const TextStyle(
                                                                       color: Colors
                                                                           .grey,
                                                                       fontSize:
@@ -448,9 +457,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                           15,
                                                                       color: Colors
                                                                           .grey),
-                                                                  const Text(
-                                                                      " Voice message",
-                                                                      style: TextStyle(
+                                                                  Text(
+                                                                      " ${languageController.textTranslate('Voice message')}",
+                                                                      style: const TextStyle(
                                                                           color: Colors
                                                                               .grey,
                                                                           fontSize:
@@ -467,9 +476,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                               15,
                                                                           color:
                                                                               Colors.grey),
-                                                                      const Text(
-                                                                          " Contact",
-                                                                          style: TextStyle(
+                                                                      Text(
+                                                                          " ${languageController.textTranslate('Contact')}",
+                                                                          style: const TextStyle(
                                                                               color: Colors.grey,
                                                                               fontSize: 13))
                                                                     ],
@@ -486,9 +495,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                                                             color:
                                                                                 Colors.grey,
                                                                           ),
-                                                                          const Text(
-                                                                              " Document",
-                                                                              style: TextStyle(color: Colors.grey, fontSize: 13))
+                                                                          Text(
+                                                                              " ${languageController.textTranslate('Document')}",
+                                                                              style: const TextStyle(color: Colors.grey, fontSize: 13))
                                                                         ],
                                                                       )
                                                                     : data.lastMessageType ==
@@ -604,11 +613,11 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
       backgroundColor: Colors.white,
       elevation: 0,
       automaticallyImplyLeading: false,
-      title: const Row(
+      title: Row(
         children: [
           Text(
-            'Chatapp',
-            style: TextStyle(
+            languageController.textTranslate('Chatapp'),
+            style: const TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 20, color: Colors.black),
           ),
         ],
@@ -663,7 +672,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                     Image.asset("assets/images/new-add.png", height: 15),
                     const SizedBox(width: 5),
                     Text(
-                      "New Group".tr,
+                      languageController.textTranslate('New Group'),
                       style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -693,7 +702,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                     borderSide: BorderSide(color: Colors.grey.shade100),
                     borderRadius: BorderRadius.circular(15)),
                 contentPadding: EdgeInsets.zero,
-                hintText: 'Search User'.tr,
+                hintText: languageController.textTranslate('Search User'),
                 hintStyle: const TextStyle(
                     fontSize: 13,
                     color: Colors.grey,
@@ -733,7 +742,7 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                 Row(
                   children: [
                     Text(
-                      'Archived'.tr,
+                      languageController.textTranslate('Archived'),
                       style: const TextStyle(
                           color: appgrey2,
                           fontSize: 14,
@@ -815,9 +824,9 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                               size: 19,
                               color: Colors.black,
                             ),
-                            title: const Text(
-                              'Archive chat',
-                              style: TextStyle(
+                            title: Text(
+                              languageController.textTranslate('Archive chat'),
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -842,7 +851,11 @@ class _ChatsState extends State<Chats> with WidgetsBindingObserver {
                                 height: 40,
                                 child: ListTile(
                                   title: Text(
-                                    isblock == false ? 'Block' : "Unblock",
+                                    isblock == false
+                                        ? languageController
+                                            .textTranslate('Block')
+                                        : languageController
+                                            .textTranslate('Unblock'),
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,

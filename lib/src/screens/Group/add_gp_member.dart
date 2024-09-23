@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/userchatlist_model/userchatlist_model.dart';
@@ -137,9 +138,9 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                 const SizedBox(
                   width: 7,
                 ),
-                const Text(
-                  "Add Participants",
-                  style: TextStyle(
+                Text(
+                  languageController.textTranslate('Add Participants'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                     fontFamily: "Poppins",
@@ -147,18 +148,19 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
                 ),
                 const Spacer(),
                 containerWidget(
-                    onTap: () async {
-                      if (contactData.isNotEmpty) {
-                        final result = await Get.to(() => MyWidget(
-                            contactData: contactData, contactID: contactID));
-                        setState(() {
-                          contactData.length = result;
-                        });
-                      } else {
-                        showCustomToast("Please select members");
-                      }
-                    },
-                    title: "Next"),
+                  onTap: () async {
+                    if (contactData.isNotEmpty) {
+                      final result = await Get.to(() => MyWidget(
+                          contactData: contactData, contactID: contactID));
+                      setState(() {
+                        contactData.length = result;
+                      });
+                    } else {
+                      showCustomToast("Please select members");
+                    }
+                  },
+                  title: languageController.textTranslate('Next'),
+                ),
               ],
             ).paddingOnly(top: 20).paddingSymmetric(
                   horizontal: 28,
@@ -225,24 +227,24 @@ class _AddMembersinGroup1State extends State<AddMembersinGroup1> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (searchQuery.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(left: 10, top: 20),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 20),
                     child: Text(
-                      "Frequently Contacted",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                      languageController.textTranslate('Frequently Contacted'),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 16),
                     ),
                   ),
                 recentContactWidget(context),
                 if (searchQuery.isEmpty &&
                     hasMatchingContacts()) // Check if there are matching contacts
-                  const Padding(
-                    padding: EdgeInsets.only(
+                  Padding(
+                    padding: const EdgeInsets.only(
                         left: 10, top: 10), // Reduced top padding to 10
                     child: Text(
-                      "Contacts on ChatWeb",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                      languageController.textTranslate('Contacts on ChatWeb'),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600, fontSize: 16),
                     ),
                   ),
                 if (hasMatchingContacts()) listOfContactWidget(context),

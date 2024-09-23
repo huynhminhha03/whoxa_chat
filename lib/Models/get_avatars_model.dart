@@ -9,9 +9,9 @@ class AvatarsModel {
   AvatarsModel.fromJson(Map<String, dynamic> json) {
     success = json["success"];
     message = json["message"];
-    avtars = json["avtars"] == null
+    avtars = json["avatars"] == null
         ? null
-        : (json["avtars"] as List).map((e) => Avtars.fromJson(e)).toList();
+        : (json["avatars"] as List).map((e) => Avtars.fromJson(e)).toList();
     pagination = json["pagination"] == null
         ? null
         : Pagination.fromJson(json["pagination"]);
@@ -22,7 +22,7 @@ class AvatarsModel {
     data["success"] = success;
     data["message"] = message;
     if (avtars != null) {
-      data["avtars"] = avtars?.map((e) => e.toJson()).toList();
+      data["avatars"] = avtars?.map((e) => e.toJson()).toList();
     }
     if (pagination != null) {
       data["pagination"] = pagination?.toJson();

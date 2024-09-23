@@ -347,11 +347,11 @@ class _TabbarScreenState extends State<TabbarScreen>
                 },
                 items: <BottomNavigationBarItem>[
                   widget.currentTab == 0
-                      ? const BottomNavigationBarItem(
-                          icon: Image(
+                      ? BottomNavigationBarItem(
+                          icon: const Image(
                               image: AssetImage('assets/icons/chat1.png'),
                               width: 24),
-                          label: "Chat")
+                          label: languageController.textTranslate('Chat'))
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/message-text.png'),
@@ -360,12 +360,12 @@ class _TabbarScreenState extends State<TabbarScreen>
                           ),
                           label: ""),
                   widget.currentTab == 1
-                      ? const BottomNavigationBarItem(
+                      ? BottomNavigationBarItem(
                           //status2
-                          icon: Image(
+                          icon: const Image(
                               image: AssetImage('assets/icons/status1.png'),
                               width: 24),
-                          label: "Status")
+                          label: languageController.textTranslate('Status'))
                       : const BottomNavigationBarItem(
                           icon: Image(
                               image: AssetImage('assets/images/status2.png'),
@@ -373,11 +373,11 @@ class _TabbarScreenState extends State<TabbarScreen>
                               color: chatColor),
                           label: ""),
                   widget.currentTab == 2
-                      ? const BottomNavigationBarItem(
-                          icon: Image(
+                      ? BottomNavigationBarItem(
+                          icon: const Image(
                               image: AssetImage('assets/icons/call1.png'),
                               width: 24),
-                          label: "Call")
+                          label: languageController.textTranslate('Call'))
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/call_1.png'),
@@ -386,11 +386,11 @@ class _TabbarScreenState extends State<TabbarScreen>
                           ),
                           label: ""),
                   widget.currentTab == 3
-                      ? const BottomNavigationBarItem(
-                          icon: Image(
+                      ? BottomNavigationBarItem(
+                          icon: const Image(
                               image: AssetImage('assets/icons/contact1.png'),
                               width: 25),
-                          label: "Contact")
+                          label: languageController.textTranslate('Contact'))
                       : const BottomNavigationBarItem(
                           icon: Image(
                             image: AssetImage('assets/images/contacts.png'),

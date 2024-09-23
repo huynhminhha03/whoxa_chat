@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -519,35 +520,31 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                                         color: Colors.white),
                                                     controller:
                                                         messagecontroller,
-                                                    decoration:
-                                                        const InputDecoration(
-                                                            fillColor: Colors
-                                                                .white,
-                                                            alignLabelWithHint:
-                                                                true,
-                                                            contentPadding:
-                                                                EdgeInsets
-                                                                    .symmetric(
-                                                                        horizontal:
-                                                                            10,
-                                                                        vertical:
-                                                                            10),
-                                                            border: InputBorder
-                                                                .none,
-                                                            hintText:
-                                                                "Type reply...",
-                                                            hintStyle: TextStyle(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        108,
-                                                                        108,
-                                                                        108,
-                                                                        1),
-                                                                fontSize: 13,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400),
-                                                            isDense: true),
+                                                    decoration: InputDecoration(
+                                                        fillColor: Colors.white,
+                                                        alignLabelWithHint:
+                                                            true,
+                                                        contentPadding:
+                                                            const EdgeInsets.symmetric(
+                                                                horizontal: 10,
+                                                                vertical: 10),
+                                                        border:
+                                                            InputBorder.none,
+                                                        hintText: languageController
+                                                            .textTranslate(
+                                                                'Type reply...'),
+                                                        hintStyle: const TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    108,
+                                                                    108,
+                                                                    108,
+                                                                    1),
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                        isDense: true),
                                                   ),
                                                 ),
                                               ),
@@ -780,8 +777,8 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                   children: [
                     Image.asset("assets/images/trash1.png", height: 20),
                     const SizedBox(width: 10),
-                    const Text("Delete",
-                        style: TextStyle(
+                    Text(languageController.textTranslate('Delete'),
+                        style: const TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w400))
                   ],
                 ),
@@ -815,13 +812,16 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Are you sure you want to Delete?",
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  Text(
+                    languageController
+                        .textTranslate('Are you sure you want to Delete?'),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "Are you sure you want to delete your status?",
+                    languageController.textTranslate(
+                        'Are you sure you want to delete your status?'),
                     style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -841,10 +841,10 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(color: yellow2Color)),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              "Cancel",
-                              style: TextStyle(
+                              languageController.textTranslate('Cancel'),
+                              style: const TextStyle(
                                   fontSize: 13, fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -865,10 +865,10 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                   colors: [yellow1Color, yellow2Color],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter)),
-                          child: const Center(
+                          child: Center(
                             child: Text(
-                              "Delete",
-                              style: TextStyle(
+                              languageController.textTranslate('Delete'),
+                              style: const TextStyle(
                                   fontSize: 13, fontWeight: FontWeight.w400),
                             ),
                           ),
@@ -915,10 +915,11 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.33,
                               child: Center(
-                                child: const Text(
-                                  "Your Story hasn't been viewed by any users yet.",
+                                child: Text(
+                                  languageController.textTranslate(
+                                      "Your Story hasn't been viewed by any users yet."),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14, color: Colors.black),
                                 ).paddingSymmetric(horizontal: 40),
                               ),
@@ -948,7 +949,7 @@ class _StoryScreen6PMState extends State<StoryScreen6PM> {
                                               end: Alignment.bottomCenter)),
                                       child: Center(
                                           child: Text(
-                                        "View By ${storyGetxController.myStorySeenData.value.statusViewsList!.where((element) => element.statusCount! >= storyIndex + 1).length}",
+                                        "${languageController.textTranslate('View By')} ${storyGetxController.myStorySeenData.value.statusViewsList!.where((element) => element.statusCount! >= storyIndex + 1).length}",
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,

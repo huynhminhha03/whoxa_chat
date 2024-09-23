@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -42,9 +43,9 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text(
-          'Add Participants',
-          style: TextStyle(color: Colors.black, fontSize: 18),
+        title: Text(
+          languageController.textTranslate('Add Participants'),
+          style: const TextStyle(color: Colors.black, fontSize: 18),
         ),
         actions: [
           Padding(
@@ -55,9 +56,9 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: const Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.red),
+                  child: Text(
+                    languageController.textTranslate('Cancel'),
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
               ],
@@ -107,7 +108,7 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
                           borderRadius: BorderRadius.circular(10)),
                       contentPadding:
                           const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                      hintText: 'Search',
+                      hintText: languageController.textTranslate('Search'),
                       hintStyle: const TextStyle(
                           fontSize: 15,
                           color: Colors.grey,
@@ -127,21 +128,21 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 10, top: 20),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, top: 20),
                 child: Text(
-                  "Recent contacts",
-                  style: TextStyle(color: Colors.grey),
+                  languageController.textTranslate('Recent contacts'),
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ),
               recentContactWidget(context),
               if (hasMatchingContacts()) // Check if there are matching contacts
-                const Padding(
-                  padding: EdgeInsets.only(
+                Padding(
+                  padding: const EdgeInsets.only(
                       left: 10, top: 10), // Reduced top padding to 10
                   child: Text(
-                    "Contacts on Whoxa",
-                    style: TextStyle(color: Colors.grey),
+                    languageController.textTranslate('Contacts on Whoxa'),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ),
               if (hasMatchingContacts()) listOfContactWidget(context),
@@ -412,7 +413,8 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
                 contactID.isNotEmpty
                     ? gpCreateController.addToGroupMember(
                         widget.grpId!, contactID)
-                    : showCustomToast("Please select member");
+                    : showCustomToast(languageController
+                        .textTranslate('Please select member'));
               },
               child: Container(
                 height: 50,
@@ -422,10 +424,10 @@ class _AddMembersinGroupState extends State<AddMembersinGroup> {
                   borderRadius: BorderRadius.circular(25),
                   color: chatownColor,
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Create',
-                    style: TextStyle(
+                    languageController.textTranslate("Create"),
+                    style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: 16),

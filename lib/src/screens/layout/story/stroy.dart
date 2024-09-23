@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -64,9 +65,9 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              "Status",
-                              style: TextStyle(
+                            Text(
+                              languageController.textTranslate('Status'),
+                              style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   fontFamily: "Poppins"),
@@ -136,8 +137,10 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                   )
                                 ],
                               ),
-                              title: const Text("My Story"),
-                              subtitle: const Text("Tap to add your story"),
+                              title: Text(
+                                  languageController.textTranslate('My Story')),
+                              subtitle: Text(languageController
+                                  .textTranslate('Tap to add your story')),
                               titleTextStyle: const TextStyle(
                                   fontSize: 16, color: blackcolor),
                               subtitleTextStyle: const TextStyle(

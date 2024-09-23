@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
@@ -100,9 +101,9 @@ class _MyWidgetState extends State<MyWidget> {
                   const SizedBox(
                     width: 7,
                   ),
-                  const Text(
-                    "New Group",
-                    style: TextStyle(
+                  Text(
+                    languageController.textTranslate('New Group'),
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       fontFamily: "Poppins",
@@ -112,11 +113,14 @@ class _MyWidgetState extends State<MyWidget> {
                   containerWidget(
                       onTap: () {
                         if (controller.text.isEmpty) {
-                          showCustomToast("Enter group name");
+                          showCustomToast(languageController
+                              .textTranslate('Enter group name'));
                         } else if (image == null) {
-                          showCustomToast("Set group profile");
+                          showCustomToast(languageController
+                              .textTranslate('Set group profile'));
                         } else if (widget.contactData.isEmpty) {
-                          showCustomToast("Please add member");
+                          showCustomToast(languageController
+                              .textTranslate('Please add member'));
                         } else {
                           gpCreateController.groupCreateApi(
                               controller.text.toString(),
@@ -125,7 +129,7 @@ class _MyWidgetState extends State<MyWidget> {
                               widget.contactData);
                         }
                       },
-                      title: "Create")
+                      title: languageController.textTranslate('Create'))
                 ],
               ).paddingOnly(top: 20).paddingSymmetric(
                     horizontal: 28,
@@ -195,16 +199,17 @@ class _MyWidgetState extends State<MyWidget> {
               maxLength: 60,
               scrollPhysics: const BouncingScrollPhysics(),
               textAlignVertical: TextAlignVertical.center,
-              decoration: const InputDecoration(
-                  contentPadding: EdgeInsets.only(top: 0),
+              decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.only(top: 0),
                   fillColor: Colors.transparent,
                   isDense: true,
-                  hintText: 'Group Name',
-                  hintStyle: TextStyle(
+                  hintText: languageController.textTranslate('Group Name'),
+                  hintStyle: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey),
-                  border: OutlineInputBorder(borderSide: BorderSide.none)),
+                  border:
+                      const OutlineInputBorder(borderSide: BorderSide.none)),
             ).paddingOnly(top: 25, left: 10),
           )
         ],
@@ -318,10 +323,10 @@ class _MyWidgetState extends State<MyWidget> {
                     width: 100,
                   ),
                   Container(height: 15.0),
-                  const Text(
-                    "Upload Image",
+                  Text(
+                    languageController.textTranslate('Upload Image'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(height: 15.0),
                   SizedBox(
@@ -335,9 +340,9 @@ class _MyWidgetState extends State<MyWidget> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
-                      child: const Text(
-                        "Take Picture",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('Take Picture'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -355,9 +360,9 @@ class _MyWidgetState extends State<MyWidget> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        "From Gallery",
-                        style: TextStyle(color: chatColor),
+                      child: Text(
+                        languageController.textTranslate('From Gallery'),
+                        style: const TextStyle(color: chatColor),
                       ),
                     ),
                   ),

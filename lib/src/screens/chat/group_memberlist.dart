@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
@@ -48,9 +49,9 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
           },
           child: const Icon(Icons.arrow_back_ios, size: 17),
         ),
-        title: const Text(
-          'Add Participants',
-          style: TextStyle(color: Colors.black, fontSize: 18),
+        title: Text(
+          languageController.textTranslate('Add Participants'),
+          style: const TextStyle(color: Colors.black, fontSize: 18),
         ),
         actions: [
           Padding(
@@ -70,9 +71,11 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                           contactID.isNotEmpty
                               ? gpCreateController.addToGroupMember(
                                   widget.grpId!, contactID)
-                              : showCustomToast("Please select member");
+                              : showCustomToast(languageController
+                                  .textTranslate('Please select member'));
                         },
-                        title: "Next");
+                        title: languageController.textTranslate('Next'),
+                      );
               }))
         ],
       ),
@@ -315,7 +318,7 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                   const SizedBox(height: 17),
                   Text(
                     Hive.box(userdata).get(userId) == data.user!.userId
-                        ? "You"
+                        ? languageController.textTranslate('You')
                         : capitalizeFirstLetter(data.user!.userName!),
                     textAlign: TextAlign.left,
                     style: const TextStyle(
@@ -366,7 +369,8 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                 contactID.isNotEmpty
                     ? gpCreateController.addToGroupMember(
                         widget.grpId!, contactID)
-                    : showCustomToast("Please select member");
+                    : showCustomToast(languageController
+                        .textTranslate('Please select member'));
               },
               child: Container(
                 height: 50,
@@ -376,10 +380,10 @@ class _GetMembersinGroupState extends State<GetMembersinGroup> {
                   borderRadius: BorderRadius.circular(25),
                   color: chatownColor,
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Add Participants',
-                    style: TextStyle(
+                    languageController.textTranslate('Add Participants'),
+                    style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: 16),

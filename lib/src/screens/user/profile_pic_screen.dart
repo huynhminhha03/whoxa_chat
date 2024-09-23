@@ -750,10 +750,10 @@ class _ProfilePicScreenState extends State<ProfilePicScreen> {
                     const SizedBox(
                       height: 10,
                     ),
-                    const Text(
-                      'Camera',
+                    Text(
+                      languageController.textTranslate('Camera'),
                       textAlign: TextAlign.left,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 12,
                           fontFamily: "Poppins",

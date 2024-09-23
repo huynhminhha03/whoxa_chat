@@ -4,6 +4,7 @@ import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/call_history_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -112,7 +113,7 @@ class _call_historyState extends State<call_history>
                             ),
                             // Adjust the spacing between image and text
                             Text(
-                              "  All Call         ",
+                              "  ${languageController.textTranslate('All Call')}         ",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -139,7 +140,7 @@ class _call_historyState extends State<call_history>
                             ),
                             // Adjust the spacing between image and text
                             Text(
-                              "   Missed Call     ",
+                              "   ${languageController.textTranslate('Missed Call')}     ",
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,

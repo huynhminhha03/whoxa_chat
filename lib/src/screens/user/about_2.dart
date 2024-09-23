@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
 class about2 extends StatefulWidget {
@@ -103,9 +104,9 @@ class _about2State extends State<about2> {
                     const SizedBox(
                       width: 7,
                     ),
-                    const Text(
-                      "About",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('About'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         fontFamily: "Poppins",
@@ -139,9 +140,9 @@ class _about2State extends State<about2> {
                       const SizedBox(
                         height: 20,
                       ),
-                      const Text(
-                        'Currently set to',
-                        style: TextStyle(
+                      Text(
+                        languageController.textTranslate('Currently set to'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 11,
                           color: Colors.black,
@@ -181,7 +182,8 @@ class _about2State extends State<about2> {
                               ),
                               contentPadding: const EdgeInsets.only(
                                   top: 15, left: 15, bottom: 20, right: 5),
-                              hintText: 'Write Something...',
+                              hintText: languageController
+                                  .textTranslate('Write Something...'),
                               hintStyle: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,

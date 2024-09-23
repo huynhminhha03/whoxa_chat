@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:meyaoo_new/Models/user_profile_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/src/global/api_helper.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -125,9 +126,9 @@ class _aboutState extends State<about> {
                     const SizedBox(
                       width: 7,
                     ),
-                    const Text(
-                      "About",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('About'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         fontFamily: "Poppins",
@@ -160,9 +161,9 @@ class _aboutState extends State<about> {
                       const SizedBox(
                         height: 20,
                       ),
-                      const Text(
-                        'Currently set to',
-                        style: TextStyle(
+                      Text(
+                        languageController.textTranslate('Currently set to'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 11,
                           color: Colors.black,
@@ -256,9 +257,9 @@ class _aboutState extends State<about> {
                       const SizedBox(
                         height: 20,
                       ),
-                      const Text(
-                        'Select your About',
-                        style: TextStyle(
+                      Text(
+                        languageController.textTranslate('Select your About'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.w400,
                           fontSize: 12,
                           color: Colors.black,
@@ -378,7 +379,7 @@ class _aboutState extends State<about> {
 
       log(responseData);
       Get.back();
-      showCustomToast("Update");
+      showCustomToast(languageController.textTranslate('Update'));
     } else {
       setState(() {
         isLoading = false;

@@ -7,6 +7,7 @@ import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:lottie/lottie.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/src/Notification/notification_service.dart';
@@ -141,9 +142,9 @@ class _IncomingCallScrennState extends State<IncomingCallScrenn> {
                     const Icon(
                       Icons.arrow_back,
                     ),
-                    const Text(
-                      "End-to-end encrypted",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('End-to-end encrypted'),
+                      style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
                         fontFamily: "Poppins",

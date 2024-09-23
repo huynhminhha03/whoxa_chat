@@ -10,6 +10,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:get/get.dart' as getx;
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/main.dart';
@@ -499,9 +500,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                     const SizedBox(
                       height: 9,
                     ),
-                    const Text(
-                      "Audio Calling",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('Audio Calling'),
+                      style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 12,
                         fontFamily: "Poppins",
@@ -563,9 +564,9 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
                   const Icon(
                     Icons.arrow_back,
                   ),
-                  const Text(
-                    "End-to-end encrypted",
-                    style: TextStyle(
+                  Text(
+                    languageController.textTranslate('End-to-end encrypted'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 12,
                       fontFamily: "Poppins",
@@ -677,7 +678,7 @@ class _AudioCallScreenState extends State<AudioCallScreen> {
           },
         ),
         BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             color: Colors.black.withOpacity(0.1),
           ),

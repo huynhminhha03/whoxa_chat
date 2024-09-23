@@ -62,10 +62,11 @@ class _WelcomeState extends State<Welcome> {
           Container(
               width: double.infinity,
               color: chatownColor,
-              child: const Text(
-                "Chatapp",
+              child: Text(
+                languageController.textTranslate('Chatapp'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                style:
+                    const TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
               )),
           Container(
             height: 20.6,

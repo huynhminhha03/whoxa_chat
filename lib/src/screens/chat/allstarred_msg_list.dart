@@ -13,6 +13,7 @@ import 'package:hive/hive.dart';
 import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:meyaoo_new/Models/add_star_model.dart';
 import 'package:meyaoo_new/Models/all_starred_msg_list.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/reply_msg_controller.dart';
@@ -162,7 +163,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
             child: const Icon(Icons.arrow_back_ios, size: 20, color: chatColor),
           ),
           title: Text(
-            widget.isPersonal == true ? "Starred Messages" : 'Starred Messages',
+            languageController.textTranslate('Starred Messages'),
             style: const TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 19, color: chatColor),
           ),
@@ -175,7 +176,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                         print("STARID:$starId");
                       });
                     },
-                    title: "Edit")
+                    title: languageController.textTranslate('Edit'))
                 .paddingOnly(right: 10)
           ],
         ),
@@ -240,19 +241,21 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                           width: 200,
                                         ),
                                         // const SizedBox(height: 25),
-                                        const Text(
-                                          "No starred Messages",
-                                          style: TextStyle(
+                                        Text(
+                                          languageController.textTranslate(
+                                              'No starred Messages'),
+                                          style: const TextStyle(
                                               color: Color(0xff000000),
                                               fontSize: 16,
                                               fontFamily: "Poppins",
                                               fontWeight: FontWeight.w400),
                                         ),
                                         const SizedBox(height: 4),
-                                        const Text(
-                                          "Tap and hold on any message to star it, so you can easily find it later.",
+                                        Text(
+                                          languageController.textTranslate(
+                                              'Tap and hold on any message to star it, so you can easily find it later.'),
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               color: Color(0xff959595),
                                               fontSize: 10,
                                               fontFamily: "Poppins",
@@ -432,7 +435,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -450,7 +453,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -614,7 +617,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -634,7 +637,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -838,7 +841,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -851,7 +854,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -989,7 +992,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -1007,7 +1010,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -1175,7 +1178,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -1195,7 +1198,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -1403,7 +1406,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -1416,7 +1419,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -1593,7 +1596,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -1611,7 +1614,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -1904,7 +1907,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -1924,7 +1927,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -2288,7 +2291,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -2301,7 +2304,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -2454,7 +2457,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -2472,7 +2475,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -2660,7 +2663,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -2680,7 +2683,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -2908,7 +2911,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -2921,7 +2924,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -3145,7 +3148,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -3163,7 +3166,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -3305,9 +3308,11 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                             FontWeight.w500,
                                                       ),
                                                     ),
-                                                    const Text(
-                                                      '0 Page - 0 KB',
-                                                      style: TextStyle(
+                                                    Text(
+                                                      languageController
+                                                          .textTranslate(
+                                                              '0 Page - 0 KB'),
+                                                      style: const TextStyle(
                                                         color: Colors.grey,
                                                         fontSize: 10,
                                                         fontWeight:
@@ -3359,8 +3364,9 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                   ],
                                                 );
                                               } else {
-                                                return const Text(
-                                                    'No PDF info available');
+                                                return Text(languageController
+                                                    .textTranslate(
+                                                        'No PDF info available'));
                                               }
                                             },
                                           ),
@@ -3447,7 +3453,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -3467,7 +3473,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -3624,9 +3630,11 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                             FontWeight.w500,
                                                       ),
                                                     ),
-                                                    const Text(
-                                                      '0 Page - 0 KB',
-                                                      style: TextStyle(
+                                                    Text(
+                                                      languageController
+                                                          .textTranslate(
+                                                              '0 Page - 0 KB'),
+                                                      style: const TextStyle(
                                                         color: Colors.grey,
                                                         fontSize: 10,
                                                         fontWeight:
@@ -3678,8 +3686,9 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                   ],
                                                 );
                                               } else {
-                                                return const Text(
-                                                    'No PDF info available');
+                                                return Text(languageController
+                                                    .textTranslate(
+                                                        'No PDF info available'));
                                               }
                                             },
                                           ),
@@ -3787,7 +3796,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -3800,7 +3809,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -3906,7 +3915,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -3924,7 +3933,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -4044,7 +4053,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -4064,7 +4073,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -4224,7 +4233,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -4237,7 +4246,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -4374,7 +4383,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -4392,7 +4401,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -4560,7 +4569,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -4580,7 +4589,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -4789,7 +4798,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -4802,7 +4811,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -5060,7 +5069,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -5078,7 +5087,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -5363,7 +5372,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -5383,7 +5392,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -5708,7 +5717,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //             Text(
           //               data.chat!.user!.userId ==
           //                       Hive.box(userdata).get(userId)
-          //                   ? "You"
+          //                   ? languageController.textTranslate('You')
           //                   : data.chat!.user!.firstName! +
           //                       data.chat!.user!.lastName!,
           //               style: const TextStyle(
@@ -5721,7 +5730,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
           //                 ? Text(
           //                     data.otherUserDetails![0].userId ==
           //                             data.chat!.user!.userId
-          //                         ? "You"
+          //                         ? languageController.textTranslate('You')
           //                         : data.otherUserDetails![0].firstName! +
           //                             data.otherUserDetails![0].lastName!,
           //                     style: const TextStyle(
@@ -5912,7 +5921,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                 ),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -5930,7 +5939,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -6109,13 +6118,14 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                 end: Alignment.bottomCenter,
                               ),
                             ),
-                            child: const Column(
+                            child: Column(
                               children: [
-                                SizedBox(height: 3),
+                                const SizedBox(height: 3),
                                 Text(
-                                  "View contact",
+                                  languageController
+                                      .textTranslate('View contact'),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color: chatColor),
@@ -6183,7 +6193,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     Text(
                         data.otherUserDetails![0].userId ==
                                 data.chat!.user!.userId
-                            ? "You"
+                            ? languageController.textTranslate('You')
                             : data.otherUserDetails![0].firstName! +
                                 data.otherUserDetails![0].lastName!,
                         style: const TextStyle(
@@ -6203,7 +6213,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                     : const Icon(Icons.arrow_left_outlined, size: 30),
                 Text(
                   data.chat!.user!.userId == Hive.box(userdata).get(userId)
-                      ? "You"
+                      ? languageController.textTranslate('You')
                       : data.chat!.user!.firstName! +
                           data.chat!.user!.lastName!,
                   style: const TextStyle(
@@ -6397,13 +6407,14 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                 end: Alignment.bottomCenter,
                               ),
                             ),
-                            child: const Column(
+                            child: Column(
                               children: [
-                                SizedBox(height: 3),
+                                const SizedBox(height: 3),
                                 Text(
-                                  "View contact",
+                                  languageController
+                                      .textTranslate('View contact'),
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color: chatColor),
@@ -6491,7 +6502,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
   //       }
   //     }
   //   }
-  //   return "You"; // This return might be a default case if no match is found
+  //   return languageController.textTranslate('You'); // This return might be a default case if no match is found
   // }
 
   Widget replyMSGWidget(int index, StarMessageList data) {
@@ -6499,21 +6510,21 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
       if (data.resData!.messageType == "text") {
         return data.resData!.message!;
       } else if (data.resData!.messageType == "image") {
-        return "📷 Photo";
+        return "📷 ${languageController.textTranslate('Photo')}";
       } else if (data.resData!.messageType == "location") {
-        return "📌 Location";
+        return "📌 ${languageController.textTranslate('Location')}";
       } else if (data.resData!.messageType == "document") {
-        return "📄 Document";
+        return "📄 ${languageController.textTranslate('Document')}";
       } else if (data.resData!.messageType == "video") {
-        return "🎥 Video";
+        return "🎥 ${languageController.textTranslate('Video')}";
       } else if (data.resData!.messageType == "audio") {
-        return "🔊 Audio";
+        return "🔊 ${languageController.textTranslate('Audio')}";
       } else if (data.resData!.messageType == "link") {
         return data.resData!.message!;
       } else if (data.resData!.messageType == "gif") {
-        return "GIF";
+        return languageController.textTranslate('GIF');
       } else if (data.resData!.messageType == "contact") {
-        return "Contact";
+        return languageController.textTranslate('Contact');
       }
       return "message removed";
     }
@@ -6618,7 +6629,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                           Text(
                             data.chat!.user!.userId ==
                                     Hive.box(userdata).get(userId)
-                                ? "You"
+                                ? languageController.textTranslate('You')
                                 : data.chat!.user!.firstName! +
                                     data.chat!.user!.lastName!,
                             style: const TextStyle(
@@ -6631,7 +6642,7 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                               ? Text(
                                   data.otherUserDetails![0].userId ==
                                           data.chat!.user!.userId
-                                      ? "You"
+                                      ? languageController.textTranslate('You')
                                       : data.otherUserDetails![0].firstName! +
                                           data.otherUserDetails![0].lastName!,
                                   style: const TextStyle(
@@ -6801,10 +6812,12 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                                             .w500,
                                                                   ),
                                                                 ),
-                                                                const Text(
-                                                                  '0 Page - 0 KB',
+                                                                Text(
+                                                                  languageController
+                                                                      .textTranslate(
+                                                                          '0 Page - 0 KB'),
                                                                   style:
-                                                                      TextStyle(
+                                                                      const TextStyle(
                                                                     color: Colors
                                                                         .grey,
                                                                     fontSize:
@@ -6882,8 +6895,10 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                               ],
                                                             );
                                                           } else {
-                                                            return const Text(
-                                                                'No PDF info available');
+                                                            return Text(
+                                                                languageController
+                                                                    .textTranslate(
+                                                                        'No PDF info available'));
                                                           }
                                                         },
                                                       ),
@@ -7296,13 +7311,13 @@ class _AllStarredMsgListState extends State<AllStarredMsgList> {
                                                                                 height: 30,
                                                                                 width: 200,
                                                                                 decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
-                                                                                child: const Column(
+                                                                                child: Column(
                                                                                   children: [
-                                                                                    SizedBox(height: 3),
+                                                                                    const SizedBox(height: 3),
                                                                                     Text(
-                                                                                      "Message",
+                                                                                     languageController.textTranslate('Message'),
                                                                                       textAlign: TextAlign.center,
-                                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
                                                                                     ),
                                                                                   ],
                                                                                 ),

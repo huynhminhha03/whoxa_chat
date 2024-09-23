@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -51,7 +52,6 @@ class _ContactSendState extends State<ContactSend> {
   }
 
   Future _fetchContacts() async {
-    
     if (!await FlutterContacts.requestPermission(readonly: true)) {
       setState(() => _permissionDenied = true);
     } else {
@@ -93,9 +93,9 @@ class _ContactSendState extends State<ContactSend> {
           child:
               const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
         ),
-        title: const Text(
-          "Send to",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+        title: Text(
+          languageController.textTranslate('Send to'),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         actions: [
           InkWell(
@@ -148,10 +148,10 @@ class _ContactSendState extends State<ContactSend> {
               width: 63,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(13), color: yellow1Color),
-              child: const Center(
+              child: Center(
                   child: Text(
-                "Next",
-                style: TextStyle(fontSize: 12),
+                languageController.textTranslate('Next'),
+                style: const TextStyle(fontSize: 12),
               )),
             ).paddingOnly(right: 20),
           )
@@ -186,7 +186,8 @@ class _ContactSendState extends State<ContactSend> {
                           image: AssetImage('assets/icons/search.png'),
                         ),
                       ),
-                      hintText: 'Search name or number',
+                      hintText: languageController
+                          .textTranslate('Search name or number'),
                       hintStyle:
                           const TextStyle(fontSize: 12, color: Colors.grey),
                       filled: true,

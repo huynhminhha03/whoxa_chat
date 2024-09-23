@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
@@ -95,9 +96,11 @@ class _create_groupState extends State<create_group> {
           InkWell(
             onTap: () {
               if (groupnameController.text.isEmpty) {
-                showCustomToast("Enter group name");
+                showCustomToast(
+                    languageController.textTranslate('Enter group name'));
               } else if (image == null) {
-                showCustomToast("Set group profile");
+                showCustomToast(
+                    languageController.textTranslate('Set group profile'));
               } else {
                 gpCreateController.groupCreateApi(
                     groupnameController.text.toString(),
@@ -150,10 +153,10 @@ class _create_groupState extends State<create_group> {
                     width: 100,
                   ),
                   Container(height: 15.0),
-                  const Text(
-                    "Upload Image",
+                  Text(
+                    languageController.textTranslate('Upload Image'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(height: 15.0),
                   SizedBox(
@@ -167,9 +170,9 @@ class _create_groupState extends State<create_group> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
-                      child: const Text(
-                        "Take Picture",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('Take Picture'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -187,9 +190,9 @@ class _create_groupState extends State<create_group> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        "From Gallery",
-                        style: TextStyle(color: chatColor),
+                      child: Text(
+                        languageController.textTranslate('From Gallery'),
+                        style: const TextStyle(color: chatColor),
                       ),
                     ),
                   ),

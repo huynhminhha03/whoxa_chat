@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/single_chat_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/chatdetails/single_chat_list_model.dart';
@@ -115,10 +116,11 @@ class _ForwardMessageState extends State<ForwardMessage> {
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30),
                                       color: const Color(0xffF4F5F6)),
-                                  child: const Center(
+                                  child: Center(
                                     child: Text(
-                                      'Forward',
-                                      style: TextStyle(
+                                      languageController
+                                          .textTranslate('Forward'),
+                                      style: const TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black),
@@ -480,10 +482,10 @@ class _ForwardMessageState extends State<ForwardMessage> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   color: const Color(0xffF4F5F6)),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  'Cancel',
-                  style: TextStyle(
+                  languageController.textTranslate('Cancel'),
+                  style: const TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
                       color: Colors.black),

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/online_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/common_widget.dart';
@@ -96,9 +97,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                   Navigator.pop(context);
                 },
                 icon: const Icon(Icons.arrow_back_ios, color: Colors.black)),
-            title: const Text(
-              'Archive list',
-              style: TextStyle(
+            title: Text(
+              languageController.textTranslate('Archive list'),
+              style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 20,
                   color: Colors.black),
@@ -328,8 +329,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                                 height: 15,
                                                 color: Colors.grey,
                                               ),
-                                              const Text(" Photo",
-                                                  style: TextStyle(
+                                              Text(
+                                                  " ${languageController.textTranslate('Photo')}",
+                                                  style: const TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.grey))
                                             ],
@@ -342,8 +344,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                                     height: 15,
                                                     color: Colors.grey,
                                                   ),
-                                                  const Text(" Location",
-                                                      style: TextStyle(
+                                                  Text(
+                                                      " ${languageController.textTranslate('Location')}",
+                                                      style: const TextStyle(
                                                           fontSize: 12,
                                                           color: Colors.grey))
                                                 ],
@@ -356,46 +359,53 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                                         height: 15,
                                                         color: Colors.grey,
                                                       ),
-                                                      const Text(" Video",
-                                                          style: TextStyle(
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.grey))
+                                                      Text(
+                                                          " ${languageController.textTranslate('Video')}",
+                                                          style:
+                                                              const TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .grey))
                                                     ],
                                                   )
                                                 : data.lastMessageType == "gif"
-                                                    ? const Row(
+                                                    ? Row(
                                                         children: [
-                                                          Icon(
+                                                          const Icon(
                                                             Icons
                                                                 .gif_box_outlined,
                                                             color: Colors.grey,
                                                           ),
                                                           Text(
-                                                            "GIF",
+                                                            languageController
+                                                                .textTranslate(
+                                                                    'GIF'),
                                                             maxLines: 1,
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontSize: 13),
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .grey,
+                                                                    fontSize:
+                                                                        13),
                                                           ),
                                                         ],
                                                       )
                                                     : data.lastMessageType ==
                                                             "link"
-                                                        ? const Row(
+                                                        ? Row(
                                                             children: [
-                                                              Icon(
+                                                              const Icon(
                                                                   CupertinoIcons
                                                                       .link,
                                                                   size: 15,
                                                                   color: Colors
                                                                       .grey),
-                                                              Text(" Link",
-                                                                  style: TextStyle(
+                                                              Text(
+                                                                  " ${languageController.textTranslate('Link')}",
+                                                                  style: const TextStyle(
                                                                       color: Colors
                                                                           .grey,
                                                                       fontSize:
@@ -412,9 +422,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                                                           15,
                                                                       color: Colors
                                                                           .grey),
-                                                                  const Text(
-                                                                      " Voice message",
-                                                                      style: TextStyle(
+                                                                  Text(
+                                                                      " ${languageController.textTranslate('Voice message')}",
+                                                                      style: const TextStyle(
                                                                           color: Colors
                                                                               .grey,
                                                                           fontSize:
@@ -431,9 +441,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                                                               15,
                                                                           color:
                                                                               Colors.grey),
-                                                                      const Text(
-                                                                          " Contact",
-                                                                          style: TextStyle(
+                                                                      Text(
+                                                                          " ${languageController.textTranslate('Contact')}",
+                                                                          style: const TextStyle(
                                                                               color: Colors.grey,
                                                                               fontSize: 13))
                                                                     ],
@@ -994,18 +1004,18 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
       child: TextField(
         controller: controller,
         onChanged: onSearchTextChanged,
-        decoration: const InputDecoration(
-          prefixIcon: Padding(
+        decoration: InputDecoration(
+          prefixIcon: const Padding(
             padding: EdgeInsets.all(17),
             child: Image(
               image: AssetImage('assets/icons/search.png'),
             ),
           ),
-          hintText: 'Search User',
-          hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+          hintText: languageController.textTranslate('Search User'),
+          hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
           filled: true,
           fillColor: Colors.transparent,
-          border: OutlineInputBorder(borderSide: BorderSide.none),
+          border: const OutlineInputBorder(borderSide: BorderSide.none),
         ),
       ),
     );
@@ -1172,9 +1182,9 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                         SizedBox(
                           height: 40,
                           child: ListTile(
-                            title: const Text(
-                              'Unarchive',
-                              style: TextStyle(
+                            title: Text(
+                              languageController.textTranslate('Unarchive'),
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -1211,7 +1221,11 @@ class _ArchiveChatState extends State<ArchiveChat> with WidgetsBindingObserver {
                                 height: 40,
                                 child: ListTile(
                                   title: Text(
-                                    isblock == "false" ? 'Block' : "Unblock",
+                                    isblock == "false"
+                                        ? languageController
+                                            .textTranslate('Block')
+                                        : languageController
+                                            .textTranslate('Unblock'),
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w700,

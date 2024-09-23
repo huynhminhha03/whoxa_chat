@@ -296,9 +296,10 @@ class _ProfileState extends State<Profile> {
                 ],
               ),
               const SizedBox(width: 3),
-              const Text(
-                "Online",
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+              Text(
+                languageController.textTranslate('Online'),
+                style:
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
               )
             ],
           )
@@ -314,28 +315,27 @@ class _ProfileState extends State<Profile> {
         children: [
           //_________________________________ PROFILE _____________________________________________
 
-          Obx(
-            () => containerProfileDesign(
-                onTap: () {
-                  // internetController.isOnline.value
-                  //     ?
+          containerProfileDesign(
+              onTap: () {
+                // internetController.isOnline.value
+                //     ?
 
-                  Get.find<AvatarController>().avatarIndex.value = -1;
-                  Get.to(AddPersonaDetails(isRought: true, isback: true),
-                          duration: const Duration(milliseconds: 800),
-                          transition: Transition.rightToLeft)!
-                      .then((_) {
-                    setState(() {});
-                  });
+                Get.find<AvatarController>().avatarIndex.value = -1;
+                Get.to(AddPersonaDetails(isRought: true, isback: true),
+                        duration: const Duration(milliseconds: 800),
+                        transition: Transition.rightToLeft)!
+                    .then((_) {
+                  setState(() {});
+                });
 
-                  // : Fluttertoast.showToast(
-                  //     msg: "Check your connectivity",
-                  //     gravity: ToastGravity.BOTTOM);
-                },
-                image: 'assets/images/about.png',
-                title: languageController.textTranslate('Profile'),
-                about: ''),
-          ),
+                // : Fluttertoast.showToast(
+                //     msg: "Check your connectivity",
+                //     gravity: ToastGravity.BOTTOM);
+              },
+              image: 'assets/images/about.png',
+              title: languageController.textTranslate('Profile'),
+              about: ''),
+          // ),
 
           const SizedBox(height: 10),
           //__________________________________ AOBUT_______________________________________________
@@ -353,7 +353,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/about.png',
-              title: 'About'.tr,
+              title: languageController.textTranslate('About'),
               about: Hive.box(userdata).get(userBio) == null
                   ? ""
                   : capitalizeFirstLetter(Hive.box(userdata).get(userBio))),
@@ -388,7 +388,7 @@ class _ProfileState extends State<Profile> {
                           color: black1Color, height: 16),
                       const SizedBox(width: 10),
                       Text(
-                        "Starred Messages".tr,
+                        languageController.textTranslate('Starred Messages'),
                         style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'Poppins',
@@ -451,7 +451,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        "Block Contacts".tr,
+                        languageController.textTranslate('Block Contacts'),
                         style: const TextStyle(
                             fontSize: 12,
                             fontFamily: 'Poppins',
@@ -503,7 +503,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/share1.png',
-              title: "Tell a firend".tr,
+              title: languageController.textTranslate('Tell a firend'),
               about: ''),
           const SizedBox(height: 10),
           //_________________________________ SHARE LINK_____________________________________________
@@ -518,7 +518,7 @@ class _ProfileState extends State<Profile> {
                 //     gravity: ToastGravity.BOTTOM);
               },
               image: 'assets/images/share2.png',
-              title: "Share a link".tr,
+              title: languageController.textTranslate('Share a link'),
               about: ''),
           const SizedBox(height: 10),
           //________________________________ LOGOUT ___________________________________________________
@@ -578,10 +578,11 @@ class _ProfileState extends State<Profile> {
                                             color: yellow2Color, width: 1),
                                         borderRadius:
                                             BorderRadius.circular(12)),
-                                    child: const Center(
+                                    child: Center(
                                         child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
+                                      languageController
+                                          .textTranslate('Cancel'),
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                           color: chatColor),
@@ -626,7 +627,8 @@ class _ProfileState extends State<Profile> {
                                             end: Alignment.bottomCenter)),
                                     child: Center(
                                         child: Text(
-                                      'Logout'.tr,
+                                      languageController
+                                          .textTranslate('Logout'),
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
@@ -664,7 +666,7 @@ class _ProfileState extends State<Profile> {
                       ),
                       const SizedBox(width: 10),
                       Text(
-                        "Logout".tr,
+                        languageController.textTranslate('Logout'),
                         style: const TextStyle(
                             fontSize: 12,
                             color: Colors.red,
@@ -764,10 +766,11 @@ class _ProfileState extends State<Profile> {
                     const SizedBox(
                       height: 20,
                     ),
-                    const Text(
-                      'Are you sure you want to delete your account?',
+                    Text(
+                      languageController.textTranslate(
+                          'Are you sure you want to delete your account?'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 14,
                           color: Colors.grey),
@@ -785,10 +788,10 @@ class _ProfileState extends State<Profile> {
                         decoration: BoxDecoration(
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(10)),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            'YES',
-                            style: TextStyle(
+                            languageController.textTranslate('YES'),
+                            style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500),
@@ -809,10 +812,10 @@ class _ProfileState extends State<Profile> {
                         decoration: BoxDecoration(
                             color: Colors.black,
                             borderRadius: BorderRadius.circular(10)),
-                        child: const Center(
+                        child: Center(
                           child: Text(
-                            'NO',
-                            style: TextStyle(
+                            languageController.textTranslate('NO'),
+                            style: const TextStyle(
                                 fontSize: 13,
                                 color: Colors.white,
                                 fontWeight: FontWeight.w500),

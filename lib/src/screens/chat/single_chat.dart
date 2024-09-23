@@ -23,6 +23,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:lottie/lottie.dart' as lt;
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
@@ -956,7 +957,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                       child: Text(
                                         data.senderId!.toString() ==
                                                 widget.userID.toString()
-                                            ? "You"
+                                            ? languageController
+                                                .textTranslate('You')
                                             : widget.username!,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
@@ -977,9 +979,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     const SizedBox(
                                       width: 2,
                                     ),
-                                    const Text(
-                                      "Status",
-                                      style: TextStyle(
+                                    Text(
+                                      languageController
+                                          .textTranslate('Status'),
+                                      style: const TextStyle(
                                         color: Color(0xffFCC604),
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
@@ -2274,7 +2277,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           builder: (context) => VideoViewFix(
                             username: data.myMessage == false
                                 ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
-                                : "You",
+                                : languageController.textTranslate('You'),
                             url: data.url!,
                             play: true,
                             mute: false,
@@ -2384,7 +2387,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                     builder: (context) => VideoViewFix(
                                       username: data.myMessage == false
                                           ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
-                                          : "You",
+                                          : languageController
+                                              .textTranslate('You'),
                                       url: data.url!,
                                       play: true,
                                       mute: false,
@@ -2609,9 +2613,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                 FontWeight.w500,
                                                           ),
                                                         ),
-                                                        const Text(
-                                                          '0 Page - 0 KB',
-                                                          style: TextStyle(
+                                                        Text(
+                                                          languageController
+                                                              .textTranslate(
+                                                                  '0 Page - 0 KB'),
+                                                          style:
+                                                              const TextStyle(
                                                             color: Colors.grey,
                                                             fontSize: 10,
                                                             fontWeight:
@@ -2672,8 +2679,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                       ],
                                                     );
                                                   } else {
-                                                    return const Text(
-                                                        'No PDF info available');
+                                                    return Text(languageController
+                                                        .textTranslate(
+                                                            'No PDF info available'));
                                                   }
                                                 },
                                               ),
@@ -3597,13 +3605,14 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                             end: Alignment.bottomCenter,
                                           ),
                                         ),
-                                        child: const Column(
+                                        child: Column(
                                           children: [
-                                            SizedBox(height: 3),
+                                            const SizedBox(height: 3),
                                             Text(
-                                              "View contact",
+                                              languageController.textTranslate(
+                                                  'View contact'),
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w400,
                                                   color: chatColor),
@@ -3751,9 +3760,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                 chatMessageList = [];
                               });
                             },
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
+                            child: Text(
+                              languageController.textTranslate('Cancel'),
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w400,
                                   color: Colors.blue),
                             )))
@@ -3799,7 +3808,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 2, vertical: 5),
                               border: InputBorder.none,
-                              hintText: "Type Message",
+                              hintText: languageController
+                                  .textTranslate('Type Message'),
                               hintStyle: TextStyle(
                                   color: darkGreyColor,
                                   fontSize: 13,
@@ -3906,7 +3916,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print("error text sent $e");
-                          showCustomToast("Something Error1");
+                          showCustomToast(languageController
+                              .textTranslate('Something Error1'));
                         }
                         messagecontroller.clear();
                       } else {
@@ -3934,7 +3945,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print("error text sent 1 $e");
-                          showCustomToast("Something Error1");
+                          showCustomToast(languageController
+                              .textTranslate('Something Error1'));
                         }
                         messagecontroller.clear();
                       }
@@ -3996,8 +4008,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                   Image.asset("assets/images/doc1.png",
                                       height: 50),
                                   const SizedBox(height: 8),
-                                  const Text('File',
-                                      style: TextStyle(
+                                  Text(languageController.textTranslate('File'),
+                                      style: const TextStyle(
                                           color: chatColor,
                                           fontWeight: FontWeight.w400,
                                           fontSize: 13))
@@ -4028,8 +4040,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                 const SizedBox(
                                   height: 8,
                                 ),
-                                const Text('Photo',
-                                    style: TextStyle(
+                                Text(languageController.textTranslate('Photo'),
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.w400,
                                         fontSize: 13))
                               ],
@@ -4045,19 +4057,20 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.transparent),
-                              child: const Column(
+                              child: Column(
                                 children: [
-                                  Image(
+                                  const Image(
                                     height: 50,
                                     image: AssetImage(
                                       'assets/images/video_gallery.png',
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 8,
                                   ),
-                                  Text('Video',
-                                      style: TextStyle(
+                                  Text(
+                                      languageController.textTranslate('Video'),
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 13))
                                 ],
@@ -4093,8 +4106,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                const Text('Gif',
-                                    style: TextStyle(
+                                Text(languageController.textTranslate('Gif'),
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.w400,
                                         fontSize: 13))
                               ],
@@ -4205,7 +4218,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
       if (await audioRecord.hasPermission()) {
         await audioRecord.start();
       } else {
-        showCustomToast("No microphone permission");
+        showCustomToast(
+            languageController.textTranslate('No microphone permission'));
       }
     } catch (e) {
       if (kDebugMode) {
@@ -4451,7 +4465,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               end: Alignment.bottomCenter)),
                       child: Center(
                         child: Text(
-                          record ? "Send" : "Start",
+                          record
+                              ? languageController.textTranslate('Send')
+                              : languageController.textTranslate('Start'),
                           style: const TextStyle(color: chatColor),
                         ),
                       ),
@@ -4477,10 +4493,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               colors: [yellow1Color, yellow2Color],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter)),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          "Cancel",
-                          style: TextStyle(color: chatColor),
+                          languageController.textTranslate('Cancel'),
+                          style: const TextStyle(color: chatColor),
                         ),
                       ),
                     ),
@@ -4928,7 +4944,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
 
         // Check if the video size is greater than 10MB
         if (image.lengthSync() > 10 * 1024 * 1024) {
-          showCustomToast("Selected video file size should be less than 10MB");
+          showCustomToast(languageController.textTranslate(
+              'Selected video file size should be less than 10MB'));
           return;
         } else {
           // Modify the file name by appending "-isvideo" before the extension
@@ -5119,22 +5136,22 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 padding: const EdgeInsets.all(12),
                 child: Text(
                   data.messageType == "location"
-                      ? capitalizeFirstLetter("📌 Location")
+                      ? "📌 ${languageController.textTranslate('Location')}"
                       : data.messageType == "video"
-                          ? capitalizeFirstLetter("🎥 Video")
+                          ? "🎥 ${languageController.textTranslate('Video')}"
                           : data.messageType == "image"
                               ? capitalizeFirstLetter("📷 Photo")
                               : data.messageType == "document"
                                   ? capitalizeFirstLetter("📄 Documenet")
                                   : data.messageType == "audio"
                                       ? capitalizeFirstLetter(
-                                          "🔊 Voice message")
+                                          "🔊 ${languageController.textTranslate('Voice message')}")
                                       : data.messageType == "link"
                                           ? capitalizeFirstLetter(data.message!)
                                           : data.messageType == "gif"
-                                              ? "😈 GIF"
+                                              ? "😈 ${languageController.textTranslate('GIF')}"
                                               : data.messageType == "contact"
-                                                  ? "📞 Contact"
+                                                  ? "📞 ${languageController.textTranslate('Contact')}"
                                                   : capitalizeFirstLetter(
                                                       data.message!),
                   maxLines: 2,
@@ -5178,9 +5195,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               Image.asset("assets/images/copy.png",
                                   height: 18, color: chatColor),
                               const SizedBox(width: 10),
-                              const Text(
-                                'Copy',
-                                style: TextStyle(
+                              Text(
+                                languageController.textTranslate('Copy'),
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -5213,24 +5230,27 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           SelectedreplyText = !SelectedreplyText;
                           USERTEXT = data.myMessage == false
                               ? "${users.firstName} ${users.lastName!}"
-                              : "You";
+                              : languageController.textTranslate('You');
                           replyText = (data.messageType == "text"
                               ? data.message
                               : data.messageType == "location"
-                                  ? "📌 Location"
+                                  ? "📌 ${languageController.textTranslate('Location')}"
                                   : data.messageType == "image"
-                                      ? "📷 Photo"
+                                      ? "📷 ${languageController.textTranslate('Photo')}"
                                       : data.messageType == "video"
-                                          ? "🎥 Video"
+                                          ? "🎥 ${languageController.textTranslate('Video')}"
                                           : data.messageType == "docdocument"
                                               ? "📄 Documenet"
                                               : data.messageType == "audio"
-                                                  ? "🔊 Voice message"
+                                                  ? "🔊 ${languageController.textTranslate('Voice message')}"
                                                   : data.messageType == "gif"
-                                                      ? "GIF"
+                                                      ? languageController
+                                                          .textTranslate('GIF')
                                                       : data.messageType ==
                                                               "contact"
-                                                          ? "Contact"
+                                                          ? languageController
+                                                              .textTranslate(
+                                                                  'Contact')
                                                           : data.message)!;
                           reply_chatID = data.messageId.toString();
                           // rplyTime = time;
@@ -5246,9 +5266,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           Image.asset("assets/images/reply.png",
                               height: 18, color: chatColor),
                           const SizedBox(width: 10),
-                          const Text(
-                            'Reply',
-                            style: TextStyle(
+                          Text(
+                            languageController.textTranslate('Reply'),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
@@ -5283,9 +5303,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         Image.asset("assets/images/forward1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Forward',
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Forward'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -5320,9 +5340,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         Image.asset("assets/images/trash1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Delete',
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Delete'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -5364,8 +5384,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         const SizedBox(width: 10),
                         Text(
                           data.isStarMessage != false
-                              ? 'Unstar Message'
-                              : 'Star Message',
+                              ? languageController
+                                  .textTranslate('Unstar Message')
+                              : languageController
+                                  .textTranslate('Star Message'),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -5401,23 +5423,23 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "image") {
-          return "📷 Photo";
+          return "📷 ${languageController.textTranslate('Photo')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "location") {
-          return "📌 Location";
+          return "📌 ${languageController.textTranslate('Location')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "document") {
-          return "📄 Document";
+          return "📄 ${languageController.textTranslate('Document')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "video") {
-          return "🎥 Video";
+          return "🎥 ${languageController.textTranslate('Video')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "audio") {
-          return "🔊 Audio";
+          return "🔊 ${languageController.textTranslate('Audio')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "link") {
@@ -5426,11 +5448,11 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "gif") {
-          return "GIF";
+          return languageController.textTranslate('GIF');
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "contact") {
-          return "Contact";
+          return languageController.textTranslate('Contact');
         }
       }
     }
@@ -5449,21 +5471,22 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
             userID) {
           if ("${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}" ==
               "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}") {
-            return 'You';
+            return languageController.textTranslate('You');
           } else {
             return "${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}";
           }
         } else {
           if ("${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}" ==
               "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}") {
-            return 'You';
+            return languageController.textTranslate('You');
           } else {
             return "${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}";
           }
         }
       }
     }
-    return "You"; // This return might be a default case if no match is found
+    return languageController.textTranslate(
+        'You'); // This return might be a default case if no match is found
   }
 
   Widget replyMSGWidget(MessageList data, int index, SenderData users) {
@@ -5714,9 +5737,12 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                         .w500,
                                                               ),
                                                             ),
-                                                            const Text(
-                                                              '0 Page - 0 KB',
-                                                              style: TextStyle(
+                                                            Text(
+                                                              languageController
+                                                                  .textTranslate(
+                                                                      '0 Page - 0 KB'),
+                                                              style:
+                                                                  const TextStyle(
                                                                 color:
                                                                     Colors.grey,
                                                                 fontSize: 10,
@@ -5784,8 +5810,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                           ],
                                                         );
                                                       } else {
-                                                        return const Text(
-                                                            'No PDF info available');
+                                                        return Text(
+                                                            languageController
+                                                                .textTranslate(
+                                                                    'No PDF info available'));
                                                       }
                                                     },
                                                   ),
@@ -6242,13 +6270,13 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                                                                       height: 30,
                                                                                       width: 210,
                                                                                       decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
-                                                                                      child: const Column(
+                                                                                      child: Column(
                                                                                         children: [
-                                                                                          SizedBox(height: 3),
+                                                                                          const SizedBox(height: 3),
                                                                                           Text(
-                                                                                            "View contact",
+                                                                                            languageController.textTranslate('View contact'),
                                                                                             textAlign: TextAlign.center,
-                                                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
                                                                                           ),
                                                                                         ],
                                                                                       ),
@@ -6387,9 +6415,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     ),
                     Obx(() {
                       return controller.allOnline.contains(widget.userID)
-                          ? const Text(
-                              "Online",
-                              style: TextStyle(
+                          ? Text(
+                              languageController.textTranslate('Online'),
+                              style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.green,
                                   fontWeight: FontWeight.w600,
@@ -6501,18 +6529,19 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               onSearchTextChanged(searchText);
             }
           },
-          decoration: const InputDecoration(
-            suffixIcon: Padding(
+          decoration: InputDecoration(
+            suffixIcon: const Padding(
               padding: EdgeInsets.all(17),
               child: Image(
                 image: AssetImage('assets/icons/search.png'),
               ),
             ),
-            hintText: '  What are you looking for?',
-            hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+            hintText:
+                '  ${languageController.textTranslate('What are you looking for?')}',
+            hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
             filled: true,
             fillColor: Colors.transparent,
-            border: OutlineInputBorder(borderSide: BorderSide.none),
+            border: const OutlineInputBorder(borderSide: BorderSide.none),
           ),
         ),
       ),
@@ -6667,9 +6696,9 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                     ),
                     Obx(() {
                       return controller.allOnline.contains(widget.userID)
-                          ? const Text(
-                              "Online",
-                              style: TextStyle(
+                          ? Text(
+                              languageController.textTranslate('Online'),
+                              style: const TextStyle(
                                   fontSize: 10,
                                   color: Colors.green,
                                   fontWeight: FontWeight.w600,
@@ -6757,9 +6786,11 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  const Text(
-                    "Are you sure you want to Delete?",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                  Text(
+                    languageController
+                        .textTranslate('Are you sure you want to Delete?'),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                   const SizedBox(height: 15),
                   const Text(
@@ -6783,10 +6814,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                           decoration: BoxDecoration(
                               border: Border.all(color: yellow2Color, width: 1),
                               borderRadius: BorderRadius.circular(12)),
-                          child: const Center(
+                          child: Center(
                               child: Text(
-                            'Cancel',
-                            style: TextStyle(
+                            languageController.textTranslate('Cancel'),
+                            style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: chatColor),
@@ -6837,10 +6868,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                   colors: [yellow1Color, yellow2Color],
                                   begin: Alignment.topCenter,
                                   end: Alignment.bottomCenter)),
-                          child: const Center(
+                          child: Center(
                               child: Text(
-                            'Delete',
-                            style: TextStyle(
+                            languageController.textTranslate('Delete'),
+                            style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: chatColor),
@@ -6903,8 +6934,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               Text(
                                 chatListController.blockModel.value!.isBlock ==
                                         true
-                                    ? "Are you sure you want to Unblock?"
-                                    : "Are you sure you want to Block?",
+                                    ? languageController.textTranslate(
+                                        'Are you sure you want to Unblock?')
+                                    : languageController.textTranslate(
+                                        'Are you sure you want to Block?'),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 16),
                               ),
@@ -6912,8 +6945,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                               Text(
                                 chatListController.blockModel.value!.isBlock ==
                                         true
-                                    ? "Are you sure you want to unblock profile of  @${widget.username}?"
-                                    : "Are you sure you want to block profile of  @${widget.username}?",
+                                    ? "${languageController.textTranslate('Are you sure you want to unblock profile of')}  @${widget.username}?"
+                                    : "${languageController.textTranslate('Are you sure you want to block profile of')}  @${widget.username}?",
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                     color: appgrey2,
@@ -6937,10 +6970,11 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                               color: yellow2Color, width: 1),
                                           borderRadius:
                                               BorderRadius.circular(12)),
-                                      child: const Center(
+                                      child: Center(
                                           child: Text(
-                                        'Cancel',
-                                        style: TextStyle(
+                                        languageController
+                                            .textTranslate('Cancel'),
+                                        style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w400,
                                             color: chatColor),
@@ -6976,8 +7010,10 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                                         chatListController.blockModel.value!
                                                     .isBlock ==
                                                 true
-                                            ? "Unblock"
-                                            : 'Block',
+                                            ? languageController
+                                                .textTranslate('Unblock')
+                                            : languageController
+                                                .textTranslate('Block'),
                                         style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w400,
@@ -6997,8 +7033,8 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               );
             },
             child: Text(chatListController.blockModel.value!.isBlock == true
-                ? "UnBlock Contact"
-                : 'Block Contact')),
+                ? languageController.textTranslate('UnBlock Contact')
+                : languageController.textTranslate('Block Contact'))),
         PopupMenuItem(
             onTap: () {
               WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -7023,7 +7059,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 });
               });
             },
-            child: const Text('View contact')),
+            child: Text(languageController.textTranslate('View contact'))),
         PopupMenuItem(
             onTap: () {
               if (chatContorller.userdetailschattModel.value != null &&
@@ -7043,7 +7079,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
               isKeyboard = false;
               //deleteMsgDialog();
             },
-            child: const Text('Clear chat')),
+            child: Text(languageController.textTranslate('Clear chat'))),
         PopupMenuItem(
             onTap: () {
               setState(() {
@@ -7051,7 +7087,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                 isTextFieldHide = "1";
               });
             },
-            child: const Text('Search chat')),
+            child: Text(languageController.textTranslate('Search chat'))),
       ],
     );
   }

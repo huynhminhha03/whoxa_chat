@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/model/chat_profile_model.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -73,27 +74,30 @@ class _MediaState extends State<Media> {
                 Container(
                   width: double.maxFinite,
                   color: Colors.white,
-                  child: const Center(
+                  child: Center(
                     child: TabBar(
-                      dividerColor: Color.fromRGBO(236, 236, 236, 1),
+                      dividerColor: const Color.fromRGBO(236, 236, 236, 1),
                       indicatorColor: chatownColor,
-                      unselectedLabelStyle: TextStyle(
+                      unselectedLabelStyle: const TextStyle(
                           color: Colors.grey,
                           fontWeight: FontWeight.w500,
                           fontSize: 15),
-                      labelStyle: TextStyle(
+                      labelStyle: const TextStyle(
                           color: chatownColor,
                           fontWeight: FontWeight.w500,
                           fontSize: 15),
                       tabs: [
                         Tab(
-                          text: '      Media        ',
+                          text:
+                              '      ${languageController.textTranslate('Media')}        ',
                         ),
                         Tab(
-                          text: "      Links       ",
+                          text:
+                              "      ${languageController.textTranslate('Links')}       ",
                         ),
                         Tab(
-                          text: "      Docs        ",
+                          text:
+                              "      ${languageController.textTranslate('Docs')}        ",
                         ),
                       ],
                     ),
@@ -152,7 +156,7 @@ class _MediaState extends State<Media> {
                                                   padding: const EdgeInsets.all(
                                                       15.0),
                                                   child: Text(
-                                                    "You haven't share any media with ${widget.peername}",
+                                                    "${languageController.textTranslate("You haven't share any media")} with ${widget.peername}",
                                                     textAlign: TextAlign.center,
                                                     maxLines: 1,
                                                     overflow:
@@ -250,7 +254,7 @@ class _MediaState extends State<Media> {
                                                             const EdgeInsets
                                                                 .all(15.0),
                                                         child: Text(
-                                                          "You haven't share any link with ${widget.peername}",
+                                                          "${languageController.textTranslate("You haven't share any link with")} ${widget.peername}",
                                                           textAlign:
                                                               TextAlign.center,
                                                           maxLines: 1,
@@ -351,7 +355,7 @@ class _MediaState extends State<Media> {
                                                         const EdgeInsets.all(
                                                             15.0),
                                                     child: Text(
-                                                      "You haven't share any doc with ${widget.peername}",
+                                                      "${languageController.textTranslate("You haven't share any doc with")} ${widget.peername}",
                                                       textAlign:
                                                           TextAlign.center,
                                                       maxLines: 1,
@@ -656,9 +660,10 @@ class _MediaState extends State<Media> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const Text(
-                                '0 Page - 0 KB',
-                                style: TextStyle(
+                              Text(
+                                languageController
+                                    .textTranslate('0 Page - 0 KB'),
+                                style: const TextStyle(
                                   color: Colors.grey,
                                   fontSize: 10,
                                   fontWeight: FontWeight.w400,
@@ -700,7 +705,8 @@ class _MediaState extends State<Media> {
                             ],
                           );
                         } else {
-                          return const Text('No PDF info available');
+                          return Text(languageController
+                              .textTranslate('No PDF info available'));
                         }
                       },
                     ),

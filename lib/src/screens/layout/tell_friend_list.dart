@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -85,9 +86,9 @@ class _InviteFriendState extends State<InviteFriend> {
               child:
                   const Icon(Icons.arrow_back_ios, color: chatColor, size: 20)),
           centerTitle: true,
-          title: const Text(
-            'Tell a friend',
-            style: TextStyle(
+          title: Text(
+            languageController.textTranslate('Tell a friend'),
+            style: const TextStyle(
                 fontWeight: FontWeight.w500, fontSize: 20, color: Colors.black),
           )),
       body: Stack(
@@ -117,19 +118,20 @@ class _InviteFriendState extends State<InviteFriend> {
                               searchText = value.toLowerCase().trim();
                             });
                           },
-                          decoration: const InputDecoration(
-                            suffixIcon: Padding(
+                          decoration: InputDecoration(
+                            suffixIcon: const Padding(
                               padding: EdgeInsets.all(17),
                               child: Image(
                                 image: AssetImage('assets/icons/search.png'),
                               ),
                             ),
-                            hintText: '  What are you looking for?',
-                            hintStyle:
-                                TextStyle(fontSize: 12, color: Colors.grey),
+                            hintText:
+                                '  ${languageController.textTranslate('What are you looking for?')}',
+                            hintStyle: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
                             filled: true,
                             fillColor: Colors.transparent,
-                            border: OutlineInputBorder(
+                            border: const OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),
                           ),
@@ -243,9 +245,9 @@ class _InviteFriendState extends State<InviteFriend> {
                               contact.phones.map((e) => e.number).toString()),
                           maxLines: 1,
                         )),
-                    trailing: const Text(
-                      "Invite  ",
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                    trailing: Text(
+                      "${languageController.textTranslate('Invite')}  ",
+                      style: const TextStyle(fontSize: 14, color: Colors.blue),
                     ),
                   ),
           ],
@@ -299,9 +301,10 @@ class _InviteFriendState extends State<InviteFriend> {
                       child: const Center(child: Icon(Icons.groups_2))),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  "New Group",
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                Text(
+                  languageController.textTranslate('New Group'),
+                  style: const TextStyle(
+                      fontSize: 15, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -313,11 +316,11 @@ class _InviteFriendState extends State<InviteFriend> {
           color: Colors.grey.shade300,
         ),
         const SizedBox(height: 15),
-        const Padding(
-          padding: EdgeInsets.only(left: 20),
+        Padding(
+          padding: const EdgeInsets.only(left: 20),
           child: Text(
-            "CONTACTS",
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            languageController.textTranslate('CONTACTS'),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           ),
         ),
         const SizedBox(height: 12),
@@ -342,7 +345,7 @@ class _InviteFriendState extends State<InviteFriend> {
             ),
             title: Center(
               child: Text(
-                capitalizeFirstLetter('Group Info'),
+                languageController.textTranslate('Group Info'),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w400,

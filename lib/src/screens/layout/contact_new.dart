@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/add_contact_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -132,19 +133,20 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                               searchText = value.toLowerCase().trim();
                             });
                           },
-                          decoration: const InputDecoration(
-                            prefixIcon: Padding(
+                          decoration: InputDecoration(
+                            prefixIcon: const Padding(
                               padding: EdgeInsets.all(17),
                               child: Image(
                                 image: AssetImage('assets/icons/search.png'),
                               ),
                             ),
-                            hintText: 'Search name or number',
-                            hintStyle:
-                                TextStyle(fontSize: 12, color: Colors.grey),
+                            hintText: languageController
+                                .textTranslate('Search name or number'),
+                            hintStyle: const TextStyle(
+                                fontSize: 12, color: Colors.grey),
                             filled: true,
                             fillColor: Colors.transparent,
-                            border: OutlineInputBorder(
+                            border: const OutlineInputBorder(
                               borderSide: BorderSide.none,
                             ),
                           ),
@@ -179,9 +181,9 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                                     Image.asset("assets/images/group1.png"))),
                       ),
                       const SizedBox(width: 10),
-                      const Text(
-                        "New Group",
-                        style: TextStyle(
+                      Text(
+                        languageController.textTranslate('New Group'),
+                        style: const TextStyle(
                             fontSize: 15, fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -229,12 +231,12 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                                       )
                                     : const SizedBox.shrink(),
                                 controller.text.trim().isEmpty
-                                    ? const Padding(
-                                        padding:
-                                            EdgeInsets.only(left: 18, top: 10),
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 18, top: 10),
                                         child: Text(
-                                          'Invite Friend to Chatweb ',
-                                          style: TextStyle(
+                                          '${languageController.textTranslate('Invite Friend to Chatweb')} ',
+                                          style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600),
                                         ),
@@ -398,15 +400,15 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                         );
                 },
               )
-            : const SizedBox(
+            : SizedBox(
                 height: 100,
                 child: Center(
                     child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(color: Colors.black),
-                    SizedBox(width: 10),
-                    Text("Please wait...!"),
+                    const CircularProgressIndicator(color: Colors.black),
+                    const SizedBox(width: 10),
+                    Text(languageController.textTranslate('Please wait...!')),
                   ],
                 )),
               );
@@ -521,9 +523,9 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                                 style: const TextStyle(
                                     color: Color.fromRGBO(73, 73, 73, 1)),
                               )),
-                          trailing: const Text(
-                            "Invite",
-                            style: TextStyle(
+                          trailing: Text(
+                            languageController.textTranslate('Invite'),
+                            style: const TextStyle(
                                 fontSize: 14,
                                 color: chatownColor,
                                 fontWeight: FontWeight.w500),
@@ -558,17 +560,17 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
   }
 
   Widget contactDesign() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 20, top: 10),
+          padding: const EdgeInsets.only(left: 20, top: 10),
           child: Text(
-            "Contact on Chatweb",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            languageController.textTranslate('Contact on Chatweb'),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -586,7 +588,7 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
             ),
             title: Center(
               child: Text(
-                capitalizeFirstLetter('Group Info'),
+                languageController.textTranslate('Group Info'),
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w400,

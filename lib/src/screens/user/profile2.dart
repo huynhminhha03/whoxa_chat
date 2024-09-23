@@ -237,9 +237,9 @@ class _profile2State extends State<profile2> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "First Name",
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('First Name'),
+                          style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 5),
@@ -277,9 +277,9 @@ class _profile2State extends State<profile2> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          "Last Name",
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Last Name'),
+                          style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 5),
@@ -412,9 +412,11 @@ class _profile2State extends State<profile2> {
                   languageController.textTranslate('No Internet Connection'));
         } else {
           if (textController.text.isEmpty) {
-            showCustomToast("Please enter first name");
+            showCustomToast(
+                languageController.textTranslate('Please enter first name'));
           } else if (textController1.text.isEmpty) {
-            showCustomToast("Please enter last name");
+            showCustomToast(
+                languageController.textTranslate('Please enter last name'));
           }
         }
       },
@@ -464,10 +466,10 @@ class _profile2State extends State<profile2> {
                     width: 100,
                   ),
                   Container(height: 15.0),
-                  const Text(
-                    "Upload Image",
+                  Text(
+                    languageController.textTranslate('Upload Image'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(height: 15.0),
                   SizedBox(
@@ -481,9 +483,9 @@ class _profile2State extends State<profile2> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
-                      child: const Text(
-                        "Take Picture",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('Take Picture'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -501,9 +503,9 @@ class _profile2State extends State<profile2> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        "From Gallery",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('From Gallery'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),

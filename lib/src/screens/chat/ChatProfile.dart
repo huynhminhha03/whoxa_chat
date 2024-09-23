@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -182,28 +183,30 @@ class _ChatProfileState extends State<ChatProfile> {
                 onTap: () {
                   chatListController.blockModel.value!.isBlock == true
                       ? Fluttertoast.showToast(
-                          msg: "User blocked, not able to voice call")
+                          msg: languageController.textTranslate(
+                              'User blocked, not able to voice call'))
                       : '';
                 },
                 img: "assets/images/call_1.png",
-                title: "Audio"),
+                title: languageController.textTranslate('Audio')),
             const SizedBox(width: 30),
             buttonContainer(
                 onTap: () {
                   chatListController.blockModel.value!.isBlock == true
                       ? Fluttertoast.showToast(
-                          msg: "User blocked, not able to video call")
+                          msg: languageController.textTranslate(
+                              'User blocked, not able to video call'))
                       : '';
                 },
                 img: "assets/images/video_1.png",
-                title: "Video"),
+                title: languageController.textTranslate('Video')),
             const SizedBox(width: 30),
             buttonContainer(
                 onTap: () {
                   Get.back(result: "1");
                 },
                 img: "assets/icons/search-normal.png",
-                title: "Search")
+                title: languageController.textTranslate('Search'))
           ],
         ),
         const SizedBox(height: 20),
@@ -271,8 +274,10 @@ class _ChatProfileState extends State<ChatProfile> {
                             Text(
                               chatListController.blockModel.value!.isBlock ==
                                       true
-                                  ? "Are you sure you want to Unblock?"
-                                  : "Are you sure you want to Block?",
+                                  ? languageController.textTranslate(
+                                      'Are you sure you want to Unblock?')
+                                  : languageController.textTranslate(
+                                      'Are you sure you want to Block?'),
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600, fontSize: 16),
                             ),
@@ -280,8 +285,8 @@ class _ChatProfileState extends State<ChatProfile> {
                             Text(
                               chatListController.blockModel.value!.isBlock ==
                                       true
-                                  ? "Are you sure you want to unblock profile of  @${widget.fullName}?"
-                                  : "Are you sure you want to block profile of  @${widget.fullName}?",
+                                  ? "${languageController.textTranslate('Are you sure you want to unblock profile of')}  @${widget.fullName}?"
+                                  : "${languageController.textTranslate('Are you sure you want to block profile of')}  @${widget.fullName}?",
                               style: const TextStyle(
                                   fontWeight: FontWeight.w500,
                                   color: appgrey2,
@@ -304,10 +309,11 @@ class _ChatProfileState extends State<ChatProfile> {
                                             color: yellow2Color, width: 1),
                                         borderRadius:
                                             BorderRadius.circular(12)),
-                                    child: const Center(
+                                    child: Center(
                                         child: Text(
-                                      'Cancel',
-                                      style: TextStyle(
+                                      languageController
+                                          .textTranslate('Cancel'),
+                                      style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
                                           color: chatColor),
@@ -342,8 +348,10 @@ class _ChatProfileState extends State<ChatProfile> {
                                       chatListController
                                                   .blockModel.value!.isBlock ==
                                               true
-                                          ? "Unblock"
-                                          : 'Block',
+                                          ? languageController
+                                              .textTranslate('Unblock')
+                                          : languageController
+                                              .textTranslate('Block'),
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
@@ -483,7 +491,7 @@ class _ChatProfileState extends State<ChatProfile> {
                       width: 10,
                     ),
                     Text(
-                      'Delete ${data.conversationsUsers![0].user!.userName!}',
+                      '${languageController.textTranslate('Delete')} ${data.conversationsUsers![0].user!.userName!}',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -598,9 +606,9 @@ class _ChatProfileState extends State<ChatProfile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Media, links and docs",
-                  style: TextStyle(
+                Text(
+                  languageController.textTranslate('Media, links and docs'),
+                  style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey),
@@ -624,10 +632,11 @@ class _ChatProfileState extends State<ChatProfile> {
               height: 100,
               child: chatProfileController
                       .profileModel.value!.mediaData!.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        "You haven't share any media",
-                        style: TextStyle(color: Colors.grey),
+                        languageController
+                            .textTranslate("You haven't share any media"),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     )
                   : Align(
@@ -773,9 +782,10 @@ class _ChatProfileState extends State<ChatProfile> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Text(
-                    'Starred Messages',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                  Text(
+                    languageController.textTranslate('Starred Messages'),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
@@ -842,16 +852,18 @@ class _ChatProfileState extends State<ChatProfile> {
                           const SizedBox(height: 10),
                           Text(
                             chatListController.blockModel.value!.isBlock == true
-                                ? "Are you sure you want to Unblock?"
-                                : "Are you sure you want to Block?",
+                                ? languageController.textTranslate(
+                                    'Are you sure you want to Unblock?')
+                                : languageController.textTranslate(
+                                    'Are you sure you want to Block?'),
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600, fontSize: 16),
                           ),
                           const SizedBox(height: 15),
                           Text(
                             chatListController.blockModel.value!.isBlock == true
-                                ? "Are you sure you want to unblock profile of  @${widget.fullName}?"
-                                : "Are you sure you want to block profile of  @${widget.fullName}?",
+                                ? "${languageController.textTranslate('Are you sure you want to unblock profile of')}  @${widget.fullName}?"
+                                : "${languageController.textTranslate('Are you sure you want to block profile of')}  @${widget.fullName}?",
                             style: const TextStyle(
                                 fontWeight: FontWeight.w500,
                                 color: appgrey2,
@@ -873,10 +885,10 @@ class _ChatProfileState extends State<ChatProfile> {
                                       border: Border.all(
                                           color: yellow2Color, width: 1),
                                       borderRadius: BorderRadius.circular(12)),
-                                  child: const Center(
+                                  child: Center(
                                       child: Text(
-                                    'Cancel',
-                                    style: TextStyle(
+                                    languageController.textTranslate('Cancel'),
+                                    style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
                                         color: chatColor),
@@ -907,8 +919,10 @@ class _ChatProfileState extends State<ChatProfile> {
                                     chatListController
                                                 .blockModel.value!.isBlock ==
                                             true
-                                        ? "Unblock"
-                                        : 'Block',
+                                        ? languageController
+                                            .textTranslate('Unblock')
+                                        : languageController
+                                            .textTranslate('Block'),
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
@@ -941,7 +955,7 @@ class _ChatProfileState extends State<ChatProfile> {
               return Text(
                 chatListController.blockModel.value!.isBlock == true
                     ? 'UnBlock'
-                    : "Block",
+                    : languageController.textTranslate('Block'),
                 style: const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w500,

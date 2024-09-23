@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/avatar_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:meyaoo_new/src/global/strings.dart';
@@ -73,10 +74,10 @@ class _PickImagePopupState extends State<PickImagePopup> {
                       const SizedBox(
                         height: 10,
                       ),
-                      const Text(
-                        'Camera',
+                      Text(
+                        languageController.textTranslate('Camera'),
                         textAlign: TextAlign.left,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 12,
                             fontFamily: "Poppins",

@@ -23,6 +23,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:lecle_flutter_link_preview/lecle_flutter_link_preview.dart';
 import 'package:lottie/lottie.dart' as lt;
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/audio_controller.dart';
 import 'package:meyaoo_new/controller/call_controller.dart/get_roomId_controller.dart';
 import 'package:meyaoo_new/controller/get_contact_controller.dart';
@@ -2182,7 +2183,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           builder: (context) => VideoViewFix(
                             username: data.myMessage == false
                                 ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
-                                : "You",
+                                : languageController.textTranslate('You'),
                             url: data.url!,
                             play: true,
                             mute: false,
@@ -2289,7 +2290,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                           builder: (context) => VideoViewFix(
                                             username: data.myMessage == false
                                                 ? "${capitalizeFirstLetter(data.senderData!.firstName!)} ${capitalizeFirstLetter(data.senderData!.lastName!)}"
-                                                : "You",
+                                                : languageController
+                                                    .textTranslate('You'),
                                             url: data.url!,
                                             play: true,
                                             mute: false,
@@ -2532,9 +2534,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                 FontWeight.w500,
                                                           ),
                                                         ),
-                                                        const Text(
-                                                          '0 Page - 0 KB',
-                                                          style: TextStyle(
+                                                        Text(
+                                                          languageController
+                                                              .textTranslate(
+                                                                  '0 Page - 0 KB'),
+                                                          style:
+                                                              const TextStyle(
                                                             color: Colors.grey,
                                                             fontSize: 10,
                                                             fontWeight:
@@ -2595,8 +2600,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                       ],
                                                     );
                                                   } else {
-                                                    return const Text(
-                                                        'No PDF info available');
+                                                    return Text(languageController
+                                                        .textTranslate(
+                                                            'No PDF info available'));
                                                   }
                                                 },
                                               ),
@@ -3547,13 +3553,14 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                             end: Alignment.bottomCenter,
                                           ),
                                         ),
-                                        child: const Column(
+                                        child: Column(
                                           children: [
-                                            SizedBox(height: 3),
+                                            const SizedBox(height: 3),
                                             Text(
-                                              "View contact",
+                                              languageController.textTranslate(
+                                                  'View contact'),
                                               textAlign: TextAlign.center,
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w400,
                                                   color: chatColor),
@@ -3787,7 +3794,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               contentPadding: const EdgeInsets.symmetric(
                                   horizontal: 2, vertical: 5),
                               border: InputBorder.none,
-                              hintText: "Type Message",
+                              hintText: languageController
+                                  .textTranslate('Type Message'),
                               hintStyle: TextStyle(
                                   color: darkGreyColor,
                                   fontSize: 13,
@@ -3894,7 +3902,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         } catch (e) {
                           chatContorller.isSendMsg.value = false;
                           print(e);
-                          showCustomToast("Something Error1");
+                          showCustomToast(languageController
+                              .textTranslate('Something Error1'));
                         }
                         messagecontroller.clear();
                       } else {
@@ -3984,8 +3993,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                   Image.asset("assets/images/doc1.png",
                                       height: 50),
                                   const SizedBox(height: 8),
-                                  const Text('File',
-                                      style: TextStyle(
+                                  Text(languageController.textTranslate('File'),
+                                      style: const TextStyle(
                                           color: chatColor,
                                           fontWeight: FontWeight.w400,
                                           fontSize: 13))
@@ -4016,8 +4025,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                 const SizedBox(
                                   height: 8,
                                 ),
-                                const Text('Photo',
-                                    style: TextStyle(
+                                Text(languageController.textTranslate('Photo'),
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.w400,
                                         fontSize: 13))
                               ],
@@ -4033,19 +4042,20 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                             child: Container(
                               decoration: const BoxDecoration(
                                   color: Colors.transparent),
-                              child: const Column(
+                              child: Column(
                                 children: [
-                                  Image(
+                                  const Image(
                                     height: 50,
                                     image: AssetImage(
                                       'assets/images/video_gallery.png',
                                     ),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 8,
                                   ),
-                                  Text('Video',
-                                      style: TextStyle(
+                                  Text(
+                                      languageController.textTranslate('Video'),
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 13))
                                 ],
@@ -4081,8 +4091,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                const Text('Gif',
-                                    style: TextStyle(
+                                Text(languageController.textTranslate('Gif'),
+                                    style: const TextStyle(
                                         fontWeight: FontWeight.w400,
                                         fontSize: 13))
                               ],
@@ -4224,9 +4234,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                 chatMessageList = [];
                               });
                             },
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
+                            child: Text(
+                              languageController.textTranslate('Cancel'),
+                              style: const TextStyle(
                                   fontWeight: FontWeight.w400,
                                   color: Colors.blue),
                             )))
@@ -4290,8 +4300,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                             const SizedBox(
                                               height: 8,
                                             ),
-                                            const Text('File',
-                                                style: TextStyle(
+                                            Text(
+                                                languageController
+                                                    .textTranslate('File'),
+                                                style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14))
                                           ],
@@ -4328,8 +4340,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                           const SizedBox(
                                             height: 8,
                                           ),
-                                          const Text('Photo',
-                                              style: TextStyle(
+                                          Text(
+                                              languageController
+                                                  .textTranslate('Photo'),
+                                              style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 14))
                                         ],
@@ -4365,8 +4379,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                           const SizedBox(
                                             height: 8,
                                           ),
-                                          const Text('Camera',
-                                              style: TextStyle(
+                                          Text(
+                                              languageController
+                                                  .textTranslate('Camera'),
+                                              style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 14))
                                         ],
@@ -4412,8 +4428,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                             const SizedBox(
                                               height: 8,
                                             ),
-                                            const Text('Video',
-                                                style: TextStyle(
+                                            Text(
+                                                languageController
+                                                    .textTranslate('Video'),
+                                                style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14))
                                           ],
@@ -4436,10 +4454,11 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                               decoration: const BoxDecoration(
                                                   shape: BoxShape.circle,
                                                   color: bg1),
-                                              child: const Center(
+                                              child: Center(
                                                   child: Text(
-                                                'GIF',
-                                                style: TextStyle(
+                                                languageController
+                                                    .textTranslate('GIF'),
+                                                style: const TextStyle(
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w500,
                                                     color: chatColor),
@@ -4449,8 +4468,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                           const SizedBox(
                                             height: 8,
                                           ),
-                                          const Text('Gif',
-                                              style: TextStyle(
+                                          Text(
+                                              languageController
+                                                  .textTranslate('Gif'),
+                                              style: const TextStyle(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 14))
                                         ],
@@ -4485,8 +4506,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                             const SizedBox(
                                               height: 8,
                                             ),
-                                            const Text('Location',
-                                                style: TextStyle(
+                                            Text(
+                                                languageController
+                                                    .textTranslate('Location'),
+                                                style: const TextStyle(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14))
                                           ],
@@ -4538,7 +4561,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
       if (await audioRecord.hasPermission()) {
         await audioRecord.start();
       } else {
-        showCustomToast("No microphone permission");
+        showCustomToast(
+            languageController.textTranslate('No microphone permission'));
       }
     } catch (e) {
       if (kDebugMode) {
@@ -4797,7 +4821,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               end: Alignment.bottomCenter)),
                       child: Center(
                         child: Text(
-                          record ? "Send" : "Start",
+                          record
+                              ? languageController.textTranslate('Send')
+                              : languageController.textTranslate('Start'),
                           style: const TextStyle(color: chatColor),
                         ),
                       ),
@@ -4823,10 +4849,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               colors: [yellow1Color, yellow2Color],
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter)),
-                      child: const Center(
+                      child: Center(
                         child: Text(
-                          "Cancel",
-                          style: TextStyle(color: chatColor),
+                          languageController.textTranslate('Cancel'),
+                          style: const TextStyle(color: chatColor),
                         ),
                       ),
                     ),
@@ -5281,7 +5307,8 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
 
         // Check if the video size is greater than 10MB
         if (image.lengthSync() > 10 * 1024 * 1024) {
-          showCustomToast("Selected video file size should be less than 10MB");
+          showCustomToast(languageController.textTranslate(
+              'Selected video file size should be less than 10MB'));
           return;
         } else {
           // Modify the file name by appending "-isvideo" before the extension
@@ -5462,22 +5489,25 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 padding: const EdgeInsets.all(12),
                 child: Text(
                   data.messageType == "location"
-                      ? capitalizeFirstLetter("📌 Location")
+                      ? "📌 ${languageController.textTranslate('Location')}"
                       : data.messageType == "video"
-                          ? capitalizeFirstLetter("🎥 Video")
+                          ? "🎥 ${languageController.textTranslate('Video')}"
                           : data.messageType == "image"
-                              ? capitalizeFirstLetter("📷 Photo")
+                              ? capitalizeFirstLetter(
+                                  "📷 ${languageController.textTranslate('Photo')}")
                               : data.messageType == "document"
                                   ? capitalizeFirstLetter("📄 Documenet")
                                   : data.messageType == "audio"
                                       ? capitalizeFirstLetter(
-                                          "🔊 Voice message")
+                                          "🔊 ${languageController.textTranslate('Voice message')}")
                                       : data.messageType == "link"
                                           ? capitalizeFirstLetter(data.message!)
                                           : data.messageType == "gif"
-                                              ? "GIF"
+                                              ? languageController
+                                                  .textTranslate('GIF')
                                               : data.messageType == "contact"
-                                                  ? "Contact"
+                                                  ? languageController
+                                                      .textTranslate('Contact')
                                                   : capitalizeFirstLetter(
                                                       data.message!),
                   maxLines: 2,
@@ -5521,9 +5551,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                               Image.asset("assets/images/copy.png",
                                   height: 18, color: chatColor),
                               const SizedBox(width: 10),
-                              const Text(
-                                'Copy',
-                                style: TextStyle(
+                              Text(
+                                languageController.textTranslate('Copy'),
+                                style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -5556,24 +5586,27 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           SelectedreplyText = !SelectedreplyText;
                           USERTEXT = data.myMessage == false
                               ? "${users.firstName} ${users.lastName!}"
-                              : "You";
+                              : languageController.textTranslate('You');
                           replyText = (data.messageType == "text"
                               ? data.message
                               : data.messageType == "location"
-                                  ? "📌 Location"
+                                  ? "📌 ${languageController.textTranslate('Location')}"
                                   : data.messageType == "image"
-                                      ? "📷 Photo"
+                                      ? "📷 ${languageController.textTranslate('Photo')}"
                                       : data.messageType == "video"
-                                          ? "🎥 Video"
+                                          ? "🎥 ${languageController.textTranslate('Video')}"
                                           : data.messageType == "docdocument"
                                               ? "📄 Documenet"
                                               : data.messageType == "audio"
-                                                  ? "🔊 Voice message"
+                                                  ? "🔊 ${languageController.textTranslate('Voice message')}"
                                                   : data.messageType == "gif"
-                                                      ? "GIF"
+                                                      ? languageController
+                                                          .textTranslate('GIF')
                                                       : data.messageType ==
                                                               "contact"
-                                                          ? "Contact"
+                                                          ? languageController
+                                                              .textTranslate(
+                                                                  'Contact')
                                                           : data.message)!;
                           reply_chatID = data.messageId.toString();
                           // rplyTime = time;
@@ -5589,9 +5622,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                           Image.asset("assets/images/reply.png",
                               height: 18, color: chatColor),
                           const SizedBox(width: 10),
-                          const Text(
-                            'Reply',
-                            style: TextStyle(
+                          Text(
+                            languageController.textTranslate('Reply'),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
@@ -5626,9 +5659,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         Image.asset("assets/images/forward1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Forward',
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Forward'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -5663,9 +5696,9 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         Image.asset("assets/images/trash1.png",
                             height: 18, color: chatColor),
                         const SizedBox(width: 10),
-                        const Text(
-                          'Delete',
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Delete'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                           ),
@@ -5707,8 +5740,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                         const SizedBox(width: 10),
                         Text(
                           data.isStarMessage != false
-                              ? 'Unstar Message'
-                              : 'Star Message',
+                              ? languageController
+                                  .textTranslate('Unstar Message')
+                              : languageController
+                                  .textTranslate('Star Message'),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
@@ -5745,7 +5780,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "image") {
-          return "📷 Photo";
+          return "📷 ${languageController.textTranslate('Photo')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "location") {
@@ -5753,15 +5788,15 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "document") {
-          return "📄 Document";
+          return "📄 ${languageController.textTranslate('Document')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "video") {
-          return "🎥 Video";
+          return "🎥 ${languageController.textTranslate('Video')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "audio") {
-          return "🔊 Audio";
+          return "🔊 ${languageController.textTranslate('Audio')}";
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "link") {
@@ -5770,11 +5805,11 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "gif") {
-          return "GIF";
+          return languageController.textTranslate('GIF');
         } else if (chatContorller
                 .userdetailschattModel.value!.messageList![i].messageType ==
             "contact") {
-          return "Contact";
+          return languageController.textTranslate('Contact');
         }
       }
     }
@@ -5794,21 +5829,22 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
             userID) {
           if ("${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}" ==
               "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}") {
-            return 'You';
+            return languageController.textTranslate('You');
           } else {
             return "${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}";
           }
         } else {
           if ("${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}" ==
               "${Hive.box(userdata).get(firstName)} ${Hive.box(userdata).get(lastName)}") {
-            return 'You';
+            return languageController.textTranslate('You');
           } else {
             return "${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.firstName!} ${chatContorller.userdetailschattModel.value!.messageList![i].senderData!.lastName!}";
           }
         }
       }
     }
-    return "You"; // This return might be a default case if no match is found
+    return languageController.textTranslate(
+        'You'); // This return might be a default case if no match is found
   }
 
   Widget replyMSGWidget(MessageList data, int index, SenderData users) {
@@ -6068,9 +6104,12 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                         .w500,
                                                               ),
                                                             ),
-                                                            const Text(
-                                                              '0 Page - 0 KB',
-                                                              style: TextStyle(
+                                                            Text(
+                                                              languageController
+                                                                  .textTranslate(
+                                                                      '0 Page - 0 KB'),
+                                                              style:
+                                                                  const TextStyle(
                                                                 color:
                                                                     Colors.grey,
                                                                 fontSize: 10,
@@ -6138,8 +6177,10 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                           ],
                                                         );
                                                       } else {
-                                                        return const Text(
-                                                            'No PDF info available');
+                                                        return Text(
+                                                            languageController
+                                                                .textTranslate(
+                                                                    'No PDF info available'));
                                                       }
                                                     },
                                                   ),
@@ -6594,13 +6635,13 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                                                                                       height: 30,
                                                                                       width: 200,
                                                                                       decoration: const BoxDecoration(borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10)), color: Colors.white),
-                                                                                      child: const Column(
+                                                                                      child: Column(
                                                                                         children: [
-                                                                                          SizedBox(height: 3),
+                                                                                          const SizedBox(height: 3),
                                                                                           Text(
-                                                                                            "View contact",
+                                                                                            languageController.textTranslate('View contact'),
                                                                                             textAlign: TextAlign.center,
-                                                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
+                                                                                            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: chatColor),
                                                                                           ),
                                                                                         ],
                                                                                       ),
@@ -6800,18 +6841,19 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
               onSearchTextChanged(searchText);
             }
           },
-          decoration: const InputDecoration(
-            suffixIcon: Padding(
+          decoration: InputDecoration(
+            suffixIcon: const Padding(
               padding: EdgeInsets.all(17),
               child: Image(
                 image: AssetImage('assets/icons/search.png'),
               ),
             ),
-            hintText: '  What are you looking for?',
-            hintStyle: TextStyle(fontSize: 12, color: Colors.grey),
+            hintText:
+                '  ${languageController.textTranslate('What are you looking for?')}',
+            hintStyle: const TextStyle(fontSize: 12, color: Colors.grey),
             filled: true,
             fillColor: Colors.transparent,
-            border: OutlineInputBorder(borderSide: BorderSide.none),
+            border: const OutlineInputBorder(borderSide: BorderSide.none),
           ),
         ),
       ),
@@ -7014,7 +7056,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 });
               });
             },
-            child: const Text('View contact')),
+            child: Text(languageController.textTranslate('View contact'))),
         PopupMenuItem(
             onTap: () {
               //deleteMsgDialog();
@@ -7034,7 +7076,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
               }
               isKeyboard = false;
             },
-            child: const Text('Clear chat')),
+            child: Text(languageController.textTranslate('Clear chat'))),
         PopupMenuItem(
             onTap: () {
               setState(() {
@@ -7042,7 +7084,7 @@ class _GroupChatMsgState extends State<GroupChatMsg> {
                 isTextFieldHide = "1";
               });
             },
-            child: const Text('Search chat')),
+            child: Text(languageController.textTranslate('Search chat'))),
       ],
     );
   }

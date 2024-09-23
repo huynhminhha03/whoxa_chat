@@ -29,7 +29,7 @@ class LanguageController extends GetxController {
       isLanguagLoading.value = true;
 
       final responseJson = await apiHelper.postMethod(
-        url: "http://192.168.0.27:3001/API/fetch-default-language",
+        url: apiHelper.defaultLanguage,
         requestBody: lnId.isEmpty
             ? {}
             : {
@@ -55,7 +55,7 @@ class LanguageController extends GetxController {
       isGetLanguagsLoading.value = true;
 
       final responseJson = await apiHelper.postMethod(
-        url: "http://192.168.0.27:3001/API/List-Language",
+        url: apiHelper.listOfLanguages,
         requestBody: {},
       );
 

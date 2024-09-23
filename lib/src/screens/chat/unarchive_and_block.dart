@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/model/userchatlist_model/archive_list_model.dart';
 
@@ -113,7 +114,9 @@ class _UnarchiveAndBlockState extends State<UnarchiveAndBlock> {
                           width: 10,
                         ),
                         Text(
-                          widget.isblock == "false" ? 'Block' : "Unblock",
+                          widget.isblock == "false"
+                              ? languageController.textTranslate('Block')
+                              : languageController.textTranslate('Unblock'),
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,

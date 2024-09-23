@@ -38,6 +38,8 @@ class ApiHelper {
   String statusDetele = '$baseUrl/delete-status-media-by-id';
   String callHistory = '$baseUrl/call-list';
   String listOfAvatars = '$baseUrl/list-all-avtars';
+  String defaultLanguage = '$baseUrl/fetch-default-language';
+  String listOfLanguages = '$baseUrl/List-Language';
 
   Future<Map<String, dynamic>> getMethod(
       {required String url,

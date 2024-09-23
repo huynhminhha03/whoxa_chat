@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/group_create_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 
@@ -55,9 +56,9 @@ class _group_profileState extends State<group_profile> {
                 Image.asset("assets/images/arrow-left.png", color: chatColor),
           ),
         ),
-        title: const Text(
-          'Group Profile',
-          style: TextStyle(
+        title: Text(
+          languageController.textTranslate('Group Profile'),
+          style: const TextStyle(
               color: Colors.black, fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
@@ -102,7 +103,8 @@ class _group_profileState extends State<group_profile> {
                               contentPadding: const EdgeInsets.only(
                                   top: 1, left: 15, bottom: 1),
                               // hintText: 'Add a brief description',
-                              hintText: 'Group Name Change',
+                              hintText: languageController
+                                  .textTranslate('Group Name Change'),
                               hintStyle: const TextStyle(
                                 fontSize: 10,
                                 color: Colors.black,
@@ -144,10 +146,10 @@ class _group_profileState extends State<group_profile> {
                   borderRadius: BorderRadius.circular(15),
                   color: chatownColor,
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'Update',
-                    style: TextStyle(
+                    languageController.textTranslate('Update'),
+                    style: const TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                         fontSize: 16),
@@ -250,10 +252,10 @@ class _group_profileState extends State<group_profile> {
                     width: 100,
                   ),
                   Container(height: 15.0),
-                  const Text(
-                    "Upload Image",
+                  Text(
+                    languageController.textTranslate('Upload Image'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(height: 15.0),
                   SizedBox(
@@ -267,9 +269,9 @@ class _group_profileState extends State<group_profile> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
-                      child: const Text(
-                        "Take Picture",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('Take Picture'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -287,9 +289,9 @@ class _group_profileState extends State<group_profile> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        "From Gallery",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('From Gallery'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),

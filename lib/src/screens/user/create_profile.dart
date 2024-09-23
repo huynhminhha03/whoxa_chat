@@ -521,11 +521,15 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                                 editApiCall();
                               } else {
                                 if (userController.text.isEmpty) {
-                                  showCustomToast("Please enter username");
+                                  showCustomToast(languageController
+                                      .textTranslate('Please enter username'));
                                 } else if (fNameController.text.isEmpty) {
-                                  showCustomToast("Please enter first name");
+                                  showCustomToast(
+                                      languageController.textTranslate(
+                                          'Please enter first name'));
                                 } else if (lNameController.text.isEmpty) {
-                                  showCustomToast("Please enter last name");
+                                  showCustomToast(languageController
+                                      .textTranslate('Please enter last name'));
                                 }
                               }
                             },
@@ -616,13 +620,16 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                                     } else {
                                       if (userController.text.isEmpty) {
                                         showCustomToast(
-                                            "Please enter username");
+                                            languageController.textTranslate(
+                                                'Please enter username'));
                                       } else if (fNameController.text.isEmpty) {
                                         showCustomToast(
-                                            "Please enter first name");
+                                            languageController.textTranslate(
+                                                'Please enter first name'));
                                       } else if (lNameController.text.isEmpty) {
                                         showCustomToast(
-                                            "Please enter last name");
+                                            languageController.textTranslate(
+                                                'Please enter last name'));
                                       }
                                     }
                                   },
@@ -815,11 +822,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       decoration: const BoxDecoration(),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
               Text(
-                'Gender',
-                style: TextStyle(
+                languageController.textTranslate('Gender'),
+                style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 11,
                     fontFamily: "Poppins",
@@ -888,7 +895,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       width: 10,
                     ),
                     Text(
-                      'Male',
+                      languageController.textTranslate('Male'),
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -955,7 +962,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       width: 10,
                     ),
                     Text(
-                      'Female',
+                      languageController.textTranslate('Female'),
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
@@ -980,11 +987,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       decoration: const BoxDecoration(),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
               Text(
-                'Username',
-                style: TextStyle(
+                languageController.textTranslate('Username'),
+                style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 11,
                     fontFamily: "Poppins",
@@ -1033,11 +1040,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   Widget Lastname() {
     return Column(
       children: [
-        const Row(
+        Row(
           children: [
             Text(
-              'Last Name',
-              style: TextStyle(
+              languageController.textTranslate('Last Name'),
+              style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 11,
                   fontFamily: "Poppins",
@@ -1326,10 +1333,10 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     width: 100,
                   ),
                   Container(height: 15.0),
-                  const Text(
-                    "Upload Image",
+                  Text(
+                    languageController.textTranslate('Upload Image'),
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   Container(height: 15.0),
                   SizedBox(
@@ -1343,9 +1350,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
-                      child: const Text(
-                        "Take Picture",
-                        style: TextStyle(color: Colors.black),
+                      child: Text(
+                        languageController.textTranslate('Take Picture'),
+                        style: const TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -1363,9 +1370,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                           ),
                         ),
                       ),
-                      child: const Text(
-                        "From Gallery",
-                        style: TextStyle(color: chatColor),
+                      child: Text(
+                        languageController.textTranslate('From Gallery'),
+                        style: const TextStyle(color: chatColor),
                       ),
                     ),
                   ),
@@ -1417,11 +1424,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       decoration: const BoxDecoration(),
       child: Column(
         children: [
-          const Row(
+          Row(
             children: [
               Text(
-                'First Name',
-                style: TextStyle(
+                languageController.textTranslate('First Name'),
+                style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 11,
                     fontFamily: "Poppins",
@@ -1486,9 +1493,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Country",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('Country'),
+                      style: const TextStyle(
                           fontSize: 9,
                           fontWeight: FontWeight.w400,
                           color: Color.fromRGBO(80, 80, 80, 1)),
@@ -1506,9 +1513,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Country",
-                style: TextStyle(
+              Text(
+                languageController.textTranslate('Country'),
+                style: const TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 11,
                     fontFamily: "Poppins",
@@ -1569,9 +1576,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          "Phone",
-                          style: TextStyle(
+                        Text(
+                          languageController.textTranslate('Phone'),
+                          style: const TextStyle(
                               fontSize: 9,
                               fontWeight: FontWeight.w400,
                               color: Color.fromRGBO(80, 80, 80, 1)),
@@ -1645,9 +1652,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       child: CupertinoActionSheet(
         actions: <Widget>[
           CupertinoActionSheetAction(
-            child: const Text(
-              "Camera",
-              style: TextStyle(color: Colors.black, fontSize: 15),
+            child: Text(
+              languageController.textTranslate('Camera'),
+              style: const TextStyle(color: Colors.black, fontSize: 15),
             ),
             onPressed: () {
               getImageFromCamera();
@@ -1655,9 +1662,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             },
           ),
           CupertinoActionSheetAction(
-            child: const Text(
-              "Photo & Video Library",
-              style: TextStyle(color: Colors.black, fontSize: 15),
+            child: Text(
+              languageController.textTranslate('Photo & Video Library'),
+              style: const TextStyle(color: Colors.black, fontSize: 15),
             ),
             onPressed: () {
               getImageFromGallery();
@@ -1671,9 +1678,10 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             // Navigator.pop(context, 'Cancel');
             Navigator.of(context, rootNavigator: true).pop("Discard");
           },
-          child: const Text(
-            "Cancel",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          child: Text(
+            languageController.textTranslate('Cancel'),
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
       ),

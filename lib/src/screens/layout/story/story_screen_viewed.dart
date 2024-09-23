@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/story_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
 import 'package:readmore/readmore.dart';
@@ -400,16 +401,18 @@ class _StoryScreen6PMViewedState extends State<StoryScreen6PMViewed> {
                                             style: const TextStyle(
                                                 color: Colors.white),
                                             controller: messagecontroller,
-                                            decoration: const InputDecoration(
+                                            decoration: InputDecoration(
                                                 fillColor: Colors.white,
                                                 alignLabelWithHint: true,
                                                 contentPadding:
-                                                    EdgeInsets.symmetric(
+                                                    const EdgeInsets.symmetric(
                                                         horizontal: 10,
                                                         vertical: 10),
                                                 border: InputBorder.none,
-                                                hintText: "Type reply...",
-                                                hintStyle: TextStyle(
+                                                hintText: languageController
+                                                    .textTranslate(
+                                                        'Type reply...'),
+                                                hintStyle: const TextStyle(
                                                     color: Color.fromRGBO(
                                                         108, 108, 108, 1),
                                                     fontSize: 13,
@@ -603,10 +606,12 @@ class _StoryScreen6PMViewedState extends State<StoryScreen6PMViewed> {
                     ? SizedBox(
                         height: MediaQuery.of(context).size.height * 0.33,
                         child: Center(
-                          child: const Text(
-                            "Your Story hasn't been viewed by any users yet.",
+                          child: Text(
+                            languageController.textTranslate(
+                                "Your Story hasn't been viewed by any users yet."),
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 14, color: Colors.black),
+                            style: const TextStyle(
+                                fontSize: 14, color: Colors.black),
                           ).paddingSymmetric(horizontal: 40),
                         ),
                       )
@@ -634,7 +639,7 @@ class _StoryScreen6PMViewedState extends State<StoryScreen6PMViewed> {
                                         end: Alignment.bottomCenter)),
                                 child: Center(
                                     child: Text(
-                                  "View By ${storyGetxController.myStorySeenData.value.statusViewsList!.length.toString()}",
+                                  "${languageController.textTranslate('View By')} ${storyGetxController.myStorySeenData.value.statusViewsList!.length.toString()}",
                                   style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,

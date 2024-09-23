@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:meyaoo_new/Models/block_list_model.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/all_block_list_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
 import 'package:meyaoo_new/src/global/global.dart';
@@ -59,9 +60,9 @@ class _BlockListState extends State<BlockList> {
                     const SizedBox(
                       width: 7,
                     ),
-                    const Text(
-                      "Block List",
-                      style: TextStyle(
+                    Text(
+                      languageController.textTranslate('Block List'),
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         fontFamily: "Poppins",
@@ -210,10 +211,11 @@ class _BlockListState extends State<BlockList> {
                     borderRadius: BorderRadius.circular(12),
                     color: chatStrokeColor,
                     border: Border.all(color: chatownColor)),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    "Unblock",
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
+                    languageController.textTranslate('Unblock'),
+                    style: const TextStyle(
+                        fontSize: 11, fontWeight: FontWeight.w500),
                   ),
                 ),
               ),

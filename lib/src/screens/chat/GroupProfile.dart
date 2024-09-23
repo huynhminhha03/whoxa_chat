@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:meyaoo_new/app.dart';
 import 'package:meyaoo_new/controller/all_star_msg_controller.dart';
 import 'package:meyaoo_new/controller/single_chat_media_controller.dart';
 import 'package:meyaoo_new/controller/user_chatlist_controller.dart';
@@ -293,10 +294,11 @@ class _GroupProfileState extends State<GroupProfile> {
                                                                             border:
                                                                                 Border.all(color: yellow2Color, width: 1),
                                                                             borderRadius: BorderRadius.circular(12)),
-                                                                        child: const Center(
+                                                                        child: Center(
                                                                             child: Text(
-                                                                          'Cancel',
-                                                                          style: TextStyle(
+                                                                          languageController
+                                                                              .textTranslate('Cancel'),
+                                                                          style: const TextStyle(
                                                                               fontSize: 14,
                                                                               fontWeight: FontWeight.w400,
                                                                               color: chatColor),
@@ -327,10 +329,11 @@ class _GroupProfileState extends State<GroupProfile> {
                                                                               yellow1Color,
                                                                               yellow2Color
                                                                             ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-                                                                        child: const Center(
+                                                                        child: Center(
                                                                             child: Text(
-                                                                          'Exit',
-                                                                          style: TextStyle(
+                                                                          languageController
+                                                                              .textTranslate('Exit'),
+                                                                          style: const TextStyle(
                                                                               fontSize: 14,
                                                                               fontWeight: FontWeight.w400,
                                                                               color: chatColor),
@@ -347,8 +350,9 @@ class _GroupProfileState extends State<GroupProfile> {
                                                     },
                                                   );
                                                 },
-                                                child:
-                                                    const Text("Group exit")),
+                                                child: Text(languageController
+                                                    .textTranslate(
+                                                        'Group exit'))),
                                             const SizedBox(
                                               height: 10,
                                             ),
@@ -377,8 +381,9 @@ class _GroupProfileState extends State<GroupProfile> {
                                                                 .conversationID);
                                                   });
                                                 },
-                                                child:
-                                                    const Text('Group edit')),
+                                                child: Text(languageController
+                                                    .textTranslate(
+                                                        'Group edit'))),
                                           ],
                                         ),
                                       );
@@ -416,10 +421,10 @@ class _GroupProfileState extends State<GroupProfile> {
                 colors: [yellow1Color, yellow2Color],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter)),
-        child: const Center(
+        child: Center(
           child: Text(
-            'Add Participants',
-            style: TextStyle(
+            languageController.textTranslate('Add Participants'),
+            style: const TextStyle(
                 color: Colors.black, fontWeight: FontWeight.w500, fontSize: 16),
           ),
         ),
@@ -454,7 +459,7 @@ class _GroupProfileState extends State<GroupProfile> {
                   Get.back(result: "1");
                 },
                 img: "assets/icons/search-normal.png",
-                title: "Search")
+                title: languageController.textTranslate('Search'))
           ],
         ),
         const SizedBox(
@@ -666,10 +671,11 @@ class _GroupProfileState extends State<GroupProfile> {
                                                   width: 1),
                                               borderRadius:
                                                   BorderRadius.circular(12)),
-                                          child: const Center(
+                                          child: Center(
                                               child: Text(
-                                            'Cancel',
-                                            style: TextStyle(
+                                            languageController
+                                                .textTranslate('Cancel'),
+                                            style: const TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w400,
                                                 color: chatColor),
@@ -725,9 +731,9 @@ class _GroupProfileState extends State<GroupProfile> {
                       },
                     );
                   },
-                  child: const Text(
-                    'Remove from group',
-                    style: TextStyle(
+                  child: Text(
+                    languageController.textTranslate('Remove from group'),
+                    style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w400,
                         color: Colors.red),
@@ -849,7 +855,7 @@ class _GroupProfileState extends State<GroupProfile> {
                         Text(
                             Hive.box(userdata).get(userId).toString() ==
                                     data.user!.userId.toString()
-                                ? "You"
+                                ? languageController.textTranslate('You')
                                 : capitalizeFirstLetter(data.user!.userName!),
                             textAlign: TextAlign.left,
                             style: const TextStyle(
@@ -879,11 +885,11 @@ class _GroupProfileState extends State<GroupProfile> {
                   ],
                 ),
                 data.isAdmin == true
-                    ? const Padding(
-                        padding: EdgeInsets.only(right: 10, top: 7),
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 10, top: 7),
                         child: Text(
-                          "Admin",
-                          style: TextStyle(
+                          languageController.textTranslate('Admin'),
+                          style: const TextStyle(
                               color: Colors.green,
                               fontSize: 10,
                               fontWeight: FontWeight.w500),
@@ -952,9 +958,9 @@ class _GroupProfileState extends State<GroupProfile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Media, links and docs",
-                  style: TextStyle(
+                Text(
+                  languageController.textTranslate('Media, links and docs'),
+                  style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey),
@@ -978,10 +984,11 @@ class _GroupProfileState extends State<GroupProfile> {
               height: 100,
               child: chatProfileController
                       .profileModel.value!.mediaData!.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        "You haven't share any media",
-                        style: TextStyle(color: Colors.grey),
+                        languageController
+                            .textTranslate("You haven't share any media"),
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     )
                   : Align(
@@ -1127,9 +1134,10 @@ class _GroupProfileState extends State<GroupProfile> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const Text(
-                    'Started Messages',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),
+                  Text(
+                    languageController.textTranslate('Started Messages'),
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
@@ -1175,7 +1183,7 @@ class _GroupProfileState extends State<GroupProfile> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "${chatProfileController.profileModel.value!.conversationDetails!.conversationsUsers!.length.toString()} Group Members",
+            "${chatProfileController.profileModel.value!.conversationDetails!.conversationsUsers!.length.toString()} ${languageController.textTranslate('Group Members')}",
             style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
           ).paddingOnly(left: 23, top: 10),
           participants()
