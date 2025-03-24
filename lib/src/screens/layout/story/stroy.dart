@@ -5,12 +5,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
-import 'package:meyaoo_new/app.dart';
-import 'package:meyaoo_new/controller/story_controller.dart';
-import 'package:meyaoo_new/src/global/global.dart';
-import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/layout/story/story_screen.dart';
-import 'package:meyaoo_new/src/screens/layout/story/story_screen_viewed.dart';
+import 'package:whoxachat/app.dart';
+import 'package:whoxachat/controller/story_controller.dart';
+import 'package:whoxachat/src/global/common_widget.dart';
+import 'package:whoxachat/src/global/global.dart';
+import 'package:whoxachat/src/global/strings.dart';
+import 'package:whoxachat/src/screens/layout/story/my_stories_list_screen.dart';
+import 'package:whoxachat/src/screens/layout/story/story_screen.dart';
+import 'package:whoxachat/src/screens/layout/story/story_screen_viewed.dart';
 import 'package:status_view/status_view.dart';
 
 class StorySectionScreen extends StatefulWidget {
@@ -30,18 +32,6 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
     super.initState();
   }
 
-  // bool isMatching(String userNumber) {
-  //   for (String numbersString in mobileContacts) {
-  //     List<String> numbers = numbersString.split(',');
-  //     for (String listNumber in numbers) {
-  //       if (listNumber == userNumber) {
-  //         return true;
-  //       }
-  //     }
-  //   }
-  //   return false;
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +40,10 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
         elevation: 0,
         backgroundColor: appColorWhite,
         automaticallyImplyLeading: false,
-        title: Image.asset("assets/images/logo.png", height: 45),
+        title: Image.network(
+          languageController.appSettingsData[0].appLogo!,
+          height: 45,
+        ),
       ),
       body: Obx(() {
         return (storyController.isAllUserStoryLoad.value) &&
@@ -61,40 +54,50 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                 children: [
                   SizedBox(
                     height: Get.height,
-                    child: SingleChildScrollView(
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              languageController.textTranslate('Status'),
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: "Poppins"),
-                            ).paddingSymmetric(horizontal: 20),
-                            ListTile(
-                              onTap: () {
-                                // inController.isOnline.value
-                                //     ?
-                                storyController.filePickForStory();
-                                // : Fluttertoast.showToast(
-                                //     msg: "Check your connectivity",
-                                //     gravity: ToastGravity.BOTTOM);
-                                // Get.to(() => PhotoScreen());
-                                // _showSimpleDialog(context);
-                              },
-                              leading: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(100),
-                                    child: Container(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            languageController.textTranslate('Status'),
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: "Poppins"),
+                          ).paddingSymmetric(horizontal: 20),
+                          ListTile(
+                            onTap: () {
+                              Get.to(
+                                const MyStoriesListScreen(),
+                                transition: Transition.rightToLeft,
+                              );
+                            },
+                            leading: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Obx(
+                                    () => Container(
                                       height: 50,
                                       width: 50,
                                       decoration: BoxDecoration(
                                           color: Colors.transparent,
                                           border: Border.all(
-                                              color: appColorYellow, width: 1),
+                                              color: (storyController
+                                                          .isAllUserStoryLoad
+                                                          .value) &&
+                                                      (storyController
+                                                          .isProfileLoading
+                                                          .value) &&
+                                                      storyController
+                                                          .storyListData
+                                                          .value
+                                                          .myStatus!
+                                                          .statuses!
+                                                          .isEmpty
+                                                  ? Colors.grey.shade400
+                                                  : chatownColor,
+                                              width: 2),
                                           shape: BoxShape.circle),
                                       child: CachedNetworkImage(
                                         imageUrl:
@@ -106,87 +109,81 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                             color: blackcolor,
                                           );
                                         },
-                                      ).marginAll(2),
+                                      ).marginAll(3),
                                     ),
                                   ),
-                                  // CircleAvatar(backgroundColor: blackcolor),
-                                  Positioned(
-                                    bottom: -1,
-                                    right: 1,
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: [
-                                                  yellow1Color,
-                                                  yellow2Color
-                                                ],
-                                                begin: Alignment.topCenter,
-                                                end: Alignment.bottomCenter),
-                                            shape: BoxShape.circle),
-                                        child: const Icon(
-                                          Icons.add,
-                                          color: Colors.black,
-                                          size: 15,
+                                ),
+                              ],
+                            ),
+                            title: Text(
+                                languageController.textTranslate('My Story')),
+                            subtitle: Text(languageController
+                                .textTranslate('Tap to add your story')),
+                            titleTextStyle: const TextStyle(
+                                fontSize: 16, color: blackcolor),
+                            subtitleTextStyle: const TextStyle(
+                                fontSize: 14, color: Colors.grey),
+                            trailing: Obx(
+                              () => Wrap(
+                                children: [
+                                  const SizedBox(width: 10),
+                                  (storyController.isAllUserStoryLoad.value) &&
+                                          (storyController
+                                              .isProfileLoading.value) &&
+                                          storyController.storyListData.value
+                                              .myStatus!.statuses!.isEmpty
+                                      ? const SizedBox.shrink()
+                                      : InkWell(
+                                          onTap: () {
+                                            storyController.filePickForStory();
+                                          },
+                                          child: Image.asset(
+                                            'assets/images/gallery.png',
+                                            height: 23,
+                                            color: appColorBlack,
+                                          ),
                                         ),
-                                      ).paddingAll(2),
-                                    ),
-                                  )
+                                  // const SizedBox(width: 20),
+                                  // Image.asset(
+                                  //   'assets/images/edit-2.png',
+                                  //   height: 23,
+                                  //   color: appColorBlack,
+                                  // ),
                                 ],
                               ),
-                              title: Text(
-                                  languageController.textTranslate('My Story')),
-                              subtitle: Text(languageController
-                                  .textTranslate('Tap to add your story')),
-                              titleTextStyle: const TextStyle(
-                                  fontSize: 16, color: blackcolor),
-                              subtitleTextStyle: const TextStyle(
-                                  fontSize: 14, color: Colors.grey),
-                              trailing: Obx(
-                                () => Wrap(
-                                  children: [
-                                    const SizedBox(width: 10),
-                                    (storyController
-                                                .isAllUserStoryLoad.value) ||
-                                            // (storyController
-                                            //             .isMyStorySeenLoading.value) ||
-                                            (storyController
-                                                .isProfileLoading.value) ||
-                                            storyController.storyListData.value
-                                                .myStatus!.statuses!.isEmpty
-                                        ? const SizedBox.shrink()
-                                        : InkWell(
-                                            onTap: () {
-                                              Get.to(() => const StoryScreen6PM(
-                                                    isForMyStory: true,
-                                                  ));
-                                            },
-                                            child: Image.asset(
-                                                'assets/images/eye.png',
-                                                height: 23)),
-                                  ],
-                                ),
-                              ),
                             ),
-                            const Divider(),
-                            storyController.isAllUserStoryLoad.value
-                                ? const SizedBox()
-                                : storyController.notViewedStatusList.isEmpty
-                                    ? const SizedBox()
-                                    : const Text(
-                                        "Recent",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600),
-                                      ).paddingOnly(left: 20),
-                            storyController.isAllUserStoryLoad.value
-                                ? const SizedBox()
-                                : storyController.notViewedStatusList.isEmpty
-                                    ? const SizedBox()
-                                    : ListView.builder(
+                          ),
+                          const Divider(),
+                          storyController.isAllUserStoryLoad.value
+                              ? const SizedBox()
+                              : storyController.notViewedStatusList.isEmpty &&
+                                      storyController.viewedStatusList.isEmpty
+                                  ? Expanded(
+                                      child: commonImageTexts(
+                                        image:
+                                            "assets/images/no_contact_found_1.png",
+                                        text1: "No Status found",
+                                        text2:
+                                            "You can find your connected friends or family status.",
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                          storyController.isAllUserStoryLoad.value
+                              ? const SizedBox()
+                              : storyController.notViewedStatusList.isEmpty
+                                  ? const SizedBox()
+                                  : const Text(
+                                      "Recent",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ).paddingOnly(left: 20),
+                          storyController.isAllUserStoryLoad.value
+                              ? const SizedBox()
+                              : storyController.notViewedStatusList.isEmpty
+                                  ? const SizedBox()
+                                  : SingleChildScrollView(
+                                      child: ListView.builder(
                                         itemCount: storyController
                                             .notViewedStatusList.length,
                                         shrinkWrap: true,
@@ -202,24 +199,7 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                       .userId ==
                                                   Hive.box(userdata).get(userId)
                                               ? const SizedBox.shrink()
-                                              :
-                                              // storyController
-                                              //             .notViewedStatusList[
-                                              //                 index]
-                                              //             .userData!
-                                              //             .statuses![0]
-                                              //             .statusViews![0]
-                                              //             .statusCount ==
-                                              //         storyController
-                                              //             .notViewedStatusList[
-                                              //                 index]
-                                              //             .userData!
-                                              //             .statuses![0]
-                                              //             .statusMedia!
-                                              //             .length
-                                              //     ? const SizedBox()
-                                              //     :
-                                              ListTile(
+                                              : ListTile(
                                                   onTap: () {
                                                     storyController
                                                         .pageIndexValue
@@ -290,7 +270,6 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                                   .notViewedStatusList
                                                                   .length -
                                                               1) {
-                                                        // If it's the last index, call getAllUsersStoryUpdate()
                                                         storyController
                                                             .getAllUsersStoryUpdate();
                                                       }
@@ -347,24 +326,25 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                           fontSize: 14,
                                                           color: Colors.grey),
                                                 ).paddingOnly(bottom: 5);
-                                          //: const SizedBox();
                                         },
                                       ),
-                            storyController.isAllUserStoryLoad.value
-                                ? const SizedBox()
-                                : storyController.viewedStatusList.isEmpty
-                                    ? const SizedBox()
-                                    : const Text(
-                                        "Viewed",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600),
-                                      ).paddingOnly(left: 20),
-                            storyController.isAllUserStoryLoad.value
-                                ? const SizedBox()
-                                : storyController.viewedStatusList.isEmpty
-                                    ? const SizedBox()
-                                    : ListView.builder(
+                                    ),
+                          storyController.isAllUserStoryLoad.value
+                              ? const SizedBox()
+                              : storyController.viewedStatusList.isEmpty
+                                  ? const SizedBox()
+                                  : const Text(
+                                      "Viewed",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600),
+                                    ).paddingOnly(left: 20),
+                          storyController.isAllUserStoryLoad.value
+                              ? const SizedBox()
+                              : storyController.viewedStatusList.isEmpty
+                                  ? const SizedBox()
+                                  : SingleChildScrollView(
+                                      child: ListView.builder(
                                         itemCount: storyController
                                             .viewedStatusList.length,
                                         shrinkWrap: true,
@@ -495,28 +475,11 @@ class _StorySectionScreenState extends State<StorySectionScreen> {
                                                           fontSize: 14,
                                                           color: Colors.grey),
                                                 ).paddingOnly(bottom: 5);
-                                          //: const SizedBox();
                                         },
                                       ),
-                          ]),
-                    ),
+                                    ),
+                        ]),
                   ),
-                  // inController.isOnline.value
-                  //     ? const SizedBox.shrink()
-                  //     : Positioned(
-                  //         bottom: 0.5,
-                  //         child: Container(
-                  //             width: Get.width,
-                  //             decoration:
-                  //                 const BoxDecoration(color: chatownColor),
-                  //             child: Center(
-                  //               child: const Text(
-                  //                 "No Internet",
-                  //                 style:
-                  //                     TextStyle(fontSize: 15, color: chatColor),
-                  //               ).paddingSymmetric(vertical: 8),
-                  //             )),
-                  //       ),
                 ],
               );
       }),

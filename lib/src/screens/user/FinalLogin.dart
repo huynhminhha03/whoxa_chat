@@ -4,16 +4,18 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:meyaoo_new/app.dart';
-import 'package:meyaoo_new/src/global/api_helper.dart';
-import 'package:meyaoo_new/src/global/global.dart';
+import 'package:whoxachat/app.dart';
+import 'package:whoxachat/src/global/api_helper.dart';
+import 'package:whoxachat/src/global/global.dart';
 import 'package:country_calling_code_picker/picker.dart';
-import 'package:meyaoo_new/src/screens/user/otp.dart';
+import 'package:whoxachat/src/screens/user/otp.dart';
+import 'package:whoxachat/src/screens/user/pp_and_tc_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -35,8 +37,9 @@ class _FloginState extends State<Flogin> {
   Country? _selectedCountry;
   Timer? _timer;
   int _counter = 0;
-  String selectedCountry = 'india';
-  String selectedCountrycode = '+91';
+  String selectedCountry = 'United States of America';
+  String selectedCountrycode = '+1';
+  String selectedCountrySortName = 'US';
   String selectedCountryimg = '';
   int maxLength = 10;
   late TextEditingController controller;
@@ -61,24 +64,20 @@ class _FloginState extends State<Flogin> {
 
   String mobileNumber = '';
   int? lengthNum;
+  bool check = false;
+  
 
   Future<void> requestPermissions() async {
-    // Request notification permission
     await Permission.notification.request();
 
-    // Request location permission
-    await Permission.location.request();
+    // await Permission.location.request();
 
-    // Request camera permission
     await Permission.camera.request();
 
-    // Request microphone permission
     await Permission.microphone.request();
 
-    // Request storage permission
     await Permission.storage.request();
 
-    // Request photo library permission
     await Permission.photos.request();
 
     await Permission.contacts.request();
@@ -90,16 +89,13 @@ class _FloginState extends State<Flogin> {
       _timer!.cancel();
     }
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      //setState(() {
       (_counter > 0) ? _counter-- : _timer!.cancel();
-      //});
+
       print(_counter);
       _events!.add(_counter);
     });
   }
 
-  //------------------------------------------------------------- OTP caLL -------------------------------------------------------------//
-  // this api mobile number submit and otp get
   oTPcaLL() async {
     try {
       if (phoneController.text.isNotEmpty) {
@@ -115,6 +111,8 @@ class _FloginState extends State<Flogin> {
         print("URL: ${apiHelper.registerPhone}");
         request.fields['country_code'] = selectedCountrycode;
         request.fields['phone_number'] = phoneController.text;
+        request.fields['country_full_name'] = selectedCountry;
+        request.fields['country'] = selectedCountrySortName;
 
         print("FIELDS:${request.fields}");
         var response = await request.send();
@@ -138,7 +136,6 @@ class _FloginState extends State<Flogin> {
                   countryName: selectedCountry,
                   varify: "",
                   inWhichScreen: 'Mobile screen',
-                  //  otpStatus: userOtpStatus!.otpStatus![0].name!,
                 ),
               ));
         } else {
@@ -167,12 +164,10 @@ class _FloginState extends State<Flogin> {
               .textTranslate('Something went wrong while sending OTP'));
     }
   }
-  //-------------------------------------------------------------otpcheck-------------------------------------------------------------//
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   @override
   initState() {
-    //otpStatus();
     _events = StreamController<int>();
     _events!.add(60);
     super.initState();
@@ -180,49 +175,15 @@ class _FloginState extends State<Flogin> {
     initCountry();
   }
 
-  // UserOtpStatus? userOtpStatus;
-  // bool isLoad = false;
-  // otpStatus() async {
-  //   setState(() {
-  //     isLoad = true;
-  //   });
-  //   try {
-  //     var uri = Uri.parse("${baseUrl()}AdminOtpStatus");
-  //     var request = http.MultipartRequest("GET", uri);
-  //     Map<String, String> headers = {
-  //       "Accept": "application/json",
-  //     };
-  //     request.headers.addAll(headers);
-  //     var response = await request.send();
-  //     String responseData =
-  //         await response.stream.transform(utf8.decoder).join();
-  //     var userData = json.decode(responseData);
-  //     userOtpStatus = UserOtpStatus.fromJson(userData);
-  //     print("OTP_STATUS:$responseData");
-  //     if (userOtpStatus!.responseCode == "1") {
-  //       setState(() {
-  //         isLoad = false;
-  //       });
-  //     } else {
-  //       setState(() {
-  //         isLoad = false;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     setState(() {
-  //       isLoad = false;
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appColorWhite,
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
-        backgroundColor: bg,
+        backgroundColor: appColorWhite,
       ),
       body: Container(
         color: Colors.white,
@@ -243,7 +204,7 @@ class _FloginState extends State<Flogin> {
               ),
               const SizedBox(height: 10),
               if (Platform.isIOS) button() else button(),
-              const SizedBox(height: 10),
+              const SizedBox(height: 35),
             ],
           ),
         ),
@@ -255,7 +216,7 @@ class _FloginState extends State<Flogin> {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: isLoading
-            ? const Center(
+            ? Center(
                 child: SizedBox(
                 height: 30,
                 width: 30,
@@ -263,19 +224,24 @@ class _FloginState extends State<Flogin> {
               ))
             : CustomButtom(
                 onPressed: () {
-                  log("MOBILE_NUM:${selectedCountrycode + phoneController.text}");
-                  if (myKey5.currentState!.validate()) {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    oTPcaLL();
-                    // userOtpStatus!.otpStatus![0].name == "firebase"
-                    //     ? sendOtp()
-                    //     : oTPcaLL();
+                  if (check == true) {
+                    log("MOBILE_NUM:${selectedCountrycode + phoneController.text}");
+                    if (myKey5.currentState!.validate()) {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      sendOtp();
+                    } else {
+                      Fluttertoast.showToast(
+                          msg: languageController
+                              .textTranslate('Enter valid mobile number'));
+                    }
                   } else {
                     Fluttertoast.showToast(
-                        msg: languageController
-                            .textTranslate('Enter valid mobile number'));
+                        msg: languageController.textTranslate(
+                            'Allow check to continue privacy policy and term condition'),
+                        backgroundColor: Colors.black,
+                        textColor: appColorWhite);
                   }
                 },
                 title: languageController.textTranslate('Send OTP'),
@@ -295,10 +261,13 @@ class _FloginState extends State<Flogin> {
               width: MediaQuery.of(context).size.width * 0.8,
               margin: EdgeInsets.only(
                   left: MediaQuery.of(context).size.width * 0.09),
-              // child: Image.asset("assets/images/Group 137.png"),
             ),
           ),
-          Image.asset("assets/images/logo.png", height: 90),
+          Image.network(
+            languageController.appSettingsData[0].appLogo!,
+            height: 90,
+            fit: BoxFit.contain,
+          ),
           const SizedBox(height: 15),
           Image.asset("assets/images/welcome.png", height: 44),
           const SizedBox(height: 8),
@@ -358,9 +327,9 @@ class _FloginState extends State<Flogin> {
                             const SizedBox(
                               width: 2,
                             ),
-                            const Icon(
+                            Icon(
                               Icons.arrow_drop_down,
-                              color: appColorYellow,
+                              color: chatownColor,
                             )
                           ],
                         ),
@@ -395,8 +364,7 @@ class _FloginState extends State<Flogin> {
                         cursorColor: Colors.black,
                         onChanged: (value) {
                           setState(() {
-                            mobileNumber =
-                                value; // Update mobileNumber with the value from TextField
+                            mobileNumber = value;
                           });
                         },
                         inputFormatters: [
@@ -408,7 +376,6 @@ class _FloginState extends State<Flogin> {
                         decoration: const InputDecoration(
                           contentPadding:
                               EdgeInsets.only(top: 1, left: 4, bottom: 1),
-
                           hintStyle: TextStyle(
                               fontSize: 17,
                               color: Colors.grey,
@@ -418,7 +385,6 @@ class _FloginState extends State<Flogin> {
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                           ),
-                          // ),
                         )),
                   ),
                 ),
@@ -435,9 +401,128 @@ class _FloginState extends State<Flogin> {
                     fontSize: 10,
                     fontWeight: FontWeight.w400,
                     fontFamily: 'Poppins')),
-          )
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.zero,
+            margin: EdgeInsets.zero,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            check = !check;
+                          });
+                        },
+                        child: check == true
+                            ? selectedContainer()
+                            : unSelectedContainer())
+                    .paddingOnly(top: 4),
+                const SizedBox(
+                  width: 6,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: Obx(
+                      () => Text.rich(
+                        TextSpan(
+                          text:
+                              "${languageController.textTranslate('To continue, check')} ",
+                          style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: 'Poppins'),
+                          children: [
+                            TextSpan(
+                              text: languageController
+                                  .textTranslate('Privacy Policy'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.black,
+                                decorationThickness: 1.5,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins',
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(PpAndTcScreen());
+                                  // handleURLButtonPress(
+                                  //     context, "${baseUrl()}get-privacy-policy");
+                                },
+                            ),
+                            TextSpan(
+                              text:
+                                  " ${languageController.textTranslate('and')} ",
+                            ),
+                            TextSpan(
+                              text: languageController
+                                  .textTranslate('Terms & Conditions.'),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                decoration: TextDecoration.underline,
+                                decorationColor: Colors.black,
+                                decorationThickness: 1.5,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'Poppins',
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Get.to(PpAndTcScreen(
+                                    isFromPP: false,
+                                  ));
+                                  // handleURLButtonPress(
+                                  //     context, "${baseUrl()}get-tncs");
+                                },
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.start,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ).paddingOnly(left: 0, right: 60),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget selectedContainer() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: 16,
+      width: 16,
+      decoration: BoxDecoration(
+        // shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(2),
+        color: appColorBlack,
+      ),
+      child: Image.asset(
+        "assets/images/check.png",
+        scale: 2,
+        color: appColorWhite,
+      ).paddingAll(3),
+    );
+  }
+
+  Widget unSelectedContainer() {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: 16,
+      width: 16,
+      decoration: BoxDecoration(
+          // shape: BoxShape.circle,
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(width: 1, color: appColorBlack)),
     );
   }
 
@@ -449,10 +534,13 @@ class _FloginState extends State<Flogin> {
       setState(() {
         selectedCountrycode = country.callingCode;
         selectedCountry = country.name;
+        selectedCountrySortName = country.countryCode;
+
+        debugPrint("selectedCountry SortName $selectedCountrySortName");
+        debugPrint("selectedCountry Name ${country.name}");
 
         _selectedCountry = country;
 
-        // Update maxLength based on the selected country
         maxLength = countryMobileLengths[selectedCountrycode] ?? 10;
       });
     }
@@ -464,61 +552,89 @@ class _FloginState extends State<Flogin> {
     Timer _timer = Timer.periodic(onsec, (timer) {
       print(start);
       if (start == 0) {
-        // setState(() {
-        //   timer.cancel();
-        //   wait = false;
-        // });
         timer.cancel();
         wait = false;
       } else {
         start--;
-        // setState(() {
-        //   start--;
-        // });
       }
     });
   }
 
-  Future sendOtp() async {
+
+Future<void> sendOtp() async {
+  try {
+    final String phoneNumber = '$selectedCountrycode${phoneController.text}';
+    
+    // Debug: In đầu vào
+    if (kDebugMode) {
+      print('🔹 Sending OTP to: $phoneNumber');
+    }
+
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: '$selectedCountrycode${phoneController.text}',
+      phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {
+        if (kDebugMode) {
+          print('✅ Verification Completed: $credential');
+        }
         setState(() {
           isLoading = false;
         });
       },
       timeout: const Duration(seconds: 30),
       verificationFailed: (FirebaseAuthException e) {
+        if (kDebugMode) {
+          print('❌ Verification Failed: ${e.code} - ${e.message}');
+        }
         Fluttertoast.showToast(msg: e.message!, toastLength: Toast.LENGTH_LONG);
         setState(() {
           isLoading = false;
         });
       },
       codeSent: (String verificationId, int? resendToken) {
-        Flogin.verify = verificationId;
         if (kDebugMode) {
-          print('PHONE PAGE VARIFI::::$verificationId');
+          print('📩 Code Sent! Verification ID: $verificationId, Resend Token: $resendToken');
         }
+        
+        
+        Flogin.verify = verificationId;
+
         Fluttertoast.showToast(
-            msg: languageController.textTranslate('OTP sent Succesfully'));
+          msg: languageController.textTranslate('OTP sent Successfully')
+        );
+        
         setState(() {
           isLoading = false;
         });
 
         Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => otp(
-                phoneController: phoneController.text,
-                selectedCountry: selectedCountrycode,
-                countryName: selectedCountry,
-                varify: verificationId,
-                inWhichScreen: 'Mobile screen',
-                //otpStatus: userOtpStatus!.otpStatus![0].name!,
-              ),
-            ));
+          context,
+          MaterialPageRoute(
+            builder: (context) => otp(
+              phoneController: phoneController.text,
+              selectedCountry: selectedCountrycode,
+              countryName: selectedCountry,
+              varify: verificationId,
+              inWhichScreen: 'Mobile screen',
+            ),
+          ),
+        );
       },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        if (kDebugMode) {
+          print('⏳ Code Auto Retrieval Timeout: $verificationId');
+        }
+      },
     );
+  } catch (e) {
+    // Bắt lỗi chung nếu có ngoại lệ không mong muốn
+    if (kDebugMode) {
+      print('🔥 Exception in sendOtp: $e');
+    }
+    Fluttertoast.showToast(msg: 'Error: $e', toastLength: Toast.LENGTH_LONG);
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
 }

@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously, must_be_immutable, avoid_print, avoid_types_as_parameter_names
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously, must_be_immutable, avoid_print, avoid_types_as_parameter_names, deprecated_member_use
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -10,19 +10,18 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meyaoo_new/Models/user_profile_model.dart';
-import 'package:meyaoo_new/Models/username_check_model.dart';
-import 'package:meyaoo_new/app.dart';
-import 'package:meyaoo_new/controller/avatar_controller.dart';
-import 'package:meyaoo_new/src/global/api_helper.dart';
-import 'package:meyaoo_new/src/global/strings.dart';
-import 'package:meyaoo_new/src/screens/user/pick_image_popup.dart';
-import 'package:meyaoo_new/src/screens/user/profile_pic_screen.dart';
+import 'package:whoxachat/Models/user_profile_model.dart';
+import 'package:whoxachat/Models/username_check_model.dart';
+import 'package:whoxachat/app.dart';
+import 'package:whoxachat/controller/avatar_controller.dart';
+import 'package:whoxachat/src/global/api_helper.dart';
+import 'package:whoxachat/src/global/strings.dart';
+import 'package:whoxachat/src/screens/user/pick_image_popup.dart';
+import 'package:whoxachat/src/screens/user/profile_pic_screen.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:meyaoo_new/src/global/global.dart';
+import 'package:whoxachat/src/global/global.dart';
 
 final ApiHelper apiHelper = ApiHelper();
 
@@ -47,7 +46,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   File? image;
   final picker = ImagePicker();
   UserProfileModel userProfileModel = UserProfileModel();
-  // TEXT CONTROLLER
+
   final TextEditingController fNameController = TextEditingController();
   final TextEditingController lNameController = TextEditingController();
   final TextEditingController userController = TextEditingController();
@@ -61,6 +60,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   @override
   void initState() {
     super.initState();
+    fetchUserDetailsAPI();
     _getToken();
     CheckUserConnection();
   }
@@ -144,7 +144,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     userProfileModel = UserProfileModel.fromJson(userData);
 
     if (userProfileModel.success == true) {
-      //Set data in hive
       await Hive.box(userdata)
           .put(userName, userProfileModel.resData!.userName.toString());
       await Hive.box(userdata)
@@ -160,9 +159,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             .put(userGender, userProfileModel.resData!.gender.toString());
       }
 
-      if (userProfileModel.resData!.country != '') {
-        await Hive.box(userdata)
-            .put(userCountryName, userProfileModel.resData!.country.toString());
+      if (userProfileModel.resData!.countryFullName != '') {
+        await Hive.box(userdata).put(userCountryName,
+            userProfileModel.resData!.countryFullName.toString());
       }
       if (userProfileModel.resData!.gender.toString() == 'male') {
         setState(() {
@@ -221,11 +220,10 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     request.fields['gender'] = genderData.toString();
     request.fields['device_token'] = _fcmtoken.toString();
     if (widget.isRought == false && Hive.box(userdata).get(userBio) == null) {
-      request.fields['bio'] = "At work";
+      request.fields['bio'] = "Available";
     }
     request.fields['one_signal_player_id'] =
         OneSignal.User.pushSubscription.id!;
-    request.fields['country'] = nationController.text;
 
     if (widget.isRought == true) {
       if (image != null) {
@@ -237,12 +235,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             .toString();
       } else if (profileImg!.isNotEmpty &&
           profileImg !=
-              "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
+              "https://whoxachat.com/uploads/not-found-images/profile-image.png" &&
           avatarController.avatarsData
               .where((avatar) => avatar.avtarMedia == profileImg)
               .map((avatar) => avatar.avtarMedia!)
               .isNotEmpty &&
-          // profileImg == avatarController.avatarsData[index].avtarMedia &&
           avatarController.avatarIndex.value == -1 &&
           image == null) {
         request.fields['avatar_id'] = avatarController.avatarsData
@@ -265,8 +262,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
               .first;
         }
       }
-      // request.files
-      //     .add(await http.MultipartFile.fromPath('files', image!.path));
     }
     var response = await request.send();
 
@@ -288,9 +283,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             .put(userGender, userProfileModel.resData!.gender.toString());
       }
 
-      if (userProfileModel.resData!.country != '') {
-        await Hive.box(userdata)
-            .put(userCountryName, userProfileModel.resData!.country.toString());
+      if (userProfileModel.resData!.countryFullName != '') {
+        await Hive.box(userdata).put(userCountryName,
+            userProfileModel.resData!.countryFullName.toString());
       }
 
       setState(() {
@@ -307,14 +302,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
           const ProfilePicScreen(),
           transition: Transition.rightToLeft,
         );
-        // Navigator.pushAndRemoveUntil(
-        //     context,
-        //     PageTransition(
-        //       curve: Curves.linear,
-        //       type: PageTransitionType.rightToLeft,
-        //       child: TabbarScreen(currentTab: 0),
-        //     ),
-        //     (route) => false);
       }
       showCustomToast(languageController.textTranslate('Success'));
     } else {
@@ -325,6 +312,38 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     }
   }
 
+  // checkUserName({
+  //   required String userName,
+  // }) async {
+  //   try {
+  //     // isReportUserLoading.value = true;
+
+  //     await Hive.openBox(userdata);
+  //     log("token: ${Hive.box(userdata).get(authToken)}");
+  //     final responseJson = await apiHelper.postMethod(
+  //       url: apiHelper.userNameCheck,
+  //       // headers: {
+  //       //   'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',
+  //       //   'Content-Type': 'application/json',
+  //       // },
+  //       requestBody: {
+  //         "user_name": userName,
+  //       },
+  //     );
+  //     if (responseJson['success'] == true) {
+  //       showCustomToast("User reported");
+  //       Get.back();
+  //     }
+  //     // isReportUserLoading.value = false;
+  //   } catch (e) {
+  //     // isReportUserLoading.value = false;
+
+  //     if (kDebugMode) {
+  //       print('report user faield: $e');
+  //     }
+  //   }
+  // }
+
   Timer? timer;
   checkUserName(String xyz) async {
     setState(() {
@@ -334,8 +353,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       var uri = Uri.parse(apiHelper.userNameCheck);
       var request = http.MultipartRequest("POST", uri);
       Map<String, String> headers = {
-        "Accept": "application/json",
-        'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}'
+        'Content-Type': 'application/json',
+        // 'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}'
       };
       request.headers.addAll(headers);
       request.fields['user_name'] = xyz;
@@ -355,10 +374,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         setState(() {
           isUsername = false;
         });
-        Fluttertoast.showToast(msg: userNameCheckModel!.message!);
-        // timer = Timer(const Duration(seconds: 5), () {
-        //   userController.clear();
-        // });
+        // Fluttertoast.showToast(msg: userNameCheckModel!.message!);
       }
     } catch (e) {
       setState(() {
@@ -398,7 +414,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: const Color(0xffFFEDAB).withOpacity(0.05),
+        statusBarColor: secondaryColor.withOpacity(0.05),
       ),
       child: Scaffold(
           backgroundColor: const Color.fromRGBO(250, 250, 250, 1),
@@ -417,12 +433,12 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         child: Column(
           children: [
             Container(
-              height: 130,
+              height: 110,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xffFFEDAB).withOpacity(0.04),
-                    const Color(0xffFCC604).withOpacity(0.04),
+                    secondaryColor.withOpacity(0.04),
+                    chatownColor.withOpacity(0.04),
                   ],
                 ),
               ),
@@ -435,7 +451,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     fontWeight: FontWeight.w600,
                     fontFamily: "Poppins",
                   ),
-                ).paddingOnly(top: 20).paddingSymmetric(
+                ).paddingOnly(top: 30).paddingSymmetric(
                       horizontal: 28,
                     ),
               ),
@@ -504,7 +520,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       height: 30,
                     ),
                     buttonClick
-                        ? const Center(
+                        ? Center(
                             child: SizedBox(
                             height: 30,
                             width: 30,
@@ -538,8 +554,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     const SizedBox(
                       height: 30,
                     ),
-
-                    // _submitButton()
                   ],
                 ).paddingSymmetric(horizontal: 20),
               ),
@@ -577,7 +591,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                           const SizedBox(
                             height: 15,
                           ),
-                          UserNameWid(),
+                          UserNameWid(isCheckuserName: false),
                           const SizedBox(
                             height: 15,
                           ),
@@ -602,7 +616,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                             height: 30,
                           ),
                           buttonClick
-                              ? const Center(
+                              ? Center(
                                   child: SizedBox(
                                   height: 30,
                                   width: 30,
@@ -635,7 +649,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                                   },
                                   title: "Continue",
                                 )
-                          // _submitButton()
                         ],
                       ),
                     ),
@@ -670,90 +683,11 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     ),
                   ],
                 )),
-            // Positioned(
-            //     top: 45,
-            //     right: 15,
-            //     child: InkWell(
-            //         onTap: () {
-            //           closekeyboard();
-
-            //           if (userController.text.isNotEmpty &&
-            //               fNameController.text.isNotEmpty &&
-            //               lNameController.text.isNotEmpty) {
-            //             editApiCall();
-            //           } else {
-            //             if (userController.text.isEmpty) {
-            //               showCustomToast("Please enter username");
-            //             } else if (fNameController.text.isEmpty) {
-            //               showCustomToast("Please enter first name");
-            //             } else if (lNameController.text.isEmpty) {
-            //               showCustomToast("Please enter last name");
-            //             }
-            //           }
-            //         },
-            //         child: buttonClick
-            //             ? const SizedBox(
-            //                 height: 20,
-            //                 width: 20,
-            //                 child: Center(
-            //                   child: CircularProgressIndicator(
-            //                       strokeWidth: 3, color: Colors.black),
-            //                 ),
-            //               )
-            //             : const Icon(Icons.check, size: 25)))
           ],
         ));
   }
 
   bool buttonClick = false;
-  // Widget _submitButton(BuildContext context) {
-  //   return InkWell(
-  //     onTap: () {
-  //       closekeyboard();
-
-  //       if (userController.text.isNotEmpty &&
-  //           fNameController.text.isNotEmpty &&
-  //           lNameController.text.isNotEmpty) {
-  //         editApiCall();
-  //       } else {
-  //         if (userController.text.isEmpty) {
-  //           showCustomToast("Please enter username");
-  //         } else if (fNameController.text.isEmpty) {
-  //           showCustomToast("Please enter first name");
-  //         } else if (lNameController.text.isEmpty) {
-  //           showCustomToast("Please enter last name");
-  //         }
-  //       }
-  //     },
-  //     child: buttonClick
-  //         ? Center(
-  //             child: Lottie.asset(
-  //               'assets/icons/Loader.json',
-  //               width: 80,
-  //               animate: true,
-  //               repeat: true,
-  //             ),
-  //           )
-  //         : Container(
-  //             height: 50,
-  //             width: MediaQuery.of(context).size.width,
-  //             decoration: BoxDecoration(
-  //               // border: Border.all(color:  Colors.black, width: 1),
-  //               borderRadius: BorderRadius.circular(25),
-  //               color: chatownColor,
-  //             ),
-  //             child: const Center(
-  //               child: Text(
-  //                 'Continue',
-  //                 style: TextStyle(
-  //                     color: Colors.black,
-  //                     fontWeight: FontWeight.w500,
-  //                     fontSize: 16),
-  //               ),
-  //             ),
-  //           ),
-  //   );
-  // }
 
   Widget _imgWidget() {
     return Container(
@@ -771,7 +705,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                   userImg(),
                   InkWell(
                     onTap: () {
-                      // selectImageSource();
                       piceImagePopup();
                     },
                     child: Container(
@@ -786,7 +719,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(30),
                                 gradient: LinearGradient(
-                                    colors: [yellow1Color, yellow2Color],
+                                    colors: [secondaryColor, chatownColor],
                                     begin: Alignment.topRight,
                                     end: Alignment.bottomCenter)),
                             child: Center(
@@ -982,7 +915,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
     );
   }
 
-  Widget UserNameWid() {
+  Widget UserNameWid({bool isCheckuserName = true}) {
     return Container(
       decoration: const BoxDecoration(),
       child: Column(
@@ -1004,15 +937,16 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
             height: 50,
             width: MediaQuery.of(context).size.width,
             child: TextField(
-                controller: userController,
-                onChanged: (String searchText) {
+              controller: userController,
+              onChanged: (String searchText) {
+                if (isCheckuserName == true) {
                   checkUserName(searchText);
-                },
-                style:
-                    const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                readOnly: false,
-                keyboardType: TextInputType.text,
-                decoration: InputDecoration(
+                }
+              },
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+              readOnly: false,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                       borderSide: const BorderSide(color: Color(0xffEFEFEF))),
@@ -1021,16 +955,42 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                  // hintText: 'Add a brief description',
                   hintStyle: const TextStyle(
                       fontSize: 15,
                       color: Colors.grey,
                       fontWeight: FontWeight.w400),
                   filled: true,
                   fillColor: Colors.white,
-
-                  // ),
-                )),
+                  suffixIcon: isCheckuserName == true
+                      ? userNameCheckModel == null ||
+                              userNameCheckModel!.success == false
+                          ? Container(
+                              margin: const EdgeInsets.all(15),
+                              decoration: BoxDecoration(
+                                // color: Colors.red,
+                                border: Border.all(color: Colors.red),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                size: 14,
+                                color: Colors.red,
+                              ),
+                            )
+                          : Container(
+                              margin: const EdgeInsets.all(15),
+                              decoration: const BoxDecoration(
+                                color: Colors.green,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            )
+                      : const SizedBox.shrink()),
+            ),
           )
         ],
       ),
@@ -1073,15 +1033,12 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     borderRadius: BorderRadius.circular(10)),
                 contentPadding:
                     const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                // hintText: 'Add a brief description',
                 hintStyle: const TextStyle(
                     fontSize: 15,
                     color: Colors.grey,
                     fontWeight: FontWeight.w400),
                 filled: true,
                 fillColor: Colors.white,
-
-                // ),
               )),
         )
       ],
@@ -1110,14 +1067,13 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                     color: Colors.grey,
                     blurRadius: 1.0,
                     spreadRadius: 0.0,
-                    offset: Offset(0.0, 0.0) // shadow direction: bottom right
-                    )
+                    offset: Offset(0.0, 0.0))
               ]),
           child: ClipRRect(
               borderRadius: BorderRadius.circular(110),
               child: profileImg != null &&
                       profileImg !=
-                          "http://62.72.36.245:3000/uploads/not-found-images/profile-image.png" &&
+                          "https://whoxachat.com/uploads/not-found-images/profile-image.png" &&
                       avatarController.avatarIndex.value == -1 &&
                       image == null
                   ? avatarController.avatarsData
@@ -1227,8 +1183,8 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                                       : Container(
                                           height: 30,
                                           width: 30,
-                                          decoration: const BoxDecoration(
-                                              color: Color(0xFFFCC604),
+                                          decoration:  BoxDecoration(
+                                              color: chatownColor,
                                               shape: BoxShape.circle),
                                           child: const Icon(
                                             Icons.person,
@@ -1242,72 +1198,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
       ),
     );
   }
-
-  // Widget userImg() {
-  //   profileImg;
-  //   if (checkForNull(Hive.box(userdata).get(userImage)) != null) {
-  //     profileImg = Hive.box(userdata).get(userImage);
-  //   }
-  //   return Material(
-  //     elevation: 0,
-  //     borderRadius: BorderRadius.circular(100),
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         // selectImageSource();
-  //         piceImagePopup();
-  //       },
-  //       child: Container(
-  //         height: 110,
-  //         width: 110,
-  //         decoration: const BoxDecoration(
-  //             shape: BoxShape.circle,
-  //             color: Colors.white,
-  //             boxShadow: [
-  //               BoxShadow(
-  //                   color: Colors.grey,
-  //                   blurRadius: 1.0,
-  //                   spreadRadius: 0.0,
-  //                   offset: Offset(0.0, 0.0) // shadow direction: bottom right
-  //                   )
-  //             ]),
-  //         child: ClipRRect(
-  //             borderRadius: BorderRadius.circular(110),
-  //             child: image == null
-  //                 ? isLoading
-  //                     ? CircularProgressIndicator(color: yellow1Color)
-  //                     : userProfileModel.resData!.profileImage != null
-  //                         ? CachedNetworkImage(
-  //                             imageUrl: userProfileModel.resData!.profileImage!,
-  //                             imageBuilder: (context, imageProvider) =>
-  //                                 Container(
-  //                               decoration: BoxDecoration(
-  //                                 shape: BoxShape.circle,
-  //                                 image: DecorationImage(
-  //                                   image: imageProvider,
-  //                                   fit: BoxFit.cover,
-  //                                 ),
-  //                               ),
-  //                             ),
-  //                             errorWidget: (context, url, error) =>
-  //                                 const Icon(Icons.person, color: chatColor),
-  //                           )
-  //                         : Container(
-  //                             height: 30,
-  //                             width: 30,
-  //                             decoration: const BoxDecoration(
-  //                                 color: Color(0xffE7E8EC),
-  //                                 shape: BoxShape.circle),
-  //                             child: const Icon(
-  //                               Icons.person,
-  //                               size: 15,
-  //                               color: Colors.black,
-  //                             ),
-  //                           )
-  //                 : Image.file(image!, fit: BoxFit.cover)),
-  //       ),
-  //     ),
-  //   );
-  // }
 
   selectImageSource() {
     return showDialog(
@@ -1347,7 +1237,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         getImageFromCamera();
                       },
                       style: ButtonStyle(
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0))),
                       ),
                       child: Text(
@@ -1364,7 +1254,7 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                         getImageFromGallery();
                       },
                       style: ButtonStyle(
-                        shape: MaterialStateProperty.all(
+                        shape: WidgetStateProperty.all(
                           RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
@@ -1385,9 +1275,9 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                   child: ClipOval(
                     child: Material(
                       elevation: 5,
-                      color: blackcolor, // button color
+                      color: blackcolor,
                       child: InkWell(
-                        splashColor: Colors.black, // inkwell color
+                        splashColor: Colors.black,
                         child: const SizedBox(
                             width: 25,
                             height: 25,
@@ -1458,15 +1348,12 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
                       borderRadius: BorderRadius.circular(10)),
                   contentPadding:
                       const EdgeInsets.only(top: 1, left: 15, bottom: 1),
-                  // hintText: 'Add a brief description',
                   hintStyle: const TextStyle(
                       fontSize: 17,
                       color: Colors.grey,
                       fontWeight: FontWeight.w400),
                   filled: true,
                   fillColor: Colors.white,
-
-                  // ),
                 )),
           )
         ],
@@ -1675,7 +1562,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
         cancelButton: CupertinoActionSheetAction(
           isDefaultAction: true,
           onPressed: () {
-            // Navigator.pop(context, 'Cancel');
             Navigator.of(context, rootNavigator: true).pop("Discard");
           },
           child: Text(
@@ -1689,7 +1575,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   }
 
   Future getImageFromCamera() async {
-    // ignore: deprecated_member_use
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
     setState(() {
       if (pickedFile != null) {
@@ -1701,7 +1586,6 @@ class _AddPersonaDetailsState extends State<AddPersonaDetails> {
   }
 
   Future getImageFromGallery() async {
-    // ignore: deprecated_member_use
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     setState(() {
       if (pickedFile != null) {

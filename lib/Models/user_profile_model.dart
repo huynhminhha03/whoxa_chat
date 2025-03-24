@@ -29,6 +29,7 @@ class ResData {
       this.userId,
       this.phoneNumber,
       this.country,
+      this.countryFullName,
       this.firstName,
       this.lastName,
       this.deviceToken,
@@ -44,6 +45,7 @@ class ResData {
     userId = json['user_id'];
     phoneNumber = json['phone_number'];
     country = json['country'];
+    countryFullName = json['country_full_name'];
     firstName = json['first_name'];
     lastName = json['last_name'];
     deviceToken = json['device_token'];
@@ -57,6 +59,7 @@ class ResData {
 
   String? bio;
   String? country;
+  String? countryFullName;
   String? countryCode;
   String? deviceToken;
   String? dob;
@@ -75,6 +78,7 @@ class ResData {
     data['user_id'] = userId;
     data['phone_number'] = phoneNumber;
     data['country'] = country;
+    data['country_full_name'] = countryFullName;
     data['first_name'] = firstName;
     data['last_name'] = lastName;
     data['device_token'] = deviceToken;

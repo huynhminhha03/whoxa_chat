@@ -3,11 +3,13 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class ApiHelper {
-  static const String baseUrl = 'http://62.72.36.245:3000/api';
+static const String baseUrl = 'http://0.0.0.0:3000/api'; //set here your domain i.e. baseUrl = https://whoxachat.com/api 
+static const String baseUrlIp = '0.0.0.0'; //here server IP to connect webrtc and socket i.e. baseUrlIp = '62.75.38.246'
 
   /// API Paths
   String registerPhone = "$baseUrl/register-phone";
   String verifyOtpPhone = "$baseUrl/verify-phone-otp";
+  String verifyOtpPhoneFireBase = "$baseUrl/verify-phone-otp-firebase";
   String userCreateProfile = "$baseUrl/user-details";
   String userNameCheck = "$baseUrl/check-user-name";
   String getAllContact = "$baseUrl/get-all-available-contacts";
@@ -40,6 +42,13 @@ class ApiHelper {
   String listOfAvatars = '$baseUrl/list-all-avtars';
   String defaultLanguage = '$baseUrl/fetch-default-language';
   String listOfLanguages = '$baseUrl/List-Language';
+  String myContacts = '$baseUrl/my-contacts';
+  String deleteAccount = '$baseUrl/delete-account';
+  String getAppSettings = '$baseUrl/get-settings';
+  String getReportTypesList = '$baseUrl/Report-type-list';
+  String reportUser = '$baseUrl/report-user';
+
+  static const String staticBaseUrl = 'https://your-domain-name/api';
 
   Future<Map<String, dynamic>> getMethod(
       {required String url,

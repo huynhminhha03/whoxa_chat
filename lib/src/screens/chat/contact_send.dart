@@ -5,9 +5,10 @@ import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:meyaoo_new/app.dart';
-import 'package:meyaoo_new/controller/single_chat_controller.dart';
-import 'package:meyaoo_new/src/global/global.dart';
+import 'package:whoxachat/app.dart';
+import 'package:whoxachat/controller/single_chat_controller.dart';
+import 'package:whoxachat/src/global/common_widget.dart';
+import 'package:whoxachat/src/global/global.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import '../../../controller/get_contact_controller.dart';
 
@@ -45,25 +46,70 @@ class _ContactSendState extends State<ContactSend> {
 
   Future<void> apis() async {
     await _fetchContacts();
-    // await getContactsFromGloble();
+
     log("MY_DEVICE_CONTACS: ${addContactController.mobileContacts}");
     var contactJson = json.encode(addContactController.mobileContacts);
     getAllDeviceContact.getAllContactApi(contact: contactJson);
   }
 
   Future _fetchContacts() async {
-    if (!await FlutterContacts.requestPermission(readonly: true)) {
-      setState(() => _permissionDenied = true);
-    } else {
+    // Step 1: Check permission
+
+    bool permissionGranted = await FlutterContacts.requestPermission(
+      readonly: true,
+    );
+
+    debugPrint("_permissionDenied 1 $permissionGranted");
+
+    if (!permissionGranted) {
+      setState(() {
+        _permissionDenied = true;
+      });
+      debugPrint("_permissionDenied $_permissionDenied");
+      return; // If permission is denied, don't proceed further
+    }
+    // }
+
+    try {
       final contacts = await FlutterContacts.getContacts(
-          withProperties: true, withPhoto: true);
+        withProperties: true,
+        withPhoto: true,
+      );
+
+      // Log the number of contacts fetched
+      debugPrint("Fetched ${contacts.length} contacts.");
+
+      // Optional: Log contact names or other properties to verify the fetched data
+      for (var contact in contacts) {
+        debugPrint("Contact name: ${contact.displayName}");
+      }
+
       setState(() {
         _contacts = contacts;
-        filteredContacts =
-            contacts; // Initially set filteredContacts to all contacts
+        filteredContacts = contacts;
+      });
+    } catch (e) {
+      debugPrint("Error fetching contacts: $e");
+      setState(() {
+        _permissionDenied = true;
       });
     }
   }
+
+  // Future _fetchContacts() async {
+  //   if (!await FlutterContacts.requestPermission(
+  //     readonly: true,
+  //   )) {
+  //     setState(() => _permissionDenied = true);
+  //   } else {
+  //     final contacts = await FlutterContacts.getContacts(
+  //         withProperties: true, withPhoto: true);
+  //     setState(() {
+  //       _contacts = contacts;
+  //       filteredContacts = contacts;
+  //     });
+  //   }
+  // }
 
   void filterContacts(String query) {
     if (_contacts != null) {
@@ -101,14 +147,13 @@ class _ContactSendState extends State<ContactSend> {
           InkWell(
             onTap: () {
               if (widget.SelectedreplyText == true) {
-                //=============================== logic for match profile img =================================
                 String mobileNum = getMobile(
                     selectedContact!.phones.map((e) => e.number).toString());
                 int matchingIndex = isMatchinginvite(mobileNum);
                 String profileImage = matchingIndex != -1
                     ? getAllDeviceContact.getList[matchingIndex].profileImage!
                     : "";
-                //=============================================================================================
+
                 chatContorller.sendMessageContact(
                     widget.conversationID,
                     "contact",
@@ -122,14 +167,13 @@ class _ContactSendState extends State<ContactSend> {
                     widget.replyID);
                 widget.SelectedreplyText = false;
               } else {
-                //=============================== logic for match profile img =================================
                 String mobileNum = getMobile(
                     selectedContact!.phones.map((e) => e.number).toString());
                 int matchingIndex = isMatchinginvite(mobileNum);
                 String profileImage = matchingIndex != -1
                     ? getAllDeviceContact.getList[matchingIndex].profileImage!
                     : "";
-                //=============================================================================================
+
                 chatContorller.sendMessageContact(
                     widget.conversationID,
                     "contact",
@@ -147,7 +191,8 @@ class _ContactSendState extends State<ContactSend> {
               height: 30,
               width: 63,
               decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(13), color: yellow1Color),
+                  borderRadius: BorderRadius.circular(13),
+                  color: secondaryColor),
               child: Center(
                   child: Text(
                 languageController.textTranslate('Next'),
@@ -157,8 +202,7 @@ class _ContactSendState extends State<ContactSend> {
           )
         ],
       ),
-      body: //To of search bar
-          Column(
+      body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Center(
@@ -166,38 +210,49 @@ class _ContactSendState extends State<ContactSend> {
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Container(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffFFFFFF),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: TextField(
-                    controller: controller,
-                    onChanged: (value) {
-                      setState(() {
-                        searchText = value.toLowerCase().trim();
-                      });
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.all(17),
-                        child: Image(
-                          image: AssetImage('assets/icons/search.png'),
-                        ),
-                      ),
-                      hintText: languageController
-                          .textTranslate('Search name or number'),
-                      hintStyle:
-                          const TextStyle(fontSize: 12, color: Colors.grey),
-                      filled: true,
-                      fillColor: Colors.grey.shade100,
-                      border: const OutlineInputBorder(
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
+                child: commonSearchField(
+                  context: context,
+                  controller: controller,
+                  onChanged: (value) {
+                    setState(() {
+                      searchText = value.toLowerCase().trim();
+                    });
+                  },
+                  hintText:
+                      languageController.textTranslate('Search name or number'),
                 ),
+                // Container(
+                //   height: 50,
+                //   width: MediaQuery.of(context).size.width * 0.9,
+                //   decoration: BoxDecoration(
+                //       color: const Color(0xffFFFFFF),
+                //       borderRadius: BorderRadius.circular(10)),
+                //   child: TextField(
+                //     controller: controller,
+                //     onChanged: (value) {
+                //       setState(() {
+                //         searchText = value.toLowerCase().trim();
+                //       });
+                //     },
+                //     decoration: InputDecoration(
+                //       prefixIcon: const Padding(
+                //         padding: EdgeInsets.all(17),
+                //         child: Image(
+                //           image: AssetImage('assets/icons/search.png'),
+                //         ),
+                //       ),
+                //       hintText: languageController
+                //           .textTranslate('Search name or number'),
+                //       hintStyle:
+                //           const TextStyle(fontSize: 12, color: Colors.grey),
+                //       filled: true,
+                //       fillColor: Colors.grey.shade100,
+                //       border: const OutlineInputBorder(
+                //         borderSide: BorderSide.none,
+                //       ),
+                //     ),
+                //   ),
+                // ),
               ),
             ),
           ),
@@ -216,12 +271,11 @@ class _ContactSendState extends State<ContactSend> {
 
   int isMatchinginvite(String userNumber) {
     for (int i = 0; i < getAllDeviceContact.getList.length; i++) {
-      //List<String> numbers = userNumber.split(',');
       if (userNumber == getAllDeviceContact.getList[i].phoneNumber) {
-        return i; // Return the index of the matching contact
+        return i;
       }
     }
-    return -1; // Return -1 if no match is found
+    return -1;
   }
 
   List<Contact> getFilteredContacts(String searchText) {
@@ -246,10 +300,8 @@ class _ContactSendState extends State<ContactSend> {
         var contact = filteredContacts[index];
         Uint8List? image = contact.photo;
 
-        // Check for matching invite
         int matchingIndex = isMatchinginvite(
             getMobile(contact.phones.map((e) => e.number).toString()));
-        // ignore: avoid_print
 
         return Column(
           children: <Widget>[
@@ -259,39 +311,8 @@ class _ContactSendState extends State<ContactSend> {
                   child: ListTile(
                       onTap: () {
                         setState(() {
-                          selectedContact =
-                              contact; // Update the selected contact
+                          selectedContact = contact;
                         });
-                        // if (widget.SelectedreplyText == true) {
-                        //   chatContorller.sendMessageContact(
-                        //       widget.conversationID,
-                        //       "contact",
-                        //       contact.displayName,
-                        //       getMobile(
-                        //           contact.phones.map((e) => e.number).toString()),
-                        //       widget.mobileNum,
-                        // matchingIndex != -1
-                        //     ? getAllDeviceContact
-                        //         .getList[matchingIndex].profileImage!
-                        //     : "",
-                        //       '',
-                        //       widget.replyID);
-                        //   widget.SelectedreplyText = false;
-                        // } else {
-                        //   chatContorller.sendMessageContact(
-                        //       widget.conversationID,
-                        //       "contact",
-                        //       contact.displayName,
-                        //       getMobile(
-                        //           contact.phones.map((e) => e.number).toString()),
-                        //       widget.mobileNum,
-                        //       matchingIndex != -1
-                        //           ? getAllDeviceContact
-                        //               .getList[matchingIndex].profileImage!
-                        //           : "",
-                        //       '',
-                        //       '');
-                        // }
                       },
                       leading: Stack(
                         children: <Widget>[
@@ -350,7 +371,7 @@ class _ContactSendState extends State<ContactSend> {
                               width: 20,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(22),
-                                  color: yellow2Color),
+                                  color: chatownColor),
                               child: const Center(
                                 child: Icon(Icons.check, size: 13),
                               ),
@@ -361,7 +382,7 @@ class _ContactSendState extends State<ContactSend> {
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(22),
                                   color: Colors.white,
-                                  border: Border.all(color: yellow2Color)),
+                                  border: Border.all(color: chatownColor)),
                             )),
                 ),
               ],

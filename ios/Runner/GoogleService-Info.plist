@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyDID67W5bsh0baMeyyHxegJCPvzF3Oibfg</string>
+	<string>AIzaSyACnqKfcE9yUJvgYZRuBvZhzJuaQFztuAc</string>
 	<key>GCM_SENDER_ID</key>
-	<string>391729812590</string>
+	<string>261407303220</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.primocys.chat</string>
+	<string>com.unimonollc.chat</string>
 	<key>PROJECT_ID</key>
-	<string>meyaoo-36820</string>
+	<string>unimonollc-chat</string>
 	<key>STORAGE_BUCKET</key>
-	<string>meyaoo-36820.appspot.com</string>
+	<string>unimonollc-chat.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:391729812590:ios:3bb89af4af4de9443cc27f</string>
+	<string>1:261407303220:ios:401507da81cabf18e98c61</string>
 </dict>
 </plist>
