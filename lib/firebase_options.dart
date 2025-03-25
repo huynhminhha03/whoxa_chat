@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDctOKnsBz80jHaVrIYXP93hjwSAUNjMvE',
-    appId: '1:261407303220:android:97d39ec646d0c956e98c61',
+    appId: '1:261407303220:android:70e1cc4541935e06e98c61',
     messagingSenderId: '261407303220',
     projectId: 'unimonollc-chat',
     storageBucket: 'unimonollc-chat.firebasestorage.app',
@@ -59,10 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyACnqKfcE9yUJvgYZRuBvZhzJuaQFztuAc',
-    appId: '1:261407303220:ios:4af4cc6733c1ad63e98c61',
+    appId: '1:261407303220:ios:401507da81cabf18e98c61',
     messagingSenderId: '261407303220',
     projectId: 'unimonollc-chat',
     storageBucket: 'unimonollc-chat.firebasestorage.app',
-    iosBundleId: 'com.primocys.chat',
+    iosBundleId: 'com.unimonollc.chat',
   );
+
 }

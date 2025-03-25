@@ -19,6 +19,7 @@ import 'package:whoxachat/src/screens/chat/single_chat.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whoxachat/src/global/global.dart';
 import 'package:whoxachat/src/global/strings.dart';
+import 'package:whoxachat/src/screens/layout/add_friend.dart';
 
 class FlutterContactsExample extends StatefulWidget {
   bool isValue;
@@ -140,72 +141,70 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                         hintText: languageController
                             .textTranslate('Search name or number'),
                       ),
-                      //     Container(
-                      //   height: 50,
-                      //   width: MediaQuery.of(context).size.width * 0.9,
-                      //   decoration: BoxDecoration(
-                      //       color: const Color.fromRGBO(238, 238, 238, 1),
-                      //       borderRadius: BorderRadius.circular(10)),
-                      //   child: TextField(
-                      //     controller: controller,
-                      //     onChanged: (value) {
-                      //       setState(() {
-                      //         searchText = value.toLowerCase().trim();
-                      //       });
-                      //     },
-                      //     decoration: InputDecoration(
-                      //       prefixIcon: const Padding(
-                      //         padding: EdgeInsets.all(17),
-                      //         child: Image(
-                      //           image: AssetImage('assets/icons/search.png'),
-                      //         ),
-                      //       ),
-                      //       hintText: languageController
-                      //           .textTranslate('Search name or number'),
-                      //       hintStyle: const TextStyle(
-                      //           fontSize: 12, color: Colors.grey),
-                      //       filled: true,
-                      //       fillColor: Colors.transparent,
-                      //       border: const OutlineInputBorder(
-                      //         borderSide: BorderSide.none,
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 15),
               InkWell(
-                onTap: () {
-                  Get.to(() => AddMembersinGroup1());
-                },
+               
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 17),
+                  padding: const EdgeInsets.only(left: 17, right: 17),
                   child: Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween, // Chia khoảng cách đều
                     children: [
-                      Container(
-                        height: 45,
-                        width: 45,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          shape: BoxShape.circle,
-                        ),
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(100),
-                            child: Center(
-                              child: Image.asset(
-                                "assets/images/group1.png",
-                                // color: chatownColor,
+                      // New Group (Nhấn vào sẽ mở màn hình tạo nhóm)
+                      InkWell(
+                        onTap: () {
+                          Get.to(() =>
+                              AddMembersinGroup1()); // Điều hướng sang màn hình "New Group"
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 45,
+                              width: 45,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                shape: BoxShape.circle,
                               ),
-                            )),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: Center(
+                                  child: Image.asset(
+                                    "assets/images/group1.png",
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              languageController.textTranslate('New Group'),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(width: 10),
-                      Text(
-                        languageController.textTranslate('New Group'),
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.w500),
+
+                      InkWell(
+                        onTap: () {
+                          Get.to(() =>
+                              AddFriendScreen()); 
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.person_add,
+                                color: Color(0xFFD6B85F), size: 24),
+                            const SizedBox(width: 5),
+                            Text(
+                              languageController.textTranslate('Add Friend'),
+                              style: const TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -288,153 +287,172 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
     );
   }
 
-Widget contactsWidget() {
-  // Kiểm tra trạng thái đang tải
-  if (getAllDeviceContact.isGetMYContectLoading.value) {
-    return loader(context);
-  }
+  Widget contactsWidget() {
+    // Kiểm tra trạng thái đang tải
+    if (getAllDeviceContact.isGetMYContectLoading.value) {
+      return loader(context);
+    }
 
-  // Lọc danh bạ khi tìm kiếm
-  var filteredContacts = getAllDeviceContact
-          .myContactsData.value.myContactList
-          ?.where((contact) =>
-              contact?.fullName?.toLowerCase().contains(searchText.toLowerCase()) ?? false)
-          .toList() ??
-      []; // Nếu myContactList là null thì trả về danh sách trống
+    // Lọc danh bạ khi tìm kiếm
+    var filteredContacts = getAllDeviceContact
+            .myContactsData.value.myContactList
+            ?.where((contact) =>
+                contact?.fullName
+                    ?.toLowerCase()
+                    .contains(searchText.toLowerCase()) ??
+                false)
+            .toList() ??
+        []; // Nếu myContactList là null thì trả về danh sách trống
 
-  // Print the filtered contacts to check if the filtering is working
-  print('Filtered contacts: ${filteredContacts.map((contact) => contact?.fullName).toList()}');
+    // Print the filtered contacts to check if the filtering is working
+    print(
+        'Filtered contacts: ${filteredContacts.map((contact) => contact?.fullName).toList()}');
 
-  // Nếu không có kết quả tìm kiếm, hiển thị thông báo
-  if (filteredContacts.isEmpty) {
-    print('No contacts found.');
-    return const SizedBox.shrink();
-  }
+    // Nếu không có kết quả tìm kiếm, hiển thị thông báo
+    if (filteredContacts.isEmpty) {
+      print('No contacts found.');
+      return const SizedBox.shrink();
+    }
 
-  // Hiển thị danh sách các liên lạc
-  return ListView.separated(
-    padding: const EdgeInsets.all(0),
-    itemCount: filteredContacts.length,
-    shrinkWrap: true,
-    physics: const NeverScrollableScrollPhysics(),
-    separatorBuilder: (context, index) {
-      var contact = filteredContacts[index];
-      // Null check before accessing contact properties
-      if (contact?.userDetails == null || contact?.userDetails?.userId == null) {
-        print('Contact userDetails is null for contact: ${contact?.fullName}');
-        return const SizedBox.shrink();  // Return empty widget if null
-      }
+    // Hiển thị danh sách các liên lạc
+    return ListView.separated(
+      padding: const EdgeInsets.all(0),
+      itemCount: filteredContacts.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      separatorBuilder: (context, index) {
+        var contact = filteredContacts[index];
+        // Null check before accessing contact properties
+        if (contact?.userDetails == null ||
+            contact?.userDetails?.userId == null) {
+          print(
+              'Contact userDetails is null for contact: ${contact?.fullName}');
+          return const SizedBox.shrink(); // Return empty widget if null
+        }
 
-      // Print the contact's phone number and userId
-      print('Contact: ${contact?.fullName}, Phone: ${contact?.phoneNumber}');
-      
-      return getAllDeviceContact.myContactsData.value.myContactList!.any(
-              (element) =>
-                  element?.phoneNumber.toString() == Hive.box(userdata).get(userMobile))
-          ? Hive.box(userdata).get(userMobile) == contact?.phoneNumber.toString()
-              ? const SizedBox.shrink()
-              : Divider(color: Colors.grey.shade300)
-          : index != filteredContacts.length - 1
-              ? Divider(color: Colors.grey.shade300)
-              : const SizedBox.shrink();
-    },
-    itemBuilder: (BuildContext context, int index) {
-      var contact = filteredContacts[index];
+        // Print the contact's phone number and userId
+        print('Contact: ${contact?.fullName}, Phone: ${contact?.phoneNumber}');
 
-      // Null check before accessing contact properties
-      if (contact?.userDetails == null && contact?.phoneNumber == null) {
-        print('Null contact details or phone number for contact: ${contact?.fullName}');
-        return const SizedBox.shrink();  // Return empty widget if null
-      }
+        return getAllDeviceContact.myContactsData.value.myContactList!.any(
+                (element) =>
+                    element?.phoneNumber.toString() ==
+                    Hive.box(userdata).get(userMobile))
+            ? Hive.box(userdata).get(userMobile) ==
+                    contact?.phoneNumber.toString()
+                ? const SizedBox.shrink()
+                : Divider(color: Colors.grey.shade300)
+            : index != filteredContacts.length - 1
+                ? Divider(color: Colors.grey.shade300)
+                : const SizedBox.shrink();
+      },
+      itemBuilder: (BuildContext context, int index) {
+        var contact = filteredContacts[index];
 
-      // Print the contact details that are being rendered
-      print('Rendering contact: ${contact?.fullName}, Phone: ${contact?.phoneNumber}');
+        // Null check before accessing contact properties
+        if (contact?.userDetails == null && contact?.phoneNumber == null) {
+          print(
+              'Null contact details or phone number for contact: ${contact?.fullName}');
+          return const SizedBox.shrink(); // Return empty widget if null
+        }
 
-      return Hive.box(userdata).get(userMobile) == contact?.phoneNumber.toString()
-          ? const SizedBox.shrink()
-          : Column(
-              children: <Widget>[
-                ListTile(
-                  onTap: () {
-                    if (chatListController
-                        .userChatListModel.value!.chatList!.isEmpty) {
-                      Get.to(() => SingleChatMsg(
-                            conversationID: '',
-                            username: contact?.fullName ?? "Unknown User",
-                            userPic: contact?.userDetails?.profileImage ?? 'default_image_url',
-                            mobileNum: contact?.phoneNumber.toString(),
-                            index: 0,
-                            userID: contact?.userDetails?.userId.toString() ?? '',
-                          ));
-                    } else {
-                      var existingChat = chatListController
-                          .userChatListModel.value!.chatList!
-                          .firstWhere(
-                              (element) =>
-                                  contact?.userDetails?.userId.toString() == 
-                                  element?.userId?.toString(),
-                              orElse: () => ChatList());
+        // Print the contact details that are being rendered
+        print(
+            'Rendering contact: ${contact?.fullName}, Phone: ${contact?.phoneNumber}');
 
-                      if (existingChat != null) {
-                        Get.to(() => SingleChatMsg(
-                              conversationID: existingChat.conversationId.toString(),
-                              username: contact?.fullName ?? "Unknown User",
-                              userPic: contact?.userDetails?.profileImage ?? 'default_image_url',
-                              mobileNum: contact?.phoneNumber.toString(),
-                              index: 0,
-                              isBlock: existingChat.isBlock,
-                              userID: existingChat.userId.toString(),
-                            ));
-                      } else {
+        return Hive.box(userdata).get(userMobile) ==
+                contact?.phoneNumber.toString()
+            ? const SizedBox.shrink()
+            : Column(
+                children: <Widget>[
+                  ListTile(
+                    onTap: () {
+                      if (chatListController
+                          .userChatListModel.value!.chatList!.isEmpty) {
                         Get.to(() => SingleChatMsg(
                               conversationID: '',
                               username: contact?.fullName ?? "Unknown User",
-                              userPic: contact?.userDetails?.profileImage ?? 'default_image_url',
+                              userPic: contact?.userDetails?.profileImage ??
+                                  'default_image_url',
                               mobileNum: contact?.phoneNumber.toString(),
                               index: 0,
-                              userID: contact?.userDetails?.userId.toString() ?? '',
+                              userID:
+                                  contact?.userDetails?.userId.toString() ?? '',
                             ));
+                      } else {
+                        var existingChat = chatListController
+                            .userChatListModel.value!.chatList!
+                            .firstWhere(
+                                (element) =>
+                                    contact?.userDetails?.userId.toString() ==
+                                    element?.userId?.toString(),
+                                orElse: () => ChatList());
+
+                        if (existingChat != null) {
+                          Get.to(() => SingleChatMsg(
+                                conversationID:
+                                    existingChat.conversationId.toString(),
+                                username: contact?.fullName ?? "Unknown User",
+                                userPic: contact?.userDetails?.profileImage ??
+                                    'default_image_url',
+                                mobileNum: contact?.phoneNumber.toString(),
+                                index: 0,
+                                isBlock: existingChat.isBlock,
+                                userID: existingChat.userId.toString(),
+                              ));
+                        } else {
+                          Get.to(() => SingleChatMsg(
+                                conversationID: '',
+                                username: contact?.fullName ?? "Unknown User",
+                                userPic: contact?.userDetails?.profileImage ??
+                                    'default_image_url',
+                                mobileNum: contact?.phoneNumber.toString(),
+                                index: 0,
+                                userID:
+                                    contact?.userDetails?.userId.toString() ??
+                                        '',
+                              ));
+                        }
                       }
-                    }
-                  },
-                  leading: Container(
-                    height: 45,
-                    width: 45,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
-                      shape: BoxShape.circle,
+                    },
+                    leading: Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        shape: BoxShape.circle,
+                      ),
+                      child: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: CustomCachedNetworkImage(
+                              imageUrl: contact?.userDetails?.profileImage ??
+                                  'default_image_url',
+                              placeholderColor: chatownColor,
+                              errorWidgeticon: const Icon(Icons.person))),
                     ),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CustomCachedNetworkImage(
-                            imageUrl: contact?.userDetails?.profileImage ?? 'default_image_url',
-                            placeholderColor: chatownColor,
-                            errorWidgeticon: const Icon(Icons.person))),
-                  ),
-                  title: Text(
-                    contact?.fullName ?? "No Name",  // Handle null value
-                    style: const TextStyle(
-                      fontSize: 15.0,
-                      fontFamily: 'Poppins',
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  subtitle: Container(
-                    padding: const EdgeInsets.only(top: 2.0),
-                    child: Text(
-                      contact?.phoneNumber.toString() ?? "No Phone",
+                    title: Text(
+                      contact?.fullName ?? "No Name", // Handle null value
                       style: const TextStyle(
-                          fontSize: 13, color: Color.fromRGBO(73, 73, 73, 1)),
+                        fontSize: 15.0,
+                        fontFamily: 'Poppins',
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
+                    subtitle: Container(
+                      padding: const EdgeInsets.only(top: 2.0),
+                      child: Text(
+                        contact?.phoneNumber.toString() ?? "No Phone",
+                        style: const TextStyle(
+                            fontSize: 13, color: Color.fromRGBO(73, 73, 73, 1)),
+                      ),
+                    ),
+                    trailing:
+                        Image.asset("assets/images/Chat1.png", height: 10),
                   ),
-                  trailing:
-                      Image.asset("assets/images/Chat1.png", height: 10),
-                ),
-              ],
-            );
-    },
-  );
-}
+                ],
+              );
+      },
+    );
+  }
 
   bool isMatchinginvite(String userNumber) {
     for (int i = 0; i < getAllDeviceContact.getList.length; i++) {

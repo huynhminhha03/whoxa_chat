@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "391729812590",
-    "project_id": "meyaoo-36820",
-    "storage_bucket": "meyaoo-36820.appspot.com"
+    "project_number": "261407303220",
+    "project_id": "unimonollc-chat",
+    "storage_bucket": "unimonollc-chat.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:391729812590:android:25416bbd4c56a0d23cc27f",
+        "mobilesdk_app_id": "1:261407303220:android:70e1cc4541935e06e98c61",
         "android_client_info": {
-          "package_name": "com.companyname.appname"
+          "package_name": "com.unimonollc.chat"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "391729812590-c1qif3msti77uf21sev4isde99i80naa.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAkQrEHySselU83c0xs5xZPc2taixT9T7A"
+          "current_key": "AIzaSyDctOKnsBz80jHaVrIYXP93hjwSAUNjMvE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "391729812590-c1qif3msti77uf21sev4isde99i80naa.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

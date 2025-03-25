@@ -3,8 +3,8 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class ApiHelper {
-static const String baseUrl = 'http://0.0.0.0:3000/api'; //set here your domain i.e. baseUrl = https://whoxachat.com/api 
-static const String baseUrlIp = '0.0.0.0'; //here server IP to connect webrtc and socket i.e. baseUrlIp = '62.75.38.246'
+static const String baseUrl = 'https://chat.unimonollc.com/api'; //set here your domain i.e. baseUrl = https://whoxachat.com/api 
+static const String baseUrlIp = '103.124.93.27'; //here server IP to connect webrtc and socket i.e. baseUrlIp = '62.75.38.246'
 
   /// API Paths
   String registerPhone = "$baseUrl/register-phone";

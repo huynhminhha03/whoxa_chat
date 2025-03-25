@@ -30,6 +30,7 @@ android {
     // ndkVersion "25.1.8937393"
 
     compileOptions {
+        coreLibraryDesugaringEnabled = true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -75,4 +76,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.github.AbedElazizShe:LightCompressor:1.3.2'
     implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+
 }
