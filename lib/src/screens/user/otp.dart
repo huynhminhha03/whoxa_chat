@@ -171,7 +171,8 @@ class _otpState extends State<otp> {
           await response.stream.transform(utf8.decoder).join();
       var userData = json.decode(responseData);
       send = VerifyOTPModel.fromJson(userData);
-      log(responseData);
+  
+      print("RESPONSE DATA: $responseData");
       if (send!.success == true) {
         await Hive.box(userdata).put(authToken, send!.token.toString());
         await Hive.box(userdata)
@@ -511,89 +512,7 @@ class _otpState extends State<otp> {
                   const SizedBox(height: 20),
                   button(time: snapshot.data.toString().padLeft(2, '0')),
                   const SizedBox(height: 35),
-                  Obx(
-                    () => languageController
-                                .appSettingsData[0].demoCredentials ==
-                            false
-                        ? const SizedBox.shrink()
-                        : Stack(
-                            children: [
-                              Container(
-                                width: Get.width,
-                                decoration: BoxDecoration(
-                                  color: secondaryColor,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      languageController
-                                          .textTranslate('For Demo'),
-                                      style: const TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          fontFamily: 'Poppins'),
-                                    ).paddingSymmetric(horizontal: 26),
-                                    const SizedBox(
-                                      height: 6,
-                                    ),
-                                    const Divider(
-                                      color: Color(0xffD8D8D8),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      languageController.textTranslate(
-                                          'Mobile Number: +1 5628532467'),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                    ).paddingSymmetric(horizontal: 26),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Text(
-                                      languageController
-                                          .textTranslate('OTP: 123456'),
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: 'Poppins',
-                                      ),
-                                    ).paddingSymmetric(horizontal: 26),
-                                    const SizedBox(
-                                      height: 12,
-                                    ),
-                                  ],
-                                ),
-                              ).paddingSymmetric(horizontal: 20),
-                              Positioned.fill(
-                                top: 8,
-                                right: 35,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _codeController.text = "123456";
-                                      setState(() {});
-                                    },
-                                    child: Image.asset(
-                                      "assets/icons/copy.png",
-                                      scale: 4,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
+                  
                 ],
               );
             }),

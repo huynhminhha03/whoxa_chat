@@ -28,7 +28,7 @@ class AddContactController extends GetxController {
   Future<void> addContactApi(fullName, mobileNum, profile) async {
     isLoading(true);
 
-    var uri = Uri.parse(apiHelper.addContact);
+    var uri = Uri.parse(apiHelper.addFriend);
     var request = http.MultipartRequest("POST", uri);
     Map<String, String> headers = {
       'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',

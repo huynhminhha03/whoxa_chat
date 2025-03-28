@@ -147,7 +147,10 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
               ),
               const SizedBox(height: 15),
               InkWell(
-               
+                onTap: () {
+                  Get.to(() =>
+                      AddMembersinGroup1()); // Điều hướng sang màn hình "New Group"
+                },
                 child: Padding(
                   padding: const EdgeInsets.only(left: 17, right: 17),
                   child: Row(
@@ -191,20 +194,20 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
                       InkWell(
                         onTap: () {
                           Get.to(() =>
-                              AddFriendScreen()); 
+                              AddFriendScreen());
                         },
-                        child: Row(
-                          children: [
-                            Icon(Icons.person_add,
-                                color: Color(0xFFD6B85F), size: 24),
-                            const SizedBox(width: 5),
-                            Text(
-                              languageController.textTranslate('Add Friend'),
-                              style: const TextStyle(
-                                  fontSize: 15, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.person_add,
+                              color: Color(0xFFD6B85F), size: 24),
+                          const SizedBox(width: 5),
+                          Text(
+                            languageController.textTranslate('Add Friend'),
+                            style: const TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w500),
+                          ),
+                        ],
+                      ),
                       ),
                     ],
                   ),
@@ -696,4 +699,5 @@ class _FlutterContactsExampleState extends State<FlutterContactsExample> {
       },
     );
   }
+
 }

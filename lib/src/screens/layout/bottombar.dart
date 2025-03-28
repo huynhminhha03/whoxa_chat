@@ -27,6 +27,7 @@ import 'package:whoxachat/src/global/global.dart';
 import 'package:whoxachat/src/global/strings.dart';
 import 'package:whoxachat/src/screens/chat/chats.dart';
 import 'package:whoxachat/src/screens/layout/contact_new.dart';
+import 'package:whoxachat/src/screens/layout/friend_list.dart';
 import 'package:whoxachat/src/screens/layout/story/stroy.dart';
 import 'package:whoxachat/src/screens/user/profile.dart';
 import 'package:whoxachat/src/screens/calllist/call_list.dart';
@@ -81,7 +82,8 @@ class _TabbarScreenState extends State<TabbarScreen>
           widget.currentPage = const call_history();
           break;
         case 3:
-          widget.currentPage = FlutterContactsExample(isValue: false);
+          // widget.currentPage = FlutterContactsExample(isValue: false);
+          widget.currentPage = FlutterContactsExample2(isValue: false);
 
           break;
 

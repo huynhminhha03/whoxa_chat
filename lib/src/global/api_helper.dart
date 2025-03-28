@@ -13,7 +13,7 @@ static const String baseUrlIp = '103.124.93.27'; //here server IP to connect web
   String userCreateProfile = "$baseUrl/user-details";
   String userNameCheck = "$baseUrl/check-user-name";
   String getAllContact = "$baseUrl/get-all-available-contacts";
-  String addContact = "$baseUrl/add-contact-name";
+  // String addContact = "$baseUrl/add-contact-name";
   String sendChatMsg = "$baseUrl/send-message";
   String deleteChatMsg = "$baseUrl/delete-messages";
   String getOnetoOneMedia = "$baseUrl/get-one-to-one-media";
@@ -47,6 +47,15 @@ static const String baseUrlIp = '103.124.93.27'; //here server IP to connect web
   String getAppSettings = '$baseUrl/get-settings';
   String getReportTypesList = '$baseUrl/Report-type-list';
   String reportUser = '$baseUrl/report-user';
+
+  //api for add friend
+  String addFriend = '$baseUrl/add-friend';
+  String checkAddFriend= '$baseUrl/check-add-friend';
+  String friendList = '$baseUrl/list-friend';
+  String countFriendRequests = '$baseUrl/count-friend-request';
+  String deleteFriend= '$baseUrl//delete-friend';
+  String getFriendRequests = '$baseUrl/get-friend-request';
+  String respondFriendRequest= '$baseUrl/friend-request/respond';
 
   static const String staticBaseUrl = 'https://your-domain-name/api';
 
