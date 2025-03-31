@@ -206,7 +206,8 @@ class _FlutterContactsExample2State extends State<FlutterContactsExample2> {
                               clipBehavior:
                                   Clip.none, // Để không bị cắt phần số lượng
                               children: [
-                                Icon(Icons.person_add, color: chatColor),
+                                Icon(Icons.person_add,
+                                    color: chatownColor),
                                 if (countFriendRequests > 0)
                                   Positioned(
                                     right: -2, // Dịch ra ngoài một chút cho đẹp
@@ -332,7 +333,7 @@ class _FlutterContactsExample2State extends State<FlutterContactsExample2> {
                   title: Text("${friend['first_name']} ${friend['last_name']}"),
                   subtitle: Text(friend['phone_number']),
                   trailing: IconButton(
-                    icon: Icon(Icons.message, color: chatColor, size: 24),
+                    icon: Icon(Icons.message, color: chatownColor, size: 24),
                     onPressed: () {
                       openOrCreateChat(friend);
                     },
@@ -388,7 +389,7 @@ class _FlutterContactsExample2State extends State<FlutterContactsExample2> {
       var uri = Uri.parse(apiHelper.friendList);
 
       final response = await http.post(
-         uri,// API lấy danh sách bạn bè
+        uri, // API lấy danh sách bạn bè
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ${Hive.box(userdata).get(authToken)}',

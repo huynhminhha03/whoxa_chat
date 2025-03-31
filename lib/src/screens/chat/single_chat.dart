@@ -5908,7 +5908,7 @@ class _SingleChatMsgState extends State<SingleChatMsg> {
                         data.isStarMessage != false
                             ? Image.asset("assets/images/star-slash.png",
                                 color: chatColor, height: 18)
-                            : Image.asset("assets/images/starUnfill.png",
+                            : Image.asset("assets/images/star.png",
                                 color: chatColor, height: 18),
                         const SizedBox(width: 10),
                         Text(

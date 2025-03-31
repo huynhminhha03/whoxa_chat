@@ -369,7 +369,7 @@ class _TabbarScreenState extends State<TabbarScreen>
                               children: [
                                 Image(
                                         image: const AssetImage(
-                                            "assets/icons/chat_s.png"),
+                                            "assets/icons/chat_s1.png"),
                                         color: chatownColor,
                                         width: 20)
                                     .paddingOnly(
@@ -377,17 +377,17 @@ class _TabbarScreenState extends State<TabbarScreen>
                                 ),
                                 const Image(
                                         image: AssetImage(
-                                            'assets/images/message-text.png'),
+                                            'assets/images/message-text1.png'),
                                         color: appColorBlack,
                                         width: 24)
-                                    .paddingOnly(left: 1.3),
+                                    // .paddingOnly(left: 1.3),
                               ],
                             ),
                           ),
                           label: languageController.textTranslate('Chat'))
                       : BottomNavigationBarItem(
                           icon: const Image(
-                            image: AssetImage('assets/images/message-text.png'),
+                            image: AssetImage('assets/images/message-text1.png'),
                             width: 24,
                             color: chatColor,
                           ),
@@ -410,17 +410,17 @@ class _TabbarScreenState extends State<TabbarScreen>
                                 ),
                                 const Image(
                                         image: AssetImage(
-                                            'assets/images/status2.png'),
+                                            'assets/images/status3.png'),
                                         color: appColorBlack,
                                         width: 24)
-                                    .paddingOnly(left: 1.3),
+                                    // .paddingOnly(left: 1.3),
                               ],
                             ),
                           ),
                           label: languageController.textTranslate('Status'))
                       : BottomNavigationBarItem(
                           icon: const Image(
-                              image: AssetImage('assets/images/status2.png'),
+                              image: AssetImage('assets/images/status3.png'),
                               width: 24,
                               color: chatColor),
                           label: languageController.textTranslate('Status')),
@@ -445,7 +445,7 @@ class _TabbarScreenState extends State<TabbarScreen>
                                             'assets/images/call_1.png'),
                                         color: appColorBlack,
                                         width: 24)
-                                    .paddingOnly(left: 1.3),
+                                    // .paddingOnly(left: 1.3),
                               ],
                             ),
                           ),
@@ -472,7 +472,8 @@ class _TabbarScreenState extends State<TabbarScreen>
                                         width: 20)
                                     .paddingOnly(
                                   top: 6,
-                                ),
+                                )
+                                ,
                                 const Image(
                                         image: AssetImage(
                                             'assets/images/contacts.png'),
@@ -508,17 +509,17 @@ class _TabbarScreenState extends State<TabbarScreen>
                                 ),
                                 const Image(
                                         image: AssetImage(
-                                            'assets/images/setting.png'),
+                                            'assets/images/setting1.png'),
                                         color: appColorBlack,
                                         width: 24)
-                                    .paddingOnly(left: 1.3),
+                                    // .paddingOnly(left: 1.3),
                               ],
                             ),
                           ),
                           label: languageController.textTranslate('Profile'))
                       : BottomNavigationBarItem(
                           icon: const Image(
-                            image: AssetImage('assets/images/setting.png'),
+                            image: AssetImage('assets/images/setting1.png'),
                             width: 24,
                             color: Colors.black,
                           ),

@@ -497,7 +497,7 @@ class _ProfileState extends State<Profile> {
             onTap: () {
               chooseLanguage();
             },
-            image: 'assets/images/language-square.png',
+            image: 'assets/images/language-icon.png',
             title: languageController.textTranslate("App Language"),
             about: '',
           ),
@@ -511,7 +511,7 @@ class _ProfileState extends State<Profile> {
                   // subject: 'Check out this website',
                 );
               },
-              image: 'assets/images/share2.png',
+              image: 'assets/images/share1.png',
               title: languageController.textTranslate('Share a link'),
               about: ''),
           const SizedBox(height: 10),
